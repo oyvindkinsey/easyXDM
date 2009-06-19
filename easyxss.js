@@ -208,7 +208,7 @@ var EasyXSS = {
         };
     },
     createHashTransport: function(config){
-        var MESSAGE_SEPARATOR = "§";
+        var MESSAGE_SEPARATOR = "\\";
         var _timer = null;
         var _lastMsg = "#start", _msgNr = 0;
         var _listenerWindow, _callerWindow;
