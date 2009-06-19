@@ -32,6 +32,7 @@ THE SOFTWARE.
         	 * It can also run XHR-queries the local domain that can be returned to the other side of the proxy.
         	 */
             var proxy;
+			var win;
             window.onload = function(){
                 /*Example using transport directly, this only supports string messages
                 proxy = XSS.createTransport({
@@ -47,7 +48,12 @@ THE SOFTWARE.
 				
                 proxy = EasyXSS.createProxy({
                     onData: function(data, origin){
-                        alert("to " + location.host + " from " + origin);
+						win= window.open();
+						win.document.write("data from '" + origin +"'<br/>");
+						for (key in data){
+							win.document.write(key+"="+data[key]+"<br/>");
+						}
+						win.document.close();
                     },
                     converter: EasyXSS.converters.hashTableConverter,
                     onReady: function(){

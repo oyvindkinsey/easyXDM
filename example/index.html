@@ -60,7 +60,14 @@ THE SOFTWARE.
                  */
                 proxy = EasyXSS.createProxy({
                     onData: function(data, origin){
-                        alert("to " + location.host + " from " + origin);
+						var div=document.createElement("div");
+						div.innerHTML="data from '"+origin+"'";
+						document.body.appendChild(div);
+                        for (key in data){
+						var div=document.createElement("div");
+						div.innerHTML=key+"="+data[key];
+						document.body.appendChild(div);
+						}
                     },
                     converter: EasyXSS.converters.hashTableConverter,
                     channel: "channel",
