@@ -180,20 +180,20 @@ var EasyXSS = {
                 config.onMessage(event.data, origin);
             }
         }
-        
+        function _onReady(){
+            if (config.onReady) {
+                window.setTimeout(config.onReady, 300);
+            }
+        }
         if (config.local) {
             _listeningWindow = xss.createFrame(config.remote + "?endpoint=" + config.local + "&channel=" + config.channel, "", function(win){
                 _windowPostMessage = win.postMessage;
-                if (config.onReady) {
-                    config.onReady();
-                }
+                _onReady();
             });
         }
         else {
             _windowPostMessage = window.parent.postMessage;
-            if (config.onReady) {
-                config.onReady();
-            }
+            _onReady();
         }
         xss.addEventListener(window, "message", _window_onMessage);
         return {
