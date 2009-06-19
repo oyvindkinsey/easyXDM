@@ -35,12 +35,6 @@ THE SOFTWARE.
             
             function proxyOnReady(){
                 proxy.start();
-                proxy.sendData({
-                    a: "b",
-                    c: "d",
-                    e: "f"
-                });
-                
             }
             
             window.onload = function(){
@@ -80,5 +74,6 @@ THE SOFTWARE.
         </script>
     </head>
     <body>
+	<input type="button" onclick="proxy.sendData({a:'b',c:'d',e:'f'});" value="send data to remote"/>
     </body>
 </html>

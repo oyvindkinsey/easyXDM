@@ -49,20 +49,20 @@ THE SOFTWARE.
                 proxy = EasyXSS.createProxy({
                     onData: function(data, origin){
 						win= window.open();
+						if (!win){
+							alert("You need to allow popups for this domain for this example to work");
+						}else{
 						win.document.write("data from '" + origin +"'<br/>");
 						for (key in data){
 							win.document.write(key+"="+data[key]+"<br/>");
 						}
+						win.document.write('<input type="button" onclick="window.opener.proxy.sendData({a:\'b\',c:\'d\',e:\'f\'});" value="Send data to local"/>');
 						win.document.close();
+						}
                     },
                     converter: EasyXSS.converters.hashTableConverter,
                     onReady: function(){
                         proxy.start();
-                        proxy.sendData({
-                            a: "b",
-                            c: "d",
-                            e: "f"
-                        });
                     }
                 });
             }
