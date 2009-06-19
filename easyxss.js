@@ -123,8 +123,8 @@ var EasyXSS = {
             config.channel = query["channel"];
             config.remote = query["endpoint"];
         }
-        if (window.postMessage || window.document.postMessage) {
-            return this.createHashTransport(config);
+        if (window.postMessage) {
+			//need to check here if it 'really' supports postMessge
             return this.createPostMessageTransport(config);
         }
         else {
