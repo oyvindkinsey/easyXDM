@@ -23,7 +23,7 @@ THE SOFTWARE.
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <title>EasyXSS Hosting window</title>
-        <script type="text/javascript" src="http://xssremote/xssproviders.js">
+        <script type="text/javascript" src="../easyxss.js">
         </script>
         <script type="text/javascript">
             /* This window will create a proxy to different domain.
@@ -64,8 +64,8 @@ THE SOFTWARE.
                     },
                     converter: EasyXSS.converters.hashTableConverter,
                     channel: "channel",
-                    local: location.protocol + "//" + location.host + "/hash.html",
-                    remote: "http://xssremote/remote.html",
+                    local: location.protocol + "//" + location.host + "/projects/easyxss/example/hash.html",
+                    remote: "http://xssremote.kinsey.no/projects/easyxss/example/remote.html",
                     onReady: proxyOnReady
                 });
                 
