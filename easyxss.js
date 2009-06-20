@@ -209,7 +209,6 @@ var EasyXSS = {
             config.channel = query["channel"];
             config.remote = query["endpoint"];
         }
-        return this.createHashTransport(config);
         if (window.postMessage) {
             // We need to check here if it 'really' supports postMessage
             // Safari is unable to post messages to an iframe
