@@ -25,7 +25,11 @@ THE SOFTWARE.
         <title>EasyXSS Hosting window</title>
         <script type="text/javascript" src="../easyxss.js">
         </script>
+        <script type="text/javascript" src="/json2.js">
+        </script>
         <script type="text/javascript">
+			if (typeof console==="undefined"){window.console={log:function(){}};}
+			console.log(location + " load");
             /* This window will create a proxy to different domain.
              * The remote side of the proxy can be used to run XHR-requests or can open
              * a window with window.open so that the user has two windows from two domains
@@ -52,7 +56,7 @@ THE SOFTWARE.
                     }
                 });
                  */
-                proxy = EasyXSS.createProxy({
+                proxy = EasyXSS.createChannel({
                     onData: function(data, origin){
 						var div=document.createElement("div");
 						div.innerHTML="data from '"+origin+"'";
@@ -63,7 +67,7 @@ THE SOFTWARE.
 						document.body.appendChild(div);
 						}
                     },
-                    converter: EasyXSS.converters.hashTableConverter,
+                    converter: EasyXSS.converters.json2Converter,
                     channel: "channel",
                     local: location.protocol + "//" + location.host + "/projects/easyxss/example/hash.html",
                     remote: "http://xssremote.kinsey.no/projects/easyxss/example/remote.html",
