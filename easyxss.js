@@ -175,7 +175,7 @@ var EasyXSS = {
         /// <param name="event" type="string">The eventname</param>
         /// <param name="handler" type="function">The handler to attach</param>
         if (window.addEventListener) {
-            element.addEventListener(event, handler, false);
+			element.addEventListener(event, handler, false);
         }
         else {
             element.attachEvent("on" + event, handler);
@@ -210,8 +210,6 @@ var EasyXSS = {
             config.remote = query["endpoint"];
         }
         if (window.postMessage) {
-            // We need to check here if it 'really' supports postMessage
-            // Safari is unable to post messages to an iframe
             return this.createPostMessageTransport(config);
         }
         else {
@@ -254,7 +252,7 @@ var EasyXSS = {
         var _targetOrigin = xss.getLocation(config.remote);
         var _windowPostMessage;
         var _isStarted, _isReady;
-        
+        var _callerWindow;
         function _getOrigin(event){
             /// <summary>
             /// The origin property should be valid, but some clients
@@ -283,6 +281,7 @@ var EasyXSS = {
             /// </summary
             /// <param name="event" type="MessageEvent">The eventobject from the browser</param>
             var origin = _getOrigin(event);
+			//alert(location.host +","+origin)
             if (origin == _targetOrigin) {
                 config.onMessage(event.data, origin);
             }
@@ -301,22 +300,24 @@ var EasyXSS = {
         }
         
         if (config.local) {
-            _listeningWindow = xss.createFrame(config.remote + "?endpoint=" + config.local + "&channel=" + config.channel, "", function(win){
-                _windowPostMessage = win.postMessage;
+            _callerWindow = xss.createFrame(config.remote + "?endpoint=" + config.local + "&channel=" + config.channel, "", function(win){
                 _onReady();
             });
         }
         else {
-            _windowPostMessage = window.parent.postMessage;
             _onReady();
         }
-        xss.addEventListener(window, "message", _window_onMessage);
+		xss.addEventListener(window, "message", _window_onMessage);
         return {
             postMessage: function(message){
                 /// <summary>
                 /// Sends the message using the bound window object
                 /// </summary
-                _windowPostMessage(message, _targetOrigin);
+				if (config.local){
+					_callerWindow.contentWindow.postMessage(message,_targetOrigin);
+				}else{
+					window.parent.postMessage(message,_targetOrigin);
+				}
             },
             start: function(){
                 //No-op
