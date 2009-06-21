@@ -43,8 +43,6 @@ THE SOFTWARE.
             
             window.onload = function(){
                 proxy = EasyXSS.createChannel({
-                    onData: async.onData,
-                    converter: EasyXSS.converters.json2Converter,
                     onReady: function(){
                         async.setChannel(proxy);
                         proxy.start();

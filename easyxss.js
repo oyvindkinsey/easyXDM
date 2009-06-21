@@ -25,32 +25,36 @@ var EasyXSS = {
         var _callbacks = {};
         var _concrete;
         var _channel;
+        
+        function _onData(data, origin){
+            /// <summary>
+            /// Receives either a request or a response from the other
+            /// end of the channel
+            /// </summary>
+            /// <param name="data" type="object">The request/repsonse</param>
+            if (data.name) {
+                var response = {
+                    id: data.id,
+                    response: _concrete[data.name].apply(null, data.params)
+                };
+                _channel.sendData(response);
+            }
+            else {
+                var fn = _callbacks[data.id]
+                fn(data.response);
+                delete _callbacks[data.id];
+            }
+        }
+        
         return {
-            onData: function(data, origin){
-                /// <summary>
-                /// Receives either a request or a response from the other
-                /// end of the channel
-                /// </summary>
-                /// <param name="data" type="object">The request/repsonse</param>
-                if (data.name) {
-                    var response = {
-                        id: data.id,
-                        response: _concrete[data.name].apply(null, data.params)
-                    };
-                    _channel.sendData(response);
-                }
-                else {
-                    var fn = _callbacks[data.id]
-                    fn(data.response);
-                    delete _callbacks[data.id];
-                }
-            },
             setChannel: function(channel){
                 /// <summary>
                 /// Set the channel to be used as transport
                 /// <summary
                 /// <param name="channel" type="EasyXSS.Transport"/>
                 _channel = channel;
+                _channel.setOnData(_onData);
+                _channel.setConverter(EasyXSS.converters.json2Converter);
             },
             setConcrete: function(concrete){
                 /// <summary>
@@ -304,6 +308,18 @@ var EasyXSS = {
             sendData: (config.converter) ? (function(data){
                 this.transport.postMessage(config.converter.convertToString(data));
             }) : transport.sendMessage,
+            setOnData: function(onData){
+                config.onData = onData;
+            },
+            setConverter: function(converter){
+                config.converter = converter;
+                this.sendData = function(data){
+                    this.transport.postMessage(config.converter.convertToString(data));
+                };
+                config.onMessage = function(message, origin){
+                    this.onData(this.converter.convertFromString(message), origin);
+                }
+            },
             start: transport.start,
             stop: transport.stop
         };

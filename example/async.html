@@ -41,8 +41,6 @@ THE SOFTWARE.
             
             window.onload = function(){
                 proxy = EasyXSS.createChannel({
-                    onData: async.onData,
-                    converter: EasyXSS.converters.json2Converter,
                     channel: "channel",
                     local: location.protocol + "//" + location.host + "/projects/easyxss/example/hash.html",
                     remote: "http://xssremote.kinsey.no/projects/easyxss/example/asyncremote.html",
