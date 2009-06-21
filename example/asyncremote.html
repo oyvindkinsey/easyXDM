@@ -33,11 +33,18 @@ THE SOFTWARE.
             var proxy;
             var async = EasyXSS.createAsync();
             async.setConcrete({
-                addNumbers: function(a, b){
-                    return a + b;
+                addNumbers: {
+                    method: function(a, b){
+                        return a + b;
+                    }
                 },
-                multiplyNumbers: function(a, b){
-                    return a * b;
+                multiplyNumbers: {
+                    async: true,
+                    method: function(a, b, fn){
+                        window.setTimeout(function(){
+                            fn(a * b);
+                        }, 5000);
+                    }
                 }
             });
             

@@ -65,6 +65,14 @@ THE SOFTWARE.
         </script>
     </head>
     <body>
-        <input type="button" onclick="add(3,5)" value="call addNumbers on remote domain"/><input type="button" onclick="multiply(3,5)" value="call multiplyNumbers on remote domain"/>
+        The remote implementation is synchronous and will return immediately
+        <br/>
+        <input type="button" onclick="add(3,5)" value="call addNumbers on remote domain"/>
+        <br/>
+        <br/>
+        The remote implementation of multiplyNumbers is asynchronous and will return after 5seconds
+        <br/>
+        This shows that you can use async calls in the remote method, eg. XHR calls<br/>
+		<input type="button" onclick="multiply(3,5)" value="call multiplyNumbers on remote domain"/>
     </body>
 </html>

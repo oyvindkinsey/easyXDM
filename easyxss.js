@@ -33,11 +33,23 @@ var EasyXSS = {
             /// </summary>
             /// <param name="data" type="object">The request/repsonse</param>
             if (data.name) {
-                var response = {
-                    id: data.id,
-                    response: _concrete[data.name].apply(null, data.params)
-                };
-                _channel.sendData(response);
+                var method = _concrete[data.name];
+                if (method.async) {
+                    data.params.push(function(result){
+                        _channel.sendData({
+                            id: data.id,
+                            response: result
+                        });
+                    });
+                    method.method.apply(null, data.params)
+                }
+                else {
+                    var response = {
+                        id: data.id,
+                        response: method.method.apply(null, data.params)
+                    };
+                    _channel.sendData(response);
+                }
             }
             else {
                 var fn = _callbacks[data.id]
