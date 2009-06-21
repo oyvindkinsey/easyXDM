@@ -36,26 +36,10 @@ THE SOFTWARE.
              * that are able to communicate.
              */
             var proxy;
+            var async = EasyXSS.createAsync();
+            var remote = async.createConcrete(["addNumbers", "multiplyNumbers"]);
             
             window.onload = function(){
-                /*Example using transport directly, this only supports string messages
-                 proxy = XSS.createTransport({
-                 onMessage: function(message, origin){
-                 alert(location.host + " Got message '" + message + "' from " + origin)
-                 },
-                 channel: "channel",
-                 local: location.protocol + "//" + location.host + "/hash.html",
-                 remote: "http://xssremote.com/remote.html",
-                 onReady: function(){
-                 proxy.start();
-                 proxy.sendMessage("abcdefg");
-                 }
-                 });
-                 */
-                var async = EasyXSS.createAsync();
-                
-                var remote = async.createConcrete(["addNumbers", "multiplyNumbers"]);
-                
                 proxy = EasyXSS.createChannel({
                     onData: async.onData,
                     converter: EasyXSS.converters.json2Converter,
@@ -65,21 +49,24 @@ THE SOFTWARE.
                     onReady: function(){
                         async.setChannel(proxy);
                         proxy.start();
-                        
-                        
-                        remote.addNumbers(3, 5, function(result){
-                            alert("3 + 5 = " + result);
-                        });
-                        remote.multiplyNumbers(3, 5, function(result){
-                            alert("3 x 5 = " + result);
-                        })
                     }
                 });
                 
             }
+            function add(a, b){
+                remote.addNumbers(a, b, function(result){
+                    alert(a + " + " + b + " = " + result);
+                });
+            }
+            
+            function multiply(a, b){
+                remote.multiplyNumbers(a, b, function(result){
+                    alert(a + " x " + b + " = " + result);
+                })
+            }
         </script>
     </head>
     <body>
-        <input type="button" onclick="proxy.sendData({a:'b',c:'d',e:'f'});" value="send data to remote"/>
+        <input type="button" onclick="add(3,5)" value="call addNumbers on remote domain"/><input type="button" onclick="multiply(3,5)" value="call multiplyNumbers on remote domain"/>
     </body>
 </html>
