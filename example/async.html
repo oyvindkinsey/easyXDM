@@ -52,23 +52,27 @@ THE SOFTWARE.
                  }
                  });
                  */
+                var async = EasyXSS.createAsync();
+                
+                var remote = async.createConcrete(["addNumbers", "multiplyNumbers"]);
+                
                 proxy = EasyXSS.createChannel({
-                    onData: function(data, origin){
-                        var div = document.createElement("div");
-                        div.innerHTML = "data from '" + origin + "'";
-                        document.body.appendChild(div);
-                        for (key in data) {
-                            var div = document.createElement("div");
-                            div.innerHTML = key + "=" + data[key];
-                            document.body.appendChild(div);
-                        }
-                    },
+                    onData: async.onData,
                     converter: EasyXSS.converters.json2Converter,
                     channel: "channel",
                     local: location.protocol + "//" + location.host + "/projects/easyxss/example/hash.html",
-                    remote: "http://xssremote.kinsey.no/projects/easyxss/example/remote.html",
+                    remote: "http://xssremote.kinsey.no/projects/easyxss/example/asyncremote.html",
                     onReady: function(){
+                        async.setChannel(proxy);
                         proxy.start();
+                        
+                        
+                        remote.addNumbers(3, 5, function(result){
+                            alert("3 + 5 = " + result);
+                        });
+                        remote.multiplyNumbers(3, 5, function(result){
+                            alert("3 x 5 = " + result);
+                        })
                     }
                 });
                 

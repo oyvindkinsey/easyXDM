@@ -18,7 +18,7 @@ THE SOFTWARE.
 --> <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
-        <title>EasyXSS Hosting window</title>
+        <title>EasyXSS Hosted window</title>
         <script type="text/javascript" src="../easyxss.js">
         </script>
         <script type="text/javascript" src="/json2.js">
@@ -30,52 +30,29 @@ THE SOFTWARE.
                     }
                 };
             }
-            /* This window will create a proxy to different domain.
-             * The remote side of the proxy can be used to run XHR-requests or can open
-             * a window with window.open so that the user has two windows from two domains
-             * that are able to communicate.
-             */
             var proxy;
+            var async = EasyXSS.createAsync();
+            async.setConcrete({
+                addNumbers: function(a, b){
+                    return a + b;
+                },
+                multiplyNumbers: function(a, b){
+                    return a * b;
+                }
+            });
             
             window.onload = function(){
-                /*Example using transport directly, this only supports string messages
-                 proxy = XSS.createTransport({
-                 onMessage: function(message, origin){
-                 alert(location.host + " Got message '" + message + "' from " + origin)
-                 },
-                 channel: "channel",
-                 local: location.protocol + "//" + location.host + "/hash.html",
-                 remote: "http://xssremote.com/remote.html",
-                 onReady: function(){
-                 proxy.start();
-                 proxy.sendMessage("abcdefg");
-                 }
-                 });
-                 */
                 proxy = EasyXSS.createChannel({
-                    onData: function(data, origin){
-                        var div = document.createElement("div");
-                        div.innerHTML = "data from '" + origin + "'";
-                        document.body.appendChild(div);
-                        for (key in data) {
-                            var div = document.createElement("div");
-                            div.innerHTML = key + "=" + data[key];
-                            document.body.appendChild(div);
-                        }
-                    },
+                    onData: async.onData,
                     converter: EasyXSS.converters.json2Converter,
-                    channel: "channel",
-                    local: location.protocol + "//" + location.host + "/projects/easyxss/example/hash.html",
-                    remote: "http://xssremote.kinsey.no/projects/easyxss/example/remote.html",
                     onReady: function(){
+                        async.setChannel(proxy);
                         proxy.start();
                     }
                 });
-                
             }
         </script>
     </head>
     <body>
-        <input type="button" onclick="proxy.sendData({a:'b',c:'d',e:'f'});" value="send data to remote"/>
     </body>
 </html>

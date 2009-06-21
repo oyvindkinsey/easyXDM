@@ -17,6 +17,75 @@
  THE SOFTWARE.
  */
 var EasyXSS = {
+    createAsync: function(){
+        /// <summary>
+        /// Creates an object able to proxy method calls over the channel
+        /// </summary>
+        var _callbackCounter = 0;
+        var _callbacks = {};
+        var _concrete;
+        var _channel;
+        return {
+            onData: function(data, origin){
+                /// <summary>
+                /// Receives either a request or a response from the other
+                /// end of the channel
+                /// </summary>
+                /// <param name="data" type="object">The request/repsonse</param>
+                if (data.name) {
+                    var response = {
+                        id: data.id,
+                        response: _concrete[data.name].apply(null, data.params)
+                    };
+                    _channel.sendData(response);
+                }
+                else {
+                    var fn = _callbacks[data.id]
+                    fn(data.response);
+                    delete _callbacks[data.id];
+                }
+            },
+            setChannel: function(channel){
+                /// <summary>
+                /// Set the channel to be used as transport
+                /// <summary
+                /// <param name="channel" type="EasyXSS.Transport"/>
+                _channel = channel;
+            },
+            setConcrete: function(concrete){
+                /// <summary>
+                /// Register the concrete implementation of the interface
+                /// </summary>
+                /// <param name="concrete" type="object">A hashtable containing the methods</param>
+                _concrete = concrete;
+            },
+            createConcrete: function(methods){
+                /// <summary>
+                /// Creates a proxy to the methods located on the other end of the channel
+                /// <summary>
+                /// <param name="abstract" type="Array">A list of method names</param>
+                var concrete = {};
+                for (var i = 0, len = methods.length; i < len; i++) {
+                    var name = methods[i];
+                    concrete[name] = (function(name){
+                        return (function(){
+                            _callbacks["" + (_callbackCounter)] = arguments[arguments.length - 1];
+                            var request = {
+                                name: name,
+                                id: (_callbackCounter++),
+                                params: []
+                            };
+                            for (var i = 0, len = arguments.length - 1; i < len; i++) {
+                                request.params[i] = arguments[i];
+                            }
+                            _channel.sendData(request);
+                        });
+                    })(name);
+                }
+                return concrete;
+            }
+        };
+    },
     onReadyCallbacks: { //     
         /// <summary>
         /// Hashtable for storing callbacks when using hashTransport
@@ -175,7 +244,7 @@ var EasyXSS = {
         /// <param name="event" type="string">The eventname</param>
         /// <param name="handler" type="function">The handler to attach</param>
         if (window.addEventListener) {
-			element.addEventListener(event, handler, false);
+            element.addEventListener(event, handler, false);
         }
         else {
             element.attachEvent("on" + event, handler);
@@ -281,7 +350,7 @@ var EasyXSS = {
             /// </summary
             /// <param name="event" type="MessageEvent">The eventobject from the browser</param>
             var origin = _getOrigin(event);
-			//alert(location.host +","+origin)
+            //alert(location.host +","+origin)
             if (origin == _targetOrigin) {
                 config.onMessage(event.data, origin);
             }
@@ -307,17 +376,18 @@ var EasyXSS = {
         else {
             _onReady();
         }
-		xss.addEventListener(window, "message", _window_onMessage);
+        xss.addEventListener(window, "message", _window_onMessage);
         return {
             postMessage: function(message){
                 /// <summary>
                 /// Sends the message using the bound window object
                 /// </summary
-				if (config.local){
-					_callerWindow.contentWindow.postMessage(message,_targetOrigin);
-				}else{
-					window.parent.postMessage(message,_targetOrigin);
-				}
+                if (config.local) {
+                    _callerWindow.contentWindow.postMessage(message, _targetOrigin);
+                }
+                else {
+                    window.parent.postMessage(message, _targetOrigin);
+                }
             },
             start: function(){
                 //No-op
