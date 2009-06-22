@@ -45,7 +45,13 @@ THE SOFTWARE.
                             fn(a * b);
                         }, 5000);
                     }
-                }
+                },
+				noOp:{
+					isVoid:true,
+					method:function(){
+						console.log("no op");
+					}
+				}
             });
             
             window.onload = function(){

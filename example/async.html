@@ -37,7 +37,13 @@ THE SOFTWARE.
              */
             var proxy;
             var async = EasyXSS.createAsync();
-            var remote = async.createConcrete(["addNumbers", "multiplyNumbers"]);
+            var remote = async.createConcrete({
+                addNumbers: {},
+                multiplyNumbers: {},
+                noOp: {
+                    iVoid: true
+                }
+            })
             
             window.onload = function(){
                 proxy = EasyXSS.createChannel({
@@ -72,7 +78,12 @@ THE SOFTWARE.
         <br/>
         The remote implementation of multiplyNumbers is asynchronous and will return after 5seconds
         <br/>
-        This shows that you can use async calls in the remote method, eg. XHR calls<br/>
-		<input type="button" onclick="multiply(3,5)" value="call multiplyNumbers on remote domain"/>
+        This shows that you can use async calls in the remote method, eg. XHR calls
+        <br/>
+        <input type="button" onclick="multiply(3,5)" value="call multiplyNumbers on remote domain"/>
+		<br/>
+		<br/>
+		This calls a non-returning method on the remote side<br/>
+		<input type="button" onclick="remote.noOp()" value="call noOp on the remote domain"/>
     </body>
 </html>

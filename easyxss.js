@@ -34,7 +34,7 @@ var EasyXSS = {
             /// <param name="data" type="object">The request/repsonse</param>
             if (data.name) {
                 var method = _concrete[data.name];
-                if (method.async) {
+                if (method.async & !method.isVoid) {
                     data.params.push(function(result){
                         _channel.sendData({
                             id: data.id,
@@ -44,11 +44,16 @@ var EasyXSS = {
                     method.method.apply(null, data.params)
                 }
                 else {
-                    var response = {
-                        id: data.id,
-                        response: method.method.apply(null, data.params)
-                    };
-                    _channel.sendData(response);
+                    if (method.isVoid) {
+                        method.method.apply(null, data.params)
+                    }
+                    else {
+                        var response = {
+                            id: data.id,
+                            response: method.method.apply(null, data.params)
+                        };
+                        _channel.sendData(response);
+                    }
                 }
             }
             else {
@@ -81,22 +86,34 @@ var EasyXSS = {
                 /// <summary>
                 /// <param name="abstract" type="Array">A list of method names</param>
                 var concrete = {};
-                for (var i = 0, len = methods.length; i < len; i++) {
-                    var name = methods[i];
+                var definition;
+                for (name in methods) {
+                    definition = methods[name];
                     concrete[name] = (function(name){
-                        return (function(){
-                            _callbacks["" + (_callbackCounter)] = arguments[arguments.length - 1];
-                            var request = {
-                                name: name,
-                                id: (_callbackCounter++),
-                                params: []
-                            };
-                            for (var i = 0, len = arguments.length - 1; i < len; i++) {
-                                request.params[i] = arguments[i];
-                            }
-                            _channel.sendData(request);
-                        });
+                        if (definition.isVoid) {
+                            return (function(){
+                                _channel.sendData({
+                                    name: name,
+                                    params: arguments
+                                });
+                            });
+                        }
+                        else {
+                            return (function(){
+                                _callbacks["" + (_callbackCounter)] = arguments[arguments.length - 1];
+                                var request = {
+                                    name: name,
+                                    id: (_callbackCounter++),
+                                    params: []
+                                };
+                                for (var i = 0, len = arguments.length - 1; i < len; i++) {
+                                    request.params[i] = arguments[i];
+                                }
+                                _channel.sendData(request);
+                            });
+                        }
                     })(name);
+                    
                 }
                 return concrete;
             }
