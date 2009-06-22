@@ -92,9 +92,13 @@ var EasyXSS = {
                     concrete[name] = (function(name){
                         if (definition.isVoid) {
                             return (function(){
+                                var params = [];
+                                for (var i = 0, len = arguments.length; i < len; i++) {
+                                    params[i] = arguments[i];
+                                }
                                 _channel.sendData({
                                     name: name,
-                                    params: arguments
+                                    params: params
                                 });
                             });
                         }
