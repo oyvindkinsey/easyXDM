@@ -35,36 +35,38 @@ THE SOFTWARE.
              * a window with window.open so that the user has two windows from two domains
              * that are able to communicate.
              */
-            var proxy;
-            var async = EasyXSS.createAsync();
-            var remote = async.createConcrete({
-                addNumbers: {},
-                multiplyNumbers: {},
-                noOp: {
-                    iVoid: true
-                }
-            })
+            var channel, interface;
             
             window.onload = function(){
-                proxy = EasyXSS.createChannel({
+                channel = EasyXSS.createChannel({
                     channel: "channel",
                     local: location.protocol + "//" + location.host + "/projects/easyxss/example/hash.html",
-                    remote: "http://xssremote.kinsey.no/projects/easyxss/example/asyncremote.html",
+                    remote: "http://xssremote.kinsey.no/projects/easyxss/example/remoteinterface.html",
                     onReady: function(){
-                        async.setChannel(proxy);
-                        proxy.start();
+                        interface = EasyXSS.createInterface({
+                            channel: channel,
+                            local: {},
+                            remote: {
+                                addNumbers: {},
+                                multiplyNumbers: {},
+                                noOp: {
+                                    iVoid: true
+                                }
+                            }
+                        })
+                        channel.start();
                     }
                 });
                 
             }
             function add(a, b){
-                remote.addNumbers(a, b, function(result){
+                interface.addNumbers(a, b, function(result){
                     alert(a + " + " + b + " = " + result);
                 });
             }
             
             function multiply(a, b){
-                remote.multiplyNumbers(a, b, function(result){
+                interface.multiplyNumbers(a, b, function(result){
                     alert(a + " x " + b + " = " + result);
                 })
             }
@@ -81,9 +83,10 @@ THE SOFTWARE.
         This shows that you can use async calls in the remote method, eg. XHR calls
         <br/>
         <input type="button" onclick="multiply(3,5)" value="call multiplyNumbers on remote domain"/>
-		<br/>
-		<br/>
-		This calls a non-returning method on the remote side<br/>
-		<input type="button" onclick="remote.noOp()" value="call noOp on the remote domain"/>
+        <br/>
+        <br/>
+        This calls a non-returning method on the remote side
+        <br/>
+        <input type="button" onclick="interface.noOp()" value="call noOp on the remote domain"/>
     </body>
 </html>

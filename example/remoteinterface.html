@@ -30,35 +30,37 @@ THE SOFTWARE.
                     }
                 };
             }
-            var proxy;
-            var async = EasyXSS.createAsync();
-            async.setConcrete({
-                addNumbers: {
-                    method: function(a, b){
-                        return a + b;
-                    }
-                },
-                multiplyNumbers: {
-                    async: true,
-                    method: function(a, b, fn){
-                        window.setTimeout(function(){
-                            fn(a * b);
-                        }, 5000);
-                    }
-                },
-				noOp:{
-					isVoid:true,
-					method:function(){
-						console.log("no op");
-					}
-				}
-            });
+            var channel, interface;
             
             window.onload = function(){
-                proxy = EasyXSS.createChannel({
+                channel = EasyXSS.createChannel({
                     onReady: function(){
-                        async.setChannel(proxy);
-                        proxy.start();
+                        interface = EasyXSS.createInterface({
+                            channel: channel,
+                            local: {
+                                addNumbers: {
+                                    method: function(a, b){
+                                        return a + b;
+                                    }
+                                },
+                                multiplyNumbers: {
+                                    async: true,
+                                    method: function(a, b, fn){
+                                        window.setTimeout(function(){
+                                            fn(a * b);
+                                        }, 5000);
+                                    }
+                                },
+                                noOp: {
+                                    isVoid: true,
+                                    method: function(){
+                                        console.log("no op");
+                                    }
+                                }
+                            },
+                            remote: {}
+                        });
+                        channel.start();
                     }
                 });
             }

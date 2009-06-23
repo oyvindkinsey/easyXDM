@@ -17,14 +17,15 @@
  THE SOFTWARE.
  */
 var EasyXSS = {
-    createAsync: function(){
+    createInterface: function(config){
         /// <summary>
-        /// Creates an object able to proxy method calls over the channel
+        /// Creates an interface that can be used to call methods implemented 
+        /// on the remote end of the channel, and also to provide the implementation
+        /// of methods to be called from the remote end.
         /// </summary>
-        var _callbackCounter = 0;
-        var _callbacks = {};
-        var _concrete;
-        var _channel;
+        var _callbackCounter = 0, _callbacks = {};
+        var _channel = config.channel;
+        var _local = (config.local) ? config.local : null;
         
         function _onData(data, origin){
             /// <summary>
@@ -33,95 +34,91 @@ var EasyXSS = {
             /// </summary>
             /// <param name="data" type="object">The request/repsonse</param>
             if (data.name) {
-                var method = _concrete[data.name];
-                if (method.async & !method.isVoid) {
+                // A method call from the remote end
+                var method = _local[data.name];
+                if (!method) {
+                    throw "The method " + data.name + " is not implemented.";
+                }
+                if (method.async) {
+					// The method is async, we need to add a callback
                     data.params.push(function(result){
+						// Send back the result
                         _channel.sendData({
                             id: data.id,
                             response: result
                         });
                     });
+					// Call local method
                     method.method.apply(null, data.params)
                 }
                 else {
                     if (method.isVoid) {
+						// Call local method 
                         method.method.apply(null, data.params)
                     }
                     else {
-                        var response = {
+						// Call local method and send back the response
+                        _channel.sendData({
                             id: data.id,
                             response: method.method.apply(null, data.params)
-                        };
-                        _channel.sendData(response);
+                        });
                     }
                 }
             }
             else {
-                var fn = _callbacks[data.id]
-                fn(data.response);
+				// A method response from the other end
+                _callbacks[data.id](data.response);
                 delete _callbacks[data.id];
             }
         }
         
-        return {
-            setChannel: function(channel){
-                /// <summary>
-                /// Set the channel to be used as transport
-                /// <summary
-                /// <param name="channel" type="EasyXSS.Transport"/>
-                _channel = channel;
-                _channel.setOnData(_onData);
-                _channel.setConverter(EasyXSS.converters.json2Converter);
-            },
-            setConcrete: function(concrete){
-                /// <summary>
-                /// Register the concrete implementation of the interface
-                /// </summary>
-                /// <param name="concrete" type="object">A hashtable containing the methods</param>
-                _concrete = concrete;
-            },
-            createConcrete: function(methods){
-                /// <summary>
-                /// Creates a proxy to the methods located on the other end of the channel
-                /// <summary>
-                /// <param name="abstract" type="Array">A list of method names</param>
-                var concrete = {};
-                var definition;
-                for (name in methods) {
-                    definition = methods[name];
-                    concrete[name] = (function(name){
-                        if (definition.isVoid) {
-                            return (function(){
-                                var params = [];
-                                for (var i = 0, len = arguments.length; i < len; i++) {
-                                    params[i] = arguments[i];
-                                }
-                                _channel.sendData({
-                                    name: name,
-                                    params: params
-                                });
+        function _createRemote(methods){
+            /// <summary>
+            /// Creates a proxy to the methods located on the other end of the channel
+            /// <summary>
+            /// <param name="methods" type="Object">A description of the interface to implement</param>
+            var concrete = {};
+            var definition;
+            for (name in methods) {
+                definition = methods[name];
+                concrete[name] = (function(name){
+                    if (definition.isVoid) {
+						// No need to register a callback
+                        return (function(){
+                            var params = [];
+                            for (var i = 0, len = arguments.length; i < len; i++) {
+                                params[i] = arguments[i];
+                            }
+							// Send the method request
+                            _channel.sendData({
+                                name: name,
+                                params: params
                             });
-                        }
-                        else {
-                            return (function(){
-                                _callbacks["" + (_callbackCounter)] = arguments[arguments.length - 1];
-                                var request = {
-                                    name: name,
-                                    id: (_callbackCounter++),
-                                    params: []
-                                };
-                                for (var i = 0, len = arguments.length - 1; i < len; i++) {
-                                    request.params[i] = arguments[i];
-                                }
-                                _channel.sendData(request);
-                            });
-                        }
-                    })(name);
-                    
-                }
-                return concrete;
+                        });
+                    }
+                    else {
+						// We need to extract and register the callback
+                        return (function(){
+                            _callbacks["" + (_callbackCounter)] = arguments[arguments.length - 1];
+                            var request = {
+                                name: name,
+                                id: (_callbackCounter++),
+                                params: []
+                            };
+                            for (var i = 0, len = arguments.length - 1; i < len; i++) {
+                                request.params[i] = arguments[i];
+                            }
+							// Send the method request
+                            _channel.sendData(request);
+                        });
+                    }
+                })(name);
             }
-        };
+            return concrete;
+        }
+        _channel.setOnData(_onData);
+        _channel.setConverter(EasyXSS.converters.json2Converter);
+        return _createRemote(config.remote);
     },
     onReadyCallbacks: { //     
         /// <summary>
