@@ -36,7 +36,6 @@ THE SOFTWARE.
              * that are able to communicate.
              */
             var channel, interface;
-            
             window.onload = function(){
                 channel = EasyXSS.createChannel({
                     channel: "channel",
@@ -53,12 +52,12 @@ THE SOFTWARE.
                                     iVoid: true
                                 }
                             }
-                        })
+                        });
                         channel.start();
                     }
                 });
-                
             }
+            
             function add(a, b){
                 interface.addNumbers(a, b, function(result){
                     alert(a + " + " + b + " = " + result);

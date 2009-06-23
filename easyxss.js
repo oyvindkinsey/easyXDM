@@ -40,24 +40,24 @@ var EasyXSS = {
                     throw "The method " + data.name + " is not implemented.";
                 }
                 if (method.async) {
-					// The method is async, we need to add a callback
+                    // The method is async, we need to add a callback
                     data.params.push(function(result){
-						// Send back the result
+                        // Send back the result
                         _channel.sendData({
                             id: data.id,
                             response: result
                         });
                     });
-					// Call local method
+                    // Call local method
                     method.method.apply(null, data.params)
                 }
                 else {
                     if (method.isVoid) {
-						// Call local method 
+                        // Call local method 
                         method.method.apply(null, data.params)
                     }
                     else {
-						// Call local method and send back the response
+                        // Call local method and send back the response
                         _channel.sendData({
                             id: data.id,
                             response: method.method.apply(null, data.params)
@@ -66,7 +66,7 @@ var EasyXSS = {
                 }
             }
             else {
-				// A method response from the other end
+                // A method response from the other end
                 _callbacks[data.id](data.response);
                 delete _callbacks[data.id];
             }
@@ -83,13 +83,13 @@ var EasyXSS = {
                 definition = methods[name];
                 concrete[name] = (function(name){
                     if (definition.isVoid) {
-						// No need to register a callback
+                        // No need to register a callback
                         return (function(){
                             var params = [];
                             for (var i = 0, len = arguments.length; i < len; i++) {
                                 params[i] = arguments[i];
                             }
-							// Send the method request
+                            // Send the method request
                             _channel.sendData({
                                 name: name,
                                 params: params
@@ -97,7 +97,7 @@ var EasyXSS = {
                         });
                     }
                     else {
-						// We need to extract and register the callback
+                        // We need to extract and register the callback
                         return (function(){
                             _callbacks["" + (_callbackCounter)] = arguments[arguments.length - 1];
                             var request = {
@@ -108,7 +108,7 @@ var EasyXSS = {
                             for (var i = 0, len = arguments.length - 1; i < len; i++) {
                                 request.params[i] = arguments[i];
                             }
-							// Send the method request
+                            // Send the method request
                             _channel.sendData(request);
                         });
                     }
@@ -118,7 +118,8 @@ var EasyXSS = {
         }
         _channel.setOnData(_onData);
         _channel.setConverter(EasyXSS.converters.json2Converter);
-        return _createRemote(config.remote);
+        
+        return (config.remote) ? _createRemote(config.remote) : null;
     },
     onReadyCallbacks: { //     
         /// <summary>
