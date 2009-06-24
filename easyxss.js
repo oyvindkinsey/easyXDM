@@ -455,6 +455,9 @@ var easyXSS = {
         var _timer = null;
         var _lastMsg = "#" + config.channel, _msgNr = 0;
         var _listenerWindow = (!config.local) ? window : null, _callerWindow;
+        if (config.local && config.local.substring(0, 1) == "/") {
+            config.local = location.protocol + "//" + location.host + config.local;
+        }
         var _remoteUrl = config.remote + ((config.local) ? "?endpoint=" + config.local + "&channel=" + config.channel : "#" + config.channel);
         var _remoteOrigin = this.getLocation(config.remote);
         var _pollInterval = (config.interval) ? config.interval : 300;
