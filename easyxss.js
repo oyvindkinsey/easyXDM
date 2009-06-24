@@ -420,6 +420,9 @@ var easyXSS = {
         }
         
         if (config.local) {
+            if (config.local.substring(0, 1) == "/") {
+                config.local = location.protocol + "//" + location.host + config.local;
+            }
             _callerWindow = xss.createFrame(config.remote + "?endpoint=" + config.local + "&channel=" + config.channel, "", function(win){
                 _onReady();
             });
