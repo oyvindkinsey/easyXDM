@@ -35,16 +35,14 @@ THE SOFTWARE.
              * a window with window.open so that the user has two windows from two domains
              * that are able to communicate.
              */
-            var channel, interface;
+            var channel, remote;
             window.onload = function(){
                 channel = EasyXSS.createChannel({
-                    channel: "channel",
                     local: location.protocol + "//" + location.host + "/projects/easyxss/example/hash.html",
                     remote: "http://xssremote.kinsey.no/projects/easyxss/example/remoteinterface.html",
                     onReady: function(){
-						interface = EasyXSS.createInterface({
+						remote = EasyXSS.createInterface({
                             channel: channel,
-                            local: {},
                             remote: {
                                 addNumbers: {},
                                 multiplyNumbers: {},
@@ -58,13 +56,13 @@ THE SOFTWARE.
             }
             
             function add(a, b){
-                interface.addNumbers(a, b, function(result){
+                remote.addNumbers(a, b, function(result){
                     alert(a + " + " + b + " = " + result);
                 });
             }
             
             function multiply(a, b){
-                interface.multiplyNumbers(a, b, function(result){
+                remote.multiplyNumbers(a, b, function(result){
                     alert(a + " x " + b + " = " + result);
                 })
             }

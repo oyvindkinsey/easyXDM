@@ -30,12 +30,12 @@ THE SOFTWARE.
                     }
                 };
             }
-            var channel, interface;
+            var channel, remote;
             window.onload = function(){
                 channel = EasyXSS.createChannel({
                     onReady: function(){
-                        interface = EasyXSS.createInterface({
-                            channel: channel,
+                        remote = EasyXSS.createInterface({
+							channel:channel,
                             local: {
                                 addNumbers: {
                                     method: function(a, b){
@@ -56,8 +56,7 @@ THE SOFTWARE.
                                         console.log("no op");
                                     }
                                 }
-                            },
-                            remote: {}
+                            }
                         });
                     }
                 });
