@@ -350,9 +350,7 @@ var EasyXSS = {
                 config.onMessage = function(message, origin){
                     this.onData(this.converter.convertFromString(message), origin);
                 }
-            },
-            start: transport.start,
-            stop: transport.stop
+            }
         };
     },
     createPostMessageTransport: function(config){
@@ -435,12 +433,6 @@ var EasyXSS = {
                 else {
                     window.parent.postMessage(message, _targetOrigin);
                 }
-            },
-            start: function(){
-                //No-op
-            },
-            stop: function(){
-                //No-op
             }
         };
     },
@@ -481,6 +473,7 @@ var EasyXSS = {
             }
         }
         
+        
         function _postMessage(message){
             /// <summary>
             /// Sends a message by encoding and placing it in the hash part of _callerWindows url. 
@@ -492,31 +485,36 @@ var EasyXSS = {
             _callerWindow.src = _remoteUrl + "#" + (_msgNr++) + "_" + encodeURIComponent(message);
         }
         
+        function _onReady(){
+            /// <summary>
+            /// Calls the supplied onReady method
+            /// </summary
+            /// <remark>
+            /// We delay this so that the the call to createChannel or 
+            /// createTransport will have completed  
+            /// </remark>
+            _timer = window.setInterval(function(){
+                _checkForMessage();
+            }, _pollInterval);
+            if (config.onReady) {
+                window.setTimeout(config.onReady, 10);
+            }
+        }
         _callerWindow = xss.createFrame(_remoteUrl, ((config.local) ? "" : "xss_" + config.channel), function(){
             if (config.onReady) {
                 if (config.local) {
                     // Register onReady callback in the library so that
                     // it can be called when hash.html has loaded.
-                    xss.registerOnReady(config.channel, config.onReady);
+                    xss.registerOnReady(config.channel, _onReady);
                 }
                 else {
-                    config.onReady();
+                    _onReady();
                 }
             }
         });
         
         return {
-            postMessage: _postMessage,
-            start: function(){
-                _timer = window.setInterval(function(){
-                    _checkForMessage();
-                }, _pollInterval);
-            },
-            stop: function(){
-                window.clearInterval(_timer);
-                _listenerWindow = null;
-                _callerWindow.parentNode.removeChild(_callerWindow);
-            }
+            postMessage: _postMessage
         };
     }
 }
