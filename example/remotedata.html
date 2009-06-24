@@ -18,14 +18,14 @@ THE SOFTWARE.
 --> <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
-        <title>EasyXSS Hosted window</title>
+        <title>easyXSS Hosted window</title>
         <script type="text/javascript" src="../easyxss.js">
         </script>
         <script type="text/javascript">
             var channel;
             window.onload = function(){
-                channel = EasyXSS.createChannel({
-					converter:EasyXSS.converters.hashTableConverter,
+                channel = easyXSS.createChannel({
+					converter:easyXSS.converters.hashTableConverter,
                     onData: function(data, origin){
                         alert("Received data from '" + origin + "':")
                         for (var key in data) {

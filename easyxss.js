@@ -16,7 +16,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  */
-var EasyXSS = {
+var easyXSS = {
     createInterface: function(config){
         /// <summary>
         /// Creates an interface that can be used to call methods implemented 
@@ -117,7 +117,7 @@ var EasyXSS = {
             return concrete;
         }
         _channel.setOnData(_onData);
-        _channel.setConverter(EasyXSS.converters.json2Converter);
+        _channel.setConverter(easyXSS.converters.json2Converter);
         
         return (config.remote) ? _createRemote(config.remote) : null;
     },

@@ -18,7 +18,7 @@ THE SOFTWARE.
 --> <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
-        <title>EasyXSS Hosted window</title>
+        <title>easyXSS Hosted window</title>
         <script type="text/javascript" src="../easyxss.js">
         </script>
         <script type="text/javascript" src="/json2.js">
@@ -46,7 +46,7 @@ THE SOFTWARE.
                  */
                 remoteapp = window.open('remoteapp.html', 'mainapp', 'width=300,height=300');
                 if (remoteapp) {
-                    proxy = EasyXSS.createChannel({
+                    proxy = easyXSS.createChannel({
                         onData: function(data, origin){
 							remoteapp.focus();
                             var div = remoteapp.document.createElement("div");
@@ -58,7 +58,7 @@ THE SOFTWARE.
                                 remoteapp.document.body.appendChild(div);
                             }
                         },
-                        converter: EasyXSS.converters.json2Converter
+                        converter: easyXSS.converters.json2Converter
                     });
                 }
                 else {

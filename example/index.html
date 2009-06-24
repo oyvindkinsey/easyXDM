@@ -18,7 +18,7 @@ THE SOFTWARE.
 --> <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
-        <title>EasyXSS Hosting window</title>
+        <title>easyXSS Hosting window</title>
         <script type="text/javascript" src="../easyxss.js">
         </script>
         <script type="text/javascript" src="/json2.js">
@@ -52,7 +52,7 @@ THE SOFTWARE.
                  }
                  });
                  */
-                proxy = EasyXSS.createChannel({
+                proxy = easyXSS.createChannel({
                     onData: function(data, origin){
                         var div = document.createElement("div");
                         div.innerHTML = "data from '" + origin + "'";
@@ -63,7 +63,7 @@ THE SOFTWARE.
                             document.body.appendChild(div);
                         }
                     },
-                    converter: EasyXSS.converters.json2Converter,
+                    converter: easyXSS.converters.json2Converter,
                     local: location.protocol + "//" + location.host + "/projects/easyxss/example/hash.html",
                     remote: "http://xssremote.kinsey.no/projects/easyxss/example/remote.html"
                 });
