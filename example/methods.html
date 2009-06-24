@@ -27,7 +27,7 @@ THE SOFTWARE.
             var channel, remote;
             window.onload = function(){
                 channel = easyXSS.createChannel({
-                    local: "/projects/easyxss/example/hash.html",
+                    local: "/projects/easyxss/hash.html",
                     remote: "http://xssremote.kinsey.no/projects/easyxss/example/remotemethods.html",
                     onReady: function(){
                         remote = easyXSS.createInterface(channel, {
