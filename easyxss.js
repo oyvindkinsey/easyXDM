@@ -17,14 +17,15 @@
  THE SOFTWARE.
  */
 var easyXSS = {
-    createInterface: function(config){
+    createInterface: function(channel, config){
         /// <summary>
         /// Creates an interface that can be used to call methods implemented 
         /// on the remote end of the channel, and also to provide the implementation
         /// of methods to be called from the remote end.
         /// </summary>
+        /// <param name="channel">A valid channel for transportation</param>
+        /// <param name="config" type="object">A valid easyXSS-definition</param>
         var _callbackCounter = 0, _callbacks = {};
-        var _channel = config.channel;
         var _local = (config.local) ? config.local : null;
         
         function _onData(data, origin){
@@ -43,7 +44,7 @@ var easyXSS = {
                     // The method is async, we need to add a callback
                     data.params.push(function(result){
                         // Send back the result
-                        _channel.sendData({
+                        channel.sendData({
                             id: data.id,
                             response: result
                         });
@@ -58,7 +59,7 @@ var easyXSS = {
                     }
                     else {
                         // Call local method and send back the response
-                        _channel.sendData({
+                        channel.sendData({
                             id: data.id,
                             response: method.method.apply(null, data.params)
                         });
@@ -90,7 +91,7 @@ var easyXSS = {
                                 params[i] = arguments[i];
                             }
                             // Send the method request
-                            _channel.sendData({
+                            channel.sendData({
                                 name: name,
                                 params: params
                             });
@@ -109,15 +110,15 @@ var easyXSS = {
                                 request.params[i] = arguments[i];
                             }
                             // Send the method request
-                            _channel.sendData(request);
+                            channel.sendData(request);
                         });
                     }
                 })(name);
             }
             return concrete;
         }
-        _channel.setOnData(_onData);
-        _channel.setConverter(easyXSS.converters.json2Converter);
+        channel.setOnData(_onData);
+        channel.setConverter(easyXSS.converters.json2Converter);
         
         return (config.remote) ? _createRemote(config.remote) : null;
     },

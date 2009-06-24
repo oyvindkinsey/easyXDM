@@ -30,8 +30,7 @@ THE SOFTWARE.
                     local: location.protocol + "//" + location.host + "/projects/easyxss/example/hash.html",
                     remote: "http://xssremote.kinsey.no/projects/easyxss/example/remotemethods.html",
                     onReady: function(){
-						remote = easyXSS.createInterface({
-                            channel: channel,
+                        remote = easyXSS.createInterface(channel, {
                             remote: {
                                 addNumbers: {},
                                 multiplyNumbers: {},

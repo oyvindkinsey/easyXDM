@@ -24,11 +24,11 @@ THE SOFTWARE.
         <script type="text/javascript" src="/json2.js">
         </script>
         <script type="text/javascript">
+            var channel, remote;
             window.onload = function(){
                 channel = easyXSS.createChannel({
                     onReady: function(){
-                        remote = easyXSS.createInterface({
-							channel:channel,
+                        remote = easyXSS.createInterface(channel, {
                             local: {
                                 addNumbers: {
                                     method: function(a, b){
