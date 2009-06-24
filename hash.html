@@ -5,7 +5,9 @@
         <meta http-equiv="CACHE-CONTROL" content="PUBLIC"/>
         <meta http-equiv="EXPIRES" content="Sat, 01 Jan 2050 00:00:00 GMT"/>
         <script type="text/javascript">
-            window.parent.parent.easyXSS.onReady(location.hash.substring(1));
+            if (location.hash) {
+				window.parent.parent.easyXSS.onReady(location.hash.substring(1));
+			}
         </script>
     </head>
     <body>
