@@ -58,10 +58,7 @@ THE SOFTWARE.
                                 remoteapp.document.body.appendChild(div);
                             }
                         },
-                        converter: EasyXSS.converters.json2Converter,
-                        onReady: function(){
-                            proxy.start();
-                        }
+                        converter: EasyXSS.converters.json2Converter
                     });
                 }
                 else {

@@ -24,22 +24,11 @@ THE SOFTWARE.
         <script type="text/javascript" src="/json2.js">
         </script>
         <script type="text/javascript">
-            if (typeof console === "undefined") {
-                window.console = {
-                    log: function(){
-                    }
-                };
-            }
-            /* This window will create a proxy to different domain.
-             * The remote side of the proxy can be used to run XHR-requests or can open
-             * a window with window.open so that the user has two windows from two domains
-             * that are able to communicate.
-             */
             var channel, remote;
             window.onload = function(){
                 channel = EasyXSS.createChannel({
                     local: location.protocol + "//" + location.host + "/projects/easyxss/example/hash.html",
-                    remote: "http://xssremote.kinsey.no/projects/easyxss/example/remoteinterface.html",
+                    remote: "http://xssremote.kinsey.no/projects/easyxss/example/remotemethods.html",
                     onReady: function(){
 						remote = EasyXSS.createInterface({
                             channel: channel,
@@ -47,7 +36,7 @@ THE SOFTWARE.
                                 addNumbers: {},
                                 multiplyNumbers: {},
                                 noOp: {
-                                    iVoid: true
+                                    isVoid: true
                                 }
                             }
                         });
@@ -83,6 +72,6 @@ THE SOFTWARE.
         <br/>
         This calls a non-returning method on the remote side
         <br/>
-        <input type="button" onclick="interface.noOp()" value="call noOp on the remote domain"/>
+        <input type="button" onclick="remote.noOp()" value="call noOp on the remote domain"/>
     </body>
 </html>

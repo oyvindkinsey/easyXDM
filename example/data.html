@@ -18,45 +18,22 @@ THE SOFTWARE.
 --> <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
-        <title>EasyXSS Hosted window</title>
+        <title>EasyXSS Hosting window</title>
         <script type="text/javascript" src="../easyxss.js">
         </script>
-        <script type="text/javascript" src="/json2.js">
-        </script>
         <script type="text/javascript">
-            if (typeof console === "undefined") {
-                window.console = {
-                    log: function(){
-                    }
-                };
-            }
-            var channel, remote;
+            var channel;
             window.onload = function(){
                 channel = EasyXSS.createChannel({
+                    local: location.protocol + "//" + location.host + "/projects/easyxss/example/hash.html",
+                    remote: "http://xssremote.kinsey.no/projects/easyxss/example/remotedata.html",
+					converter:EasyXSS.converters.hashTableConverter,
                     onReady: function(){
-                        remote = EasyXSS.createInterface({
-							channel:channel,
-                            local: {
-                                addNumbers: {
-                                    method: function(a, b){
-                                        return a + b;
-                                    }
-                                },
-                                multiplyNumbers: {
-                                    async: true,
-                                    method: function(a, b, fn){
-                                        window.setTimeout(function(){
-                                            fn(a * b);
-                                        }, 5000);
-                                    }
-                                },
-                                noOp: {
-                                    isVoid: true,
-                                    method: function(){
-                                        console.log("no op");
-                                    }
-                                }
-                            }
+						console.log(channel);
+                        channel.sendData({
+                            propA: "abc",
+                            propB: "def",
+                            propC: 44
                         });
                     }
                 });

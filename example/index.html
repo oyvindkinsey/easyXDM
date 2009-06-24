@@ -64,12 +64,8 @@ THE SOFTWARE.
                         }
                     },
                     converter: EasyXSS.converters.json2Converter,
-                    channel: "channel",
                     local: location.protocol + "//" + location.host + "/projects/easyxss/example/hash.html",
-                    remote: "http://xssremote.kinsey.no/projects/easyxss/example/remote.html",
-                    onReady: function(){
-                        proxy.start();
-                    }
+                    remote: "http://xssremote.kinsey.no/projects/easyxss/example/remote.html"
                 });
                 
             }
