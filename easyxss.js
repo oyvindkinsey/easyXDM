@@ -40,7 +40,7 @@ var easyXSS = {
                 if (!method) {
                     throw "The method " + data.name + " is not implemented.";
                 }
-                if (method.async) {
+                if (method.isAsync) {
                     // The method is async, we need to add a callback
                     data.params.push(function(result){
                         // Send back the result
