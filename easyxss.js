@@ -193,14 +193,19 @@ var EasyXSS = {
         /// Returns a hashtable containing the query parameteres
         /// </summary>
         /// <returns type="object">A hashtable</returns>
-        var pair, key, value, hash = {}, search = location.search.substring(1).split("&");
+        /// <remark>The hashtable is stored for subsequent calls</remark>
+        if (this._query) {
+            return this._query;
+        }
+        this._query = {};
+        var pair, key, value, search = location.search.substring(1).split("&");
         for (var i = 0, len = search.length; i < len; i++) {
             pair = search[i];
             key = pair.substring(0, pair.indexOf("="));
             value = pair.substring(key.length + 1);
-            hash[key] = value;
+            this._query[key] = value;
         }
-        return hash;
+        return this._query;
     },
     getDomainName: function(url){
         /// <summary>
@@ -307,8 +312,10 @@ var EasyXSS = {
         /// </summary
         /// <param name="config" type="object"></param>
         /// <returns type="object">An object able to send and receive messages</returns>
-        if (!config.local) {
-            // We assume that this is the remote part of the channel
+        if (config.local) {
+            config.channel = (config.channel) ? config.channel : "default";
+        }
+        else {
             var query = this.Query();
             config.channel = query["channel"];
             config.remote = query["endpoint"];
@@ -364,8 +371,6 @@ var EasyXSS = {
         /// <returns type="object">An object able to send and receive strings</returns>
         var xss = this;
         var _targetOrigin = xss.getLocation(config.remote);
-        var _windowPostMessage;
-        var _isStarted, _isReady;
         var _callerWindow;
         function _getOrigin(event){
             /// <summary>
@@ -395,11 +400,11 @@ var EasyXSS = {
             /// </summary
             /// <param name="event" type="MessageEvent">The eventobject from the browser</param>
             var origin = _getOrigin(event);
-            //alert(location.host +","+origin)
-            if (origin == _targetOrigin) {
-                config.onMessage(event.data, origin);
+            if (origin == _targetOrigin && event.data.substring(0, config.channel.length + 1) == config.channel + " ") {
+                config.onMessage(event.data.substring(config.channel.length + 1), origin);
             }
         }
+        
         function _onReady(){
             /// <summary>
             /// Calls the supplied onReady method
@@ -425,13 +430,15 @@ var EasyXSS = {
         return {
             postMessage: function(message){
                 /// <summary>
-                /// Sends the message using the bound window object
+                /// Sends the message using the postMethod method available on the window object
                 /// </summary
+                /// <param name="message" type="string">The message to send</param>
+                /// <remark>
                 if (config.local) {
-                    _callerWindow.contentWindow.postMessage(message, _targetOrigin);
+                    _callerWindow.contentWindow.postMessage(config.channel + " " + message, _targetOrigin);
                 }
                 else {
-                    window.parent.postMessage(message, _targetOrigin);
+                    window.parent.postMessage(config.channel + " " + message, _targetOrigin);
                 }
             }
         };
@@ -473,18 +480,6 @@ var EasyXSS = {
             }
         }
         
-        
-        function _postMessage(message){
-            /// <summary>
-            /// Sends a message by encoding and placing it in the hash part of _callerWindows url. 
-            /// </summary
-            /// <param name="message" type="string">The message to send</param>
-            /// <remark>
-            /// We include a message number so that identical messages will be read as separate messages.
-            /// </remark>
-            _callerWindow.src = _remoteUrl + "#" + (_msgNr++) + "_" + encodeURIComponent(message);
-        }
-        
         function _onReady(){
             /// <summary>
             /// Calls the supplied onReady method
@@ -500,6 +495,7 @@ var EasyXSS = {
                 window.setTimeout(config.onReady, 10);
             }
         }
+        
         _callerWindow = xss.createFrame(_remoteUrl, ((config.local) ? "" : "xss_" + config.channel), function(){
             if (config.onReady) {
                 if (config.local) {
@@ -512,9 +508,17 @@ var EasyXSS = {
                 }
             }
         });
-        
         return {
-            postMessage: _postMessage
+            postMessage: function(message){
+                /// <summary>
+                /// Sends a message by encoding and placing it in the hash part of _callerWindows url. 
+                /// </summary
+                /// <param name="message" type="string">The message to send</param>
+                /// <remark>
+                /// We include a message number so that identical messages will be read as separate messages.
+                /// </remark>
+                _callerWindow.src = _remoteUrl + "#" + (_msgNr++) + "_" + encodeURIComponent(message);
+            }
         };
     }
 }
