@@ -17,7 +17,8 @@
  THE SOFTWARE.
  */
 var easyXSS = {
-    createInterface: function(channel, config){
+    version: "1.0",
+    createInterface: function(channel, config, onready){
         /// <summary>
         /// Creates an interface that can be used to call methods implemented 
         /// on the remote end of the channel, and also to provide the implementation
@@ -119,7 +120,10 @@ var easyXSS = {
         }
         channel.setOnData(_onData);
         channel.setConverter(easyXSS.converters.json2Converter);
-        
+        if (onready){
+			window.setTimeout(onready,10);
+		}
+		
         return (config.remote) ? _createRemote(config.remote) : null;
     },
     onReadyCallbacks: { //     
@@ -157,10 +161,10 @@ var easyXSS = {
             /// http://json.org/json2.js
             /// </remark>
             convertToString: function(data){
-                return (data) ? JSON.stringify(data) : "";
+                return JSON.stringify(data);
             },
             convertFromString: function(message){
-                return (message) ? JSON.parse(message) : {};
+                return JSON.parse(message);
             }
         },
         hashTableConverter: {//
@@ -249,7 +253,6 @@ var easyXSS = {
             // name om DOMElements created in Javascript.
             // A workaround is to insert HTML and have the browser parse
             // and instantiate the element.
-            // NOTE: This might be fixed 
             var span = document.createElement("span");
             document.body.appendChild(span);
             span.innerHTML = '<iframe src="' + url + '" id="' + name + '" name="' + name + '"></iframe>';
@@ -263,32 +266,18 @@ var easyXSS = {
         else {
             // When name is not needed, or in other browsers, 
             // we use regular createElement.
-            var framesets = document.getElementsByTagName("FRAMESET");
-            if (framesets && framesets.length > 0) {
-                frame = document.createElement("FRAME");
-                frame.src = url;
-                if (onLoad) {
-                    this.addEventListener(frame, "load", function(){
-                        onLoad(frame.contentWindow);
-                    })
-                }
-                framesets[0].appendChild(frame);
-            }
-            else {
-                frame = document.createElement("IFRAME");
-                frame.style.position = "absolute";
-                frame.style.left = "-2000px";
-                frame.src = url;
-                if (onLoad) {
-                    this.addEventListener(frame, "load", function(){
-                        onLoad(frame.contentWindow);
-                    })
-                }
-                document.body.appendChild(frame);
-            }
-            
+            frame = document.createElement("IFRAME");
+            frame.style.position = "absolute";
+            frame.style.left = "-2000px";
             frame.name = name;
             frame.id = name;
+            frame.src = url;
+            if (onLoad) {
+                this.addEventListener(frame, "load", function(){
+                    onLoad(frame.contentWindow);
+                })
+            }
+            document.body.appendChild(frame);
         }
         return frame;
     },
@@ -373,7 +362,8 @@ var easyXSS = {
                 config.onMessage = function(message, origin){
                     this.onData(this.converter.convertFromString(message), origin);
                 }
-            }
+            },
+            destroy: transport.destroy
         };
     },
     createPostMessageTransport: function(config){
@@ -388,7 +378,6 @@ var easyXSS = {
         var xss = this;
         var _targetOrigin = xss.getLocation(config.remote);
         var _callerWindow;
-        var _remoteIsReady = (config.local) ? false : true;
         function _getOrigin(event){
             /// <summary>
             /// The origin property should be valid, but some clients
@@ -409,6 +398,7 @@ var easyXSS = {
             }
             throw "Unable to retrieve the origin of the event"
         }
+        
         function _window_onMessage(event){
             /// <summary>
             /// The handler for the "message" event.
@@ -417,28 +407,7 @@ var easyXSS = {
             /// <param name="event" type="MessageEvent">The eventobject from the browser</param>
             var origin = _getOrigin(event);
             if (origin == _targetOrigin && event.data.substring(0, config.channel.length + 1) == config.channel + " ") {
-                if (_remoteIsReady) {
-                    config.onMessage(event.data.substring(config.channel.length + 1), origin);
-                }
-                else {
-                    // We assume that the first message is notification about the other side being ready
-                    _remoteIsReady = true;
-                    _onReady();
-                }
-            }
-        }
-        
-        function _postMessage(message){
-            /// <summary>
-            /// Sends the message using the postMethod method available on the window object
-            /// </summary
-            /// <param name="message" type="string">The message to send</param>
-            /// <remark>
-            if (config.local) {
-                _callerWindow.contentWindow.postMessage(config.channel + " " + message, _targetOrigin);
-            }
-            else {
-                window.parent.postMessage(config.channel + " " + message, _targetOrigin);
+                config.onMessage(event.data.substring(config.channel.length + 1), origin);
             }
         }
         
@@ -451,25 +420,43 @@ var easyXSS = {
             /// createTransport will have completed  
             /// </remark>
             if (config.onReady) {
-                window.setTimeout(config.onReady, 300);
-            }
-            if (!config.local) {
-                window.setTimeout(function(){
-                    _postMessage("");
-                }, 300)
+                window.setTimeout(config.onReady, 10);
             }
         }
         
-        
-        xss.addEventListener(window, "message", _window_onMessage);
         if (config.local) {
-            _callerWindow = xss.createFrame(config.remote + "?endpoint=" + config.local + "&channel=" + config.channel, "");
+            if (config.local.substring(0, 1) == "/") {
+                config.local = location.protocol + "//" + location.host + config.local;
+            }
+            _callerWindow = xss.createFrame(config.remote + "?endpoint=" + config.local + "&channel=" + config.channel, "", function(win){
+                _onReady();
+            });
         }
         else {
             _onReady();
         }
+        xss.addEventListener(window, "message", _window_onMessage);
         return {
-            postMessage: _postMessage
+            postMessage: function(message){
+                /// <summary>
+                /// Sends the message using the postMethod method available on the window object
+                /// </summary
+                /// <param name="message" type="string">The message to send</param>
+                /// <remark>
+                if (config.local) {
+                    _callerWindow.contentWindow.postMessage(config.channel + " " + message, _targetOrigin);
+                }
+                else {
+                    window.parent.postMessage(config.channel + " " + message, _targetOrigin);
+                }
+            },
+            destroy: function(){
+                xss.removeEventListener(window, "message", _window_onMessage);
+                if (config.local) {
+                    _callerWindow.parentNode.removeChild(_callerWindow);
+                    _callerWindow = null;
+                }
+            }
         };
     },
     createHashTransport: function(config){
@@ -483,6 +470,9 @@ var easyXSS = {
         var _timer = null;
         var _lastMsg = "#" + config.channel, _msgNr = 0;
         var _listenerWindow = (!config.local) ? window : null, _callerWindow;
+        if (config.local && config.local.substring(0, 1) == "/") {
+            config.local = location.protocol + "//" + location.host + config.local;
+        }
         var _remoteUrl = config.remote + ((config.local) ? "?endpoint=" + config.local + "&channel=" + config.channel : "#" + config.channel);
         var _remoteOrigin = this.getLocation(config.remote);
         var _pollInterval = (config.interval) ? config.interval : 300;
@@ -547,6 +537,11 @@ var easyXSS = {
                 /// We include a message number so that identical messages will be read as separate messages.
                 /// </remark>
                 _callerWindow.src = _remoteUrl + "#" + (_msgNr++) + "_" + encodeURIComponent(message);
+            },
+            destroy: function(){
+                window.clearInterval(_timer);
+                _callerWindow.parentNode.removeChild(_callerWindow);
+                _callerWindow = null;
             }
         };
     }

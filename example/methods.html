@@ -1,5 +1,5 @@
 <!--
-Copyright (c) <2009> <Øyvind Sean Kinsey, oyvind@kinsey.no>
+Copyright (c) <2009> <ï¿½yvind Sean Kinsey, oyvind@kinsey.no>
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -38,8 +38,11 @@ THE SOFTWARE.
                                     isVoid: true
                                 }
                             }
+                        }, function(){
+                            if (location.hash) {
+                                remote.noOp();
+                            }
                         });
-						remote.noOp();
                     }
                 });
             }
