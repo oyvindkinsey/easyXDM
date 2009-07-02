@@ -1,5 +1,5 @@
 /*
- Copyright (c) <2009> <Øyvind Sean Kinsey, oyvind@kinsey.no>
+ Copyright (c) <2009> <ï¿½yvind Sean Kinsey, oyvind@kinsey.no>
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
  in the Software without restriction, including without limitation the rights
@@ -17,6 +17,7 @@
  THE SOFTWARE.
  */
 var easyXSS = {
+    version: "1.0",
     createInterface: function(channel, config){
         /// <summary>
         /// Creates an interface that can be used to call methods implemented 
@@ -358,7 +359,8 @@ var easyXSS = {
                 config.onMessage = function(message, origin){
                     this.onData(this.converter.convertFromString(message), origin);
                 }
-            }
+            },
+            destroy: transport.destroy
         };
     },
     createPostMessageTransport: function(config){
@@ -444,6 +446,13 @@ var easyXSS = {
                 else {
                     window.parent.postMessage(config.channel + " " + message, _targetOrigin);
                 }
+            },
+            destroy: function(){
+                xss.removeEventListener(window, "message", _window_onMessage);
+                if (config.local) {
+                    _callerWindow.parentNode.removeChild(_callerWindow);
+                    _callerWindow = null;
+                }
             }
         };
     },
@@ -525,6 +534,11 @@ var easyXSS = {
                 /// We include a message number so that identical messages will be read as separate messages.
                 /// </remark>
                 _callerWindow.src = _remoteUrl + "#" + (_msgNr++) + "_" + encodeURIComponent(message);
+            },
+            destroy: function(){
+                window.clearInterval(_timer);
+                _callerWindow.parentNode.removeChild(_callerWindow);
+                _callerWindow = null;
             }
         };
     }
