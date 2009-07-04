@@ -119,7 +119,7 @@ var easyXSS = {
             return concrete;
         }
         channel.setOnData(_onData);
-        channel.setConverter(easyXSS.converters.json2Converter);
+        channel.setConverter(JSON);
         if (onready){
 			window.setTimeout(onready,10);
 		}
@@ -151,35 +151,19 @@ var easyXSS = {
         }
     },
     converters: {
-        json2Converter: {//
-            /// <summary>
-            /// A converter that uses the JSON library for
-            /// converting between JSON strings and objects.
-            /// </summary>
-            /// <remark>
-            /// Requires an available JSON object, native or using JSON2
-            /// http://json.org/json2.js
-            /// </remark>
-            convertToString: function(data){
-                return JSON.stringify(data);
-            },
-            convertFromString: function(message){
-                return JSON.parse(message);
-            }
-        },
         hashTableConverter: {//
             /// <summary>
             /// A converter that can convert to and from hashtables
             /// string values, or values having valid string representation.
             /// </summary>
-            convertToString: function(data){
+            stringify: function(data){
                 var message = "";
                 for (key in data) {
                     message += key + "=" + escape(data[key]) + "&";
                 }
                 return message.substring(0, message.length - 1);
             },
-            convertFromString: function(message){
+            parse: function(message){
                 var data = {};
                 var d = message.split("&");
                 var pair, key, value;
@@ -266,18 +250,30 @@ var easyXSS = {
         else {
             // When name is not needed, or in other browsers, 
             // we use regular createElement.
-            frame = document.createElement("IFRAME");
-            frame.style.position = "absolute";
-            frame.style.left = "-2000px";
-            frame.name = name;
-            frame.id = name;
-            frame.src = url;
-            if (onLoad) {
-                this.addEventListener(frame, "load", function(){
-                    onLoad(frame.contentWindow);
-                })
-            }
-            document.body.appendChild(frame);
+			var framesets = document.getElementsByTagName("FRAMESET");
+            if (framesets && framesets.length > 0) {
+                frame = document.createElement("FRAME");
+				frame.src = url;
+				if (onLoad) {
+					this.addEventListener(frame, "load", function(){
+						onLoad(frame.contentWindow);
+					})
+				}
+                framesets[0].appendChild(frame);
+            }else {
+				frame = document.createElement("IFRAME");
+				frame.style.position = "absolute";
+				frame.style.left = "-2000px";
+				frame.src = url;
+				if (onLoad) {
+					this.addEventListener(frame, "load", function(){
+						onLoad(frame.contentWindow);
+					})
+				}
+				document.body.appendChild(frame);
+			}
+			frame.name = name;
+			frame.id = name;
         }
         return frame;
     },
@@ -342,14 +338,14 @@ var easyXSS = {
         /// <remark>The supported data types depends on the converter used</remark>
         // If a converter is present then we wrap the callback in a call to this
         config.onMessage = (config.converter) ? (function(message, origin){
-            this.onData(this.converter.convertFromString(message), origin);
+            this.onData(this.converter.parse(message), origin);
         }) : config.onData;
         var transport = this.createTransport(config);
         return {
             transport: transport,
             // If a converter is present then we wrap postMessage in a call to this
             sendData: (config.converter) ? (function(data){
-                this.transport.postMessage(config.converter.convertToString(data));
+                this.transport.postMessage(config.converter.stringify(data));
             }) : transport.sendMessage,
             setOnData: function(onData){
                 config.onData = onData;
@@ -357,10 +353,10 @@ var easyXSS = {
             setConverter: function(converter){
                 config.converter = converter;
                 this.sendData = function(data){
-                    this.transport.postMessage(config.converter.convertToString(data));
+                    this.transport.postMessage(config.converter.stringify(data));
                 };
                 config.onMessage = function(message, origin){
-                    this.onData(this.converter.convertFromString(message), origin);
+                    this.onData(this.converter.parse(message), origin);
                 }
             },
             destroy: transport.destroy
