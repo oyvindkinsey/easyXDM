@@ -92,10 +92,12 @@ var easyXSS = {
                                 params[i] = arguments[i];
                             }
                             // Send the method request
-                            channel.sendData({
-                                name: name,
-                                params: params
-                            });
+                            window.setTimeout(function(){
+                                channel.sendData({
+                                    name: name,
+                                    params: params
+                                });
+                            }, 0);
                         });
                     }
                     else {
@@ -111,7 +113,9 @@ var easyXSS = {
                                 request.params[i] = arguments[i];
                             }
                             // Send the method request
-                            channel.sendData(request);
+                            window.setTimeout(function(){
+                                channel.sendData(request);
+                            }, 0);
                         });
                     }
                 })(name);
