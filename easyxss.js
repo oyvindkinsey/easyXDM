@@ -124,10 +124,10 @@ var easyXSS = {
         }
         channel.setOnData(_onData);
         channel.setConverter(JSON);
-        if (onready){
-			window.setTimeout(onready,10);
-		}
-		
+        if (onready) {
+            window.setTimeout(onready, 10);
+        }
+        
         return (config.remote) ? _createRemote(config.remote) : null;
     },
     onReadyCallbacks: { //     
@@ -224,7 +224,7 @@ var easyXSS = {
         loc = loc.substring(0, loc.indexOf("/"));
         return uri.substring(0, indexOf + 2) + loc;
     },
-    createFrame: function(url, name, onLoad){
+    createFrame: function(url, name, container, onLoad){
         /// <summary>
         /// Creates a frame and appends it to the DOM. 
         /// </summary
@@ -243,7 +243,7 @@ var easyXSS = {
             // and instantiate the element.
             var span = document.createElement("span");
             document.body.appendChild(span);
-            span.innerHTML = '<iframe src="' + url + '" id="' + name + '" name="' + name + '"></iframe>';
+            span.innerHTML = '<iframe style="position:absolute;left:-2000px;" src="' + url + '" id="' + name + '" name="' + name + '"></iframe>';
             frame = document.getElementById(name);
             if (onLoad) {
                 this.addEventListener(frame, "load", function(){
@@ -254,30 +254,36 @@ var easyXSS = {
         else {
             // When name is not needed, or in other browsers, 
             // we use regular createElement.
-			var framesets = document.getElementsByTagName("FRAMESET");
-            if (framesets && framesets.length > 0) {
+            var framesets = document.getElementsByTagName("FRAMESET");
+            if (!container && framesets && framesets.length > 0) {
                 frame = document.createElement("FRAME");
-				frame.src = url;
-				if (onLoad) {
-					this.addEventListener(frame, "load", function(){
-						onLoad(frame.contentWindow);
-					})
-				}
+                frame.src = url;
+                if (onLoad) {
+                    this.addEventListener(frame, "load", function(){
+                        onLoad(frame.contentWindow);
+                    })
+                }
                 framesets[0].appendChild(frame);
-            }else {
-				frame = document.createElement("IFRAME");
-				frame.style.position = "absolute";
-				frame.style.left = "-2000px";
-				frame.src = url;
-				if (onLoad) {
-					this.addEventListener(frame, "load", function(){
-						onLoad(frame.contentWindow);
-					})
-				}
-				document.body.appendChild(frame);
-			}
-			frame.name = name;
-			frame.id = name;
+            }
+            else {
+                frame = document.createElement("IFRAME");
+                frame.src = url;
+                if (onLoad) {
+                    this.addEventListener(frame, "load", function(){
+                        onLoad(frame.contentWindow);
+                    })
+                }
+                if (container) {
+                    container.appendChild(frame);
+                }
+                else {
+                    frame.style.position = "absolute";
+                    frame.style.left = "-2000px";
+                    document.body.appendChild(frame);
+                }
+            }
+            frame.name = name;
+            frame.id = name;
         }
         return frame;
     },
@@ -428,7 +434,7 @@ var easyXSS = {
             if (config.local.substring(0, 1) == "/") {
                 config.local = location.protocol + "//" + location.host + config.local;
             }
-            _callerWindow = xss.createFrame(config.remote + "?endpoint=" + config.local + "&channel=" + config.channel, "", function(win){
+            _callerWindow = xss.createFrame(config.remote + "?endpoint=" + config.local + "&channel=" + config.channel, "", config.container, function(win){
                 _onReady();
             });
         }
@@ -515,7 +521,7 @@ var easyXSS = {
             }
         }
         
-        _callerWindow = xss.createFrame(_remoteUrl, ((config.local) ? "" : "xss_" + config.channel), function(){
+        _callerWindow = xss.createFrame(_remoteUrl, ((config.local) ? "" : "xss_" + config.channel), config.container, function(){
             if (config.onReady) {
                 if (config.local) {
                     // Register onReady callback in the library so that

@@ -1,5 +1,5 @@
 <!--
-Copyright (c) <2009> <Øyvind Sean Kinsey, oyvind@kinsey.no>
+Copyright (c) <2009> <ï¿½yvind Sean Kinsey, oyvind@kinsey.no>
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -19,12 +19,12 @@ THE SOFTWARE.
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <title>easyXSS Hosted window</title>
-        <script type="text/javascript" src="../easyxss.js">
-        </script>
         <script type="text/javascript">
-		    if (typeof JSON == "undefined" || !JSON) {
-				document.write('\x3Cscript type="text/javascript" src="json2.js">\x3C/script>');
-			}
+            if (typeof JSON == "undefined" || !JSON) {
+                document.write('\x3Cscript type="text/javascript" src="/json2.js">\x3C/script>');
+            }
+        </script>
+        <script type="text/javascript" src="../easyxss.js">
         </script>
         <script type="text/javascript">
             var channel, remote;
@@ -35,13 +35,16 @@ THE SOFTWARE.
                             local: {
                                 addNumbers: {
                                     method: function(a, b){
+                                        _log("method addNumbers called");
                                         return a + b;
                                     }
                                 },
                                 multiplyNumbers: {
                                     isAsync: true,
                                     method: function(a, b, fn){
+                                        _log("method multiplyNumbers called");
                                         window.setTimeout(function(){
+                                            _log("returning multiplyNumbers");
                                             fn(a * b);
                                         }, 5000);
                                     }
@@ -49,6 +52,7 @@ THE SOFTWARE.
                                 noOp: {
                                     isVoid: true,
                                     method: function(){
+                                        _log("method noOp called");
                                         alert("Method not returning any data");
                                     }
                                 }
@@ -57,8 +61,16 @@ THE SOFTWARE.
                     }
                 });
             }
+            function _log(msg){
+                var div = document.createElement("div");
+                div.innerHTML = msg;
+                document.body.appendChild(div);
+            }
         </script>
     </head>
     <body>
+        <script type="text/javascript">
+            document.write("Domain: " + location.host);
+        </script>
     </body>
 </html>
