@@ -21,7 +21,10 @@ THE SOFTWARE.
         <title>easyXSS Hosting window</title>
         <script type="text/javascript" src="../easyxss.js">
         </script>
-        <script type="text/javascript" src="/json2.js">
+        <script type="text/javascript">
+		    if (typeof JSON == "undefined" || !JSON) {
+				document.write('\x3Cscript type="text/javascript" src="json2.js">\x3C/script>');
+			}
         </script>
         <script type="text/javascript">
             var channel, remote;
