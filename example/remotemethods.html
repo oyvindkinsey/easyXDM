@@ -32,6 +32,11 @@ THE SOFTWARE.
                 channel = easyXSS.createChannel({
                     onReady: function(){
                         remote = easyXSS.createInterface(channel, {
+                            remote: {
+                                alertMessage: {
+                                    isVoid: true
+                                }
+                            },
                             local: {
                                 addNumbers: {
                                     method: function(a, b){
@@ -72,5 +77,7 @@ THE SOFTWARE.
         <script type="text/javascript">
             document.write("Domain: " + location.host);
         </script>
+        <br/>
+        <input type="button" onclick="remote.alertMessage('message from remote');" value="call alertMessage on local domain"/>
     </body>
 </html>
