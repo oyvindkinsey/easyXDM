@@ -17,7 +17,7 @@
  THE SOFTWARE.
  */
 var easyXSS = {
-    version: "1.0",
+    version: "1.1",
     createInterface: function(channel, config, onready){
         /// <summary>
         /// Creates an interface that can be used to call methods implemented 
