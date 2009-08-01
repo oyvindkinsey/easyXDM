@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="JS Build Tools" default="build" basedir=".">
+	<!-- Allow any user specific values to override the defaults -->
+	<property file="build.properties"/>
+	<property file="${user.home}/build.properties" />
+
+	<!-- Build classpath -->
+	<path id="tasks.classpath">
+		<fileset dir="lib">
+			<include name="**/*.jar" /> 
+			<exclude name="**/*${project.jar.prefix}.jar*"/>
+		</fileset>
+
+		<pathelement location="${project.build.dir}/classes" /> 
+	</path>
+
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="tasks.classpath" loaderref="tasks.classpath.loader" />
+
+    <target name="javadoc" depends="" description="Generates HTML documentation out of java source">
+		<mkdir dir="${project.build.dir}/docs/api"/>
+		<javadoc
+			sourcepath="${project.src.dir}"
+			destdir="${project.build.dir}/docs/api"
+			author="true"
+			version="true"
+			use="true"
+			bottom="&lt;i&gt;Copyright &#169; 2003-2009 Moxiecode Systems AB. All Rights Reserved.&lt;/i&gt;"
+			windowtitle="${project.description}">
+		</javadoc>
+    </target>
+
+    <target name="clean" depends="" description="Cleans up the project from temporary files">
+		<delete dir="${project.build.dir}" quiet="true"/>
+    </target>
+
+    <target name="build" depends="" description="Builds the project and adds build numbers in source and .jar file">
+		<!-- Remove previous classes -->
+		<delete dir="${project.build.dir}" quiet="true"/>
+    	
+    	<!-- Include build number and build date in the Info.java source and the INFO file in .jar -->
+		<tstamp/>
+		<mkdir dir="${project.build.dir}/classes"/>
+
+		<!-- Compile the java code from ${src} into ${build} -->
+		<javac nowarn="true" srcdir="${project.src.dir}" destdir="${project.build.dir}/classes">
+			<classpath refid="tasks.classpath" />
+		</javac>
+
+		<!-- Build jar, and copy to lib -->
+		<jar jarfile="${project.build.dir}/${project.jar.prefix}.jar" basedir="${project.build.dir}/classes" compress="true" index="true" />
+		<copy file="${project.build.dir}/${project.jar.prefix}.jar" tofile="lib/${project.jar.prefix}.jar" overwrite="true"/>
+    </target>
+
+    <target name="release" depends="" description="Builds a release package">
+		<loadfile property="changelog" srcFile="changelog.txt" />
+		<propertyregex property="version" input="${changelog}" regexp="^Version ([0-9xabrc.]+)" select="\1" />
+		<propertyregex property="release_date" input="${changelog}" regexp="^Version [^\(]+\(([^\)]+)\)" select="\1" />
+		<propertyregex property="file_version" input="${version}" regexp="\." replace="_" />
+
+		<!-- Compress development package -->
+		<mkdir dir="${project.build.dir}" />
+		<delete file="${project.build.dir}/js_build_tools_${file_version}.zip" quiet="true" />
+		<zip destfile="${project.build.dir}/js_build_tools_${file_version}.zip">
+			<zipfileset dir="." prefix="js-build-tools">
+				<include name="example/*" />
+				<include name="lib/js_build_tools.jar" />
+				<include name="lib/yuicompressor.jar" />
+				<include name="changelog.txt" />
+				<include name="readme.txt" />
+			</zipfileset>
+		</zip>
+    </target>
+</project>
+

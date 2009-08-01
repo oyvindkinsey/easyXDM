@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="TestBuild" default="build" basedir=".">
+	<property file="build.properties"/>
+	
+	<!-- Setup classpath for js-build-tools ant tasks -->
+	<path id="js-build-tasks.classpath">
+		<pathelement location="."/>
+
+		<fileset dir="tools\js-build-tools\lib">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+
+	<!-- Register new js-build-tools ant tasks -->
+	<taskdef name="preprocess" classname="com.moxiecode.ant.tasks.PreProcessTask" classpathref="js-build-tasks.classpath" loaderref="js-build-tasks.classpath.loader" />
+	<taskdef name="yuicompress" classname="com.moxiecode.ant.tasks.YuiCompressTask" classpathref="js-build-tasks.classpath" loaderref="js-build-tasks.classpath.loader" />
+	<!--<taskdef name="jsdoctoolkit" classname="uk.co.darrenhurley.ant.tasks.JsDocToolkit" classpath="tools\jsdoctoolkit-ant-task-1.0.1.jar;tools\jsdoc_toolkit-2.3.0\jsdoc-toolkit\java\classes\js.jar"/> -->
+	 
+	 
+	<target name="clean" depends="" description="Cleans up the project from temporary files">
+		<delete dir="${project.build.dir}" quiet="true"/>
+    </target>
+	<!-- Setup default build target -->
+	<target name="build" depends="clean">
+		<!-- Process pre proccesing instuctions like #if/#endif etc -->
+		<mkdir dir="${project.build.dir}"/>
+		
+		<concat destfile="${project.src.dir}\easyXSS.combined.js">
+            <fileset dir="." includes="${project.src.dir}\easyXSS.js" />
+            <fileset dir="." includes="${project.src.dir}\easyXSS.DomHelper.js" />
+			<fileset dir="." includes="${project.src.dir}\easyXSS.Events.js" />
+			<fileset dir="." includes="${project.src.dir}\easyXSS.Transport.js" />
+			<fileset dir="." includes="${project.src.dir}\easyXSS.Interface.js" />
+			<fileset dir="." includes="${project.src.dir}\easyXSS.Url.js" />
+			<fileset dir="." includes="${project.src.dir}\easyXSS.Serializing.js" />
+        </concat>
+
+				
+		<preprocess infile="${project.src.dir}\easyXSS.combined.js" outfile="${project.build.dir}\easyxss.js"/>
+		<preprocess infile="${project.src.dir}\easyXSS.combined.js" outfile="${project.build.dir}\easyxss.debug.js" defines="debug"/>
+	    <preprocess infile="${project.src.dir}\hash.html" outfile="${project.build.dir}\hash.html"/>
+		
+		<!-- Run jslint -->
+		<java jar="tools\jslint4java-1.3.1\jslint4java-1.3.1.jar" fork="true" failonerror="true" maxmemory="128m" >
+			<arg value="${project.build.dir}\easyxss.js"/>
+        </java>
+
+		<!-- Compress the file using the YUI Compressor -->
+		<yuicompress infile="${project.build.dir}\easyxss.js" outfile="${project.build.dir}\easyxss.min.js" />
+		
+		<copy todir="${project.build.dir}\example">
+			<fileset dir="${project.src.dir}\example"/>
+		</copy>
+	</target>
+	
+</project>
