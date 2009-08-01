@@ -1,5 +1,7 @@
 /**
  * Contains classes related to the interface implementation
+ * The contained classes are not instantiated but server as the template 
+ * for creating configuration objects.
  * @namespace
  */
 easyXSS.Interface = {

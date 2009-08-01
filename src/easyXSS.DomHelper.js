@@ -92,5 +92,25 @@ easyXSS.DomHelper = {
         else {
             element.detachEvent("on" + event, handler);
         }
+    },
+    /**
+     * Checks for the precense of the JSON object.
+     * If it is not precent it will use the supplied path to load the JSON2 library.
+     * This should be called in the documents head right after the easyXSS script tag.
+     * http://json.org/json2.js
+     * @param {Object} path
+     */
+    requiresJSON: function(path){
+        if (typeof JSON == "undefined" || !JSON) {
+            // #ifdef debug
+            trace("loading external JSON");
+            // #endif
+            document.write('<script type="text/javascript" src="' + path + '"></script>');
+        }
+        // #ifdef debug
+        else {
+            trace("native JSON found");
+        }
+        // #endif
     }
 };

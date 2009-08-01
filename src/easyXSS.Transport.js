@@ -1,6 +1,6 @@
 /** 
  * Contains available transport classes
- * @namespace 
+ * @namespace
  */
 easyXSS.Transport = {
     /**
@@ -47,19 +47,15 @@ easyXSS.Transport = {
     
     /**
      * PostMessageTransport is a transport class that uses HTML5 postMessage for communication
-     * <a href="https://developer.mozilla.org/en/DOM/window.postMessage>https://developer.mozilla.org/en/DOM/window.postMessage</a>
+     * http://msdn.microsoft.com/en-us/library/ms644944(VS.85).aspx
+     * https://developer.mozilla.org/en/DOM/window.postMessage
      * @param {easyXSS.Transport.TransportConfiguration} config The transports configuration.
      * @class
      */
     PostMessageTransport: function(config){
-        /// <summary>
-        /// Sets up the infrastructure for sending and receiving 
-        /// messages using the window.postMessage interface.
-        /// http://msdn.microsoft.com/en-us/library/ms644944(VS.85).aspx
-        /// https://developer.mozilla.org/en/DOM/window.postMessage
-        /// </summary
-        /// <param name="config" type="object"></param>
-        /// <returns type="object">An object able to send and receive strings</returns>
+        // #ifdef debug
+        trace("easyXSS.Transport.PostMessageTransport.constructor");
+        // #endif
         var _targetOrigin = easyXSS.Url.getLocation(config.remote);
         var _callerWindow;
         function _getOrigin(event){
@@ -90,6 +86,9 @@ easyXSS.Transport = {
             /// </summary
             /// <param name="event" type="MessageEvent">The eventobject from the browser</param>
             var origin = _getOrigin(event);
+            // #ifdef debug
+            trace("received message '" + event.data + "' from " + origin);
+            // #endif
             if (origin == _targetOrigin && event.data.substring(0, config.channel.length + 1) == config.channel + " ") {
                 config.onMessage(event.data.substring(config.channel.length + 1), origin);
             }
@@ -121,13 +120,15 @@ easyXSS.Transport = {
         }
         easyXSS.DomHelper.addEventListener(window, "message", _window_onMessage);
         
-        
         return {
             /** 
              * Sends the message using the postMethod method available on the window object
              * @param {String} message The message to send
              */
             postMessage: function(message){
+                // #ifdef debug
+                trace("sending message '" + message + "' to " + _targetOrigin);
+                // #endif
                 if (config.local) {
                     _callerWindow.contentWindow.postMessage(config.channel + " " + message, _targetOrigin);
                 }
@@ -135,10 +136,13 @@ easyXSS.Transport = {
                     window.parent.postMessage(config.channel + " " + message, _targetOrigin);
                 }
             },
-			/**
-			 * 
-			 */
+            /**
+             *
+             */
             destroy: function(){
+                // #ifdef debug
+                trace("destroying transport");
+                // #endif
                 easyXSS.DomHelper.removeEventListener(window, "message", _window_onMessage);
                 if (config.local) {
                     _callerWindow.parentNode.removeChild(_callerWindow);
@@ -154,12 +158,9 @@ easyXSS.Transport = {
      * @constructor
      */
     HashTransport: function(config){
-        /// <summary>
-        /// Sets up the infrastructure for sending and receiving 
-        /// messages using the the IFrame URI Technique.
-        /// </summary
-        /// <param name="config" type="object"></param>
-        /// <returns type="object">An object able to send and receive strings</returns>
+        // #ifdef debug
+        trace("easyXSS.Transport.PostMessageTransport.constructor");
+        // #endif
         var _timer = null;
         var _lastMsg = "#" + config.channel, _msgNr = 0;
         var _listenerWindow = (!config.local) ? window : null, _callerWindow;
@@ -188,6 +189,9 @@ easyXSS.Transport = {
             }
             if (_listenerWindow.location.hash && _listenerWindow.location.hash != _lastMsg) {
                 _lastMsg = _listenerWindow.location.hash;
+                // #ifdef debug
+                trace("received message '" + _lastMsg + "' from " + _remoteOrigin);
+                // #endif
                 config.onMessage(decodeURIComponent(_lastMsg.substring(_lastMsg.indexOf("_") + 1)), _remoteOrigin);
             }
         }
@@ -221,18 +225,24 @@ easyXSS.Transport = {
             }
         });
         return {
-			            /** 
+            /** 
              * Sends a message by encoding and placing it in the hash part of _callerWindows url.
-             * We include a message number so that identical messages will be read as separate messages. 
+             * We include a message number so that identical messages will be read as separate messages.
              * @param {String} message The message to send
              */
             postMessage: function(message){
+                // #ifdef debug
+                trace("sending message '" + message + "' to " + _remoteOrigin);
+                // #endif
                 _callerWindow.src = _remoteUrl + "#" + (_msgNr++) + "_" + encodeURIComponent(message);
             },
-			/**
-			 * 
-			 */
+            /**
+             *
+             */
             destroy: function(){
+                // #ifdef debug
+                trace("destroying transport");
+                // #endif
                 window.clearInterval(_timer);
                 _callerWindow.parentNode.removeChild(_callerWindow);
                 _callerWindow = null;

@@ -1,13 +1,18 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!doctype html>
+<html>
     <head>
-        <title>Remote app</title>
-		<script type="text/javascript">
-           if (typeof console==="undefined"){window.console={log:function(){}};}
-			console.log(location + " load");
-		</script>
+        <title>easyXSS</title>
+        <script type="text/javascript">
+            if (typeof console === "undefined") {
+                window.console = {
+                    log: function(){
+                    }
+                };
+            }
+            console.log(location + " load");
+        </script>
     </head>
     <body>
-	<input type="button" onclick="window.opener.proxy.sendData({a:'b',c:'d',e:'f'});" value="send data to local"/>
+        <input type="button" onclick="window.opener.proxy.sendData({a:'b',c:'d',e:'f'});" value="send data to local"/>
     </body>
 </html>
