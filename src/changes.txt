@@ -1,6 +1,7 @@
 1.2
 Restructured the code to allow better documentation
 Converted most of the code to JsDoc format
+The debug version will try to trace all relevant actions to console.info if available
 
 Breaking changes:
 The method called by hash.html has moved.

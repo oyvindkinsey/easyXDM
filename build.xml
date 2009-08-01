@@ -79,8 +79,7 @@
 		<delete dir="${project.build.dir}\temp" quiet="true"/>
 	</target>
 	
-	<target name="package" depends="build">
-		<zip destfile="dist\${ant.project.name}.build-${build.number}.zip"
-       basedir="${project.build.dir}"/>
+	<target name="package">
+		<zip destfile="dist\${ant.project.name}.zip" basedir="${project.build.dir}"/>
 	</target>
 </project>
