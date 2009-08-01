@@ -4,15 +4,13 @@
 
 /** 
  * A javascript library providing cross-browser, cross-site messaging/method invocation
- * @author <a href="mailto:oyvind@kinsey.no">Øyvind Sean Kinsey</a>, <a href="http://kinsey.no/blog/">http://kinsey.no/blog</a>
- * @class
- * @singleton
+ * @namespace
  */
 var easyXSS = {
     /**
      * The version of the library
      */
-    version: "1.2",
+    version: "%%version%%",
     /**
      * Creates an interface that can be used to call methods implemented
      * on the remote end of the channel, and also to provide the implementation
@@ -257,7 +255,7 @@ var easyXSS = {
     /**
      * Creates a wrapper around the available transport mechanism that
      * also enables you to insert a serializer for the messages transmitted.
-     * @param {Object} config The channels configuration
+     * @param {easyXSS.ChannelConfiguration} config The channels configuration
      * @return An object able to send and receive arbitrary data
      * @see {easyXSS.Channel}
      * @type {easyXSS.Channel}

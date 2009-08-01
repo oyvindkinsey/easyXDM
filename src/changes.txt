@@ -1,0 +1,6 @@
+1.2
+Restructured the code to allow better documentation
+Converted most of the code to JsDoc format
+
+Breaking changes:
+The method called by hash.html has moved.
