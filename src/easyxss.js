@@ -1,5 +1,4 @@
 /*jslint browser: true, forin: true, immed: true, passfail: true, undef: true */
-
 /*global window, escape, unescape */
 
 

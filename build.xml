@@ -22,10 +22,10 @@
     </target>
 	<!-- Setup default build target -->
 	<target name="build" depends="clean">
-		<!-- Process pre proccesing instuctions like #if/#endif etc -->
 		<mkdir dir="${project.build.dir}"/>
+		<mkdir dir="${project.build.dir}\temp"/>
 		
-		<concat destfile="${project.src.dir}\easyXSS.combined.js">
+		<concat destfile="${project.build.dir}\temp\easyXSS.combined.js">
             <fileset dir="." includes="${project.src.dir}\easyXSS.js" />
             <fileset dir="." includes="${project.src.dir}\easyXSS.DomHelper.js" />
 			<fileset dir="." includes="${project.src.dir}\easyXSS.Events.js" />
@@ -34,23 +34,48 @@
 			<fileset dir="." includes="${project.src.dir}\easyXSS.Url.js" />
 			<fileset dir="." includes="${project.src.dir}\easyXSS.Serializing.js" />
         </concat>
-
-				
-		<preprocess infile="${project.src.dir}\easyXSS.combined.js" outfile="${project.build.dir}\easyxss.js"/>
-		<preprocess infile="${project.src.dir}\easyXSS.combined.js" outfile="${project.build.dir}\easyxss.debug.js" defines="debug"/>
-	    <preprocess infile="${project.src.dir}\hash.html" outfile="${project.build.dir}\hash.html"/>
 		
 		<!-- Run jslint -->
 		<java jar="tools\jslint4java-1.3.1\jslint4java-1.3.1.jar" fork="true" failonerror="true" maxmemory="128m" >
-			<arg value="${project.build.dir}\easyxss.js"/>
+			<arg value="${project.build.dir}\temp\easyXSS.combined.js"/>
         </java>
+		
+		<!-- Process pre proccesing instuctions like #if/#endif etc -->
+		<preprocess infile="${project.build.dir}\temp\easyXSS.combined.js" outfile="${project.build.dir}\temp\easyXSS.js"/>
+		<preprocess infile="${project.build.dir}\temp\easyXSS.combined.js" outfile="${project.build.dir}\temp\easyXSS.debug.js" defines="debug"/>
+	    <preprocess infile="${project.src.dir}\hash.html" outfile="${project.build.dir}\temp\hash.html"/>
+		
+		<delete file="${project.build.dir}\temp\easyXSS.combined.js" quiet="true"/>
 
 		<!-- Compress the file using the YUI Compressor -->
-		<yuicompress infile="${project.build.dir}\easyxss.js" outfile="${project.build.dir}\easyxss.min.js" />
+		<yuicompress infile="${project.build.dir}\temp\easyXSS.js" outfile="${project.build.dir}\temp\easyXSS.min.js" />
+		
+		<!-- concat header files -->
+		<concat destfile="${project.build.dir}\easyXSS.js">
+            <fileset dir="." includes="${project.src.dir}\header.js" />
+            <fileset dir="." includes="${project.build.dir}\temp\easyXSS.js" />
+		</concat>
+		<concat destfile="${project.build.dir}\easyXSS.debug.js">
+            <fileset dir="." includes="${project.src.dir}\header.js" />
+            <fileset dir="." includes="${project.build.dir}\temp\easyXSS.debug.js" />
+		</concat>
+		<concat destfile="${project.build.dir}\easyXSS.min.js">
+            <fileset dir="." includes="${project.src.dir}\header.js" />
+            <fileset dir="." includes="${project.build.dir}\temp\easyXSS.min.js" />
+		</concat>
+		<concat destfile="${project.build.dir}\hash.html">
+            <fileset dir="." includes="${project.src.dir}\header.html" />
+            <fileset dir="." includes="${project.build.dir}\temp\hash.html" />
+		</concat>
+		
+		<copy todir="${project.build.dir}">
+			<fileset dir="${project.build.dir}\temp"/>
+		</copy>
 		
 		<copy todir="${project.build.dir}\example">
 			<fileset dir="${project.src.dir}\example"/>
 		</copy>
+		<delete dir="${project.build.dir}\temp" quiet="true"/>
 	</target>
 	
 </project>
