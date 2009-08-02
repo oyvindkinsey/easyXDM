@@ -1,11 +1,46 @@
 /**
- * Contains classes related to the interface implementation
- * The contained classes are not instantiated but serves as the template 
+ * Contains classes related to the configurations
+ * The contained classes are not instantiated but serves as the template
  * for creating configuration objects.
  * @namespace
  */
-easyXSS.Interface = {
+easyXSS.Configuration = {
 
+    /**
+     * The configuration for transport classes
+     * @class
+     */
+    TransportConfiguration: {
+        /**
+         * The url of the remote endpoint
+         */
+        remote: "",
+        /**
+         * The url of the local copy of hash.html
+         */
+        local: "",
+        /**
+         * The method that should handle incoming messages
+         * @param {String} message The message
+         * @param {String} origin The origin of the message
+         */
+        onMessage: function(message, origin){
+        
+        }
+    },
+    
+    /**
+     * The channels configuration
+     * @extends easyXSS.Configuration.TransportConfiguration
+     * @class
+     */
+    ChannelConfiguration: {
+        /**
+         * The serializer to use
+         * @type easyXSS.Serializing.ISerializer
+         */
+        converter: {}
+    },
     /**
      * The interface configuration
      * @class
@@ -13,12 +48,12 @@ easyXSS.Interface = {
     InterfaceConfiguration: {
         /**
          * The local property contains a list of method-definitions in the form of methodname:{implementation}
-         * @type easyXSS.Interface.LocalConfiguration
+         * @type easyXSS.Configuration.LocalConfiguration
          */
         local: {},
         /**
          * The remote property contains a list of method-definitions in the form of methodname:{description}
-         * @type easyXSS.Interface.RemoteConfiguration
+         * @type easyXSS.Configuration.RemoteConfiguration
          */
         remote: {}
     },
@@ -29,18 +64,18 @@ easyXSS.Interface = {
     LocalConfiguration: {
         /**
          * A method returning data
-         * @type easyXSS.Interface.Methods.LocalMethod
+         * @type easyXSS.Configuration.Methods.LocalMethod
          */
         methodName: {},
         /**
          * A method not returning any data
-         * @type easyXSS.Interface.Methods.LocalVoidMethod
+         * @type easyXSS.Configuration.Methods.LocalVoidMethod
          */
         voidMethodName: {},
         /**
          * An asynchronous method that is unable to return data immediately
          * This can for instance be a method using an xmlHttpRequest object to retrieve data
-         * @type easyXSS.Interface.Methods.LocalAsyncMethod
+         * @type easyXSS.Configuration.Methods.LocalAsyncMethod
          */
         asyncMethodName: {}
     },
@@ -51,17 +86,17 @@ easyXSS.Interface = {
     RemoteConfiguration: {
         /**
          * Methods are by default expected to return data
-         * @type easyXSS.Interface.Methods.RemoteMethod
+         * @type easyXSS.Configuration.Methods.RemoteMethod
          */
         methodName: {},
         /**
          * We do not expect any data back from this method
-         * @type easyXSS.Interface.Methods.RemoteVoidMethod
+         * @type easyXSS.Configuration.Methods.RemoteVoidMethod
          */
         voidMethodName: {},
         /**
          * We do not need to know that the remote method is implemented asynchronous
-         * @type easyXSS.Interface.Methods.RemoteAsyncMethod
+         * @type easyXSS.Configuration.Methods.RemoteAsyncMethod
          */
         asyncMethodName: {}
     },
@@ -125,25 +160,25 @@ easyXSS.Interface = {
             method: function(arg1, arg2, argN, callback){
             }
         },
-		/**
-		 * Methods are by default expected to return data
-		 * @class
-		 */
+        /**
+         * Methods are by default expected to return data
+         * @class
+         */
         RemoteMethod: {},
-		/**
-		 * We do not expect any data back from this method
-		 * @class
-		 */
+        /**
+         * We do not expect any data back from this method
+         * @class
+         */
         RemoteVoidMethod: {
             /**
              * We mark the method as void so that the framework will not wait for any response, and will not expect a callback method
              */
             isVoid: true
         },
-		/**
-		 * We do not need to know that the remote method is implemented asynchronous
-		 * @class
-		 */
+        /**
+         * We do not need to know that the remote method is implemented asynchronous
+         * @class
+         */
         RemoteAsyncMethod: {}
     }
 };

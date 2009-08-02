@@ -4,35 +4,13 @@
  */
 easyXSS.Transport = {
     /**
-     * The configuration for transport classes
-     * @class
-     */
-    TransportConfiguration: {
-        /**
-         * The url of the remote endpoint
-         */
-        remote: "",
-        /**
-         * The url of the local copy of hash.html
-         */
-        local: "",
-        /**
-         * The method that should handle incoming messages
-         * @param {String} message The message
-         * @param {String} origin The origin of the message
-         */
-        onMessage: function(message, origin){
-        
-        }
-    },
-    /**
      * The interface implemented by all transport classes
+     * @class
      */
     ITransport: {
         /**
          * Sends the message
          * @param {String} message The message to send
-         * @class
          */
         postMessage: function(message){
         

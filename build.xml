@@ -29,7 +29,7 @@
             <fileset dir="." includes="${project.src.dir}\easyXSS.DomHelper.js" />
 			<fileset dir="." includes="${project.src.dir}\easyXSS.Events.js" />
 			<fileset dir="." includes="${project.src.dir}\easyXSS.Transport.js" />
-			<fileset dir="." includes="${project.src.dir}\easyXSS.Interface.js" />
+			<fileset dir="." includes="${project.src.dir}\easyXSS.Configuration.js" />
 			<fileset dir="." includes="${project.src.dir}\easyXSS.Url.js" />
 			<fileset dir="." includes="${project.src.dir}\easyXSS.Serializing.js" />
         </concat>

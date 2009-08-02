@@ -18,10 +18,11 @@ var easyXSS = {
      * of methods to be called from the remote end.
      * @requires JSON
      * @param {String} channel A valid channel for transportation
-     * @param {easyXSS.Interface.InterfaceConfiguration} config A valid easyXSS-definition
+     * @param {easyXSS.Configuration.InterfaceConfiguration} config A valid easyXSS-definition
      * @param {Function} onReady A method that should be called when the interface is ready
+     * @class
      */
-    createInterface: function(channel, config, onReady){
+    Interface: function(channel, config, onReady){
         // #ifdef debug
         easyXSS.Debug.trace("creating new interface");
         // #endif
@@ -133,10 +134,10 @@ var easyXSS = {
                         // #ifdef debug
                         easyXSS.Debug.trace("executing method " + name);
                         // #endif
-                        _callbacks["" + (_callbackCounter)] = arguments[arguments.length - 1];
+                        _callbacks["" + (++_callbackCounter)] = arguments[arguments.length - 1];
                         var request = {
                             name: name,
-                            id: (++_callbackCounter),
+                            id: (_callbackCounter),
                             params: []
                         };
                         for (var i = 0, len = arguments.length - 1; i < len; i++) {
@@ -190,18 +191,6 @@ var easyXSS = {
         else {
             return new easyXSS.Transport.HashTransport(config, onReady);
         }
-    },
-    /**
-     * The channels configuration
-     * @extends easyXSS.Transport.TransportConfiguration
-     * @class
-     */
-    ChannelConfiguration: {
-        /**
-         * The serializer to use
-         * @type easyXSS.Serializing.ISerializer
-         */
-        converter: {}
     },
     /**
      * A channel
@@ -305,19 +294,6 @@ var easyXSS = {
              */
             sendData: sendData
         };
-    },
-    /**
-     * Creates a wrapper around the available transport mechanism that
-     * also enables you to insert a serializer for the messages transmitted.
-     * @param {easyXSS.ChannelConfiguration} config The channels configuration
-     * @return An object able to send and receive arbitrary data
-     * @type easyXSS.Channel
-     */
-    createChannel: function(config){
-        // #ifdef debug
-        easyXSS.Debug.trace("creating channel");
-        // #endif
-        return new easyXSS.Channel(config);
     }
 };
 

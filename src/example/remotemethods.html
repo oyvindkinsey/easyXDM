@@ -19,11 +19,11 @@
                 /**
                  * We start by creating a channel
                  */
-                channel = easyXSS.createChannel(/** The configuration */{}, /**The onReady handler*/ function(){
+                channel = new easyXSS.Channel(/** The configuration */{}, /**The onReady handler*/ function(){
                     /**
                      * When the channel is ready we create the interface
                      */
-                    remote = easyXSS.createInterface(/** The channel to use*/channel, /** The configuration */ {
+                    remote = new easyXSS.Interface(/** The channel to use*/channel, /** The configuration */ {
                         remote: {
                             alertMessage: {
                                 isVoid: true
