@@ -54,7 +54,7 @@ easyXSS.Transport = {
      */
     PostMessageTransport: function(config){
         // #ifdef debug
-        trace("easyXSS.Transport.PostMessageTransport.constructor");
+        easyXSS.Debug.trace("easyXSS.Transport.PostMessageTransport.constructor");
         // #endif
         var _targetOrigin = easyXSS.Url.getLocation(config.remote);
         var _callerWindow;
@@ -87,7 +87,7 @@ easyXSS.Transport = {
             /// <param name="event" type="MessageEvent">The eventobject from the browser</param>
             var origin = _getOrigin(event);
             // #ifdef debug
-            trace("received message '" + event.data + "' from " + origin);
+            easyXSS.Debug.trace("received message '" + event.data + "' from " + origin);
             // #endif
             if (origin == _targetOrigin && event.data.substring(0, config.channel.length + 1) == config.channel + " ") {
                 config.onMessage(event.data.substring(config.channel.length + 1), origin);
@@ -127,7 +127,7 @@ easyXSS.Transport = {
              */
             postMessage: function(message){
                 // #ifdef debug
-                trace("sending message '" + message + "' to " + _targetOrigin);
+                easyXSS.Debug.trace("sending message '" + message + "' to " + _targetOrigin);
                 // #endif
                 if (config.local) {
                     _callerWindow.contentWindow.postMessage(config.channel + " " + message, _targetOrigin);
@@ -141,7 +141,7 @@ easyXSS.Transport = {
              */
             destroy: function(){
                 // #ifdef debug
-                trace("destroying transport");
+                easyXSS.Debug.trace("destroying transport");
                 // #endif
                 easyXSS.DomHelper.removeEventListener(window, "message", _window_onMessage);
                 if (config.local) {
@@ -159,7 +159,7 @@ easyXSS.Transport = {
      */
     HashTransport: function(config){
         // #ifdef debug
-        trace("easyXSS.Transport.PostMessageTransport.constructor");
+        easyXSS.Debug.trace("easyXSS.Transport.PostMessageTransport.constructor");
         // #endif
         var _timer = null;
         var _lastMsg = "#" + config.channel, _msgNr = 0;
@@ -190,7 +190,7 @@ easyXSS.Transport = {
             if (_listenerWindow.location.hash && _listenerWindow.location.hash != _lastMsg) {
                 _lastMsg = _listenerWindow.location.hash;
                 // #ifdef debug
-                trace("received message '" + _lastMsg + "' from " + _remoteOrigin);
+                easyXSS.Debug.trace("received message '" + _lastMsg + "' from " + _remoteOrigin);
                 // #endif
                 config.onMessage(decodeURIComponent(_lastMsg.substring(_lastMsg.indexOf("_") + 1)), _remoteOrigin);
             }
@@ -232,7 +232,7 @@ easyXSS.Transport = {
              */
             postMessage: function(message){
                 // #ifdef debug
-                trace("sending message '" + message + "' to " + _remoteOrigin);
+                easyXSS.Debug.trace("sending message '" + message + "' to " + _remoteOrigin);
                 // #endif
                 _callerWindow.src = _remoteUrl + "#" + (_msgNr++) + "_" + encodeURIComponent(message);
             },
@@ -241,7 +241,7 @@ easyXSS.Transport = {
              */
             destroy: function(){
                 // #ifdef debug
-                trace("destroying transport");
+                easyXSS.Debug.trace("destroying transport");
                 // #endif
                 window.clearInterval(_timer);
                 _callerWindow.parentNode.removeChild(_callerWindow);

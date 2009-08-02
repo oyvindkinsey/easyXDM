@@ -21,16 +21,13 @@
                             local: {
                                 addNumbers: {
                                     method: function(a, b){
-                                        _log("method addNumbers called");
                                         return a + b;
                                     }
                                 },
                                 multiplyNumbers: {
                                     isAsync: true,
                                     method: function(a, b, fn){
-                                        _log("method multiplyNumbers called");
                                         window.setTimeout(function(){
-                                            _log("returning multiplyNumbers");
                                             fn(a * b);
                                         }, 5000);
                                     }
@@ -38,7 +35,6 @@
                                 noOp: {
                                     isVoid: true,
                                     method: function(){
-                                        _log("method noOp called");
                                         alert("Method not returning any data");
                                     }
                                 }
@@ -47,17 +43,13 @@
                     }
                 });
             }
-            function _log(msg){
-                var div = document.createElement("div");
-                div.innerHTML = msg;
-                document.body.appendChild(div);
-            }
         </script>
     </head>
     <body>
-        <script type="text/javascript">
+		<script type="text/javascript">
             document.write("Domain: " + location.host);
         </script>
+        <div id="log" style="height:100px;border:1px dotted black;overflow:auto"></div>
         <br/>
         <input type="button" onclick="remote.alertMessage('message from remote');" value="call alertMessage on local domain"/>
     </body>

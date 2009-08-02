@@ -16,7 +16,7 @@ easyXSS.Events = (function(){
          */
         registerOnReady: function(channel, callback){
             // #ifdef debug
-            trace("registerign onReady callback for channel " + channel);
+            easyXSS.Debug.trace("registering onReady callback for channel " + channel);
             // #endif
             onReadyCallbacks[channel] = callback;
         },
@@ -26,7 +26,7 @@ easyXSS.Events = (function(){
          */
         onReady: function(channel){
             // #ifdef debug
-            trace("executing onReady calback for channel " + channel);
+            easyXSS.Debug.trace("executing onReady calback for channel " + channel);
             // #endif
             var fn = this.onReadyCallbacks[channel];
             if (fn) {

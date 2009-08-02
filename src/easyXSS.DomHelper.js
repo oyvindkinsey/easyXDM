@@ -103,13 +103,13 @@ easyXSS.DomHelper = {
     requiresJSON: function(path){
         if (typeof JSON == "undefined" || !JSON) {
             // #ifdef debug
-            trace("loading external JSON");
+            easyXSS.Debug.log("loading external JSON");
             // #endif
             document.write('<script type="text/javascript" src="' + path + '"></script>');
         }
         // #ifdef debug
         else {
-            trace("native JSON found");
+            easyXSS.Debug.log("native JSON found");
         }
         // #endif
     }

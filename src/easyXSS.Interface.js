@@ -1,6 +1,6 @@
 /**
  * Contains classes related to the interface implementation
- * The contained classes are not instantiated but server as the template 
+ * The contained classes are not instantiated but serves as the template 
  * for creating configuration objects.
  * @namespace
  */
