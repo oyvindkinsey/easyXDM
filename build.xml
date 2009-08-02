@@ -12,6 +12,9 @@
 	<taskdef name="preprocess" classname="com.moxiecode.ant.tasks.PreProcessTask" classpathref="js-build-tasks.classpath" loaderref="js-build-tasks.classpath.loader" />
 	<taskdef name="yuicompress" classname="com.moxiecode.ant.tasks.YuiCompressTask" classpathref="js-build-tasks.classpath" loaderref="js-build-tasks.classpath.loader" />
 	
+	<taskdef name="jsdoctoolkit" classname="uk.co.darrenhurley.ant.tasks.JsDocToolkit" 
+		classpath="tools\jsdoctoolkit-ant-task-1.0.1.jar;tools\js.jar"/>
+	
 	<target name="clean" depends="" description="Cleans up the project from temporary files">
 		<delete dir="${project.build.dir}" quiet="true"/>
     </target>
@@ -78,8 +81,13 @@
 		</copy>
 		<delete dir="${project.build.dir}\temp" quiet="true"/>
 	</target>
-	
-	<target name="package">
+	<target name="document" depends="build">
+		<jsdoctoolkit jsdochome="tools\jsdoc_toolkit-2.3.0\jsdoc-toolkit\" 
+			template="outline" outputdir="build/docs">
+			 <source file="build/easyXSS.debug.js" />
+		</jsdoctoolkit>
+	</target>
+	<target name="package" depends="document">
 		<mkdir dir="dist"/>
 		<zip destfile="dist\${ant.project.name}.zip" basedir="${project.build.dir}"/>
 	</target>
