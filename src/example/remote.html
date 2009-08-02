@@ -5,6 +5,9 @@
         <script type="text/javascript" src="../easyXSS.debug.js">
         </script>
         <script type="text/javascript">
+            /**
+             * Request the use of the JSON object
+             */
             easyXSS.DomHelper.requiresJSON("../json2.js");
         </script>
         <script type="text/javascript">
@@ -15,10 +18,27 @@
              */
             var proxy;
             var remoteapp;
+            /**
+             * When the window is finished loading start setting up the channel
+             */
             window.onload = function(){
+                /**
+                 * Try to open up a new window.
+                 */
                 remoteapp = window.open('remoteapp.html', 'mainapp', 'width=300,height=300');
+                /**
+                 * Check that the window wasn't blocked as a popup
+                 */
                 if (remoteapp) {
-                    proxy = easyXSS.createChannel({
+                    /**
+                     * We start by creating a channel
+                     */
+                    proxy = easyXSS.createChannel(/** The configuration */{
+                        /**
+                         * Register the method that should handle incoming data
+                         * @param {Object} data
+                         * @param {String} origin
+                         */
                         onData: function(data, origin){
                             remoteapp.focus();
                             var div = remoteapp.document.createElement("div");
@@ -30,6 +50,10 @@
                                 remoteapp.document.body.appendChild(div);
                             }
                         },
+                        /**
+                         * Register the serializer to use for converting messages
+                         * @field
+                         */
                         converter: JSON
                     });
                 }

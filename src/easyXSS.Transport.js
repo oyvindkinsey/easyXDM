@@ -50,9 +50,10 @@ easyXSS.Transport = {
      * http://msdn.microsoft.com/en-us/library/ms644944(VS.85).aspx
      * https://developer.mozilla.org/en/DOM/window.postMessage
      * @param {easyXSS.Transport.TransportConfiguration} config The transports configuration.
+     * @param {Function} onReady A method that should be called when the transport is ready
      * @class
      */
-    PostMessageTransport: function(config){
+    PostMessageTransport: function(config, onReady){
         // #ifdef debug
         easyXSS.Debug.trace("easyXSS.Transport.PostMessageTransport.constructor");
         // #endif
@@ -102,8 +103,8 @@ easyXSS.Transport = {
             /// We delay this so that the the call to createChannel or 
             /// createTransport will have completed  
             /// </remark>
-            if (config.onReady) {
-                window.setTimeout(config.onReady, 10);
+            if (onReady) {
+                window.setTimeout(onReady, 10);
             }
         }
         
@@ -155,9 +156,10 @@ easyXSS.Transport = {
      * HashTransport is a transport class that uses the IFrame URL Technique for communication
      * <a href="http://msdn.microsoft.com/en-us/library/bb735305.aspx">http://msdn.microsoft.com/en-us/library/bb735305.aspx</a>
      * @param {easyXSS.Transport.TransportConfiguration} config The transports configuration.
+     * @param {Function} onReady A method that should be called when the transport is ready
      * @constructor
      */
-    HashTransport: function(config){
+    HashTransport: function(config, onReady){
         // #ifdef debug
         easyXSS.Debug.trace("easyXSS.Transport.PostMessageTransport.constructor");
         // #endif
@@ -207,13 +209,13 @@ easyXSS.Transport = {
             _timer = window.setInterval(function(){
                 _checkForMessage();
             }, _pollInterval);
-            if (config.onReady) {
-                window.setTimeout(config.onReady, 10);
+            if (onReady) {
+                window.setTimeout(onReady, 10);
             }
         }
         
         _callerWindow = easyXSS.DomHelper.createFrame(_remoteUrl, ((config.local) ? "" : "xss_" + config.channel), config.container, function(){
-            if (config.onReady) {
+            if (onReady) {
                 if (config.local) {
                     // Register onReady callback in the library so that
                     // it can be called when hash.html has loaded.

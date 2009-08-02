@@ -12,75 +12,6 @@ var easyXSS = {
      * The version of the library
      */
     version: "%%version%%",
-    // #ifdef debug
-    /**
-     * Utilities for debugging
-     * @class
-     */
-    Debug: {
-        /**
-         * Logs the message to console.log if available
-         * @param {String} msg The message to log
-         */
-        log: function(msg){
-            if (console === "undefined" || console.log === "undefiend") {
-                /**
-                 * @ignore
-                 */
-                easyXSS.Debug.log = function(){
-                };
-            }
-            else {
-                /**
-                 * @ignore
-                 * @param {String} msg
-                 */
-                easyXSS.Debug.log = function(msg){
-                    console.log(location.host + ":" + msg);
-                };
-            }
-        },
-        /**
-         * Will try to trace the given message either to a DOMElement with the id "log",
-         * or by using console.info.
-         * @param {String} msg The message to trace
-         */
-        trace: function(msg){
-            var trace;
-            var el = document.getElementById("log");
-            if (el) {
-                /**
-                 * @ignore
-                 * @param {String} msg
-                 */
-                trace = function(msg){
-                    el.appendChild(document.createElement("div")).appendChild(document.createTextNode(location.host + ":" + msg));
-                    el.scrollTop = el.scrollHeight;
-                };
-            }
-            else {
-                if (console === "undefined") {
-                    /**
-                     * @ignore
-                     */
-                    trace = function(){
-                    };
-                }
-                else {
-                    /**
-                     * @ignore
-                     * @param {String} msg
-                     */
-                    trace = function(msg){
-                        console.info(location.host + ":" + msg);
-                    };
-                }
-            }
-            trace(location.host + ":" + msg);
-            easyXSS.Debug.trace = trace;
-        }
-    },
-    // #endif
     /**
      * Creates an interface that can be used to call methods implemented
      * on the remote end of the channel, and also to provide the implementation
@@ -88,9 +19,9 @@ var easyXSS = {
      * @requires JSON
      * @param {String} channel A valid channel for transportation
      * @param {easyXSS.Interface.InterfaceConfiguration} config A valid easyXSS-definition
-     * @param {Function} onready A method that should be called when the interface is ready
+     * @param {Function} onReady A method that should be called when the interface is ready
      */
-    createInterface: function(channel, config, onready){
+    createInterface: function(channel, config, onReady){
         // #ifdef debug
         easyXSS.Debug.trace("creating new interface");
         // #endif
@@ -226,8 +157,8 @@ var easyXSS = {
         }
         channel.setOnData(_onData);
         channel.setConverter(JSON);
-        if (onready) {
-            window.setTimeout(onready, 10);
+        if (onReady) {
+            window.setTimeout(onReady, 10);
         }
         
         return (config.remote) ? _createRemote(config.remote) : null;
@@ -239,8 +170,9 @@ var easyXSS = {
      * @param {easyXSS.Transport.TransportConfiguration} config The transports configuration
      * @return An object able to send and receive messages
      * @type easyXSS.Transport.ITransport
+     * @param {Function} onReady A method that should be called when the transport is ready
      */
-    createTransport: function(config){
+    createTransport: function(config, onReady){
         if (config.local) {
             config.channel = (config.channel) ? config.channel : "default";
         }
@@ -253,10 +185,10 @@ var easyXSS = {
         easyXSS.Debug.trace("creating transport for channel " + config.channel);
         // #endif
         if (window.postMessage) {
-            return new easyXSS.Transport.PostMessageTransport(config);
+            return new easyXSS.Transport.PostMessageTransport(config, onReady);
         }
         else {
-            return new easyXSS.Transport.HashTransport(config);
+            return new easyXSS.Transport.HashTransport(config, onReady);
         }
     },
     /**
@@ -275,8 +207,9 @@ var easyXSS = {
      * A channel
      * @constructor
      * @param {easyXSS.ChannelConfiguration} config The channels configuration
+     * @param {Function} onReady A method that should be called when the channel is ready
      */
-    Channel: function(config){
+    Channel: function(config, onReady){
         // #ifdef debug
         easyXSS.Debug.trace("easyXSS.Channel.constructor");
         // #endif
@@ -318,7 +251,7 @@ var easyXSS = {
              * The underlying transport used by this channel
              * @type easyXSS.Transport.ITransport
              */
-            transport: easyXSS.createTransport(/** easyXSS.Transport.TransportConfiguration*/config),
+            transport: easyXSS.createTransport(/** easyXSS.Transport.TransportConfiguration*/config, onReady),
             /**
              * Sets the serializer to be used when transmitting and receiving messages
              * @param {Object} converter The serializer to use
@@ -387,3 +320,83 @@ var easyXSS = {
         return new easyXSS.Channel(config);
     }
 };
+
+// #ifdef debug
+/**
+ * Utilities for debugging. This class is only precent in the debug version.
+ * @class
+ */
+easyXSS.Debug = {
+    /**
+     * Logs the message to console.log if available
+     * @param {String} msg The message to log
+     */
+    log: function(msg){
+        // Uses memoizing to cache the implementation
+        var log;
+        if (console === "undefined" || console.log === "undefiend") {
+            /**
+             * Sets log to be an empty function since we have no output available
+             * @ignore
+             */
+            log = function(){
+            };
+        }
+        else {
+            /**
+             * Sets log to be a wrapper around console.log
+             * @ignore
+             * @param {String} msg
+             */
+            log = function(msg){
+                console.log(location.host + ":" + msg);
+            };
+        }
+        log(msg);
+        easyXSS.Debug.log = log;
+    },
+    /**
+     * Will try to trace the given message either to a DOMElement with the id "log",
+     * or by using console.info.
+     * @param {String} msg The message to trace
+     */
+    trace: function(msg){
+        // Uses memoizing to cache the implementation
+        var trace;
+        var el = document.getElementById("log");
+        if (el) {
+            /**
+             * Sets trace to be a function that outputs the messages to the DOMElement with id "log"
+             * @ignore
+             * @param {String} msg
+             */
+            trace = function(msg){
+                el.appendChild(document.createElement("div")).appendChild(document.createTextNode(location.host + ":" + msg));
+                el.scrollTop = el.scrollHeight;
+            };
+        }
+        else {
+            if (console === "undefined") {
+                /**
+                 * Sets trace to be an empty function
+                 * @ignore
+                 */
+                trace = function(){
+                };
+            }
+            else {
+                /**
+                 * Sets trace to be a wrapper around console.info
+                 * @ignore
+                 * @param {String} msg
+                 */
+                trace = function(msg){
+                    console.info(location.host + ":" + msg);
+                };
+            }
+        }
+        trace(location.host + ":" + msg);
+        easyXSS.Debug.trace = trace;
+    }
+};
+// #endif

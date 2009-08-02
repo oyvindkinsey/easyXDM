@@ -67,38 +67,86 @@ easyXSS.DomHelper = {
     },
     /**
      * Gives a consistent interface for adding eventhandlers
-     * @param {DOMElement} element The DOMElement to attach the handler to
-     * @param {String} event The eventname
-     * @param {Function} handler The handler to attach
+     * @param {Object} target The target to add the event to
+     * @param {String} type The name of the event
+     * @param {Function} listener The listener
      */
-    addEventListener: function(element, event, handler){
+    addEventListener: function(target, type, listener, useCapture){
+        // Uses memoizing to cache the implementation
+        var addEventListener;
         if (window.addEventListener) {
-            element.addEventListener(event, handler, false);
+            /**
+             * Set addEventListener to use the DOM level 2 addEventListener
+             * https://developer.mozilla.org/en/DOM/element.addEventListener
+             * @ignore
+             * @param {Object} target
+             * @param {String} type
+             * @param {Function} listener
+             */
+            addEventListener = function(target, type, listener, useCapture){
+                target.addEventListener(type, listener, useCapture);
+            };
         }
         else {
-            element.attachEvent("on" + event, handler);
+            /**
+             * Set addEventlistener to a wrapper around the IE spesific attachEvent
+             * http://msdn.microsoft.com/en-us/library/ms536343%28VS.85%29.aspx
+             * @ignore
+             * @param {Object} object
+             * @param {String} sEvent
+             * @param {Function} fpNotify
+             */
+            addEventListener = function(object, sEvent, fpNotify){
+                object.attachEvent("on" + sEvent, fpNotify);
+            };
         }
+        addEventListener(target, type, listener);
+        easyXSS.DomHelper.addEventListener = addEventListener;
     },
     /**
-     * Gives a consistent interface for removing eventhandlers
-     * @param {DOMElement} element The DOMElement to remove the handler from
-     * @param {String} event The eventname
-     * @param {Function} handler The handler to remove
+     * Gives a consistent interface for adding eventhandlers
+     * @param {Object} target The target to add the event to
+     * @param {String} type The name of the event
+     * @param {Function} listener The listener
      */
-    removeEventListener: function(element, event, handler){
+    removeEventListener: function(target, type, listener, useCapture){
+        // Uses memoizing to cache the implementation
+        var removeEventListener;
         if (window.removeEventListener) {
-            element.removeEventListener(event, handler, false);
+            /**
+             * Set removeEventListener to use the DOM level 2 removeEventListener
+             * https://developer.mozilla.org/en/DOM/element.removeEventListener
+             * @ignore
+             * @param {Object} target
+             * @param {String} type
+             * @param {Function} listener
+             */
+            removeEventListener = function(target, type, listener, useCapture){
+                target.removeEventListener(type, listener, useCapture);
+            };
         }
         else {
-            element.detachEvent("on" + event, handler);
+            /**
+             * Set removeEventlistener to a wrapper around the IE spesific detachEvent
+             * http://msdn.microsoft.com/en-us/library/ms536411%28VS.85%29.aspx
+             * @ignore
+             * @param {Object} object
+             * @param {String} sEvent
+             * @param {Function} fpNotify
+             */
+            removeEventListener = function(object, sEvent, fpNotify){
+                object.detachEvent("on" + sEvent, fpNotify);
+            };
         }
+        removeEventListener(target, type, listener);
+        easyXSS.DomHelper.removeEventListener = removeEventListener;
     },
     /**
      * Checks for the precense of the JSON object.
      * If it is not precent it will use the supplied path to load the JSON2 library.
      * This should be called in the documents head right after the easyXSS script tag.
      * http://json.org/json2.js
-     * @param {Object} path
+     * @param {String} path A valid path to json2.js
      */
     requiresJSON: function(path){
         if (typeof JSON == "undefined" || !JSON) {

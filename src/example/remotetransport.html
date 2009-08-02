@@ -6,8 +6,19 @@
         </script>
         <script type="text/javascript">
             var transport;
+            /**
+             * When the window is finished loading start setting up the channel
+             */
             window.onload = function(){
-                transport = easyXSS.createTransport({
+                /**
+                 * We start by creating a transport
+                 */
+                transport = easyXSS.createTransport(/** The configuration */{
+                    /**
+                     * Register the method that should handle incoming messages
+                     * @param {String} data
+                     * @param {String} origin
+                     */
                     onMessage: function(message, origin){
                         alert("Received '" + message + "' from '" + origin + "'");
                     }

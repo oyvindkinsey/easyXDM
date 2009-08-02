@@ -6,9 +6,24 @@
         </script>
         <script type="text/javascript">
             var channel;
+            /**
+             * When the window is finished loading start setting up the channel
+             */
             window.onload = function(){
-                channel = easyXSS.createChannel({
+                /**
+                 * We start by creating a channel
+                 */
+                channel = easyXSS.createChannel(/** The configuration */{
+                    /**
+                     * Register the serializer to use for converting messages
+                     * @field
+                     */
                     converter: easyXSS.Serializing.hashTableSerializer,
+                    /**
+                     * Register the method that should handle incoming data
+                     * @param {Object} data
+                     * @param {String} origin
+                     */
                     onData: function(data, origin){
                         alert("Received data from '" + origin + "':")
                         for (var key in data) {

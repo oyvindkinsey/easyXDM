@@ -6,23 +6,47 @@
         </script>
         <script type="text/javascript">
             var channel;
+            /**
+             * When the window is finished loading start setting up the channel
+             */
             window.onload = function(){
-                channel = easyXSS.createChannel({
+                /**
+                 * We start by creating a channel
+                 */
+                channel = easyXSS.createChannel(/** The configuration */{
+                    /**
+                     * Register the url to hash.html, this must be an absolute path
+                     * or a path relative to the root.
+                     * @field
+                     */
                     local: "/hash.html",
+                    /**
+                     * Register the url to the remote interface
+                     * @field
+                     */
                     remote: "http://provider.easyxss.net/example/remotedata.html",
-                    converter: easyXSS.Serializing.hashTableSerializer,
-                    onReady: function(){
-                        channel.sendData({
-                            propA: "abc",
-                            propB: "def",
-                            propC: 44
-                        });
-                    }
+                    
+                    /**
+                     * Register the serializer to use for converting messages
+                     * @field
+                     */
+                    converter: easyXSS.Serializing.hashTableSerializer
+                },/**The onReady handler*/ function(){
+                    /**
+                     * Send some data to the other side
+                     */
+                    channel.sendData({
+                        propA: "abc",
+                        propB: "def",
+                        propC: 44
+                    });
                 });
             }
         </script>
     </head>
     <body>
-		<div id="log" style="height:100px;border:1px dotted black;overflow:auto"></div>
+        <!-- easyXSS.Debug.trace(msg) will output its messages to any element with the id "log" -->
+        <div id="log" style="height:100px;border:1px dotted black;overflow:auto">
+        </div>
     </body>
 </html>
