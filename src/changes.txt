@@ -1,3 +1,11 @@
+1.3.0 - 02.08.09
+Restructured the code again sot that it will be easier to understand.
+Changed to using the 'new classname' construct instead of easyXSS.createClassname
+Added documentation to the examples.
+
+Breaking changes:
+Removed several create.. methods. 
+
 1.2
 Restructured the code to allow better documentation
 Converted most of the code to JsDoc format
