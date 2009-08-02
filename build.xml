@@ -80,6 +80,7 @@
 	</target>
 	
 	<target name="package">
+		<mkdir dir="dist"/>
 		<zip destfile="dist\${ant.project.name}.zip" basedir="${project.build.dir}"/>
 	</target>
 </project>
