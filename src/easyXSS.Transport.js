@@ -1,11 +1,8 @@
-/** 
- * Contains available transport classes
- * @namespace
- */
 easyXSS.Transport = {
     /**
+     * @class easyXSS.Transport.ITransport
      * The interface implemented by all transport classes
-     * @class
+     * @namespace easyXSS.Transport
      */
     ITransport: {
         /**
@@ -24,12 +21,15 @@ easyXSS.Transport = {
     },
     
     /**
+     * @class easyXSS.Transport.PostMessageTransport
+     * @extends easyXSS.Transport.ITransport
      * PostMessageTransport is a transport class that uses HTML5 postMessage for communication
-     * http://msdn.microsoft.com/en-us/library/ms644944(VS.85).aspx
-     * https://developer.mozilla.org/en/DOM/window.postMessage
+     * <a href="http://msdn.microsoft.com/en-us/library/ms644944(VS.85).aspx">http://msdn.microsoft.com/en-us/library/ms644944(VS.85).aspx</a>
+     * <a href="https://developer.mozilla.org/en/DOM/window.postMessage">https://developer.mozilla.org/en/DOM/window.postMessage</a>
+     * @constructor
      * @param {easyXSS.Transport.TransportConfiguration} config The transports configuration.
      * @param {Function} onReady A method that should be called when the transport is ready
-     * @class
+     * @namespace easyXSS.Transport
      */
     PostMessageTransport: function(config, onReady){
         // #ifdef debug
@@ -131,11 +131,14 @@ easyXSS.Transport = {
         };
     },
     /**
+     * @class easyXSS.Transport.HashTransport
+     * @extends easyXSS.Transport.ITransport
      * HashTransport is a transport class that uses the IFrame URL Technique for communication
      * <a href="http://msdn.microsoft.com/en-us/library/bb735305.aspx">http://msdn.microsoft.com/en-us/library/bb735305.aspx</a>
+     * @constructor
      * @param {easyXSS.Transport.TransportConfiguration} config The transports configuration.
      * @param {Function} onReady A method that should be called when the transport is ready
-     * @constructor
+     * @namespace easyXSS.Transport
      */
     HashTransport: function(config, onReady){
         // #ifdef debug

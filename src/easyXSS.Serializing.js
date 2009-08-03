@@ -1,10 +1,8 @@
-/** 
- * Contains serializers for serializing and deserializing messages
- * @namespace 
- */
 easyXSS.Serializing = {
     /**
+     * @class easyXSS.Serializing.ISerializer
      * The Interface implemented by all serializers
+     * @namespace easyXSS.Serializing
      */
     ISerializer: {
         /**
@@ -27,9 +25,10 @@ easyXSS.Serializing = {
         }
     },
     /**
+     * @class easyXSS.Serializing.hashTableSerializer
      * A serializer that can convert to and from hashtables
      * It uses the same format as the query string for its serialized data
-     * @class
+     * @namespace easyXSS.Serializing
      */
     hashTableSerializer: {
         /**

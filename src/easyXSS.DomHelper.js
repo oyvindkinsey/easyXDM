@@ -1,6 +1,7 @@
 /** 
+ * @class easyXSS.DomHelper
  * Contains methods for dealing with the DOM
- * @class
+ * @singleton
  */
 easyXSS.DomHelper = {
     /**

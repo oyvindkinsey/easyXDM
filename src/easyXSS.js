@@ -3,16 +3,44 @@
 /*global window, escape, unescape */
 
 /** 
+ * @class easyXSS
  * A javascript library providing cross-browser, cross-site messaging/method invocation
  * @version %%version%%
- * @namespace
+ * @singleton
  */
 var easyXSS = {
     /**
      * The version of the library
+     * @type {String}
      */
     version: "%%version%%",
     /**
+     * @method
+     * @param {easyXSS.Transport.TransportConfiguration} config The transports configuration
+     * @param {Function} onReady A method that should be called when the transport is ready
+     * @return easyXSS.Transport.ITransport An object able to send and receive messages
+     */
+    createTransport: function(config, onReady){
+        if (config.local) {
+            config.channel = (config.channel) ? config.channel : "default";
+        }
+        else {
+            var query = easyXSS.Url.Query();
+            config.channel = query.channel;
+            config.remote = query.endpoint;
+        }
+        // #ifdef debug
+        easyXSS.Debug.trace("creating transport for channel " + config.channel);
+        // #endif
+        if (window.postMessage) {
+            return new easyXSS.Transport.PostMessageTransport(config, onReady);
+        }
+        else {
+            return new easyXSS.Transport.HashTransport(config, onReady);
+        }
+    },
+    /** 
+     * @class easyXSS.Interface
      * Creates an interface that can be used to call methods implemented
      * on the remote end of the channel, and also to provide the implementation
      * of methods to be called from the remote end.
@@ -20,7 +48,8 @@ var easyXSS = {
      * @param {String} channel A valid channel for transportation
      * @param {easyXSS.Configuration.InterfaceConfiguration} config A valid easyXSS-definition
      * @param {Function} onReady A method that should be called when the interface is ready
-     * @class
+     * @namespace easyXSS
+     * @constructor
      */
     Interface: function(channel, config, onReady){
         // #ifdef debug
@@ -165,38 +194,12 @@ var easyXSS = {
         return (config.remote) ? _createRemote(config.remote) : null;
     },
     /**
-     * Creates a transport channel using the available parameters.
-     * Parameters are collected both from the supplied config,
-     * but also from the querystring if not present in the config.
-     * @param {easyXSS.Transport.TransportConfiguration} config The transports configuration
-     * @return An object able to send and receive messages
-     * @type easyXSS.Transport.ITransport
-     * @param {Function} onReady A method that should be called when the transport is ready
-     */
-    createTransport: function(config, onReady){
-        if (config.local) {
-            config.channel = (config.channel) ? config.channel : "default";
-        }
-        else {
-            var query = easyXSS.Url.Query();
-            config.channel = query.channel;
-            config.remote = query.endpoint;
-        }
-        // #ifdef debug
-        easyXSS.Debug.trace("creating transport for channel " + config.channel);
-        // #endif
-        if (window.postMessage) {
-            return new easyXSS.Transport.PostMessageTransport(config, onReady);
-        }
-        else {
-            return new easyXSS.Transport.HashTransport(config, onReady);
-        }
-    },
-    /**
+     * @class easyXSS.Channel
      * A channel
-     * @constructor
      * @param {easyXSS.ChannelConfiguration} config The channels configuration
      * @param {Function} onReady A method that should be called when the channel is ready
+     * @namespace easyXSS
+     * @constructor
      */
     Channel: function(config, onReady){
         // #ifdef debug
@@ -299,8 +302,9 @@ var easyXSS = {
 
 // #ifdef debug
 /**
+ * @class easyXSS.Debug
  * Utilities for debugging. This class is only precent in the debug version.
- * @class
+ * @namespace easyXSS
  */
 easyXSS.Debug = {
     /**

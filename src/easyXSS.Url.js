@@ -1,6 +1,7 @@
 /** 
+ * @class easyXSS.Url
  * Contains methods for dealing with url's
- * @class
+ * @singleton
  */
 easyXSS.Url = {
     /**

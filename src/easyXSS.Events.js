@@ -1,6 +1,7 @@
 /** 
+ * @class easyXSS.Events
  * Contains methods for dealing with special events needed to support the library
- * @class
+ * @singleton
  */
 easyXSS.Events = (function(){
     /**

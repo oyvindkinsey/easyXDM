@@ -1,14 +1,9 @@
-/**
- * Contains classes related to the configurations
- * The contained classes are not instantiated but serves as the template
- * for creating configuration objects.
- * @namespace
- */
 easyXSS.Configuration = {
 
     /**
+     * @class easyXSS.Configuration.TransportConfiguration
      * The configuration for transport classes
-     * @class
+     * @namespace easyXSS.Configuration
      */
     TransportConfiguration: {
         /**
@@ -30,9 +25,10 @@ easyXSS.Configuration = {
     },
     
     /**
+     * @class easyXSS.Configuration.ChannelConfiguration
      * The channels configuration
      * @extends easyXSS.Configuration.TransportConfiguration
-     * @class
+     * @namespace easyXSS.Configuration
      */
     ChannelConfiguration: {
         /**
@@ -42,12 +38,14 @@ easyXSS.Configuration = {
         converter: {}
     },
     /**
+     * @class easyXSS.Configuration.InterfaceConfiguration
      * The interface configuration
-     * @class
+     * @namespace easyXSS.Configuration
      */
     InterfaceConfiguration: {
         /**
-         * The local property contains a list of method-definitions in the form of methodname:{implementation}
+         * The local property is of type {@link easyXSS.Configuration.LocalConfiguration}
+         * @link {easyXSS.Configuration.LocalConfiguration}
          * @type easyXSS.Configuration.LocalConfiguration
          */
         local: {},
@@ -58,8 +56,9 @@ easyXSS.Configuration = {
         remote: {}
     },
     /**
+     * @class easyXSS.Configuration.LocalConfiguration
      * The configuration for the local property
-     * @class
+     * @namespace easyXSS.Configuration
      */
     LocalConfiguration: {
         /**
@@ -80,8 +79,9 @@ easyXSS.Configuration = {
         asyncMethodName: {}
     },
     /**
+     * @class easyXSS.Configuration.RemoteConfiguration
      * The configuration for the remote property
-     * @class
+     * @namespace easyXSS.Configuration
      */
     RemoteConfiguration: {
         /**
@@ -102,12 +102,12 @@ easyXSS.Configuration = {
     },
     /**
      * Contains description on the various method descriptions
-     * @namespace
      */
     Methods: {
         /**
+         * @class easyXSS.Configuration.Methods.LocalMethod
          * A method returning data
-         * @class
+         * @namespace easyXSS.Configuration.Methods
          */
         LocalMethod: {
             /**
@@ -121,8 +121,9 @@ easyXSS.Configuration = {
             }
         },
         /**
+         * @class easyXSS.Configuration.Methods.LocalVoidMethod
          * A method not returning any data
-         * @class
+         * @namespace easyXSS.Configuration.Methods
          */
         LocalVoidMethod: {
             /**
@@ -140,9 +141,10 @@ easyXSS.Configuration = {
             }
         },
         /**
+         * @class easyXSS.Configuration.Methods.LocalAsyncMethod
          * An asynchronous method that is unable to return data immediately
          * This can for instance be a method using an xmlHttpRequest object to retrieve data
-         * @class
+         * @namespace easyXSS.Configuration.Methods
          */
         LocalAsyncMethod: {
             /**
@@ -161,13 +163,15 @@ easyXSS.Configuration = {
             }
         },
         /**
+         * @class easyXSS.Configuration.Methods.RemoteMethod
          * Methods are by default expected to return data
-         * @class
+         * @namespace easyXSS.Configuration.Methods
          */
         RemoteMethod: {},
         /**
+         * @class easyXSS.Configuration.Methods.RemoteVoidMethod
          * We do not expect any data back from this method
-         * @class
+         * @namespace easyXSS.Configuration.Methods
          */
         RemoteVoidMethod: {
             /**
@@ -176,8 +180,9 @@ easyXSS.Configuration = {
             isVoid: true
         },
         /**
+         * @class easyXSS.Configuration.Methods.RemoteAsyncMethod
          * We do not need to know that the remote method is implemented asynchronous
-         * @class
+         * @namespace easyXSS.Configuration.Methods
          */
         RemoteAsyncMethod: {}
     }
