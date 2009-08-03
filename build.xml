@@ -24,6 +24,7 @@
 		
 		<concat destfile="${project.build.dir}\temp\easyXSS.combined.js">	
             <fileset dir="." includes="${project.src.dir}\easyXSS.js" />
+            <fileset dir="." includes="${project.src.dir}\easyXSS.Exceptions.js" />
             <fileset dir="." includes="${project.src.dir}\easyXSS.DomHelper.js" />
 			<fileset dir="." includes="${project.src.dir}\easyXSS.Events.js" />
 			<fileset dir="." includes="${project.src.dir}\easyXSS.Transport.js" />

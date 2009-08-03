@@ -6,6 +6,7 @@
  * @class easyXSS
  * A javascript library providing cross-browser, cross-site messaging/method invocation
  * @version %%version%%
+ * @author &Oslash;yvind Sean Kinsey, <a href="mailto:oyvind@kinsey.no">oyvind@kinsey.no</a>
  * @singleton
  */
 var easyXSS = {
@@ -45,11 +46,13 @@ var easyXSS = {
      * on the remote end of the channel, and also to provide the implementation
      * of methods to be called from the remote end.
      * @requires JSON
+     * @cfg {easyXSS.Configuration.LocalConfiguration} local The local configuration
+     * @cfg {easyXSS.Configuration.RemoteConfiguration} remote The remote configuration
+     * @constructor
      * @param {String} channel A valid channel for transportation
      * @param {easyXSS.Configuration.InterfaceConfiguration} config A valid easyXSS-definition
      * @param {Function} onReady A method that should be called when the interface is ready
      * @namespace easyXSS
-     * @constructor
      */
     Interface: function(channel, config, onReady){
         // #ifdef debug

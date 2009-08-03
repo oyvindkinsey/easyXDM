@@ -1,4 +1,4 @@
 call tools\apache-ant-1.7.1\bin\ant
-pause
+IF NOT %ERRORLEVEL% == 0 pause
 
 

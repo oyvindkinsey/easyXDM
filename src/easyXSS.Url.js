@@ -40,7 +40,7 @@ easyXSS.Url = {
         return domain;
     },
     /**
-     * Returns  a string containing the schema, domain and if present the port
+     * Get the the schema, domain and if present the port from a url
      * @param {String} url The url to extract the location from
      * @returns The location part of the url
      * @type {String}

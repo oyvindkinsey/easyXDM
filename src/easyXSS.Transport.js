@@ -2,22 +2,27 @@ easyXSS.Transport = {
     /**
      * @class easyXSS.Transport.ITransport
      * The interface implemented by all transport classes
+     * @cfg {String} local The url to the local hash.html
+     * @cfg {String} remote The url to the remote interface
+     * @param {object} config The configuration
      * @namespace easyXSS.Transport
      */
-    ITransport: {
-        /**
-         * Sends the message
-         * @param {String} message The message to send
-         */
-        postMessage: function(message){
-        
-        },
-        /** 
-         * Breaks down the connection and tries to clean up the dom.
-         */
-        destroy: function(){
-        
-        }
+    ITransport: function(config){
+        return {
+            /**
+             * Sends the message
+             * @memberOf esyXSS.Transport.ITransport
+             * @param {String} message The message to send
+             */
+            postMessage: function(message){
+            },
+            /** 
+             * Breaks down the connection and tries to clean up the dom.
+             * @memberOf esyXSS.Transport.ITransport
+             */
+            destroy: function(){
+            }
+        };
     },
     
     /**
