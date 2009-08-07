@@ -1,4 +1,9 @@
 1.4.0 - 07.08.09
+Renamed the library to easyXDM to avoid being associated with the XSS-vulnerability
+Alle references to easyXSS can be replaced with easyXDM
+The communication protocol has not changed, so easyXDM 1.4.0 is 100% compatible with easyXSS 1.4.0
+
+1.4.0 - 07.08.09
 Restructured the implementation of easyXSS.Interface, this now creates its own easyXSS.Channel,
 just like easyXSS.Channel creates its own easyXSS.Transport.ITransport.
 The internals of this class has also been restructured and should be easier to understand.

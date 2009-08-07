@@ -1,9 +1,9 @@
 /** 
- * @class easyXSS.DomHelper
+ * @class easyXDM.DomHelper
  * Contains methods for dealing with the DOM
  * @singleton
  */
-easyXSS.DomHelper = {
+easyXDM.DomHelper = {
     /**
      * Creates a frame and appends it to the DOM.
      * @param {String} url The url the frame should be set to
@@ -102,7 +102,7 @@ easyXSS.DomHelper = {
             };
         }
         addEventListener(target, type, listener);
-        easyXSS.DomHelper.addEventListener = addEventListener;
+        easyXDM.DomHelper.addEventListener = addEventListener;
     },
     /**
      * Gives a consistent interface for adding eventhandlers
@@ -140,25 +140,25 @@ easyXSS.DomHelper = {
             };
         }
         removeEventListener(target, type, listener);
-        easyXSS.DomHelper.removeEventListener = removeEventListener;
+        easyXDM.DomHelper.removeEventListener = removeEventListener;
     },
     /**
      * Checks for the precense of the JSON object.
      * If it is not precent it will use the supplied path to load the JSON2 library.
-     * This should be called in the documents head right after the easyXSS script tag.
+     * This should be called in the documents head right after the easyXDM script tag.
      * http://json.org/json2.js
      * @param {String} path A valid path to json2.js
      */
     requiresJSON: function(path){
         if (typeof JSON == "undefined" || !JSON) {
             // #ifdef debug
-            easyXSS.Debug.log("loading external JSON");
+            easyXDM.Debug.log("loading external JSON");
             // #endif
             document.write('<script type="text/javascript" src="' + path + '"></script>');
         }
         // #ifdef debug
         else {
-            easyXSS.Debug.log("native JSON found");
+            easyXDM.Debug.log("native JSON found");
         }
         // #endif
     }

@@ -1,10 +1,10 @@
-easyXSS.Serializing = {
+easyXDM.Serializing = {
     // #ifdef debug
     /**
-     * @class easyXSS.Serializing.ISerializer
+     * @class easyXDM.Serializing.ISerializer
      * The Interface implemented by all serializers.<br/>
      * Only available in debug mode.
-     * @namespace easyXSS.Serializing
+     * @namespace easyXDM.Serializing
      */
     ISerializer: {
         /**
@@ -28,10 +28,10 @@ easyXSS.Serializing = {
     },
     // #endif
     /**
-     * @class easyXSS.Serializing.hashTableSerializer
+     * @class easyXDM.Serializing.hashTableSerializer
      * A serializer that can convert to and from hashtables
      * It uses the same format as the query string for its serialized data
-     * @namespace easyXSS.Serializing
+     * @namespace easyXDM.Serializing
      */
     hashTableSerializer: {
         /**

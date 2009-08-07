@@ -1,14 +1,14 @@
 <!doctype html>
 <html>
     <head>
-        <title>easyXSS</title>
-        <script type="text/javascript" src="../easyXSS.debug.js">
+        <title>easyXDM</title>
+        <script type="text/javascript" src="../easyXDM.debug.js">
         </script>
         <script type="text/javascript">
             /**
              * Request the use of the JSON object
              */
-            easyXSS.DomHelper.requiresJSON("../json2.js");
+            easyXDM.DomHelper.requiresJSON("../json2.js");
         </script>
         <script type="text/javascript">
             /* This window can use window.open() to open up a new window in its own domain.
@@ -33,7 +33,7 @@
                     /**
                      * We start by creating a channel
                      */
-                    proxy = new easyXSS.Channel(/** The configuration */{
+                    proxy = new easyXDM.Channel(/** The configuration */{
                         /**
                          * Register the method that should handle incoming data
                          * @param {Object} data

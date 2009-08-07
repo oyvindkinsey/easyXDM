@@ -1,8 +1,8 @@
 <!doctype html>
 <html>
     <head>
-        <title>easyXSS</title>
-        <script type="text/javascript" src="../easyXSS.debug.js">
+        <title>easyXDM</title>
+        <script type="text/javascript" src="../easyXDM.debug.js">
         </script>
         <script type="text/javascript">
             var transport;
@@ -13,7 +13,7 @@
                 /**
                  * We start by creating a transport
                  */
-                transport = easyXSS.createTransport(/** The configuration */{
+                transport = new easyXDM.Transport.BestAvailableTransport(/** The configuration */{
                     /**
                      * Register the method that should handle incoming messages
                      * @param {String} data

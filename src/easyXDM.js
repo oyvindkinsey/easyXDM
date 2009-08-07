@@ -3,32 +3,32 @@
 /*global window, escape, unescape */
 
 /** 
- * @class easyXSS
- * A javascript library providing cross-browser, cross-site messaging/method invocation.
- * easyXSS.Debug and the easyXSS.Configuration namespace is only available in the debug version.
+ * @class easyXDM
+ * A javascript library providing cross-browser, cross-site messaging/method invocation.<br/>
+ * easyXDM.Debug and the easyXDM.Configuration namespace is only available in the debug version.
  * @version %%version%%
  * @singleton
  */
-var easyXSS = {
+var easyXDM = {
     /**
      * The version of the library
      * @type {String}
      */
     version: "%%version%%",
     /** 
-     * @class easyXSS.Interface
+     * @class easyXDM.Interface
      * Creates an interface that can be used to call methods implemented
      * on the remote end of the channel, and also to provide the implementation
      * of methods to be called from the remote end.
      * @constructor
-     * @param {easyXSS.Configuration.ChannelConfiguration} channelConfig The underlying channels configuration.
-     * @param {easyXSS.Configuration.InterfaceConfiguration} config The description of the interface to implement
+     * @param {easyXDM.Configuration.ChannelConfiguration} channelConfig The underlying channels configuration.
+     * @param {easyXDM.Configuration.InterfaceConfiguration} config The description of the interface to implement
      * @param {Function} onReady A method that should be called when the interface is ready
-     * @namespace easyXSS
+     * @namespace easyXDM
      */
     Interface: function(channelConfig, config, onReady){
         // #ifdef debug
-        easyXSS.Debug.trace("creating new interface");
+        easyXDM.Debug.trace("creating new interface");
         // #endif
         var _channel;
         var _callbackCounter = 0, _callbacks = {};
@@ -36,18 +36,18 @@ var easyXSS = {
         /**
          * Creates a method that implements the given definition
          * @private
-         * @param {easyXSS.Configuration.Methods.Method} The method configuration
+         * @param {easyXDM.Configuration.Methods.Method} The method configuration
          * @param {String} name The name of the method
          */
         function _createMethod(definition, name){
             if (definition.isVoid) {
                 // #ifdef debug
-                easyXSS.Debug.trace("creating void method " + name);
+                easyXDM.Debug.trace("creating void method " + name);
                 // #endif
                 // No need to register a callback
                 return function(){
                     // #ifdef debug
-                    easyXSS.Debug.trace("executing void method " + name);
+                    easyXDM.Debug.trace("executing void method " + name);
                     // #endif
                     var params = [];
                     for (var i = 0, len = arguments.length; i < len; i++) {
@@ -64,12 +64,12 @@ var easyXSS = {
             }
             else {
                 // #ifdef debug
-                easyXSS.Debug.trace("creating method " + name);
+                easyXDM.Debug.trace("creating method " + name);
                 // #endif
                 // We need to extract and register the callback
                 return function(){
                     // #ifdef debug
-                    easyXSS.Debug.trace("executing method " + name);
+                    easyXDM.Debug.trace("executing method " + name);
                     // #endif
                     _callbacks["" + (++_callbackCounter)] = arguments[arguments.length - 1];
                     var request = {
@@ -102,7 +102,7 @@ var easyXSS = {
             }
             if (method.isAsync) {
                 // #ifdef debug
-                easyXSS.Debug.trace("requested to execute async method " + name);
+                easyXDM.Debug.trace("requested to execute async method " + name);
                 // #endif
                 // The method is async, we need to add a callback
                 params.push(function(result){
@@ -118,14 +118,14 @@ var easyXSS = {
             else {
                 if (method.isVoid) {
                     // #ifdef debug
-                    easyXSS.Debug.trace("requested to execute void method " + name);
+                    easyXDM.Debug.trace("requested to execute void method " + name);
                     // #endif
                     // Call local method 
                     method.method.apply(null, params);
                 }
                 else {
                     // #ifdef debug
-                    easyXSS.Debug.trace("requested to execute method " + name);
+                    easyXDM.Debug.trace("requested to execute method " + name);
                     // #endif
                     // Call local method and send back the response
                     _channel.sendData({
@@ -146,7 +146,7 @@ var easyXSS = {
          */
         channelConfig.onData = function(data, origin){
             // #ifdef debug
-            easyXSS.Debug.trace("interface$_onData:(" + data + "," + origin + ")");
+            easyXDM.Debug.trace("interface$_onData:(" + data + "," + origin + ")");
             // #endif
             /// <summary>
             /// Receives either a request or a response from the other
@@ -155,14 +155,14 @@ var easyXSS = {
             /// <param name="data" type="object">The request/repsonse</param>
             if (data.name) {
                 // #ifdef debug
-                easyXSS.Debug.trace("received request to execute method " + data.name + " using callback id " + data.id);
+                easyXDM.Debug.trace("received request to execute method " + data.name + " using callback id " + data.id);
                 // #endif
                 // A method call from the remote end
                 _executeMethod(data.name, data.id, config.local[data.name], data.params);
             }
             else {
                 // #ifdef debug
-                easyXSS.Debug.trace("received return value destined to callback with id " + data.id);
+                easyXDM.Debug.trace("received return value destined to callback with id " + data.id);
                 // #endif
                 // A method response from the other end
                 _callbacks[data.id](data.response);
@@ -170,7 +170,7 @@ var easyXSS = {
             }
         };
         
-        _channel = new easyXSS.Channel(channelConfig, onReady);
+        _channel = new easyXDM.Channel(channelConfig, onReady);
         
         /**
          * The underlying channel used by the interface
@@ -189,7 +189,7 @@ var easyXSS = {
         
         if (config.remote) {
             // #ifdef debug
-            easyXSS.Debug.trace("creating concrete implementations");
+            easyXDM.Debug.trace("creating concrete implementations");
             // #endif
             // Implement the remote sides exposed methods
             for (var name in config.remote) {
@@ -198,22 +198,22 @@ var easyXSS = {
         }
     },
     /**
-     * @class easyXSS.Channel
-     * A channel
-     * @param {easyXSS.ChannelConfiguration} config The channels configuration
+     * @class easyXDM.Channel
+     * A channel wrapping an underlying transport.
+     * @param {easyXDM.ChannelConfiguration} config The channels configuration
      * @param {Function} onReady A method that should be called when the channel is ready
-     * @namespace easyXSS
+     * @namespace easyXDM
      * @constructor
      */
     Channel: function(config, onReady){
         // #ifdef debug
-        easyXSS.Debug.trace("easyXSS.Channel.constructor");
+        easyXDM.Debug.trace("easyXDM.Channel.constructor");
         // #endif
         if (!config.converter) {
-            throw "No converter present. You should use the easyXSS.Transport classes directly.";
+            throw "No converter present. You should use the easyXDM.Transport classes directly.";
         }
         /**
-         * Wraps the transports onMessage method using the supplied serializer to convert
+         * Wraps the transports onMessage method using the supplied serializer to convert.
          * @param {Object} data
          * @ignore
          */
@@ -224,15 +224,15 @@ var easyXSS = {
         
         /**
          * The underlying transport used by this channel
-         * @type easyXSS.Transport.ITransport
+         * @type easyXDM.Transport.ITransport
          */
-        this.transport = new easyXSS.Transport.BestAvailableTransport(config, onReady);
+        this.transport = new easyXDM.Transport.BestAvailableTransport(config, onReady);
         /**
          * Tries to destroy the underlying transport
          */
         this.destroy = function(){
             // #ifdef debug
-            easyXSS.Debug.trace("easyXSS.Channel.destroy");
+            easyXDM.Debug.trace("easyXDM.Channel.destroy");
             // #endif
             this.transport.destroy();
         };
@@ -249,11 +249,11 @@ var easyXSS = {
 
 // #ifdef debug
 /**
- * @class easyXSS.Debug
+ * @class easyXDM.Debug
  * Utilities for debugging. This class is only precent in the debug version.
- * @namespace easyXSS
+ * @namespace easyXDM
  */
-easyXSS.Debug = {
+easyXDM.Debug = {
     /**
      * Logs the message to console.log if available
      * @param {String} msg The message to log
@@ -280,7 +280,7 @@ easyXSS.Debug = {
             };
         }
         log(msg);
-        easyXSS.Debug.log = log;
+        easyXDM.Debug.log = log;
     },
     /**
      * Will try to trace the given message either to a DOMElement with the id "log",
@@ -323,7 +323,7 @@ easyXSS.Debug = {
             }
         }
         trace(location.host + ":" + msg);
-        easyXSS.Debug.trace = trace;
+        easyXDM.Debug.trace = trace;
     }
 };
 // #endif

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="easyXSS" default="build" basedir=".">
+<project name="easyXDM" default="build" basedir=".">
 	<property file="build.properties"/>
 	
 	<!-- Setup classpath for js-build-tools ant tasks -->
@@ -22,47 +22,47 @@
 		<mkdir dir="${project.build.dir}"/>
 		<mkdir dir="${project.build.dir}\temp"/>
 		
-		<concat destfile="${project.build.dir}\temp\easyXSS.combined.js">	
-            <fileset dir="." includes="${project.src.dir}\easyXSS.js" />
-            <fileset dir="." includes="${project.src.dir}\easyXSS.Exceptions.js" />
-            <fileset dir="." includes="${project.src.dir}\easyXSS.DomHelper.js" />
-			<fileset dir="." includes="${project.src.dir}\easyXSS.Events.js" />
-			<fileset dir="." includes="${project.src.dir}\easyXSS.Transport.js" />
-			<fileset dir="." includes="${project.src.dir}\easyXSS.Configuration.js" />
-			<fileset dir="." includes="${project.src.dir}\easyXSS.Url.js" />
-			<fileset dir="." includes="${project.src.dir}\easyXSS.Serializing.js" />
+		<concat destfile="${project.build.dir}\temp\easyXDM.combined.js">	
+            <fileset dir="." includes="${project.src.dir}\easyXDM.js" />
+            <fileset dir="." includes="${project.src.dir}\easyXDM.Exceptions.js" />
+            <fileset dir="." includes="${project.src.dir}\easyXDM.DomHelper.js" />
+			<fileset dir="." includes="${project.src.dir}\easyXDM.Events.js" />
+			<fileset dir="." includes="${project.src.dir}\easyXDM.Transport.js" />
+			<fileset dir="." includes="${project.src.dir}\easyXDM.Configuration.js" />
+			<fileset dir="." includes="${project.src.dir}\easyXDM.Url.js" />
+			<fileset dir="." includes="${project.src.dir}\easyXDM.Serializing.js" />
         </concat>
 	
-		<replace file="${project.build.dir}\temp\easyXSS.combined.js"
+		<replace file="${project.build.dir}\temp\easyXDM.combined.js"
 			token="%%version%%" value="1.4.0.${build.number}"/>
 
 		<!-- Run jslint -->
 		<java jar="tools\jslint4java-1.3.1\jslint4java-1.3.1.jar" fork="true" failonerror="true" maxmemory="128m" >
-			<arg value="${project.build.dir}\temp\easyXSS.combined.js"/>
+			<arg value="${project.build.dir}\temp\easyXDM.combined.js"/>
         </java>
 		
 		<!-- Process pre proccesing instuctions like #if/#endif etc -->
-		<preprocess infile="${project.build.dir}\temp\easyXSS.combined.js" outfile="${project.build.dir}\temp\easyXSS.js"/>
-		<preprocess infile="${project.build.dir}\temp\easyXSS.combined.js" outfile="${project.build.dir}\temp\easyXSS.debug.js" defines="debug"/>
+		<preprocess infile="${project.build.dir}\temp\easyXDM.combined.js" outfile="${project.build.dir}\temp\easyXDM.js"/>
+		<preprocess infile="${project.build.dir}\temp\easyXDM.combined.js" outfile="${project.build.dir}\temp\easyXDM.debug.js" defines="debug"/>
 	    <preprocess infile="${project.src.dir}\hash.html" outfile="${project.build.dir}\temp\hash.html"/>
 		
-		<delete file="${project.build.dir}\temp\easyXSS.combined.js" quiet="true"/>
+		<delete file="${project.build.dir}\temp\easyXDM.combined.js" quiet="true"/>
 
 		<!-- Compress the file using the YUI Compressor -->
-		<yuicompress infile="${project.build.dir}\temp\easyXSS.js" outfile="${project.build.dir}\temp\easyXSS.min.js" />
+		<yuicompress infile="${project.build.dir}\temp\easyXDM.js" outfile="${project.build.dir}\temp\easyXDM.min.js" />
 		
 		<!-- concat header files -->
-		<concat destfile="${project.build.dir}\easyXSS.js">
+		<concat destfile="${project.build.dir}\easyXDM.js">
             <fileset dir="." includes="${project.src.dir}\header.js" />
-            <fileset dir="." includes="${project.build.dir}\temp\easyXSS.js" />
+            <fileset dir="." includes="${project.build.dir}\temp\easyXDM.js" />
 		</concat>
-		<concat destfile="${project.build.dir}\easyXSS.debug.js">
+		<concat destfile="${project.build.dir}\easyXDM.debug.js">
             <fileset dir="." includes="${project.src.dir}\header.js" />
-            <fileset dir="." includes="${project.build.dir}\temp\easyXSS.debug.js" />
+            <fileset dir="." includes="${project.build.dir}\temp\easyXDM.debug.js" />
 		</concat>
-		<concat destfile="${project.build.dir}\easyXSS.min.js">
+		<concat destfile="${project.build.dir}\easyXDM.min.js">
             <fileset dir="." includes="${project.src.dir}\header.js" />
-            <fileset dir="." includes="${project.build.dir}\temp\easyXSS.min.js" />
+            <fileset dir="." includes="${project.build.dir}\temp\easyXDM.min.js" />
 		</concat>
 		<concat destfile="${project.build.dir}\hash.html">
             <fileset dir="." includes="${project.src.dir}\header.html" />

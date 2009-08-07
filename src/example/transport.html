@@ -1,8 +1,8 @@
 <!doctype html>
 <html>
     <head>
-        <title>easyXSS</title>
-        <script type="text/javascript" src="../easyXSS.debug.js">
+        <title>easyXDM</title>
+        <script type="text/javascript" src="../easyXDM.debug.js">
         </script>
         <script type="text/javascript">
             var transport;
@@ -11,7 +11,7 @@
                 /**
                  * When the window is finished loading start setting up the transport
                  */
-                transport = easyXSS.createTransport(/** The configuration */{
+                transport = new easyXDM.Transport.BestAvailableTransport(/** The configuration */{
                     /**
                      * Register the url to hash.html, this must be an absolute path
                      * or a path relative to the root.
@@ -33,7 +33,7 @@
         </script>
     </head>
     <body>
-        <!-- easyXSS.Debug.trace(msg) will output its messages to any element with the id "log" -->
+        <!-- easyXDM.Debug.trace(msg) will output its messages to any element with the id "log" -->
         <div id="log" style="height:100px;border:1px dotted black;overflow:auto">
         </div>
     </body>

@@ -1,8 +1,8 @@
 <!doctype html>
 <html>
     <head>
-        <title>easyXSS</title>
-        <script type="text/javascript" src="../easyXSS.debug.js">
+        <title>easyXDM</title>
+        <script type="text/javascript" src="../easyXDM.debug.js">
         </script>
         <script type="text/javascript">
             var channel;
@@ -13,12 +13,12 @@
                 /**
                  * We start by creating a channel
                  */
-                channel = new easyXSS.Channel(/** The configuration */{
+                channel = new easyXDM.Channel(/** The configuration */{
                     /**
                      * Register the serializer to use for converting messages
                      * @field
                      */
-                    converter: easyXSS.Serializing.hashTableSerializer,
+                    converter: easyXDM.Serializing.hashTableSerializer,
                     /**
                      * Register the method that should handle incoming data
                      * @param {Object} data

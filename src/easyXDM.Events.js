@@ -1,9 +1,9 @@
 /** 
- * @class easyXSS.Events
+ * @class easyXDM.Events
  * Contains methods for dealing with special events needed to support the library
  * @singleton
  */
-easyXSS.Events = (function(){
+easyXDM.Events = (function(){
     /**
      * Hashtable for storing callbacks when using hashTransport
      * @private
@@ -17,7 +17,7 @@ easyXSS.Events = (function(){
          */
         registerOnReady: function(channel, callback){
             // #ifdef debug
-            easyXSS.Debug.trace("registering onReady callback for channel " + channel);
+            easyXDM.Debug.trace("registering onReady callback for channel " + channel);
             // #endif
             onReadyCallbacks[channel] = callback;
         },
@@ -27,7 +27,7 @@ easyXSS.Events = (function(){
          */
         onReady: function(channel){
             // #ifdef debug
-            easyXSS.Debug.trace("executing onReady calback for channel " + channel);
+            easyXDM.Debug.trace("executing onReady calback for channel " + channel);
             // #endif
             var fn = this.onReadyCallbacks[channel];
             if (fn) {

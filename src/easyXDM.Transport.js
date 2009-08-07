@@ -1,10 +1,10 @@
-easyXSS.Transport = {
+easyXDM.Transport = {
     // #ifdef debug
     /**
-     * @class easyXSS.Transport.ITransport
+     * @class easyXDM.Transport.ITransport
      * The interface implemented by all transport classes.<br/>
      * Only available in debug mode.
-     * @namespace easyXSS.Transport
+     * @namespace easyXDM.Transport
      */
     ITransport: {
         /**
@@ -21,50 +21,50 @@ easyXSS.Transport = {
     },
     // #endif
     /**
-     * @class easyXSS.Transport.BestAvailableTransport
-     * @extends easyXSS.Transport.ITransport
+     * @class easyXDM.Transport.BestAvailableTransport
+     * @extends easyXDM.Transport.ITransport
      * BestAvailableTransport is a transport class that uses the best transport available.
      * Currently it will select among PostMessageTransport and HashTransport.
      * @constructor
-     * @param {easyXSS.Transport.TransportConfiguration} config The transports configuration.
+     * @param {easyXDM.Transport.TransportConfiguration} config The transports configuration.
      * @param {Function} onReady A method that should be called when the transport is ready
-     * @namespace easyXSS.Transport
+     * @namespace easyXDM.Transport
      */
     BestAvailableTransport: function(config, onReady){
         // #ifdef debug
-        easyXSS.Debug.trace("easyXSS.Transport.BestAvailableTransport.constructor");
+        easyXDM.Debug.trace("easyXDM.Transport.BestAvailableTransport.constructor");
         // #endif
         if (config.local) {
             config.channel = (config.channel) ? config.channel : "default";
         }
         else {
-            var query = easyXSS.Url.Query();
+            var query = easyXDM.Url.Query();
             config.channel = query.channel;
             config.remote = query.endpoint;
         }
         if (window.postMessage) {
-            return new easyXSS.Transport.PostMessageTransport(config, onReady);
+            return new easyXDM.Transport.PostMessageTransport(config, onReady);
         }
         else {
-            return new easyXSS.Transport.HashTransport(config, onReady);
+            return new easyXDM.Transport.HashTransport(config, onReady);
         }
     },
     /**
-     * @class easyXSS.Transport.PostMessageTransport
-     * @extends easyXSS.Transport.ITransport
+     * @class easyXDM.Transport.PostMessageTransport
+     * @extends easyXDM.Transport.ITransport
      * PostMessageTransport is a transport class that uses HTML5 postMessage for communication
      * <a href="http://msdn.microsoft.com/en-us/library/ms644944(VS.85).aspx">http://msdn.microsoft.com/en-us/library/ms644944(VS.85).aspx</a>
      * <a href="https://developer.mozilla.org/en/DOM/window.postMessage">https://developer.mozilla.org/en/DOM/window.postMessage</a>
      * @constructor
-     * @param {easyXSS.Transport.TransportConfiguration} config The transports configuration.
+     * @param {easyXDM.Transport.TransportConfiguration} config The transports configuration.
      * @param {Function} onReady A method that should be called when the transport is ready
-     * @namespace easyXSS.Transport
+     * @namespace easyXDM.Transport
      */
     PostMessageTransport: function(config, onReady){
         // #ifdef debug
-        easyXSS.Debug.trace("easyXSS.Transport.PostMessageTransport.constructor");
+        easyXDM.Debug.trace("easyXDM.Transport.PostMessageTransport.constructor");
         // #endif
-        var _targetOrigin = easyXSS.Url.getLocation(config.remote);
+        var _targetOrigin = easyXDM.Url.getLocation(config.remote);
         var _callerWindow;
         function _getOrigin(event){
             /// <summary>
@@ -77,7 +77,7 @@ easyXSS.Transport = {
                 return event.origin;
             }
             if (event.uri) {
-                return easyXSS.Url.getLocation(event.uri);
+                return easyXDM.Url.getLocation(event.uri);
             }
             if (event.domain) {
                 // This will fail if the origin is not using the same
@@ -95,7 +95,7 @@ easyXSS.Transport = {
             /// <param name="event" type="MessageEvent">The eventobject from the browser</param>
             var origin = _getOrigin(event);
             // #ifdef debug
-            easyXSS.Debug.trace("received message '" + event.data + "' from " + origin);
+            easyXDM.Debug.trace("received message '" + event.data + "' from " + origin);
             // #endif
             if (origin == _targetOrigin && event.data.substring(0, config.channel.length + 1) == config.channel + " ") {
                 config.onMessage(event.data.substring(config.channel.length + 1), origin);
@@ -119,14 +119,14 @@ easyXSS.Transport = {
             if (config.local.substring(0, 1) == "/") {
                 config.local = location.protocol + "//" + location.host + config.local;
             }
-            _callerWindow = easyXSS.DomHelper.createFrame(config.remote + "?endpoint=" + config.local + "&channel=" + config.channel, "", config.container, function(win){
+            _callerWindow = easyXDM.DomHelper.createFrame(config.remote + "?endpoint=" + config.local + "&channel=" + config.channel, "", config.container, function(win){
                 _onReady();
             });
         }
         else {
             _onReady();
         }
-        easyXSS.DomHelper.addEventListener(window, "message", _window_onMessage);
+        easyXDM.DomHelper.addEventListener(window, "message", _window_onMessage);
         
         
         /** 
@@ -135,7 +135,7 @@ easyXSS.Transport = {
          */
         this.postMessage = function(message){
             // #ifdef debug
-            easyXSS.Debug.trace("sending message '" + message + "' to " + _targetOrigin);
+            easyXDM.Debug.trace("sending message '" + message + "' to " + _targetOrigin);
             // #endif
             if (config.local) {
                 _callerWindow.contentWindow.postMessage(config.channel + " " + message, _targetOrigin);
@@ -149,9 +149,9 @@ easyXSS.Transport = {
          */
         this.destroy = function(){
             // #ifdef debug
-            easyXSS.Debug.trace("destroying transport");
+            easyXDM.Debug.trace("destroying transport");
             // #endif
-            easyXSS.DomHelper.removeEventListener(window, "message", _window_onMessage);
+            easyXDM.DomHelper.removeEventListener(window, "message", _window_onMessage);
             if (config.local) {
                 _callerWindow.parentNode.removeChild(_callerWindow);
                 _callerWindow = null;
@@ -159,18 +159,18 @@ easyXSS.Transport = {
         };
     },
     /**
-     * @class easyXSS.Transport.HashTransport
-     * @extends easyXSS.Transport.ITransport
+     * @class easyXDM.Transport.HashTransport
+     * @extends easyXDM.Transport.ITransport
      * HashTransport is a transport class that uses the IFrame URL Technique for communication
      * <a href="http://msdn.microsoft.com/en-us/library/bb735305.aspx">http://msdn.microsoft.com/en-us/library/bb735305.aspx</a>
      * @constructor
-     * @param {easyXSS.Transport.TransportConfiguration} config The transports configuration.
+     * @param {easyXDM.Transport.TransportConfiguration} config The transports configuration.
      * @param {Function} onReady A method that should be called when the transport is ready
-     * @namespace easyXSS.Transport
+     * @namespace easyXDM.Transport
      */
     HashTransport: function(config, onReady){
         // #ifdef debug
-        easyXSS.Debug.trace("easyXSS.Transport.PostMessageTransport.constructor");
+        easyXDM.Debug.trace("easyXDM.Transport.PostMessageTransport.constructor");
         // #endif
         var _timer = null;
         var _lastMsg = "#" + config.channel, _msgNr = 0;
@@ -179,7 +179,7 @@ easyXSS.Transport = {
             config.local = location.protocol + "//" + location.host + config.local;
         }
         var _remoteUrl = config.remote + ((config.local) ? "?endpoint=" + config.local + "&channel=" + config.channel : "#" + config.channel);
-        var _remoteOrigin = easyXSS.Url.getLocation(config.remote);
+        var _remoteOrigin = easyXDM.Url.getLocation(config.remote);
         var _pollInterval = (config.interval) ? config.interval : 300;
         
         function _checkForMessage(){
@@ -201,7 +201,7 @@ easyXSS.Transport = {
             if (_listenerWindow.location.hash && _listenerWindow.location.hash != _lastMsg) {
                 _lastMsg = _listenerWindow.location.hash;
                 // #ifdef debug
-                easyXSS.Debug.trace("received message '" + _lastMsg + "' from " + _remoteOrigin);
+                easyXDM.Debug.trace("received message '" + _lastMsg + "' from " + _remoteOrigin);
                 // #endif
                 config.onMessage(decodeURIComponent(_lastMsg.substring(_lastMsg.indexOf("_") + 1)), _remoteOrigin);
             }
@@ -223,12 +223,12 @@ easyXSS.Transport = {
             }
         }
         
-        _callerWindow = easyXSS.DomHelper.createFrame(_remoteUrl, ((config.local) ? "" : "xss_" + config.channel), config.container, function(){
+        _callerWindow = easyXDM.DomHelper.createFrame(_remoteUrl, ((config.local) ? "" : "xss_" + config.channel), config.container, function(){
             if (onReady) {
                 if (config.local) {
                     // Register onReady callback in the library so that
                     // it can be called when hash.html has loaded.
-                    easyXSS.Events.registerOnReady(config.channel, _onReady);
+                    easyXDM.Events.registerOnReady(config.channel, _onReady);
                 }
                 else {
                     _onReady();
@@ -242,7 +242,7 @@ easyXSS.Transport = {
          */
         this.postMessage = function(message){
             // #ifdef debug
-            easyXSS.Debug.trace("sending message '" + message + "' to " + _remoteOrigin);
+            easyXDM.Debug.trace("sending message '" + message + "' to " + _remoteOrigin);
             // #endif
             _callerWindow.src = _remoteUrl + "#" + (_msgNr++) + "_" + encodeURIComponent(message);
         };
@@ -251,7 +251,7 @@ easyXSS.Transport = {
          */
         this.destroy = function(){
             // #ifdef debug
-            easyXSS.Debug.trace("destroying transport");
+            easyXDM.Debug.trace("destroying transport");
             // #endif
             window.clearInterval(_timer);
             _callerWindow.parentNode.removeChild(_callerWindow);

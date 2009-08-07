@@ -1,9 +1,9 @@
-easyXSS.Exceptions = {
+easyXDM.Exceptions = {
     /**
-     * @class easyXSS.Exceptions.Exception
+     * @class easyXDM.Exceptions.Exception
      * @constructor
      * @param {String} msg The exception message
-     * @namespace easyXSS.Exceptions
+     * @namespace easyXDM.Exceptions
      */
     Exception: function(msg){
         /**
@@ -18,9 +18,9 @@ easyXSS.Exceptions = {
         this.name = "GenericException";
     },
     /**
-     * @class easyXSS.Exceptions.MissingCallbackException
-     * @namespace easyXSS.Exceptions
-     * @extends easyXSS.Exceptions.Exception
+     * @class easyXDM.Exceptions.MissingCallbackException
+     * @namespace easyXDM.Exceptions
+     * @extends easyXDM.Exceptions.Exception
      * @constructor
      * @param {String} msg The exception message
      */

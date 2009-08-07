@@ -1,10 +1,10 @@
 // #ifdef debug
-easyXSS.Configuration = {
+easyXDM.Configuration = {
 
     /**
-     * @class easyXSS.Configuration.TransportConfiguration
+     * @class easyXDM.Configuration.TransportConfiguration
      * The configuration for transport classes.
-     * @namespace easyXSS.Configuration
+     * @namespace easyXDM.Configuration
      */
     TransportConfiguration: {
         /**
@@ -26,78 +26,78 @@ easyXSS.Configuration = {
     },
     
     /**
-     * @class easyXSS.Configuration.ChannelConfiguration
+     * @class easyXDM.Configuration.ChannelConfiguration
      * The channels configuration
-     * @extends easyXSS.Configuration.TransportConfiguration
-     * @namespace easyXSS.Configuration
+     * @extends easyXDM.Configuration.TransportConfiguration
+     * @namespace easyXDM.Configuration
      */
     ChannelConfiguration: {
         /**
          * The serializer to use
-         * @type easyXSS.Serializing.ISerializer
+         * @type easyXDM.Serializing.ISerializer
          */
         converter: {}
     },
     /**
-     * @class easyXSS.Configuration.InterfaceConfiguration
+     * @class easyXDM.Configuration.InterfaceConfiguration
      * The interface configuration
-     * @namespace easyXSS.Configuration
+     * @namespace easyXDM.Configuration
      */
     InterfaceConfiguration: {
         /**
-         * The local property is of type {@link easyXSS.Configuration.LocalConfiguration}
-         * @link {easyXSS.Configuration.LocalConfiguration}
-         * @type easyXSS.Configuration.LocalConfiguration
+         * The local property is of type {@link easyXDM.Configuration.LocalConfiguration}
+         * @link {easyXDM.Configuration.LocalConfiguration}
+         * @type easyXDM.Configuration.LocalConfiguration
          */
         local: {},
         /**
          * The remote property contains a list of method-definitions in the form of methodname:{description}
-         * @type easyXSS.Configuration.RemoteConfiguration
+         * @type easyXDM.Configuration.RemoteConfiguration
          */
         remote: {}
     },
     /**
-     * @class easyXSS.Configuration.LocalConfiguration
+     * @class easyXDM.Configuration.LocalConfiguration
      * The configuration for the local property
-     * @namespace easyXSS.Configuration
+     * @namespace easyXDM.Configuration
      */
     LocalConfiguration: {
         /**
          * A method returning data
-         * @type easyXSS.Configuration.Methods.LocalMethod
+         * @type easyXDM.Configuration.Methods.LocalMethod
          */
         methodName: {},
         /**
          * A method not returning any data
-         * @type easyXSS.Configuration.Methods.LocalVoidMethod
+         * @type easyXDM.Configuration.Methods.LocalVoidMethod
          */
         voidMethodName: {},
         /**
          * An asynchronous method that is unable to return data immediately
          * This can for instance be a method using an xmlHttpRequest object to retrieve data
-         * @type easyXSS.Configuration.Methods.LocalAsyncMethod
+         * @type easyXDM.Configuration.Methods.LocalAsyncMethod
          */
         asyncMethodName: {}
     },
     /**
-     * @class easyXSS.Configuration.RemoteConfiguration
+     * @class easyXDM.Configuration.RemoteConfiguration
      * The configuration for the remote property
-     * @namespace easyXSS.Configuration
+     * @namespace easyXDM.Configuration
      */
     RemoteConfiguration: {
         /**
          * Methods are by default expected to return data
-         * @type easyXSS.Configuration.Methods.RemoteMethod
+         * @type easyXDM.Configuration.Methods.RemoteMethod
          */
         methodName: {},
         /**
          * We do not expect any data back from this method
-         * @type easyXSS.Configuration.Methods.RemoteVoidMethod
+         * @type easyXDM.Configuration.Methods.RemoteVoidMethod
          */
         voidMethodName: {},
         /**
          * We do not need to know that the remote method is implemented asynchronous
-         * @type easyXSS.Configuration.Methods.RemoteAsyncMethod
+         * @type easyXDM.Configuration.Methods.RemoteAsyncMethod
          */
         asyncMethodName: {}
     },
@@ -106,18 +106,18 @@ easyXSS.Configuration = {
      */
     Methods: {
 		/**
-		 * @class easyXSS.Configuration.Methods.Method
+		 * @class easyXDM.Configuration.Methods.Method
 		 * The base method implementation
-		 * @namespace easyXSS.Configuration.Methods
+		 * @namespace easyXDM.Configuration.Methods
 		 */
 		Method:{
 			
 		},
         /**
-         * @class easyXSS.Configuration.Methods.LocalMethod
-         * @extends easyXSS.Configuration.Methods.Method
+         * @class easyXDM.Configuration.Methods.LocalMethod
+         * @extends easyXDM.Configuration.Methods.Method
          * A method returning data
-         * @namespace easyXSS.Configuration.Methods
+         * @namespace easyXDM.Configuration.Methods
          */
         LocalMethod: {
             /**
@@ -131,10 +131,10 @@ easyXSS.Configuration = {
             }
         },
         /**
-         * @class easyXSS.Configuration.Methods.LocalVoidMethod
-         * @extends easyXSS.Configuration.Methods.Method
+         * @class easyXDM.Configuration.Methods.LocalVoidMethod
+         * @extends easyXDM.Configuration.Methods.Method
          * A method not returning any data
-         * @namespace easyXSS.Configuration.Methods
+         * @namespace easyXDM.Configuration.Methods
          */
         LocalVoidMethod: {
             /**
@@ -152,11 +152,11 @@ easyXSS.Configuration = {
             }
         },
         /**
-         * @class easyXSS.Configuration.Methods.LocalAsyncMethod
-         * @extends easyXSS.Configuration.Methods.Method
+         * @class easyXDM.Configuration.Methods.LocalAsyncMethod
+         * @extends easyXDM.Configuration.Methods.Method
          * An asynchronous method that is unable to return data immediately
          * This can for instance be a method using an xmlHttpRequest object to retrieve data
-         * @namespace easyXSS.Configuration.Methods
+         * @namespace easyXDM.Configuration.Methods
          */
         LocalAsyncMethod: {
             /**
@@ -175,16 +175,16 @@ easyXSS.Configuration = {
             }
         },
         /**
-         * @class easyXSS.Configuration.Methods.RemoteMethod
+         * @class easyXDM.Configuration.Methods.RemoteMethod
          * Methods are by default expected to return data
-         * @namespace easyXSS.Configuration.Methods
+         * @namespace easyXDM.Configuration.Methods
          */
         RemoteMethod: {},
         /**
-         * @class easyXSS.Configuration.Methods.RemoteVoidMethod
-         * @extends easyXSS.Configuration.Methods.Method
+         * @class easyXDM.Configuration.Methods.RemoteVoidMethod
+         * @extends easyXDM.Configuration.Methods.Method
          * We do not expect any data back from this method
-         * @namespace easyXSS.Configuration.Methods
+         * @namespace easyXDM.Configuration.Methods
          */
         RemoteVoidMethod: {
             /**
@@ -193,10 +193,10 @@ easyXSS.Configuration = {
             isVoid: true
         },
         /**
-         * @class easyXSS.Configuration.Methods.RemoteAsyncMethod
-         * @extends easyXSS.Configuration.Methods.Method
+         * @class easyXDM.Configuration.Methods.RemoteAsyncMethod
+         * @extends easyXDM.Configuration.Methods.Method
          * We do not need to know that the remote method is implemented asynchronous
-         * @namespace easyXSS.Configuration.Methods
+         * @namespace easyXDM.Configuration.Methods
          */
         RemoteAsyncMethod: {}
     }

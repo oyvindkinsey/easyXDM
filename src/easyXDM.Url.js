@@ -1,9 +1,9 @@
 /** 
- * @class easyXSS.Url
+ * @class easyXDM.Url
  * Contains methods for dealing with url's
  * @singleton
  */
-easyXSS.Url = {
+easyXDM.Url = {
     /**
      * A hashtable that gives access to the documents query string
      * The hashtable is cached internally
