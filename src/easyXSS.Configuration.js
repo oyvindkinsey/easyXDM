@@ -1,8 +1,9 @@
+// #ifdef debug
 easyXSS.Configuration = {
 
     /**
      * @class easyXSS.Configuration.TransportConfiguration
-     * The configuration for transport classes
+     * The configuration for transport classes.
      * @namespace easyXSS.Configuration
      */
     TransportConfiguration: {
@@ -104,8 +105,17 @@ easyXSS.Configuration = {
      * Contains description on the various method descriptions
      */
     Methods: {
+		/**
+		 * @class easyXSS.Configuration.Methods.Method
+		 * The base method implementation
+		 * @namespace easyXSS.Configuration.Methods
+		 */
+		Method:{
+			
+		},
         /**
          * @class easyXSS.Configuration.Methods.LocalMethod
+         * @extends easyXSS.Configuration.Methods.Method
          * A method returning data
          * @namespace easyXSS.Configuration.Methods
          */
@@ -122,6 +132,7 @@ easyXSS.Configuration = {
         },
         /**
          * @class easyXSS.Configuration.Methods.LocalVoidMethod
+         * @extends easyXSS.Configuration.Methods.Method
          * A method not returning any data
          * @namespace easyXSS.Configuration.Methods
          */
@@ -142,6 +153,7 @@ easyXSS.Configuration = {
         },
         /**
          * @class easyXSS.Configuration.Methods.LocalAsyncMethod
+         * @extends easyXSS.Configuration.Methods.Method
          * An asynchronous method that is unable to return data immediately
          * This can for instance be a method using an xmlHttpRequest object to retrieve data
          * @namespace easyXSS.Configuration.Methods
@@ -170,6 +182,7 @@ easyXSS.Configuration = {
         RemoteMethod: {},
         /**
          * @class easyXSS.Configuration.Methods.RemoteVoidMethod
+         * @extends easyXSS.Configuration.Methods.Method
          * We do not expect any data back from this method
          * @namespace easyXSS.Configuration.Methods
          */
@@ -181,9 +194,11 @@ easyXSS.Configuration = {
         },
         /**
          * @class easyXSS.Configuration.Methods.RemoteAsyncMethod
+         * @extends easyXSS.Configuration.Methods.Method
          * We do not need to know that the remote method is implemented asynchronous
          * @namespace easyXSS.Configuration.Methods
          */
         RemoteAsyncMethod: {}
     }
 };
+// #endif

@@ -4,9 +4,9 @@
 
 /** 
  * @class easyXSS
- * A javascript library providing cross-browser, cross-site messaging/method invocation
+ * A javascript library providing cross-browser, cross-site messaging/method invocation.
+ * easyXSS.Debug and the easyXSS.Configuration namespace is only available in the debug version.
  * @version %%version%%
- * @author &Oslash;yvind Sean Kinsey, <a href="mailto:oyvind@kinsey.no">oyvind@kinsey.no</a>
  * @singleton
  */
 var easyXSS = {
@@ -15,53 +15,136 @@ var easyXSS = {
      * @type {String}
      */
     version: "%%version%%",
-    /**
-     * @method
-     * @param {easyXSS.Transport.TransportConfiguration} config The transports configuration
-     * @param {Function} onReady A method that should be called when the transport is ready
-     * @return easyXSS.Transport.ITransport An object able to send and receive messages
-     */
-    createTransport: function(config, onReady){
-        if (config.local) {
-            config.channel = (config.channel) ? config.channel : "default";
-        }
-        else {
-            var query = easyXSS.Url.Query();
-            config.channel = query.channel;
-            config.remote = query.endpoint;
-        }
-        // #ifdef debug
-        easyXSS.Debug.trace("creating transport for channel " + config.channel);
-        // #endif
-        if (window.postMessage) {
-            return new easyXSS.Transport.PostMessageTransport(config, onReady);
-        }
-        else {
-            return new easyXSS.Transport.HashTransport(config, onReady);
-        }
-    },
     /** 
      * @class easyXSS.Interface
      * Creates an interface that can be used to call methods implemented
      * on the remote end of the channel, and also to provide the implementation
      * of methods to be called from the remote end.
-     * @requires JSON
-     * @cfg {easyXSS.Configuration.LocalConfiguration} local The local configuration
-     * @cfg {easyXSS.Configuration.RemoteConfiguration} remote The remote configuration
      * @constructor
-     * @param {String} channel A valid channel for transportation
-     * @param {easyXSS.Configuration.InterfaceConfiguration} config A valid easyXSS-definition
+     * @param {easyXSS.Configuration.ChannelConfiguration} channelConfig The underlying channels configuration.
+     * @param {easyXSS.Configuration.InterfaceConfiguration} config The description of the interface to implement
      * @param {Function} onReady A method that should be called when the interface is ready
      * @namespace easyXSS
      */
-    Interface: function(channel, config, onReady){
+    Interface: function(channelConfig, config, onReady){
         // #ifdef debug
         easyXSS.Debug.trace("creating new interface");
         // #endif
+        var channel;
         var _callbackCounter = 0, _callbacks = {};
-        var _local = (config.local) ? config.local : null;
         
-        function _onData(data, origin){
+        /**
+         * Creates a method that implements the given definition
+         * @private
+         * @param {easyXSS.Configuration.Methods.Method} The method configuration
+         * @param {String} name The name of the method
+         */
+        function _createMethod(definition, name){
+            if (definition.isVoid) {
+                // #ifdef debug
+                easyXSS.Debug.trace("creating void method " + name);
+                // #endif
+                // No need to register a callback
+                return function(){
+                    // #ifdef debug
+                    easyXSS.Debug.trace("executing void method " + name);
+                    // #endif
+                    var params = [];
+                    for (var i = 0, len = arguments.length; i < len; i++) {
+                        params[i] = arguments[i];
+                    }
+                    // Send the method request
+                    window.setTimeout(function(){
+                        channel.sendData({
+                            name: name,
+                            params: params
+                        });
+                    }, 0);
+                };
+            }
+            else {
+                // #ifdef debug
+                easyXSS.Debug.trace("creating method " + name);
+                // #endif
+                // We need to extract and register the callback
+                return function(){
+                    // #ifdef debug
+                    easyXSS.Debug.trace("executing method " + name);
+                    // #endif
+                    _callbacks["" + (++_callbackCounter)] = arguments[arguments.length - 1];
+                    var request = {
+                        name: name,
+                        id: (_callbackCounter),
+                        params: []
+                    };
+                    for (var i = 0, len = arguments.length - 1; i < len; i++) {
+                        request.params[i] = arguments[i];
+                    }
+                    // Send the method request
+                    window.setTimeout(function(){
+                        channel.sendData(request);
+                    }, 0);
+                };
+            }
+        }
+        
+        /**
+         * Executes the exposed method
+         * @private
+         * @param {String} name The name of the method
+         * @param {Number} id The callback id to use
+         * @param {Function} method The exposed implementation
+         * @param {Array} params The parameters supplied by the remote end
+         */
+        function _executeMethod(name, id, method, params){
+            if (!method) {
+                throw "The method " + name + " is not implemented.";
+            }
+            if (method.isAsync) {
+                // #ifdef debug
+                easyXSS.Debug.trace("requested to execute async method " + name);
+                // #endif
+                // The method is async, we need to add a callback
+                params.push(function(result){
+                    // Send back the result
+                    channel.sendData({
+                        id: id,
+                        response: result
+                    });
+                });
+                // Call local method
+                method.method.apply(null, params);
+            }
+            else {
+                if (method.isVoid) {
+                    // #ifdef debug
+                    easyXSS.Debug.trace("requested to execute void method " + name);
+                    // #endif
+                    // Call local method 
+                    method.method.apply(null, params);
+                }
+                else {
+                    // #ifdef debug
+                    easyXSS.Debug.trace("requested to execute method " + name);
+                    // #endif
+                    // Call local method and send back the response
+                    channel.sendData({
+                        id: id,
+                        response: method.method.apply(null, params)
+                    });
+                }
+            }
+        }
+        
+        channelConfig.converter = JSON;
+        
+        /**
+         * Handles incoming data
+         * @private
+         * @param {Object} data The JSON data object
+         * @param {String} origin
+         */
+        channelConfig.onData = function(data, origin){
             // #ifdef debug
             easyXSS.Debug.trace("interface$_onData:(" + data + "," + origin + ")");
             // #endif
@@ -71,45 +154,11 @@ var easyXSS = {
             /// </summary>
             /// <param name="data" type="object">The request/repsonse</param>
             if (data.name) {
+                // #ifdef debug
+                easyXSS.Debug.trace("received request to execute method " + data.name + " using callback id " + data.id);
+                // #endif
                 // A method call from the remote end
-                var method = _local[data.name];
-                if (!method) {
-                    throw "The method " + data.name + " is not implemented.";
-                }
-                if (method.isAsync) {
-                    // #ifdef debug
-                    easyXSS.Debug.trace("requested to execute async method " + data.name);
-                    // #endif
-                    // The method is async, we need to add a callback
-                    data.params.push(function(result){
-                        // Send back the result
-                        channel.sendData({
-                            id: data.id,
-                            response: result
-                        });
-                    });
-                    // Call local method
-                    method.method.apply(null, data.params);
-                }
-                else {
-                    if (method.isVoid) {
-                        // #ifdef debug
-                        easyXSS.Debug.trace("requested to execute void method " + data.name);
-                        // #endif
-                        // Call local method 
-                        method.method.apply(null, data.params);
-                    }
-                    else {
-                        // #ifdef debug
-                        easyXSS.Debug.trace("requested to execute method " + data.name);
-                        // #endif
-                        // Call local method and send back the response
-                        channel.sendData({
-                            id: data.id,
-                            response: method.method.apply(null, data.params)
-                        });
-                    }
-                }
+                _executeMethod(data.name, data.id, config.local[data.name], data.params);
             }
             else {
                 // #ifdef debug
@@ -119,82 +168,34 @@ var easyXSS = {
                 _callbacks[data.id](data.response);
                 delete _callbacks[data.id];
             }
-        }
+        };
         
-        function _createRemote(methods){
+        channel = new easyXSS.Channel(channelConfig, onReady);
+        
+        /**
+         * The underlying channel used by the interface
+         */
+        this.channel = channel;
+
+		/**
+		 * Tries to destroy the underlying channel and to remove all traces of the interface.
+		 */
+        this.destroy = function(){
+            this.channel.destroy();
+            for (var x in this) {
+                delete this[x];
+            }
+        };
+		
+        if (config.remote) {
             // #ifdef debug
             easyXSS.Debug.trace("creating concrete implementations");
             // #endif
-            /// <summary>
-            /// Creates a proxy to the methods located on the other end of the channel
-            /// <summary>
-            /// <param name="methods" type="Object">A description of the interface to implement</param>
-            function _createConcrete(definition, name){
-                /// <summary>
-                /// Creates the concrete implementation of the supplied definition
-                /// </summary>
-                /// <param name="definitin" type="Object"/>
-                /// <param name="name" type="String">The name of the method to expose</param>
-                if (definition.isVoid) {
-                    // #ifdef debug
-                    easyXSS.Debug.trace("creating void method " + name);
-                    // #endif
-                    // No need to register a callback
-                    return function(){
-                        // #ifdef debug
-                        easyXSS.Debug.trace("executing void method " + name);
-                        // #endif
-                        var params = [];
-                        for (var i = 0, len = arguments.length; i < len; i++) {
-                            params[i] = arguments[i];
-                        }
-                        // Send the method request
-                        window.setTimeout(function(){
-                            channel.sendData({
-                                name: name,
-                                params: params
-                            });
-                        }, 0);
-                    };
-                }
-                else {
-                    // #ifdef debug
-                    easyXSS.Debug.trace("creating method " + name);
-                    // #endif
-                    // We need to extract and register the callback
-                    return function(){
-                        // #ifdef debug
-                        easyXSS.Debug.trace("executing method " + name);
-                        // #endif
-                        _callbacks["" + (++_callbackCounter)] = arguments[arguments.length - 1];
-                        var request = {
-                            name: name,
-                            id: (_callbackCounter),
-                            params: []
-                        };
-                        for (var i = 0, len = arguments.length - 1; i < len; i++) {
-                            request.params[i] = arguments[i];
-                        }
-                        // Send the method request
-                        window.setTimeout(function(){
-                            channel.sendData(request);
-                        }, 0);
-                    };
-                }
+			// Implement the remote sides exposed methods
+            for (var name in config.remote) {
+                this[name] = _createMethod(config.remote[name], name);
             }
-            var concrete = {};
-            for (var name in methods) {
-                concrete[name] = _createConcrete(methods[name], name);
-            }
-            return concrete;
         }
-        channel.setOnData(_onData);
-        channel.setConverter(JSON);
-        if (onReady) {
-            window.setTimeout(onReady, 10);
-        }
-        
-        return (config.remote) ? _createRemote(config.remote) : null;
     },
     /**
      * @class easyXSS.Channel
@@ -208,82 +209,24 @@ var easyXSS = {
         // #ifdef debug
         easyXSS.Debug.trace("easyXSS.Channel.constructor");
         // #endif
-        var sendData;
-        if (config.converter) {
-            // #ifdef debug
-            easyXSS.Debug.trace("implementing serializer");
-            // #endif
-            /**
-             * Wraps the onMessage method using the supplied serializer to convert
-             * @param {Object} data
-             * @ignore
-             */
-            config.onMessage = function(message, origin){
-                this.onData(this.converter.parse(message), origin);
-            };
-            /**
-             * Wraps the postMessage method using hte supplied serializer to convert
-             * @param {Object} data
-             * @ignore
-             */
-            sendData = function(data){
-                this.transport.postMessage(config.converter.stringify(data));
-            };
+        if (!config.converter) {
+            throw "No converter present. You should use the easyXSS.Transport classes directly.";
         }
-        else {
-            config.onMessage = config.onData;
-            /**
-             * @param {Object} message
-             * @ignore
-             */
-            sendData = function(message){
-                this.transport.postMessage(message);
-            };
-        }
+        /**
+         * Wraps the transports onMessage method using the supplied serializer to convert
+         * @param {Object} data
+         * @ignore
+         */
+        config.onMessage = function(message, origin){
+            this.onData(this.converter.parse(message), origin);
+        };
         
         return {
             /**
              * The underlying transport used by this channel
              * @type easyXSS.Transport.ITransport
              */
-            transport: easyXSS.createTransport(/** easyXSS.Transport.TransportConfiguration*/config, onReady),
-            /**
-             * Sets the serializer to be used when transmitting and receiving messages
-             * @param {Object} converter The serializer to use
-             */
-            setConverter: function(converter){
-                // #ifdef debug
-                easyXSS.Debug.trace("implementing serializer after initialization");
-                // #endif
-                config.converter = converter;
-                /**
-                 * Wraps the postMessage method using the supplied serializer to convert
-                 * @param {Object} data
-                 * @ignore
-                 */
-                this.sendData = function(data){
-                    this.transport.postMessage(config.converter.stringify(data));
-                };
-                /**
-                 * Wraps the onData method using the supplied serializer to convert
-                 * @param {String} message
-                 * @param {String} origin
-                 * @ignore
-                 */
-                config.onMessage = function(message, origin){
-                    this.onData(this.converter.parse(message), origin);
-                };
-            },
-            /**
-             * Sets the method that should handle incoming messages
-             * @param {Function} onData
-             */
-            setOnData: function(onData){
-                // #ifdef debug
-                easyXSS.Debug.trace("overriding onData after intialization");
-                // #endif
-                config.onData = onData;
-            },
+            transport: new easyXSS.Transport.BestAvailableTransport(config, onReady),
             /**
              * Tries to destroy the underlying transport
              */
@@ -298,7 +241,9 @@ var easyXSS = {
              * If a serializer is specified then this will be used to serialize the data first.
              * @param {Object} data
              */
-            sendData: sendData
+            sendData: function(data){
+                this.transport.postMessage(config.converter.stringify(data));
+            }
         };
     }
 };

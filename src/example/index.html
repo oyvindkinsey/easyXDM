@@ -19,12 +19,10 @@
              * remote web application and can serve as a bridge between the two applications.
              */
             var proxy;
-            /**
-             * When the window is finished loading start setting up the channel
-             */
+            
             window.onload = function(){
                 /**
-                 * We start by creating a channel
+                 * When the window is finished loading start setting up the channel
                  */
                 proxy = new easyXSS.Channel(/** The configuration */{
                     /**

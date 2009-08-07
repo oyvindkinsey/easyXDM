@@ -11,15 +11,12 @@
             easyXSS.DomHelper.requiresJSON("../json2.js");
         </script>
         <script type="text/javascript">
-            var channel, remote;
-            /**
-             * When the window is finished loading start setting up the channel
-             */
+            var remote;
             window.onload = function(){
                 /**
-                 * We start by creating a channel
+                 * When the window is finished loading start setting up the interface
                  */
-                channel = new easyXSS.Channel(/** The configuration */{
+                remote = new easyXSS.Interface(/** The channel configuration */{
                     /**
                      * Register the url to hash.html, this must be an absolute path
                      * or a path relative to the root.
@@ -35,32 +32,27 @@
                      * Register the DOMElement that the generated IFrame should be inserted into
                      */
                     container: document.getElementById("embedded")
+                }, /** The interface configuration */ {
+                    remote: {
+                        addNumbers: {},
+                        multiplyNumbers: {},
+                        noOp: {
+                            isVoid: true
+                        }
+                    },
+                    local: {
+                        alertMessage: {
+                            method: function(msg){
+                                alert(msg);
+                            },
+                            isVoid: true
+                        }
+                    }
                 },/**The onReady handler*/ function(){
                     /**
-                     * When the channel is ready we create the interface
+                     * Call a method on the other side
                      */
-                    remote = new easyXSS.Interface(/** The channel to use*/channel, /** The configuration */ {
-                        remote: {
-                            addNumbers: {},
-                            multiplyNumbers: {},
-                            noOp: {
-                                isVoid: true
-                            }
-                        },
-                        local: {
-                            alertMessage: {
-                                method: function(msg){
-                                    alert(msg);
-                                },
-                                isVoid: true
-                            }
-                        }
-                    },/**The onReady handler*/ function(){
-                        /**
-                         * Call a method on the other side
-                         */
-                        remote.noOp();
-                    });
+                    remote.noOp();
                 });
             }
             

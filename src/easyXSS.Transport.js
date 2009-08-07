@@ -1,30 +1,54 @@
 easyXSS.Transport = {
+    // #ifdef debug
     /**
      * @class easyXSS.Transport.ITransport
-     * The interface implemented by all transport classes
-     * @cfg {String} local The url to the local hash.html
-     * @cfg {String} remote The url to the remote interface
-     * @param {object} config The configuration
+     * The interface implemented by all transport classes.<br/>
+     * Only available in debug mode.
      * @namespace easyXSS.Transport
      */
-    ITransport: function(config){
-        return {
-            /**
-             * Sends the message
-             * @memberOf esyXSS.Transport.ITransport
-             * @param {String} message The message to send
-             */
-            postMessage: function(message){
-            },
-            /** 
-             * Breaks down the connection and tries to clean up the dom.
-             * @memberOf esyXSS.Transport.ITransport
-             */
-            destroy: function(){
-            }
-        };
+    ITransport: {
+        /**
+         * Sends the message
+         * @param {String} message The message to send
+         */
+        postMessage: function(message){
+        },
+        /** 
+         * Breaks down the connection and tries to clean up the dom.
+         */
+        destroy: function(){
+        }
     },
-    
+    // #endif
+    /**
+     * @class easyXSS.Transport.BestAvailableTransport
+     * @extends easyXSS.Transport.ITransport
+     * BestAvailableTransport is a transport class that uses the best transport available.
+     * Currently it will select among PostMessageTransport and HashTransport.
+     * @constructor
+     * @param {easyXSS.Transport.TransportConfiguration} config The transports configuration.
+     * @param {Function} onReady A method that should be called when the transport is ready
+     * @namespace easyXSS.Transport
+     */
+    BestAvailableTransport: function(config, onReady){
+        // #ifdef debug
+        easyXSS.Debug.trace("easyXSS.Transport.BestAvailableTransport.constructor");
+        // #endif
+        if (config.local) {
+            config.channel = (config.channel) ? config.channel : "default";
+        }
+        else {
+            var query = easyXSS.Url.Query();
+            config.channel = query.channel;
+            config.remote = query.endpoint;
+        }
+        if (window.postMessage) {
+            return new easyXSS.Transport.PostMessageTransport(config, onReady);
+        }
+        else {
+            return new easyXSS.Transport.HashTransport(config, onReady);
+        }
+    },
     /**
      * @class easyXSS.Transport.PostMessageTransport
      * @extends easyXSS.Transport.ITransport

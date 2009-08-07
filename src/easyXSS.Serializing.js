@@ -1,7 +1,9 @@
 easyXSS.Serializing = {
+    // #ifdef debug
     /**
      * @class easyXSS.Serializing.ISerializer
-     * The Interface implemented by all serializers
+     * The Interface implemented by all serializers.<br/>
+     * Only available in debug mode.
      * @namespace easyXSS.Serializing
      */
     ISerializer: {
@@ -24,6 +26,7 @@ easyXSS.Serializing = {
         
         }
     },
+    // #endif
     /**
      * @class easyXSS.Serializing.hashTableSerializer
      * A serializer that can convert to and from hashtables

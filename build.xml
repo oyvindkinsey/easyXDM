@@ -34,7 +34,7 @@
         </concat>
 	
 		<replace file="${project.build.dir}\temp\easyXSS.combined.js"
-			token="%%version%%" value="1.3.0.${build.number}"/>
+			token="%%version%%" value="1.4.0.${build.number}"/>
 
 		<!-- Run jslint -->
 		<java jar="tools\jslint4java-1.3.1\jslint4java-1.3.1.jar" fork="true" failonerror="true" maxmemory="128m" >
