@@ -128,34 +128,33 @@ easyXSS.Transport = {
         }
         easyXSS.DomHelper.addEventListener(window, "message", _window_onMessage);
         
-        return {
-            /** 
-             * Sends the message using the postMethod method available on the window object
-             * @param {String} message The message to send
-             */
-            postMessage: function(message){
-                // #ifdef debug
-                easyXSS.Debug.trace("sending message '" + message + "' to " + _targetOrigin);
-                // #endif
-                if (config.local) {
-                    _callerWindow.contentWindow.postMessage(config.channel + " " + message, _targetOrigin);
-                }
-                else {
-                    window.parent.postMessage(config.channel + " " + message, _targetOrigin);
-                }
-            },
-            /**
-             *
-             */
-            destroy: function(){
-                // #ifdef debug
-                easyXSS.Debug.trace("destroying transport");
-                // #endif
-                easyXSS.DomHelper.removeEventListener(window, "message", _window_onMessage);
-                if (config.local) {
-                    _callerWindow.parentNode.removeChild(_callerWindow);
-                    _callerWindow = null;
-                }
+        
+        /** 
+         * Sends the message using the postMethod method available on the window object
+         * @param {String} message The message to send
+         */
+        this.postMessage = function(message){
+            // #ifdef debug
+            easyXSS.Debug.trace("sending message '" + message + "' to " + _targetOrigin);
+            // #endif
+            if (config.local) {
+                _callerWindow.contentWindow.postMessage(config.channel + " " + message, _targetOrigin);
+            }
+            else {
+                window.parent.postMessage(config.channel + " " + message, _targetOrigin);
+            }
+        };
+        /**
+         *
+         */
+        this.destroy = function(){
+            // #ifdef debug
+            easyXSS.Debug.trace("destroying transport");
+            // #endif
+            easyXSS.DomHelper.removeEventListener(window, "message", _window_onMessage);
+            if (config.local) {
+                _callerWindow.parentNode.removeChild(_callerWindow);
+                _callerWindow = null;
             }
         };
     },
@@ -236,29 +235,27 @@ easyXSS.Transport = {
                 }
             }
         });
-        return {
-            /** 
-             * Sends a message by encoding and placing it in the hash part of _callerWindows url.
-             * We include a message number so that identical messages will be read as separate messages.
-             * @param {String} message The message to send
-             */
-            postMessage: function(message){
-                // #ifdef debug
-                easyXSS.Debug.trace("sending message '" + message + "' to " + _remoteOrigin);
-                // #endif
-                _callerWindow.src = _remoteUrl + "#" + (_msgNr++) + "_" + encodeURIComponent(message);
-            },
-            /**
-             *
-             */
-            destroy: function(){
-                // #ifdef debug
-                easyXSS.Debug.trace("destroying transport");
-                // #endif
-                window.clearInterval(_timer);
-                _callerWindow.parentNode.removeChild(_callerWindow);
-                _callerWindow = null;
-            }
+        /** 
+         * Sends a message by encoding and placing it in the hash part of _callerWindows url.
+         * We include a message number so that identical messages will be read as separate messages.
+         * @param {String} message The message to send
+         */
+        this.postMessage = function(message){
+            // #ifdef debug
+            easyXSS.Debug.trace("sending message '" + message + "' to " + _remoteOrigin);
+            // #endif
+            _callerWindow.src = _remoteUrl + "#" + (_msgNr++) + "_" + encodeURIComponent(message);
+        };
+        /**
+         *
+         */
+        this.destroy = function(){
+            // #ifdef debug
+            easyXSS.Debug.trace("destroying transport");
+            // #endif
+            window.clearInterval(_timer);
+            _callerWindow.parentNode.removeChild(_callerWindow);
+            _callerWindow = null;
         };
     }
 };

@@ -176,22 +176,22 @@ var easyXSS = {
          * The underlying channel used by the interface
          */
         this.channel = _channel;
-
-		/**
-		 * Tries to destroy the underlying channel and to remove all traces of the interface.
-		 */
+        
+        /**
+         * Tries to destroy the underlying channel and to remove all traces of the interface.
+         */
         this.destroy = function(){
             this.channel.destroy();
             for (var x in this) {
                 delete this[x];
             }
         };
-		
+        
         if (config.remote) {
             // #ifdef debug
             easyXSS.Debug.trace("creating concrete implementations");
             // #endif
-			// Implement the remote sides exposed methods
+            // Implement the remote sides exposed methods
             for (var name in config.remote) {
                 this[name] = _createMethod(config.remote[name], name);
             }
@@ -221,29 +221,28 @@ var easyXSS = {
             this.onData(this.converter.parse(message), origin);
         };
         
-        return {
-            /**
-             * The underlying transport used by this channel
-             * @type easyXSS.Transport.ITransport
-             */
-            transport: new easyXSS.Transport.BestAvailableTransport(config, onReady),
-            /**
-             * Tries to destroy the underlying transport
-             */
-            destroy: function(){
-                // #ifdef debug
-                easyXSS.Debug.trace("easyXSS.Channel.destroy");
-                // #endif
-                this.transport.destroy();
-            },
-            /**
-             * Send data using the underlying transport
-             * If a serializer is specified then this will be used to serialize the data first.
-             * @param {Object} data
-             */
-            sendData: function(data){
-                this.transport.postMessage(config.converter.stringify(data));
-            }
+        
+        /**
+         * The underlying transport used by this channel
+         * @type easyXSS.Transport.ITransport
+         */
+        this.transport = new easyXSS.Transport.BestAvailableTransport(config, onReady);
+        /**
+         * Tries to destroy the underlying transport
+         */
+        this.destroy = function(){
+            // #ifdef debug
+            easyXSS.Debug.trace("easyXSS.Channel.destroy");
+            // #endif
+            this.transport.destroy();
+        };
+        /**
+         * Send data using the underlying transport
+         * If a serializer is specified then this will be used to serialize the data first.
+         * @param {Object} data
+         */
+        this.sendData = function(data){
+            this.transport.postMessage(config.converter.stringify(data));
         };
     }
 };
