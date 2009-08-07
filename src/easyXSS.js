@@ -30,7 +30,7 @@ var easyXSS = {
         // #ifdef debug
         easyXSS.Debug.trace("creating new interface");
         // #endif
-        var channel;
+        var _channel;
         var _callbackCounter = 0, _callbacks = {};
         
         /**
@@ -55,7 +55,7 @@ var easyXSS = {
                     }
                     // Send the method request
                     window.setTimeout(function(){
-                        channel.sendData({
+                        _channel.sendData({
                             name: name,
                             params: params
                         });
@@ -82,7 +82,7 @@ var easyXSS = {
                     }
                     // Send the method request
                     window.setTimeout(function(){
-                        channel.sendData(request);
+                        _channel.sendData(request);
                     }, 0);
                 };
             }
@@ -107,7 +107,7 @@ var easyXSS = {
                 // The method is async, we need to add a callback
                 params.push(function(result){
                     // Send back the result
-                    channel.sendData({
+                    _channel.sendData({
                         id: id,
                         response: result
                     });
@@ -128,7 +128,7 @@ var easyXSS = {
                     easyXSS.Debug.trace("requested to execute method " + name);
                     // #endif
                     // Call local method and send back the response
-                    channel.sendData({
+                    _channel.sendData({
                         id: id,
                         response: method.method.apply(null, params)
                     });
@@ -170,12 +170,12 @@ var easyXSS = {
             }
         };
         
-        channel = new easyXSS.Channel(channelConfig, onReady);
+        _channel = new easyXSS.Channel(channelConfig, onReady);
         
         /**
          * The underlying channel used by the interface
          */
-        this.channel = channel;
+        this.channel = _channel;
 
 		/**
 		 * Tries to destroy the underlying channel and to remove all traces of the interface.
