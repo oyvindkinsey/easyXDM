@@ -14,6 +14,9 @@ easyXDM.DomHelper = {
      * @type DOMElement
      */
     createFrame: function(url, name, container, onLoad){
+        // #ifdef debug
+        easyXDM.Debug.trace("creating frame" + ((name) ? (" " + name) : "") + " pointing to " + url);
+        // #endif
         var frame;
         if (name && window.attachEvent) {
             // Internet Explorer does not support setting the 
@@ -60,9 +63,9 @@ easyXDM.DomHelper = {
                     frame.style.left = "-2000px";
                     document.body.appendChild(frame);
                 }
+                frame.name = name;
+                frame.id = name;
             }
-            frame.name = name;
-            frame.id = name;
         }
         return frame;
     },
@@ -74,7 +77,6 @@ easyXDM.DomHelper = {
      */
     addEventListener: function(target, type, listener, useCapture){
         // Uses memoizing to cache the implementation
-        var addEventListener;
         if (window.addEventListener) {
             /**
              * Set addEventListener to use the DOM level 2 addEventListener
@@ -84,7 +86,10 @@ easyXDM.DomHelper = {
              * @param {String} type
              * @param {Function} listener
              */
-            addEventListener = function(target, type, listener, useCapture){
+            easyXDM.DomHelper.addEventListener = function(target, type, listener, useCapture){
+                // #ifdef debug
+                easyXDM.Debug.trace("adding listener " + type);
+                // #endif
                 target.addEventListener(type, listener, useCapture);
             };
         }
@@ -97,12 +102,14 @@ easyXDM.DomHelper = {
              * @param {String} sEvent
              * @param {Function} fpNotify
              */
-            addEventListener = function(object, sEvent, fpNotify){
+            easyXDM.DomHelper.addEventListener = function(object, sEvent, fpNotify){
+                // #ifdef debug
+                easyXDM.Debug.trace("adding listener " + sEvent);
+                // #endif
                 object.attachEvent("on" + sEvent, fpNotify);
             };
         }
-        addEventListener(target, type, listener);
-        easyXDM.DomHelper.addEventListener = addEventListener;
+        easyXDM.DomHelper.addEventListener(target, type, listener);
     },
     /**
      * Gives a consistent interface for adding eventhandlers

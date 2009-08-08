@@ -27,9 +27,9 @@ easyXDM.Events = (function(){
          */
         onReady: function(channel){
             // #ifdef debug
-            easyXDM.Debug.trace("executing onReady calback for channel " + channel);
+            easyXDM.Debug.trace("executing onReady callback for channel " + channel);
             // #endif
-            var fn = this.onReadyCallbacks[channel];
+            var fn = onReadyCallbacks[channel];
             if (fn) {
                 fn();
                 delete onReadyCallbacks[channel];

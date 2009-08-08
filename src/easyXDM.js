@@ -170,7 +170,6 @@ var easyXDM = {
             }
         };
         
-        _channel = new easyXDM.Channel(channelConfig, onReady);
         
         /**
          * The underlying channel used by the interface
@@ -196,6 +195,10 @@ var easyXDM = {
                 this[name] = _createMethod(config.remote[name], name);
             }
         }
+        //Delay setting up the channel until the interface has been returned
+        window.setTimeout(function(){
+            _channel = new easyXDM.Channel(channelConfig, onReady);
+        }, 5);
     },
     /**
      * @class easyXDM.Channel
@@ -226,7 +229,7 @@ var easyXDM = {
          * The underlying transport used by this channel
          * @type easyXDM.Transport.ITransport
          */
-        this.transport = new easyXDM.Transport.BestAvailableTransport(config, onReady);
+        this.transport = null;
         /**
          * Tries to destroy the underlying transport
          */
@@ -244,6 +247,13 @@ var easyXDM = {
         this.sendData = function(data){
             this.transport.postMessage(config.converter.stringify(data));
         };
+        
+        var that = this;
+        
+        //Delay setting up the transport until the Channel is returned
+        window.setTimeout(function(){
+            that.transport = new easyXDM.Transport.BestAvailableTransport(config, onReady);
+        }, 5);
     }
 };
 
@@ -261,7 +271,7 @@ easyXDM.Debug = {
     log: function(msg){
         // Uses memoizing to cache the implementation
         var log;
-        if (console === "undefined" || console.log === "undefiend") {
+        if (typeof console === "undefined" || typeof console.log === "undefined") {
             /**
              * Sets log to be an empty function since we have no output available
              * @ignore
@@ -298,12 +308,12 @@ easyXDM.Debug = {
              * @param {String} msg
              */
             trace = function(msg){
-                el.appendChild(document.createElement("div")).appendChild(document.createTextNode(location.host + ":" + msg));
+                el.appendChild(document.createElement("div")).appendChild(document.createTextNode(location.host + "-" + new Date().valueOf() + ":" + msg));
                 el.scrollTop = el.scrollHeight;
             };
         }
         else {
-            if (console === "undefined") {
+            if (typeof console === "undefined" || typeof console.info === "undefined") {
                 /**
                  * Sets trace to be an empty function
                  * @ignore

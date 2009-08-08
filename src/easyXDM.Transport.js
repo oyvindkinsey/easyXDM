@@ -42,12 +42,17 @@ easyXDM.Transport = {
             config.channel = query.channel;
             config.remote = query.endpoint;
         }
-        if (window.postMessage) {
-            return new easyXDM.Transport.PostMessageTransport(config, onReady);
+        var type = "HashTransport";
+        if (config.transportType) {
+            type = config.transportType;
         }
         else {
-            return new easyXDM.Transport.HashTransport(config, onReady);
+            if (window.postMessage) {
+                type = "PostMessageTransport";
+            }
         }
+        return new easyXDM.Transport[type](config, onReady);
+        
     },
     /**
      * @class easyXDM.Transport.PostMessageTransport
@@ -66,33 +71,62 @@ easyXDM.Transport = {
         // #endif
         var _targetOrigin = easyXDM.Url.getLocation(config.remote);
         var _callerWindow;
+        
+        /**
+         * Resolves the origin from the event object
+         * @param {Object} event The messageevent
+         * @return {String} The scheme, host and port of the origin
+         */
         function _getOrigin(event){
-            /// <summary>
-            /// The origin property should be valid, but some clients
-            /// still uses the uri or domain property.
-            /// </summary
-            /// <param name="event" type="MessageEvent">The eventobject from the browser</param>
-            /// <returns type="string">The origin of the event</returns>
             if (event.origin) {
+                // This is the standardized property
                 return event.origin;
             }
             if (event.uri) {
+                // From earlier implementations 
                 return easyXDM.Url.getLocation(event.uri);
             }
             if (event.domain) {
-                // This will fail if the origin is not using the same
-                // schema as we are
+                // This is the last option and will fail if the 
+                //origin is not using the same schema as we are
                 return location.protocol + "//" + event.domain;
             }
             throw "Unable to retrieve the origin of the event";
         }
         
+        /**
+         * Delays calling onReady until the class has been returned
+         */
+        function _onReady(){
+            if (onReady) {
+                window.setTimeout(onReady, 5);
+            }
+        }
+        
+        /**
+         * This will at any time point to the real implementation of the onMessage handler
+         */
+        var _window_onMessageImplementation;
+        
+        /**
+         * The main onMessage handler. This will pass on the event to the real implementation
+         * @ignore
+         * @param {Object} event The messageevent
+         */
         function _window_onMessage(event){
-            /// <summary>
-            /// The handler for the "message" event.
-            /// If the origin is allowed then we relay the message to the receiver
-            /// </summary
-            /// <param name="event" type="MessageEvent">The eventobject from the browser</param>
+            // #ifdef debug
+            easyXDM.Debug.trace("onMessage");
+            // #endif
+            _window_onMessageImplementation(event);
+        }
+        easyXDM.DomHelper.addEventListener(window, "message", _window_onMessage);
+        
+        /**
+         * This is the main implementation for the onMessage event.<br/>
+         * It checks the validity of the origin and passes the message on if appropriate.
+         * @param {Object} event The messageevent
+         */
+        function _handleMessage(event){
             var origin = _getOrigin(event);
             // #ifdef debug
             easyXDM.Debug.trace("received message '" + event.data + "' from " + origin);
@@ -102,31 +136,27 @@ easyXDM.Transport = {
             }
         }
         
-        function _onReady(){
-            /// <summary>
-            /// Calls the supplied onReady method
-            /// </summary
-            /// <remark>
-            /// We delay this so that the the call to createChannel or 
-            /// createTransport will have completed  
-            /// </remark>
-            if (onReady) {
-                window.setTimeout(onReady, 10);
-            }
-        }
-        
-        if (config.local) {
-            if (config.local.substring(0, 1) == "/") {
-                config.local = location.protocol + "//" + location.host + config.local;
-            }
-            _callerWindow = easyXDM.DomHelper.createFrame(config.remote + "?endpoint=" + config.local + "&channel=" + config.channel, "", config.container, function(win){
+        /**
+         * Used by local to fire the onReady method.
+         * After being notified by the remote, this method will replace the
+         * onMessage handler with _handleMessage and fire onReady
+         * @param {Object} event The messageevent
+         */
+        function _waitForReady(event){
+            if (event.data == config.channel + "-ready") {
+                // #ifdef debug
+                easyXDM.Debug.trace("firing onReady");
+                // #endif
+                // We use memoization to avoid having to run this check each time
+                _window_onMessageImplementation = _handleMessage;
                 _onReady();
-            });
+            }
+            // #ifdef debug
+            else {
+                easyXDM.Debug.trace("received unexpected message: " + event.data);
+            }
+            // #endif
         }
-        else {
-            _onReady();
-        }
-        easyXDM.DomHelper.addEventListener(window, "message", _window_onMessage);
         
         
         /** 
@@ -134,18 +164,9 @@ easyXDM.Transport = {
          * @param {String} message The message to send
          */
         this.postMessage = function(message){
-            // #ifdef debug
-            easyXDM.Debug.trace("sending message '" + message + "' to " + _targetOrigin);
-            // #endif
-            if (config.local) {
-                _callerWindow.contentWindow.postMessage(config.channel + " " + message, _targetOrigin);
-            }
-            else {
-                window.parent.postMessage(config.channel + " " + message, _targetOrigin);
-            }
         };
         /**
-         *
+         * Destroy all that we can destroy :)
          */
         this.destroy = function(){
             // #ifdef debug
@@ -157,6 +178,35 @@ easyXDM.Transport = {
                 _callerWindow = null;
             }
         };
+        
+        // Set up the messaging differently depending on being local or remote
+        if (config.local) {
+            this.postMessage = function(message){
+                // #ifdef debug
+                easyXDM.Debug.trace("sending message '" + message + "' to iframe " + _targetOrigin);
+                // #endif
+                _callerWindow.contentWindow.postMessage(config.channel + " " + message, _targetOrigin);
+            };
+            _window_onMessageImplementation = _waitForReady;
+            if (config.local.substring(0, 1) == "/") {
+                config.local = location.protocol + "//" + location.host + config.local;
+            }
+            _callerWindow = easyXDM.DomHelper.createFrame(config.remote + "?endpoint=" + config.local + "&channel=" + config.channel, "", config.container);
+        }
+        else {
+            this.postMessage = function(message){
+                // #ifdef debug
+                easyXDM.Debug.trace("sending message '" + message + "' to parent " + _targetOrigin);
+                // #endif
+                window.parent.postMessage(config.channel + " " + message, _targetOrigin);
+            };
+            _window_onMessageImplementation = _handleMessage;
+            // #ifdef debug
+            easyXDM.Debug.trace("firing onReady");
+            // #endif
+            window.parent.postMessage(config.channel + "-ready", _targetOrigin);
+            _onReady();
+        }
     },
     /**
      * @class easyXDM.Transport.HashTransport
@@ -170,7 +220,7 @@ easyXDM.Transport = {
      */
     HashTransport: function(config, onReady){
         // #ifdef debug
-        easyXDM.Debug.trace("easyXDM.Transport.PostMessageTransport.constructor");
+        easyXDM.Debug.trace("easyXDM.Transport.HashTransport.constructor");
         // #endif
         var _timer = null;
         var _lastMsg = "#" + config.channel, _msgNr = 0;
@@ -196,8 +246,12 @@ easyXDM.Transport = {
                 // If _listenerWindow is not already set (to window) then we try to attach the 
                 // frame located on [remote]. 
                 // We need to include the hash part of the url to avoid reloading the frame.
+                easyXDM.Debug.trace("trying to find window xss_" + config.channel + " with url " + config.local + "#" + config.channel);
                 _listenerWindow = window.open(config.local + "#" + config.channel, "xss_" + config.channel);
             }
+			if (!_listenerWindow){
+				throw "Not able to get a reference to the iframe";
+			}
             if (_listenerWindow.location.hash && _listenerWindow.location.hash != _lastMsg) {
                 _lastMsg = _listenerWindow.location.hash;
                 // #ifdef debug
@@ -222,19 +276,12 @@ easyXDM.Transport = {
                 window.setTimeout(onReady, 10);
             }
         }
-        
-        _callerWindow = easyXDM.DomHelper.createFrame(_remoteUrl, ((config.local) ? "" : "xss_" + config.channel), config.container, function(){
-            if (onReady) {
-                if (config.local) {
-                    // Register onReady callback in the library so that
-                    // it can be called when hash.html has loaded.
-                    easyXDM.Events.registerOnReady(config.channel, _onReady);
-                }
-                else {
-                    _onReady();
-                }
-            }
-        });
+        if (config.local) {
+            // Register onReady callback in the library so that
+            // it can be called when hash.html has loaded.
+            easyXDM.Events.registerOnReady(config.channel, _onReady);
+        }
+        _callerWindow = easyXDM.DomHelper.createFrame(_remoteUrl, ((config.local) ? "" : "xss_" + config.channel), config.container, (config.local) ? null : _onReady);
         /** 
          * Sends a message by encoding and placing it in the hash part of _callerWindows url.
          * We include a message number so that identical messages will be read as separate messages.
