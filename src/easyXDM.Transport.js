@@ -43,13 +43,8 @@ easyXDM.Transport = {
             config.remote = query.endpoint;
         }
         var type = "HashTransport";
-        if (config.transportType) {
-            type = config.transportType;
-        }
-        else {
-            if (window.postMessage) {
-                type = "PostMessageTransport";
-            }
+        if (window.postMessage) {
+            type = "PostMessageTransport";
         }
         return new easyXDM.Transport[type](config, onReady);
         
@@ -228,7 +223,13 @@ easyXDM.Transport = {
         if (config.local && config.local.substring(0, 1) == "/") {
             config.local = location.protocol + "//" + location.host + config.local;
         }
-        var _remoteUrl = config.remote + ((config.local) ? "?endpoint=" + config.local + "&channel=" + config.channel : "#" + config.channel);
+        var _remoteUrl = config.remote;
+        if (config.local) {
+            _remoteUrl += "?endpoint=" + config.local + "&channel=" + config.channel;
+        }
+        else {
+            _remoteUrl += "?version=" + easyXDM.version + "#" + config.channel;
+        }
         var _remoteOrigin = easyXDM.Url.getLocation(config.remote);
         var _pollInterval = (config.interval) ? config.interval : 300;
         
@@ -243,15 +244,11 @@ easyXDM.Transport = {
             /// are unread. 
             /// </remark>
             if (!_listenerWindow) {
-                // If _listenerWindow is not already set (to window) then we try to attach the 
-                // frame located on [remote]. 
-                // We need to include the hash part of the url to avoid reloading the frame.
-                easyXDM.Debug.trace("trying to find window xss_" + config.channel + " with url " + config.local + "#" + config.channel);
-                _listenerWindow = window.open(config.local + "#" + config.channel, "xss_" + config.channel);
+                _listenerWindow = easyXDM.Transport.HashTransport.getWindow(config.channel);
+                if (!_listenerWindow) {
+                    throw "Not able to get a reference to the iframe";
+                }
             }
-			if (!_listenerWindow){
-				throw "Not able to get a reference to the iframe";
-			}
             if (_listenerWindow.location.hash && _listenerWindow.location.hash != _lastMsg) {
                 _lastMsg = _listenerWindow.location.hash;
                 // #ifdef debug
@@ -279,7 +276,7 @@ easyXDM.Transport = {
         if (config.local) {
             // Register onReady callback in the library so that
             // it can be called when hash.html has loaded.
-            easyXDM.Events.registerOnReady(config.channel, _onReady);
+            easyXDM.Transport.HashTransport.registerOnReady(config.channel, _onReady);
         }
         _callerWindow = easyXDM.DomHelper.createFrame(_remoteUrl, ((config.local) ? "" : "xss_" + config.channel), config.container, (config.local) ? null : _onReady);
         /** 
@@ -307,4 +304,51 @@ easyXDM.Transport = {
     }
 };
 
+/**
+ * Contains the callbacks used to notify local that the remote end is ready
+ */
+easyXDM.Transport.HashTransport.callbacks = {};
+/**
+ * Contains the proxy windows used to read messages from remote when
+ * using HashTransport.
+ */
+easyXDM.Transport.HashTransport.windows = {};
 
+/**
+ * Register a callback that should be called when the remote end of a channel is ready
+ * @param {String} channel
+ * @param {Function} callback
+ */
+easyXDM.Transport.HashTransport.registerOnReady = function(channel, callback){
+    // #ifdef debug
+    easyXDM.Debug.trace("registering onReady callback for channel " + channel);
+    // #endif
+    easyXDM.Transport.HashTransport.callbacks[channel] = callback;
+};
+
+/**
+ * Register a window to be used for reading messages for a given channel
+ * @param {String} channel
+ * @param {Window} contentWindow
+ */
+easyXDM.Transport.HashTransport.registerWindow = function(channel, contentWindow){
+    easyXDM.Transport.HashTransport.windows[channel] = contentWindow;
+    // #ifdef debug
+    easyXDM.Debug.trace("executing onReady callback for channel " + channel);
+    // #endif
+    var fn = easyXDM.Transport.HashTransport.callbacks[channel];
+    if (fn) {
+        fn();
+        delete easyXDM.Transport.HashTransport.callbacks[channel];
+    }
+    
+};
+
+/**
+ * Returns the window associated with a channel
+ * @param {String} channel
+ * @return {Window} The window
+ */
+easyXDM.Transport.HashTransport.getWindow = function(channel){
+    return easyXDM.Transport.HashTransport.windows[channel];
+};
