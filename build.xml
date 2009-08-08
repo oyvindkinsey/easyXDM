@@ -24,7 +24,6 @@
 		
 		<concat destfile="${project.build.dir}\temp\easyXDM.combined.js">	
             <fileset dir="." includes="${project.src.dir}\easyXDM.js" />
-            <fileset dir="." includes="${project.src.dir}\easyXDM.Exceptions.js" />
             <fileset dir="." includes="${project.src.dir}\easyXDM.DomHelper.js" />
 			<fileset dir="." includes="${project.src.dir}\easyXDM.Transport.js" />
 			<fileset dir="." includes="${project.src.dir}\easyXDM.Configuration.js" />
