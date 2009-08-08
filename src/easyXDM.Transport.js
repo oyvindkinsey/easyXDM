@@ -327,11 +327,12 @@ easyXDM.Transport.HashTransport.registerOnReady = function(channel, callback){
 };
 
 /**
- * Register a window to be used for reading messages for a given channel
+ * Notify that a channel is ready and register a window to be used for reading messages
+ * for on the channel.
  * @param {String} channel
  * @param {Window} contentWindow
  */
-easyXDM.Transport.HashTransport.registerWindow = function(channel, contentWindow){
+easyXDM.Transport.HashTransport.channelReady = function(channel, contentWindow){
     easyXDM.Transport.HashTransport.windows[channel] = contentWindow;
     // #ifdef debug
     easyXDM.Debug.trace("executing onReady callback for channel " + channel);

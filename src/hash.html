@@ -9,7 +9,7 @@
                 /**
                  * Notify the library that the transport is ready
                  */
-                window.parent.parent.easyXDM.Transport.HashTransport.registerWindow(location.hash.substring(1), window);
+                window.parent.parent.easyXDM.Transport.HashTransport.channelReady(location.hash.substring(1), window);
             }
         </script>
     </head>
