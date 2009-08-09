@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="easyXDM" default="build" basedir=".">
 	<property file="build.properties"/>
+	<property name="project.build.artifactdir" value="./artifacts/"/>
+	<property name="project.build.version" value="1.5.0"/>
 	
 	<!-- Setup classpath for js-build-tools ant tasks -->
 	<path id="js-build-tasks.classpath">
@@ -14,15 +16,14 @@
 	<taskdef name="yuicompress" classname="com.moxiecode.ant.tasks.YuiCompressTask" classpathref="js-build-tasks.classpath" loaderref="js-build-tasks.classpath.loader" />
 		
 	<target name="clean" depends="" description="Cleans up the project from temporary files">
-		<delete dir="${project.build.dir}" quiet="true"/>
+		<delete dir="work" quiet="true"/>
     </target>
 	
 	<target name="build" depends="clean">
 		<buildnumber/>
-		<mkdir dir="${project.build.dir}"/>
-		<mkdir dir="${project.build.dir}\temp"/>
+		<mkdir dir="work"/>
 		
-		<concat destfile="${project.build.dir}\temp\easyXDM.combined.js">	
+		<concat destfile="work\easyXDM.combined.js">	
             <fileset dir="." includes="${project.src.dir}\easyXDM.js" />
             <fileset dir="." includes="${project.src.dir}\easyXDM.DomHelper.js" />
 			<fileset dir="." includes="${project.src.dir}\easyXDM.Transport.js" />
@@ -31,62 +32,68 @@
 			<fileset dir="." includes="${project.src.dir}\easyXDM.Serializing.js" />
         </concat>
 	
-		<replace file="${project.build.dir}\temp\easyXDM.combined.js"
-			token="%%version%%" value="1.5.0.${build.number}"/>
+		<replace file="work\easyXDM.combined.js"
+			token="%%version%%" value="${project.build.version}.${build.number}"/>
 
 		<!-- Run jslint -->
 		<java jar="tools\jslint4java-1.3.1\jslint4java-1.3.1.jar" fork="true" failonerror="true" maxmemory="128m" >
-			<arg value="${project.build.dir}\temp\easyXDM.combined.js"/>
+			<arg value="work\easyXDM.combined.js"/>
         </java>
 		
-		<!-- Process pre proccesing instuctions like #if/#endif etc -->
-		<preprocess infile="${project.build.dir}\temp\easyXDM.combined.js" outfile="${project.build.dir}\temp\easyXDM.js"/>
-		<preprocess infile="${project.build.dir}\temp\easyXDM.combined.js" outfile="${project.build.dir}\temp\easyXDM.debug.js" defines="debug"/>
-	    <preprocess infile="${project.src.dir}\hash.html" outfile="${project.build.dir}\temp\hash.html"/>
+		<!-- Process pre proccesing instructions like #if/#endif etc -->
+		<preprocess infile="work\easyXDM.combined.js" outfile="work\easyXDM.js"/>
+		<preprocess infile="work\easyXDM.combined.js" outfile="work\easyXDM.debug.js" defines="debug"/>
+	    <preprocess infile="${project.src.dir}\hash.html" outfile="work\hash.html"/>
 		
-		<delete file="${project.build.dir}\temp\easyXDM.combined.js" quiet="true"/>
-
+		
 		<!-- Compress the file using the YUI Compressor -->
-		<yuicompress infile="${project.build.dir}\temp\easyXDM.js" outfile="${project.build.dir}\temp\easyXDM.min.js" />
+		<yuicompress infile="work\easyXDM.js" outfile="work\easyXDM.min.js" />
 		
 		<!-- concat header files -->
-		<concat destfile="${project.build.dir}\easyXDM.js">
+		<concat destfile="${project.build.artifactdir}\v${project.build.version}\easyXDM.js">
             <fileset dir="." includes="${project.src.dir}\header.js" />
-            <fileset dir="." includes="${project.build.dir}\temp\easyXDM.js" />
+            <fileset dir="." includes="work\easyXDM.js" />
 		</concat>
-		<concat destfile="${project.build.dir}\easyXDM.debug.js">
+		<concat destfile="${project.build.artifactdir}\v${project.build.version}\easyXDM.debug.js">
             <fileset dir="." includes="${project.src.dir}\header.js" />
-            <fileset dir="." includes="${project.build.dir}\temp\easyXDM.debug.js" />
+            <fileset dir="." includes="work\easyXDM.debug.js" />
 		</concat>
-		<concat destfile="${project.build.dir}\easyXDM.min.js">
+		<concat destfile="${project.build.artifactdir}\v${project.build.version}\easyXDM.min.js">
             <fileset dir="." includes="${project.src.dir}\header.js" />
-            <fileset dir="." includes="${project.build.dir}\temp\easyXDM.min.js" />
+            <fileset dir="." includes="work\easyXDM.min.js" />
 		</concat>
-		<concat destfile="${project.build.dir}\hash.html">
+		<concat destfile="${project.build.artifactdir}\v${project.build.version}\hash.html">
             <fileset dir="." includes="${project.src.dir}\header.html" />
-            <fileset dir="." includes="${project.build.dir}\temp\hash.html" />
+            <fileset dir="." includes="work\hash.html" />
 		</concat>
+		<delete file="work\easyXDM.combined.js" quiet="true"/>
 		
-		<copy todir="${project.build.dir}">
-			<fileset dir="${project.build.dir}\temp"/>
+		<copy todir="${project.build.artifactdir}\v${project.build.version}">
+			<fileset dir="work"/>
 			<fileset file= "${project.src.dir}\changes.txt"/>
 			<fileset file= "tools\json2.js"/>
+			<fileset file= "tools\jquery-1.3.2.min.js"/>
 		</copy>
 		
-		<copy todir="${project.build.dir}\example">
+		<copy todir="${project.build.artifactdir}\v${project.build.version}\example">
 			<fileset dir="${project.src.dir}\example"/>
 		</copy>
-		<delete dir="${project.build.dir}\temp" quiet="true"/>
+		<delete dir="work" quiet="true"/>
 	</target>
 	
 	<target name="document" depends="build">
+		<delete dir="${project.build.artifactdir}\v${project.build.version}-docs" quiet="true"/>
 		<java jar="tools\ext-doc-1.0.131\ext-doc.jar" fork="true" failonerror="true" maxmemory="128m" >
-			<arg line="-p docs.xml -o docs -t tools\ext-doc-1.0.131\template\ext\template.xml"/>
+			<arg line="-p docs.xml -o ${project.build.artifactdir}\v${project.build.version}-docs -t tools\ext-doc-1.0.131\template\ext\template.xml"/>
         </java>
 	</target>
 	
 	<target name="package" depends="document">
-		<mkdir dir="dist"/>
-		<zip destfile="dist\${ant.project.name}-1.5.0.zip" basedir="${project.build.dir}"/>
+		<zip destfile="${project.build.artifactdir}${ant.project.name}-${project.build.version}.${build.number}.zip" basedir="${project.build.artifactdir}\v${project.build.version}"/>
+		<zip destfile="${project.build.artifactdir}${ant.project.name}-${project.build.version}.${build.number}-docs.zip" basedir="${project.build.artifactdir}\v${project.build.version}-docs"/>
+	</target>
+	
+	<target name="publish" depends="document,package">
+		
 	</target>
 </project>

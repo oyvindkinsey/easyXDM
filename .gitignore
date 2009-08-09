@@ -3,3 +3,4 @@ build/
 dist/
 docs/
 build.number
+.tmp_*
