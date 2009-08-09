@@ -15,3 +15,10 @@ consumed methods. This then allows you to call methods, with arguments,
 across the domain boundary and have the result returned.
 
 This also enables you to expose AJAX services in an easy way.
+
+USAGE
+Place easyXDM.js/easyXDM.min.js/easyXDM.debug.js and hash.html on your domain.
+json2.js should also be placed there if you intend to use easyXDM.Interface,
+or a easyXDM.Channel with the JSON serializer.
+
+Follow the documentation and examples at http://easyxdm.net/docs for more.

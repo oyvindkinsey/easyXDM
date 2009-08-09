@@ -1,5 +1,5 @@
 artifacts/
-build/
+work/
 dist/
 docs/
 build.number
