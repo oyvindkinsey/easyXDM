@@ -12,6 +12,6 @@ to send Javascript objects over the transport.
 
 easyXDM.Interface wraps a Channel and enables you to define exposed and
 consumed methods. This then allows you to call methods, with arguments, 
-across the domain boundary and have the result returnet.
+across the domain boundary and have the result returned.
 
 This also enables you to expose AJAX services in an easy way.
