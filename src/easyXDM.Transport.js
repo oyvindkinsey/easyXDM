@@ -183,10 +183,7 @@ easyXDM.Transport = {
                 _callerWindow.contentWindow.postMessage(config.channel + " " + message, _targetOrigin);
             };
             _window_onMessageImplementation = _waitForReady;
-            if (config.local.substring(0, 1) == "/") {
-                config.local = location.protocol + "//" + location.host + config.local;
-            }
-            _callerWindow = easyXDM.DomHelper.createFrame(config.remote + "?endpoint=" + config.local + "&channel=" + config.channel, "", config.container);
+            _callerWindow = easyXDM.DomHelper.createFrame(config.remote + "?endpoint=" + easyXDM.Url.resolveUrl(config.local) + "&channel=" + config.channel, "", config.container);
         }
         else {
             this.postMessage = function(message){
@@ -220,15 +217,12 @@ easyXDM.Transport = {
         var _timer = null;
         var _lastMsg = "#" + config.channel, _msgNr = 0;
         var _listenerWindow = (!config.local) ? window : null, _callerWindow;
-        if (config.local && config.local.substring(0, 1) == "/") {
-            config.local = location.protocol + "//" + location.host + config.local;
-        }
         var _remoteUrl = config.remote;
         if (config.local) {
-            _remoteUrl += "?endpoint=" + config.local + "&channel=" + config.channel;
+            _remoteUrl += "?endpoint=" + easyXDM.Url.resolveUrl(config.local) + "&channel=" + config.channel;
         }
         else {
-            _remoteUrl += "?version=" + easyXDM.version + "#" + config.channel;
+            _remoteUrl += "#" + config.channel;
         }
         var _remoteOrigin = easyXDM.Url.getLocation(config.remote);
         var _pollInterval = (config.interval) ? config.interval : 300;

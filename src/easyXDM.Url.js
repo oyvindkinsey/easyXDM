@@ -42,13 +42,29 @@ easyXDM.Url = {
     /**
      * Returns  a string containing the schema, domain and if present the port
      * @param {String} url The url to extract the location from
-     * @returns The location part of the url
-     * @type {String}
+     * @return {String} The location part of the url
      */
     getLocation: function(url){
         var indexOf = url.indexOf("//");
         var loc = url.substring(indexOf + 2);
         loc = loc.substring(0, loc.indexOf("/"));
         return url.substring(0, indexOf + 2) + loc;
+    },
+	/**
+	 * Resolves a path to a complete url
+	 * @param {String} url The path to resolve
+	 * @return {String} The resolved url 
+	 */
+    resolveUrl: function(url){
+        // If the url is a valid url we do nothing
+        if (url.match(/^(http||https):\/\//)) {
+            return url;
+        }
+        // If the url is relative to the root  
+        if (url.substring(0, 1) == "/") {
+            return location.protocol + "//" + location.host + url;
+        }
+        // If the url is relative to the current directory
+        return location.href.substring(0, location.href.lastIndexOf("/") + 1) + url;
     }
 };

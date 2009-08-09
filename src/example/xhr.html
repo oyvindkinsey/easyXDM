@@ -27,45 +27,33 @@
                      * Register the url to the remote interface
                      * @field
                      */
-                    remote: "http://provider.easyxdm.net/example/remotemethods.html",
+                    remote: "http://provider.easyxdm.net/example/xhr_remote.html",
                     /**
                      * Register the DOMElement that the generated IFrame should be inserted into
                      */
                     container: document.getElementById("embedded")
                 }, /** The interface configuration */ {
                     remote: {
-                        addNumbers: {},
-                        multiplyNumbers: {},
-                        noOp: {
-                            isVoid: true
-                        }
-                    },
-                    local: {
-                        alertMessage: {
-                            method: function(msg){
-                                alert(msg);
-                            },
-                            isVoid: true
-                        }
+                        getGlossary: {},
+                        ajax: {}
                     }
                 },/**The onReady handler*/ function(){
-                    /**
-                     * Call a method on the other side
-                     */
-                    remote.noOp();
+                
+                
+                });
+            }
+            function getGlossary(){
+                remote.getGlossary(function(json){
+                    alert(json.glossary.title);
                 });
             }
             
-            function add(a, b){
-                remote.addNumbers(a, b, function(result){
-                    alert(a + " + " + b + " = " + result);
+            function getGlossaryUsingAjax(){
+                remote.ajax("glossary.json", {
+                    name: "sometitle"
+                }, function(json){
+                    alert(json.glossary.title);
                 });
-            }
-            
-            function multiply(a, b){
-                remote.multiplyNumbers(a, b, function(result){
-                    alert(a + " x " + b + " = " + result);
-                })
             }
         </script>
         <style type="text/css">
@@ -87,21 +75,10 @@
         <div id="embedded">
         </div>
         <div>
-            The remote implementation is synchronous and will return immediately
-            <br/>
-            <input type="button" onclick="add(3,5)" value="call addNumbers on remote domain"/>
-            <br/>
-            <br/>
-            The remote implementation of multiplyNumbers is asynchronous and will return after 5seconds
-            <br/>
-            This shows that you can use async calls in the remote method, eg. XHR calls
-            <br/>
-            <input type="button" onclick="multiply(3,5)" value="call multiplyNumbers on remote domain"/>
-            <br/>
-            <br/>
-            This calls a non-returning method on the remote side
-            <br/>
-            <input type="button" onclick="remote.noOp()" value="call noOp on the remote domain"/>
-        </div>
+            <input type="button" onclick="getGlossary()" value="Call getGlossary using the exposed method"/>
+        <br/>
+		<input type="button" onclick="getGlossaryUsingAjax()" value="Call getGlossary using the exposed ajax wraper"/>
+        
+		</div>
     </body>
 </html>
