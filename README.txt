@@ -1,4 +1,4 @@
-easyXDM is javascript library created to enable web developers
+easyXDM is a javascript library created to enable web developers
 to easily expose javascript API's across domain boundaries.
 
 The library provides three layers of abstraction to current methods.
