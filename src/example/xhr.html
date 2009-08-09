@@ -66,6 +66,11 @@
         </style>
     </head>
     <body>
+        <div>
+            <a href="http://easyxdm.net/docs/">See easyxdm.net/docs for full documentation and more examples</a>
+            <br/>
+            The examples are executing slower than the production build due to the extensive tracing.
+        </div>
         <script type="text/javascript">
             document.write("Domain: " + location.host);
         </script>
@@ -75,10 +80,31 @@
         <div id="embedded">
         </div>
         <div>
+            This example shows how to use easyXDM to call regular ajax services (no JSONP) from remote domains.
+            <br/>
+            This is shown both by having the remote end expose a wrapper around a specific ajax call, but also
+            by exposing a generic ajax(url,data,callback) method that can be used to call any service on the domain.
+            <br/>
+            The remote end is using jQuery for the ajax request, but any library could be used.
+            <br/>
             <input type="button" onclick="getGlossary()" value="Call getGlossary using the exposed method"/>
-        <br/>
-		<input type="button" onclick="getGlossaryUsingAjax()" value="Call getGlossary using the exposed ajax wraper"/>
-        
-		</div>
+            <br/>
+            <input type="button" onclick="getGlossaryUsingAjax()" value="Call getGlossary using the exposed ajax wraper"/>
+        </div>
+        <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+        </script>
+        <script type="text/javascript">
+            if (location.host.indexOf("easyxdm.net") !== -1) {
+                try {
+                    var pageTracker = _gat._getTracker("UA-9535591-3");
+                    pageTracker._setDomainName(".easyxdm.net");
+                    pageTracker._trackPageview();
+                } 
+                catch (err) {
+                }
+            }
+        </script>
     </body>
 </html>

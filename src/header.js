@@ -1,9 +1,9 @@
 /*
- * easyXDM 1.2
- * http://easyxss.net/
- * Copyright(c) 2009, Øyvind Sean Kinsey, oyvind@kinsey.no.
+ * easyXDM 
+ * http://easyxdm.net/
+ * Copyright(c) 2009, Ã˜yvind Sean Kinsey, oyvind@kinsey.no.
  * 
- * MIT Licensed - http://easyxss.net/license/mit.txt
+ * MIT Licensed - http://easyxdm.net/license/mit.txt
  * 
  */
  

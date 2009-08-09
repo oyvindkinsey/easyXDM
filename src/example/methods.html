@@ -78,6 +78,11 @@
         </style>
     </head>
     <body>
+        <div>
+            <a href="http://easyxdm.net/docs/">See easyxdm.net/docs for full documentation and more examples</a>
+            <br/>
+            The examples are executing slower than the production build due to the extensive tracing.
+        </div>
         <script type="text/javascript">
             document.write("Domain: " + location.host);
         </script>
@@ -103,5 +108,20 @@
             <br/>
             <input type="button" onclick="remote.noOp()" value="call noOp on the remote domain"/>
         </div>
+        <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+        </script>
+        <script type="text/javascript">
+            if (location.host.indexOf("easyxdm.net") !== -1) {
+                try {
+                    var pageTracker = _gat._getTracker("UA-9535591-3");
+                    pageTracker._setDomainName(".easyxdm.net");
+                    pageTracker._trackPageview();
+                } 
+                catch (err) {
+                }
+            }
+        </script>
     </body>
 </html>

@@ -61,9 +61,29 @@
         </script>
     </head>
     <body>
+        <div>
+            <a href="http://easyxdm.net/docs/">See easyxdm.net/docs for full documentation and more examples</a>
+            <br/>
+            The examples are executing slower than the production build due to the extensive tracing.
+        </div>
         <!-- easyXDM.Debug.trace(msg) will output its messages to any element with the id "log" -->
         <div id="log" style="height:100px;border:1px dotted black;overflow:auto">
         </div>
         <!-- Send som data to the other side --><input type="button" onclick="proxy.sendData({a:'b',c:'d',e:'f'});" value="send data to remote"/>
+        <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+        </script>
+        <script type="text/javascript">
+            if (location.host.indexOf("easyxdm.net") !== -1) {
+                try {
+                    var pageTracker = _gat._getTracker("UA-9535591-3");
+                    pageTracker._setDomainName(".easyxdm.net");
+                    pageTracker._trackPageview();
+                } 
+                catch (err) {
+                }
+            }
+        </script>
     </body>
 </html>
