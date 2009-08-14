@@ -69,6 +69,7 @@ easyXDM.Transport = {
         
         /**
          * Resolves the origin from the event object
+         * @private
          * @param {Object} event The messageevent
          * @return {String} The scheme, host and port of the origin
          */
@@ -88,9 +89,9 @@ easyXDM.Transport = {
             }
             throw "Unable to retrieve the origin of the event";
         }
-        
         /**
          * Delays calling onReady until the class has been returned
+         * @private
          */
         function _onReady(){
             if (onReady) {
@@ -98,14 +99,13 @@ easyXDM.Transport = {
             }
         }
         
-        /**
-         * This will at any time point to the real implementation of the onMessage handler
-         */
+        
+        // This will at any time point to the real implementation of the onMessage handler
         var _window_onMessageImplementation;
         
         /**
          * The main onMessage handler. This will pass on the event to the real implementation
-         * @ignore
+         * @private
          * @param {Object} event The messageevent
          */
         function _window_onMessage(event){
@@ -119,6 +119,7 @@ easyXDM.Transport = {
         /**
          * This is the main implementation for the onMessage event.<br/>
          * It checks the validity of the origin and passes the message on if appropriate.
+         * @private
          * @param {Object} event The messageevent
          */
         function _handleMessage(event){
@@ -135,6 +136,7 @@ easyXDM.Transport = {
          * Used by local to fire the onReady method.
          * After being notified by the remote, this method will replace the
          * onMessage handler with _handleMessage and fire onReady
+         * @private
          * @param {Object} event The messageevent
          */
         function _waitForReady(event){
