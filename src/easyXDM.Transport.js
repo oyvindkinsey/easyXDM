@@ -185,7 +185,7 @@ easyXDM.Transport = {
                 _callerWindow.contentWindow.postMessage(config.channel + " " + message, _targetOrigin);
             };
             _window_onMessageImplementation = _waitForReady;
-            _callerWindow = easyXDM.DomHelper.createFrame(config.remote + "?endpoint=" + easyXDM.Url.resolveUrl(config.local) + "&channel=" + config.channel, "", config.container);
+            _callerWindow = easyXDM.DomHelper.createFrame(config.remote + "?endpoint=" + easyXDM.Url.resolveUrl(config.local) + "&channel=" + config.channel, config.container);
         }
         else {
             this.postMessage = function(message){
@@ -274,7 +274,7 @@ easyXDM.Transport = {
             // it can be called when hash.html has loaded.
             easyXDM.Transport.HashTransport.registerOnReady(config.channel, _onReady);
         }
-        _callerWindow = easyXDM.DomHelper.createFrame(_remoteUrl, ((config.local) ? "" : "xss_" + config.channel), config.container, (config.local) ? null : _onReady);
+        _callerWindow = easyXDM.DomHelper.createFrame(_remoteUrl, config.container, (config.local) ? null : _onReady);
         /** 
          * Sends a message by encoding and placing it in the hash part of _callerWindows url.
          * We include a message number so that identical messages will be read as separate messages.
