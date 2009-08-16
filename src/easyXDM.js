@@ -139,20 +139,16 @@ var easyXDM = {
         channelConfig.converter = JSON;
         
         /**
-         * Handles incoming data
+         * Handles incoming data.<br/>
+         * This can be either a request a method invocation, the response to one. 
          * @private
          * @param {Object} data The JSON data object
-         * @param {String} origin
+         * @param {String} origin The origin of the message
          */
         channelConfig.onData = function(data, origin){
             // #ifdef debug
             easyXDM.Debug.trace("interface$_onData:(" + data + "," + origin + ")");
             // #endif
-            /// <summary>
-            /// Receives either a request or a response from the other
-            /// end of the channel
-            /// </summary>
-            /// <param name="data" type="object">The request/repsonse</param>
             if (data.name) {
                 // #ifdef debug
                 easyXDM.Debug.trace("received request to execute method " + data.name + " using callback id " + data.id);
@@ -169,7 +165,6 @@ var easyXDM = {
                 delete _callbacks[data.id];
             }
         };
-        
         
         /**
          * The underlying channel used by the interface
@@ -195,7 +190,7 @@ var easyXDM = {
                 this[name] = _createMethod(config.remote[name], name);
             }
         }
-        //Delay setting up the channel until the interface has been returned
+        // Delay setting up the channel until the interface has been returned
         window.setTimeout(function(){
             _channel = new easyXDM.Channel(channelConfig, onReady);
         }, 5);
@@ -203,10 +198,10 @@ var easyXDM = {
     /**
      * @class easyXDM.Channel
      * A channel wrapping an underlying transport.
+     * @constructor
      * @param {easyXDM.ChannelConfiguration} config The channels configuration
      * @param {Function} onReady A method that should be called when the channel is ready
      * @namespace easyXDM
-     * @constructor
      */
     Channel: function(config, onReady){
         // #ifdef debug
@@ -218,12 +213,11 @@ var easyXDM = {
         /**
          * Wraps the transports onMessage method using the supplied serializer to convert.
          * @param {Object} data
-         * @ignore
+         * @private
          */
         config.onMessage = function(message, origin){
             this.onData(this.converter.parse(message), origin);
         };
-        
         
         /**
          * The underlying transport used by this channel
@@ -242,7 +236,7 @@ var easyXDM = {
         /**
          * Send data using the underlying transport
          * If a serializer is specified then this will be used to serialize the data first.
-         * @param {Object} data
+         * @param {Object} data the data to send
          */
         this.sendData = function(data){
             this.transport.postMessage(config.converter.stringify(data));
@@ -250,7 +244,7 @@ var easyXDM = {
         
         var that = this;
         
-        //Delay setting up the transport until the Channel is returned
+        // Delay setting up the transport until the Channel is returned
         window.setTimeout(function(){
             that.transport = new easyXDM.Transport.BestAvailableTransport(config, onReady);
         }, 5);

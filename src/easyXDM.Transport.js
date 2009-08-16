@@ -84,7 +84,7 @@ easyXDM.Transport = {
             }
             if (event.domain) {
                 // This is the last option and will fail if the 
-                //origin is not using the same schema as we are
+                // origin is not using the same schema as we are
                 return location.protocol + "//" + event.domain;
             }
             throw "Unable to retrieve the origin of the event";
@@ -154,7 +154,6 @@ easyXDM.Transport = {
             }
             // #endif
         }
-        
         
         /** 
          * Sends the message using the postMethod method available on the window object
