@@ -1,6 +1,6 @@
 
 /*jslint evil:true, browser: true, forin: true, immed: true, passfail: true, undef: true */
-/*global window, escape, unescape */
+/*global easyXDM, window, escape, unescape */
 
 /** 
  * @class easyXDM
@@ -9,7 +9,7 @@
  * @version %%version%%
  * @singleton
  */
-var easyXDM = {
+easyXDM = {
     /**
      * The version of the library
      * @type {String}
