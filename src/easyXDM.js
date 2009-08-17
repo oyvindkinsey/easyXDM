@@ -40,6 +40,10 @@ easyXDM = {
          * @param {String} name The name of the method
          */
         function _createMethod(definition, name){
+            // Add the scope so that calling the methods will work as expected
+            if (typeof definition.scope === "undefined") {
+                definition.scope = window;
+            }
             if (definition.isVoid) {
                 // #ifdef debug
                 easyXDM.Debug.trace("creating void method " + name);
@@ -49,10 +53,7 @@ easyXDM = {
                     // #ifdef debug
                     easyXDM.Debug.trace("executing void method " + name);
                     // #endif
-                    var params = [];
-                    for (var i = 0, len = arguments.length; i < len; i++) {
-                        params[i] = arguments[i];
-                    }
+                    var params = Array.slice(arguments,0);
                     // Send the method request
                     window.setTimeout(function(){
                         _channel.sendData({
@@ -75,11 +76,8 @@ easyXDM = {
                     var request = {
                         name: name,
                         id: (_callbackCounter),
-                        params: []
+                        params: Array.slice(arguments, 0, arguments.length - 1)
                     };
-                    for (var i = 0, len = arguments.length - 1; i < len; i++) {
-                        request.params[i] = arguments[i];
-                    }
                     // Send the method request
                     window.setTimeout(function(){
                         _channel.sendData(request);
@@ -113,7 +111,7 @@ easyXDM = {
                     });
                 });
                 // Call local method
-                method.method.apply(null, params);
+                method.method.apply(method.scope, params);
             }
             else {
                 if (method.isVoid) {
@@ -121,7 +119,7 @@ easyXDM = {
                     easyXDM.Debug.trace("requested to execute void method " + name);
                     // #endif
                     // Call local method 
-                    method.method.apply(null, params);
+                    method.method.apply(method.scope, params);
                 }
                 else {
                     // #ifdef debug
@@ -130,7 +128,7 @@ easyXDM = {
                     // Call local method and send back the response
                     _channel.sendData({
                         id: id,
-                        response: method.method.apply(null, params)
+                        response: method.method.apply(method.scope, params)
                     });
                 }
             }
@@ -140,7 +138,7 @@ easyXDM = {
         
         /**
          * Handles incoming data.<br/>
-         * This can be either a request a method invocation, the response to one. 
+         * This can be either a request a method invocation, the response to one.
          * @private
          * @param {Object} data The JSON data object
          * @param {String} origin The origin of the message
