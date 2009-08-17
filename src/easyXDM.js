@@ -53,7 +53,7 @@ easyXDM = {
                     // #ifdef debug
                     easyXDM.Debug.trace("executing void method " + name);
                     // #endif
-                    var params = Array.slice(arguments,0);
+                    var params = Array.prototype.slice.call(arguments,0);
                     // Send the method request
                     window.setTimeout(function(){
                         _channel.sendData({
@@ -76,7 +76,7 @@ easyXDM = {
                     var request = {
                         name: name,
                         id: (_callbackCounter),
-                        params: Array.slice(arguments, 0, arguments.length - 1)
+                        params: Array.prototype.slice.call(arguments, 0, arguments.length - 1)
                     };
                     // Send the method request
                     window.setTimeout(function(){
