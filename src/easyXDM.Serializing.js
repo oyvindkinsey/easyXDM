@@ -43,7 +43,9 @@ easyXDM.Serializing = {
         stringify: function(data){
             var message = "";
             for (var key in data) {
-                message += key + "=" + escape(data[key]) + "&";
+                if (data.hasOwnProperty(key)) {
+                    message += key + "=" + escape(data[key]) + "&";
+                }
             }
             return message.substring(0, message.length - 1);
         },

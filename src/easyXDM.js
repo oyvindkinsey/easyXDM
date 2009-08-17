@@ -175,7 +175,9 @@ easyXDM = {
         this.destroy = function(){
             this.channel.destroy();
             for (var x in this) {
-                delete this[x];
+                if (this.hasOwnProperty(x)) {
+                    delete this[x];
+                }
             }
         };
         
@@ -185,7 +187,9 @@ easyXDM = {
             // #endif
             // Implement the remote sides exposed methods
             for (var name in config.remote) {
-                this[name] = _createMethod(config.remote[name], name);
+                if (config.remote.hasOwnProperty(name)) {
+                    this[name] = _createMethod(config.remote[name], name);
+                }
             }
         }
         // Delay setting up the channel until the interface has been returned
