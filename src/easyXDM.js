@@ -1,6 +1,6 @@
 
-/*jslint evil:true, browser: true, forin: true, immed: true, passfail: true, undef: true */
-/*global easyXDM, window, escape, unescape */
+/*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
+/*global easyXDM: true, window, escape, unescape */
 
 /** 
  * @class easyXDM
@@ -53,7 +53,7 @@ easyXDM = {
                     // #ifdef debug
                     easyXDM.Debug.trace("executing void method " + name);
                     // #endif
-                    var params = Array.prototype.slice.call(arguments,0);
+                    var params = Array.prototype.slice.call(arguments, 0);
                     // Send the method request
                     window.setTimeout(function(){
                         _channel.sendData({

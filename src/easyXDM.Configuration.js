@@ -105,14 +105,12 @@ easyXDM.Configuration = {
      * Contains description on the various method descriptions
      */
     Methods: {
-		/**
-		 * @class easyXDM.Configuration.Methods.Method
-		 * The base method implementation
-		 * @namespace easyXDM.Configuration.Methods
-		 */
-		Method:{
-			
-		},
+        /**
+         * @class easyXDM.Configuration.Methods.Method
+         * The base method implementation
+         * @namespace easyXDM.Configuration.Methods
+         */
+        Method: {},
         /**
          * @class easyXDM.Configuration.Methods.LocalMethod
          * @extends easyXDM.Configuration.Methods.Method
