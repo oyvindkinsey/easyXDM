@@ -1,10 +1,10 @@
-easyXDM.Serializing = {
+easyXDM.serializing = {
     // #ifdef debug
     /**
-     * @class easyXDM.Serializing.ISerializer
+     * @class easyXDM.serializing.ISerializer
      * The Interface implemented by all serializers.<br/>
      * Only available in debug mode.
-     * @namespace easyXDM.Serializing
+     * @namespace easyXDM.serializing
      */
     ISerializer: {
         /**
@@ -28,10 +28,10 @@ easyXDM.Serializing = {
     },
     // #endif
     /**
-     * @class easyXDM.Serializing.hashTableSerializer
+     * @class easyXDM.serializing.hashTableSerializer
      * A serializer that can convert to and from hashtables
      * It uses the same format as the query string for its serialized data
-     * @namespace easyXDM.Serializing
+     * @namespace easyXDM.serializing
      */
     hashTableSerializer: {
         /**

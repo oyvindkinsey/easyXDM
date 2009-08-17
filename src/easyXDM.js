@@ -5,7 +5,7 @@
 /** 
  * @class easyXDM
  * A javascript library providing cross-browser, cross-site messaging/method invocation.<br/>
- * easyXDM.Debug and the easyXDM.Configuration namespace is only available in the debug version.
+ * easyXDM.Debug and the easyXDM.configuration namespace is only available in the debug version.
  * @version %%version%%
  * @singleton
  */
@@ -21,8 +21,8 @@ easyXDM = {
      * on the remote end of the channel, and also to provide the implementation
      * of methods to be called from the remote end.
      * @constructor
-     * @param {easyXDM.Configuration.ChannelConfiguration} channelConfig The underlying channels configuration.
-     * @param {easyXDM.Configuration.InterfaceConfiguration} config The description of the interface to implement
+     * @param {easyXDM.configuration.ChannelConfiguration} channelConfig The underlying channels configuration.
+     * @param {easyXDM.configuration.InterfaceConfiguration} config The description of the interface to implement
      * @param {Function} onReady A method that should be called when the interface is ready
      * @namespace easyXDM
      */
@@ -36,7 +36,7 @@ easyXDM = {
         /**
          * Creates a method that implements the given definition
          * @private
-         * @param {easyXDM.Configuration.Methods.Method} The method configuration
+         * @param {easyXDM.configuration.Methods.Method} The method configuration
          * @param {String} name The name of the method
          */
         function _createMethod(definition, name){
@@ -210,7 +210,7 @@ easyXDM = {
         easyXDM.Debug.trace("easyXDM.Channel.constructor");
         // #endif
         if (!config.converter) {
-            throw "No converter present. You should use the easyXDM.Transport classes directly.";
+            throw "No converter present. You should use the easyXDM.transport classes directly.";
         }
         /**
          * Wraps the transports onMessage method using the supplied serializer to convert.
@@ -223,7 +223,7 @@ easyXDM = {
         
         /**
          * The underlying transport used by this channel
-         * @type easyXDM.Transport.ITransport
+         * @type easyXDM.transport.ITransport
          */
         this.transport = null;
         /**
@@ -248,7 +248,7 @@ easyXDM = {
         
         // Delay setting up the transport until the Channel is returned
         window.setTimeout(function(){
-            that.transport = new easyXDM.Transport.BestAvailableTransport(config, onReady);
+            that.transport = new easyXDM.transport.BestAvailableTransport(config, onReady);
         }, 5);
     }
 };
