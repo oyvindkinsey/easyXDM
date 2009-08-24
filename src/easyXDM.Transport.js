@@ -216,7 +216,7 @@ easyXDM.transport = {
         var _timer, _pollInterval = config.interval || 300;
         var _lastMsg = "#" + config.channel, _msgNr = 0;
         var _listenerWindow = (!config.local) ? window : null, _callerWindow;
-        var _remoteUrl = config.remote + (config.local) ? ("?endpoint=" + easyXDM.Url.resolveUrl(config.local) + "&channel=" + config.channel) : "#" + config.channel;
+        var _remoteUrl = config.remote + ((config.local) ? ("?endpoint=" + easyXDM.Url.resolveUrl(config.local) + "&channel=" + config.channel) : "#" + config.channel);
         var _remoteOrigin = easyXDM.Url.getLocation(config.remote);
         
         /**
@@ -239,7 +239,9 @@ easyXDM.transport = {
          * @private
          */
         function _onReady(){
-            _listenerWindow = easyXDM.transport.HashTransport.getWindow(config.channel);
+            if (config.local) {
+				_listenerWindow = easyXDM.transport.HashTransport.getWindow(config.channel);
+			}
             _timer = window.setInterval(function(){
                 _checkForMessage();
             }, _pollInterval);
