@@ -74,7 +74,6 @@
 			<fileset file= "README.txt"/>
 			<fileset file= "${project.src.dir}\changes.txt"/>
 			<fileset file= "tools\json2.js"/>
-			<fileset file= "tools\jquery-1.3.2.min.js"/>
 		</copy>
 		
 		<copy todir="${project.build.artifactdir}\v${project.build.version}\example">
