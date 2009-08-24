@@ -26,10 +26,10 @@
 		<concat destfile="work\easyXDM.combined.js">	
             <fileset dir="." includes="${project.src.dir}\easyXDM.js" />
             <fileset dir="." includes="${project.src.dir}\easyXDM.DomHelper.js" />
-			<fileset dir="." includes="${project.src.dir}\easyXDM.transport.js" />
-			<fileset dir="." includes="${project.src.dir}\easyXDM.configuration.js" />
+			<fileset dir="." includes="${project.src.dir}\easyXDM.Transport.js" />
+			<fileset dir="." includes="${project.src.dir}\easyXDM.Configuration.js" />
 			<fileset dir="." includes="${project.src.dir}\easyXDM.Url.js" />
-			<fileset dir="." includes="${project.src.dir}\easyXDM.serializing.js" />
+			<fileset dir="." includes="${project.src.dir}\easyXDM.Serializing.js" />
         </concat>
 	
 		<replace file="work\easyXDM.combined.js"
