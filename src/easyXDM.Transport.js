@@ -61,6 +61,9 @@ easyXDM.transport = {
      * @namespace easyXDM.transport
      */
     PostMessageTransport: function(config, onReady){
+        if (!window.postMessage) {
+            throw "This browser does not support window.postMessage";
+        }
         // #ifdef debug
         easyXDM.Debug.trace("easyXDM.transport.PostMessageTransport.constructor");
         // #endif
@@ -198,7 +201,7 @@ easyXDM.transport = {
             }
         }());
     },
-	
+    
     /**
      * @class easyXDM.transport.HashTransport
      * @extends easyXDM.transport.ITransport
@@ -224,12 +227,16 @@ easyXDM.transport = {
          * @private
          */
         function _checkForMessage(){
-            if (_listenerWindow.location.hash && _listenerWindow.location.hash != _lastMsg) {
-                _lastMsg = _listenerWindow.location.hash;
-                // #ifdef debug
-                easyXDM.Debug.trace("received message '" + _lastMsg + "' from " + _remoteOrigin);
-                // #endif
-                config.onMessage(decodeURIComponent(_lastMsg.substring(_lastMsg.indexOf("_") + 1)), _remoteOrigin);
+            try {
+                if (_listenerWindow.location.hash && _listenerWindow.location.hash != _lastMsg) {
+                    _lastMsg = _listenerWindow.location.hash;
+                    // #ifdef debug
+                    easyXDM.Debug.trace("received message '" + _lastMsg + "' from " + _remoteOrigin);
+                    // #endif
+                    config.onMessage(decodeURIComponent(_lastMsg.substring(_lastMsg.indexOf("_") + 1)), _remoteOrigin);
+                }
+            } 
+            catch (ex) {
             }
         }
         
@@ -240,8 +247,8 @@ easyXDM.transport = {
          */
         function _onReady(){
             if (config.local) {
-				_listenerWindow = easyXDM.transport.HashTransport.getWindow(config.channel);
-			}
+                _listenerWindow = easyXDM.transport.HashTransport.getWindow(config.channel);
+            }
             _timer = window.setInterval(function(){
                 _checkForMessage();
             }, _pollInterval);
