@@ -165,15 +165,10 @@ easyXDM = {
         };
         
         /**
-         * The underlying channel used by the interface
-         */
-        this.channel = _channel;
-        
-        /**
          * Tries to destroy the underlying channel and to remove all traces of the interface.
          */
         this.destroy = function(){
-            this.channel.destroy();
+            _channel.destroy();
             for (var x in this) {
                 if (this.hasOwnProperty(x)) {
                     delete this[x];
