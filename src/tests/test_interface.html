@@ -3,6 +3,8 @@
     <head>
         <title>easyXDM</title>
         <script type="text/javascript" src="../easyXDM.debug.js">
+            //Is not executed, but makes jslint validate
+            var easyXDM;
         </script>
         <script type="text/javascript">
             easyXDM.DomHelper.requiresJSON("../json2.js");
@@ -41,6 +43,11 @@
                         }
                     }
                 });
+            };
+            window.onunload = function(){
+				if (remote) {
+					remote.destroy();
+				}
             };
         </script>
     </head>

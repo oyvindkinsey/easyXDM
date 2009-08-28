@@ -58,12 +58,12 @@ var easyTest = (function(){
         if (step.timeout) {
             _timer = window.setTimeout(function(){
                 _notifyResult(step.name, false, "Failed due to timeout.");
-                _finishStep();
             }, step.timeout);
             try {
                 step.run.call(_scope);
             } 
             catch (ex) {
+				window.clearTimeout(_timer);
                 _notifyResult(step.name, false, ex.message);
             }
         }

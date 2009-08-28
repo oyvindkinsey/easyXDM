@@ -3,6 +3,8 @@
     <head>
         <title>easyXDM</title>
         <script type="text/javascript" src="../easyXDM.debug.js">
+            //Is not executed, but makes jslint validate
+            var easyXDM;
         </script>
         <script type="text/javascript">
             var transport;
@@ -16,6 +18,11 @@
                         transport.postMessage(message);
                     }
                 });
+            };
+            window.onunload = function(){
+                if (transport) {
+					transport.destroy();
+				}
             };
         </script>
     </head>

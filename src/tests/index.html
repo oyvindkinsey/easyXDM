@@ -4,12 +4,21 @@
         <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
         <title>easyTest results</title>
         <script type="text/javascript" src="../easyXDM.debug.js">
+            //Is not executed, but makes jslint validate
+            var easyXDM, JSON;
+        </script>
+        <script type="text/javascript">
+            if (typeof JSON === "undefined") {
+                document.write(unescape("%3Cscript src='../json2.js' type='text/javascript'%3E%3C/script%3E"));
+            }
         </script>
         <script type="text/javascript" src="easyTest.js">
+            //Is not executed, but makes jslint validate
+            var easyTest;
         </script>
         <link type="text/css" rel="stylesheet" href="easyTest.css"/>
         <script type="text/javascript">
-            
+            var _remoteUrl = location.href.substring(0, location.href.lastIndexOf("/") + 1);
             function runTests(){
                 easyTest.test([/**Tests for the presence of namespaces and classes*/{
                     name: "Check that the library is complete",
@@ -75,13 +84,13 @@
                     },
                     steps: [{
                         name: "onReady is fired",
-                        timeout: 2000,
+                        timeout: 5000,
                         run: function(){
                             var scope = this;
                             this.transport = new easyXDM.transport.HashTransport({
                                 channel: "default",
                                 local: "../hash.html",
-                                remote: location.href.replace("test.html", "test_hashtransport.html"),
+                                remote: _remoteUrl + "test_hashtransport.html",
                                 onMessage: this.onMessage,
                                 container: document.getElementById("container")
                             }, function(){
@@ -90,7 +99,7 @@
                         }
                     }, {
                         name: "message is echoed back",
-                        timeout: 2000,
+                        timeout: 1000,
                         run: function(){
                             this.expectedMessage = "abcd1234";
                             this.transport.postMessage(this.expectedMessage);
@@ -113,13 +122,13 @@
                     },
                     steps: [{
                         name: "onReady is fired",
-                        timeout: 2000,
+                        timeout: 5000,
                         run: function(){
                             var scope = this;
                             this.transport = new easyXDM.transport.PostMessageTransport({
                                 channel: "default",
                                 local: "../hash.html",
-                                remote: location.href.replace("test.html", "test_postmessagetransport.html"),
+                                remote: _remoteUrl + "test_postmessagetransport.html",
                                 onMessage: this.onMessage,
                                 container: document.getElementById("container")
                             }, function(){
@@ -128,7 +137,7 @@
                         }
                     }, {
                         name: "message is echoed back",
-                        timeout: 2000,
+                        timeout: 1000,
                         run: function(){
                             this.expectedMessage = "abcd1234";
                             this.transport.postMessage(this.expectedMessage);
@@ -144,12 +153,12 @@
                     name: "test easyXDM.Interface",
                     steps: [{
                         name: "onReady is fired",
-                        timeout: 2000,
+                        timeout: 5000,
                         run: function(){
                             var scope = this;
                             this.remote = new easyXDM.Interface({
                                 local: "../hash.html",
-                                remote: location.href.replace("test.html", "test_interface.html"),
+                                remote: _remoteUrl + "test_interface.html",
                                 container: document.getElementById("embedded")
                             }, {
                                 remote: {
@@ -173,14 +182,14 @@
                         }
                     }, {
                         name: "void method",
-                        timeout: 2000,
+                        timeout: 1000,
                         run: function(){
                             this.expectedMessage = "abcd1234";
                             this.remote.voidMethod(this.expectedMessage);
                         }
                     }, {
                         name: "async method",
-                        timeout: 2000,
+                        timeout: 1000,
                         run: function(){
                             var scope = this;
                             this.expectedMessage = "abcd1234";
@@ -190,7 +199,7 @@
                         }
                     }, {
                         name: "regular method",
-                        timeout: 2000,
+                        timeout: 1000,
                         run: function(){
                             var scope = this;
                             this.expectedMessage = "abcd1234";
@@ -210,5 +219,20 @@
         </script>
     </head>
     <body onload="runTests();">
+        <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+        </script>
+        <script type="text/javascript">
+            if (location.host.indexOf("easyxdm.net") !== -1) {
+                try {
+                    var pageTracker = _gat._getTracker("UA-9535591-3");
+                    pageTracker._setDomainName(".easyxdm.net");
+                    pageTracker._trackPageview();
+                } 
+                catch (err) {
+                }
+            }
+        </script>
     </body>
 </html>
