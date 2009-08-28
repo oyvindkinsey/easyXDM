@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+    <head>
+        <title>easyXDM</title>
+        <script type="text/javascript" src="../easyXDM.debug.js">
+        </script>
+        <script type="text/javascript">
+            var transport;
+            window.onload = function(){
+                var query = easyXDM.Url.Query();
+                transport = new easyXDM.transport.HashTransport({
+                    channel: query.channel,
+                    remote: query.endpoint,
+                    onMessage: function(message, origin){
+                        // Echo back the message
+                        transport.postMessage(message);
+                    }
+                });
+            };
+        </script>
+    </head>
+    <body>
+    </body>
+</html>

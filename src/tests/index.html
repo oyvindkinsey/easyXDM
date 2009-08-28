@@ -1,0 +1,214 @@
+<!doctype html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+        <title>easyTest results</title>
+        <script type="text/javascript" src="../easyXDM.debug.js">
+        </script>
+        <script type="text/javascript" src="easyTest.js">
+        </script>
+        <link type="text/css" rel="stylesheet" href="easyTest.css"/>
+        <script type="text/javascript">
+            
+            function runTests(){
+                easyTest.test([/**Tests for the presence of namespaces and classes*/{
+                    name: "Check that the library is complete",
+                    steps: [{
+                        name: "check for the presence of easyXDM",
+                        run: function(){
+                            return (typeof easyXDM === "object");
+                        }
+                    }, {
+                        name: "check for the presence of easyXDM.transport",
+                        run: function(){
+                            return (typeof easyXDM.transport === "object");
+                        }
+                    }, {
+                        name: "check for the presence of easyXDM.serializing",
+                        run: function(){
+                            return (typeof easyXDM.serializing === "object");
+                        }
+                    }, {
+                        name: "check for the presence of easyXDM.configuration",
+                        run: function(){
+                            return (typeof easyXDM.configuration === "object");
+                        }
+                    }, {
+                        name: "check for the presence of easyXDM.Channel",
+                        run: function(){
+                            return (typeof easyXDM.Channel === "function");
+                        }
+                    }, {
+                        name: "check for the presence of easyXDM.transport.HashTransport",
+                        run: function(){
+                            return (typeof easyXDM.transport.HashTransport === "function");
+                        }
+                    }, {
+                        name: "check for the presence of easyXDM.transport.PostMessageTransport",
+                        run: function(){
+                            return (typeof easyXDM.transport.PostMessageTransport === "function");
+                        }
+                    }, {
+                        name: "check for the presence of easyXDM.Debug",
+                        run: function(){
+                            return (typeof easyXDM.Debug === "object");
+                        }
+                    }, {
+                        name: "check for the presence of easyXDM.DomHelper",
+                        run: function(){
+                            return (typeof easyXDM.DomHelper === "object");
+                        }
+                    }, {
+                        name: "check for the presence of easyXDM.Url",
+                        run: function(){
+                            return (typeof easyXDM.Url === "object");
+                        }
+                    }]
+                }, /** easyXDM.transport.HashTransport*/ {
+                    name: "test easyXDM.transport.HashTransport",
+                    setup: function(){
+                        var scope = this;
+                        // This will handle the incoming message and checks if the message is equal to the expected one
+                        this.onMessage = function(message, origin){
+                            scope.notifyResult((scope.expectedMessage === message));
+                        };
+                    },
+                    steps: [{
+                        name: "onReady is fired",
+                        timeout: 2000,
+                        run: function(){
+                            var scope = this;
+                            this.transport = new easyXDM.transport.HashTransport({
+                                channel: "default",
+                                local: "../hash.html",
+                                remote: location.href.replace("test.html", "test_hashtransport.html"),
+                                onMessage: this.onMessage,
+                                container: document.getElementById("container")
+                            }, function(){
+                                scope.notifyResult(true);
+                            });
+                        }
+                    }, {
+                        name: "message is echoed back",
+                        timeout: 2000,
+                        run: function(){
+                            this.expectedMessage = "abcd1234";
+                            this.transport.postMessage(this.expectedMessage);
+                        }
+                    }, {
+                        name: "destroy",
+                        run: function(){
+                            this.transport.destroy();
+                            return ((document.getElementsByTagName("iframe").length === 0));
+                        }
+                    }]
+                }, /** easyXDM.transport.PostMessageTransport*/ {
+                    name: "test easyXDM.transport.PostMessageTransport",
+                    setup: function(){
+                        var scope = this;
+                        // This will handle the incoming message and checks if the message is equal to the expected one
+                        this.onMessage = function(message, origin){
+                            scope.notifyResult((scope.expectedMessage === message));
+                        };
+                    },
+                    steps: [{
+                        name: "onReady is fired",
+                        timeout: 2000,
+                        run: function(){
+                            var scope = this;
+                            this.transport = new easyXDM.transport.PostMessageTransport({
+                                channel: "default",
+                                local: "../hash.html",
+                                remote: location.href.replace("test.html", "test_postmessagetransport.html"),
+                                onMessage: this.onMessage,
+                                container: document.getElementById("container")
+                            }, function(){
+                                scope.notifyResult(true);
+                            });
+                        }
+                    }, {
+                        name: "message is echoed back",
+                        timeout: 2000,
+                        run: function(){
+                            this.expectedMessage = "abcd1234";
+                            this.transport.postMessage(this.expectedMessage);
+                        }
+                    }, {
+                        name: "destroy",
+                        run: function(){
+                            this.transport.destroy();
+                            return ((document.getElementsByTagName("iframe").length === 0));
+                        }
+                    }]
+                }, /** easyXDM.Interface*/ {
+                    name: "test easyXDM.Interface",
+                    steps: [{
+                        name: "onReady is fired",
+                        timeout: 2000,
+                        run: function(){
+                            var scope = this;
+                            this.remote = new easyXDM.Interface({
+                                local: "../hash.html",
+                                remote: location.href.replace("test.html", "test_interface.html"),
+                                container: document.getElementById("embedded")
+                            }, {
+                                remote: {
+                                    voidMethod: {
+                                        isVoid: true
+                                    },
+                                    asyncMethod: {},
+                                    method: {}
+                                },
+                                local: {
+                                    voidCallback: {
+                                        method: function(message){
+                                            scope.notifyResult((scope.expectedMessage === message));
+                                        },
+                                        isVoid: true
+                                    }
+                                }
+                            }, function(){
+                                scope.notifyResult(true);
+                            });
+                        }
+                    }, {
+                        name: "void method",
+                        timeout: 2000,
+                        run: function(){
+                            this.expectedMessage = "abcd1234";
+                            this.remote.voidMethod(this.expectedMessage);
+                        }
+                    }, {
+                        name: "async method",
+                        timeout: 2000,
+                        run: function(){
+                            var scope = this;
+                            this.expectedMessage = "abcd1234";
+                            this.remote.asyncMethod(this.expectedMessage, function(message){
+                                scope.notifyResult((scope.expectedMessage === message));
+                            });
+                        }
+                    }, {
+                        name: "regular method",
+                        timeout: 2000,
+                        run: function(){
+                            var scope = this;
+                            this.expectedMessage = "abcd1234";
+                            this.remote.method(this.expectedMessage, function(message){
+                                scope.notifyResult((scope.expectedMessage === message));
+                            });
+                        }
+                    }, {
+                        name: "destroy",
+                        run: function(){
+                            this.remote.destroy();
+                            return ((document.getElementsByTagName("iframe").length === 0));
+                        }
+                    }]
+                }]);
+            }
+        </script>
+    </head>
+    <body onload="runTests();">
+    </body>
+</html>

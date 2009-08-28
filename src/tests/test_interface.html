@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+    <head>
+        <title>easyXDM</title>
+        <script type="text/javascript" src="../easyXDM.debug.js">
+        </script>
+        <script type="text/javascript">
+            easyXDM.DomHelper.requiresJSON("../json2.js");
+        </script>
+        <script type="text/javascript">
+            var remote;
+            window.onload = function(){
+                remote = new easyXDM.Interface({}, {
+                    remote: {
+                        voidCallback: {
+                            isVoid: true
+                        }
+                    },
+                    local: {
+                        voidMethod: {
+                            isVoid: true,
+                            method: function(msg){
+                                // Echo back the message
+                                remote.voidCallback(msg);
+                            }
+                        },
+                        asyncMethod: {
+                            isAsync: true,
+                            method: function(msg, fn){
+                                window.setTimeout(function(){
+                                    // Echo back the msg
+                                    fn(msg);
+                                }, 100);
+                            }
+                        },
+                        method: {
+                            method: function(msg){
+                                // Echo back the msg
+                                return msg;
+                            }
+                        }
+                    }
+                });
+            };
+        </script>
+    </head>
+    <body>
+    </body>
+</html>

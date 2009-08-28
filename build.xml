@@ -20,6 +20,7 @@
     </target>
 	
 	<target name="build" depends="clean">
+		<delete dir="${project.build.artifactdir}\v${project.build.version}" quiet="true"/>
 		<buildnumber/>
 		<mkdir dir="work"/>
 		
@@ -79,6 +80,9 @@
 		<copy todir="${project.build.artifactdir}\v${project.build.version}\example">
 			<fileset dir="${project.src.dir}\example"/>
 		</copy>
+		<copy todir="${project.build.artifactdir}\v${project.build.version}\tests">
+			<fileset dir="${project.src.dir}\tests"/>
+		</copy>	
 	</target>
 	
 	<target name="document" depends="build">
