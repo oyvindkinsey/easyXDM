@@ -144,12 +144,9 @@ easyXDM = {
          * @param {String} origin The origin of the message
          */
         channelConfig.onData = function(data, origin){
-            // #ifdef debug
-            easyXDM.Debug.trace("interface$_onData:(" + data + "," + origin + ")");
-            // #endif
             if (data.name) {
                 // #ifdef debug
-                easyXDM.Debug.trace("received request to execute method " + data.name + " using callback id " + data.id);
+                easyXDM.Debug.trace("received request to execute method " + data.name + (data.id ? (" using callback id " + data.id) : ""));
                 // #endif
                 // A method call from the remote end
                 _executeMethod(data.name, data.id, config.local[data.name], data.params);
@@ -323,8 +320,8 @@ easyXDM.Debug = {
                 };
             }
         }
-        trace(location.host + ":" + msg);
         easyXDM.Debug.trace = trace;
+        easyXDM.Debug.trace(msg);
     }
 };
 // #endif
