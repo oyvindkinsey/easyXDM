@@ -96,7 +96,7 @@ easyXDM = {
          */
         function _executeMethod(name, id, method, params){
             if (!method) {
-                throw "The method " + name + " is not implemented.";
+                throw new Error("The method " + name + " is not implemented.");
             }
             if (method.isAsync) {
                 // #ifdef debug
@@ -202,7 +202,7 @@ easyXDM = {
         easyXDM.Debug.trace("easyXDM.Channel.constructor");
         // #endif
         if (!config.converter) {
-            throw "No converter present. You should use the easyXDM.transport classes directly.";
+            throw new Error("No converter present. You should use the easyXDM.transport classes directly.");
         }
         /**
          * Wraps the transports onMessage method using the supplied serializer to convert.
