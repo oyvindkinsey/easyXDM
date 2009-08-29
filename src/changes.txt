@@ -1,3 +1,9 @@
+1.5.2 - 29.08.09
+Modified the HashTransport to using the resize event to trigger new messages to be read.
+This is a lot faster and less resource consuming than polling.
+For iframes placed in a container we still use polling so that we don't disturbe the layout.
+Added a test suite.
+
 1.5.1 - 17.08.09
 Namespaces are now in lowercase. This makes it easier to distinguish between classes
 and namespaces.
