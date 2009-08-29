@@ -5,7 +5,7 @@
         <title>easyTest results</title>
         <script type="text/javascript" src="../easyXDM.debug.js">
             //Is not executed, but makes jslint validate
-            var easyXDM, JSON;
+            var easyXDM, JSON, _gat;
         </script>
         <script type="text/javascript">
             if (typeof JSON === "undefined") {
@@ -74,28 +74,59 @@
                         }
                     }]
                 }, /** easyXDM.transport.HashTransport*/ {
-                    name: "test easyXDM.transport.HashTransport",
-                    setup: function(){
-                        var scope = this;
-                        // This will handle the incoming message and checks if the message is equal to the expected one
-                        this.onMessage = function(message, origin){
-                            scope.notifyResult((scope.expectedMessage === message));
-                        };
-                    },
+                    name: "test easyXDM.transport.HashTransport using polling",
                     steps: [{
                         name: "onReady is fired",
                         timeout: 5000,
                         run: function(){
+                            /** -----------------------------*/
                             var scope = this;
                             this.transport = new easyXDM.transport.HashTransport({
                                 channel: "default",
                                 local: "../hash.html",
                                 remote: _remoteUrl + "test_hashtransport.html",
-                                onMessage: this.onMessage,
-                                container: document.getElementById("container")
+                                onMessage: function(message, origin){
+                                    scope.notifyResult((scope.expectedMessage === message));
+                                },
+                                container: document.getElementById("embedded")
                             }, function(){
                                 scope.notifyResult(true);
                             });
+                            /** -----------------------------*/
+                        }
+                    }, {
+                        name: "message is echoed back",
+                        timeout: 1000,
+                        run: function(){
+                            this.expectedMessage = "abcd1234";
+                            this.transport.postMessage(this.expectedMessage);
+                        }
+                    }, {
+                        name: "destroy",
+                        run: function(){
+                            this.transport.destroy();
+                            return ((document.getElementsByTagName("iframe").length === 0));
+                        }
+                    }]
+                }, /** easyXDM.transport.HashTransport*/ {
+                    name: "test easyXDM.transport.HashTransport using onresze",
+                    steps: [{
+                        name: "onReady is fired",
+                        timeout: 5000,
+                        run: function(){
+                            /** -----------------------------*/
+                            var scope = this;
+                            this.transport = new easyXDM.transport.HashTransport({
+                                channel: "default",
+                                local: "../hash.html",
+                                remote: _remoteUrl + "test_hashtransport.html",
+                                onMessage: function(message, origin){
+                                    scope.notifyResult((scope.expectedMessage === message));
+                                }
+                            }, function(){
+                                scope.notifyResult(true);
+                            });
+                            /** -----------------------------*/
                         }
                     }, {
                         name: "message is echoed back",
@@ -113,27 +144,24 @@
                     }]
                 }, /** easyXDM.transport.PostMessageTransport*/ {
                     name: "test easyXDM.transport.PostMessageTransport",
-                    setup: function(){
-                        var scope = this;
-                        // This will handle the incoming message and checks if the message is equal to the expected one
-                        this.onMessage = function(message, origin){
-                            scope.notifyResult((scope.expectedMessage === message));
-                        };
-                    },
                     steps: [{
                         name: "onReady is fired",
                         timeout: 5000,
                         run: function(){
+                            /** -----------------------------*/
                             var scope = this;
                             this.transport = new easyXDM.transport.PostMessageTransport({
                                 channel: "default",
                                 local: "../hash.html",
                                 remote: _remoteUrl + "test_postmessagetransport.html",
-                                onMessage: this.onMessage,
+                                onMessage: function(message, origin){
+                                    scope.notifyResult((scope.expectedMessage === message));
+                                },
                                 container: document.getElementById("container")
                             }, function(){
                                 scope.notifyResult(true);
                             });
+                            /** -----------------------------*/
                         }
                     }, {
                         name: "message is echoed back",
@@ -155,6 +183,7 @@
                         name: "onReady is fired",
                         timeout: 5000,
                         run: function(){
+                            /** -----------------------------*/
                             var scope = this;
                             this.remote = new easyXDM.Interface({
                                 local: "../hash.html",
@@ -179,6 +208,7 @@
                             }, function(){
                                 scope.notifyResult(true);
                             });
+                            /** -----------------------------*/
                         }
                     }, {
                         name: "void method",
@@ -217,11 +247,29 @@
                 }]);
             }
         </script>
+        <style type="text/css">
+            
+            #embedded {
+                height: 100px;
+            }
+            
+            #embedded iframe {
+                height: 90px;
+            }
+        </style>
     </head>
-    <body onload="runTests();">
+    <body onload="runTests();"><!-- easyXDM.Debug.trace(msg) will output its messages to any element with the id "log" -->
+        <div id="log" style="height:100px;border:1px dotted black;overflow:auto">
+        </div>
+        <div id="embedded">
+        </div>
+        <div id="messages">
+        </div>
         <script type="text/javascript">
-            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+            if (location.host.indexOf("easyxdm.net") !== -1) {
+                var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+                document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+            }
         </script>
         <script type="text/javascript">
             if (location.host.indexOf("easyxdm.net") !== -1) {

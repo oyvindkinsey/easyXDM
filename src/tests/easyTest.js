@@ -1,8 +1,7 @@
 var easyTest = (function(){
     var _messages;
-    var _tests, _steps;
-    var _testIndex, _stepIndex;
-    var _start, _timer;
+    var _tests,_testIndex;
+    var _start;
     var _scope;
     var _finishStep;
     var MessageType = {
@@ -39,11 +38,13 @@ var easyTest = (function(){
      * @param {String} reason An optional reason why the test returned the result
      */
     function _notifyResult(name, result, reason){
+        var now = new Date().valueOf();
+        var times = (now - _start.valueOf()) + "ms, " + (now - _scope.startedAt.valueOf()) + "ms - ";
         if (result) {
-            _log(name + " succeded! " + (reason || ""), MessageType.Success);
+            _log(times + name + " succeeded! " + (reason || ""), MessageType.Success);
         }
         else {
-            _log(name + " failed! " + (reason || ""), MessageType.Error);
+            _log(times + name + " failed! " + (reason || ""), MessageType.Error);
         }
         _finishStep();
     }
@@ -56,15 +57,15 @@ var easyTest = (function(){
         _scope.stepName = step.name;
         
         if (step.timeout) {
-            _timer = window.setTimeout(function(){
+            _scope.timer = window.setTimeout(function(){
                 _notifyResult(step.name, false, "Failed due to timeout.");
             }, step.timeout);
             try {
                 step.run.call(_scope);
             } 
             catch (ex) {
-				window.clearTimeout(_timer);
-                _notifyResult(step.name, false, ex.message);
+                window.clearTimeout(_scope.timer);
+                _notifyResult(step.name, false, "'" + ex.message + "'");
             }
         }
         else {
@@ -72,7 +73,7 @@ var easyTest = (function(){
                 _notifyResult(step.name, step.run.call(_scope));
             } 
             catch (ex) {
-                _notifyResult(step.name, false, "'" + ex.message + "' at line " + ex.lineNumber);
+                _notifyResult(step.name, false, "'" + ex.message + "'");
             }
         }
     }
@@ -85,7 +86,7 @@ var easyTest = (function(){
         _scope = {
             startedAt: new Date(),
             notifyResult: function(result){
-                window.clearTimeout(_timer);
+                window.clearTimeout(this.timer);
                 _notifyResult(this.stepName, result);
             }
         };
@@ -97,23 +98,23 @@ var easyTest = (function(){
                 test.setup.call(_scope);
             } 
             catch (ex) {
-                _notifyResult(test.name, false, ex.message);
+                _notifyResult(test.name, false, "'" + ex.message + "'");
             }
         }
         if (test.run) {
-            _steps = [];
-            _stepIndex = 0;
+            _scope.steps = [];
+            _scope.stepIndex = 0;
             try {
                 _notifyResult(test.name, test.run());
             } 
             catch (ex) {
-                _notifyResult(test.name, false, ex.message);
+                _notifyResult(test.name, false, "'" + ex.message + "'");
             }
         }
         else {
-            _steps = test.steps;
-            _stepIndex = 0;
-            _runStep(_steps[_stepIndex++]);
+            _scope.steps = test.steps;
+            _scope.stepIndex = 0;
+            _runStep(_scope.steps[_scope.stepIndex++]);
         }
     }
     
@@ -127,7 +128,7 @@ var easyTest = (function(){
                 _tests[_testIndex - 1].teardown.call(_scope);
             }
         }
-        if (_stepIndex === _steps.length) {
+        if (_scope.stepIndex === _scope.steps.length) {
             if (_testIndex === _tests.length) {
                 tryTeardown();
                 _log("testing completed in " + (new Date().valueOf() - _start.valueOf()) + "ms");
@@ -138,7 +139,7 @@ var easyTest = (function(){
             }
         }
         else {
-            _runStep(_steps[_stepIndex++]);
+            _runStep(_scope.steps[_scope.stepIndex++]);
         }
     };
     
@@ -151,7 +152,7 @@ var easyTest = (function(){
             if (!_messages) {
                 _messages = document.createElement("div");
                 _messages.className = "easyTest_messages";
-                document.body.appendChild(_messages);
+                (document.getElementById("messages") || document.body).appendChild(_messages);
             }
             else {
                 _messages.innerHTML = "";
