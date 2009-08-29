@@ -216,12 +216,30 @@ easyXDM.transport = {
         // #ifdef debug
         easyXDM.Debug.trace("easyXDM.transport.HashTransport.constructor");
         // #endif
-        var _timer, _pollInterval = config.interval || 300;
-        var _lastMsg = "#" + config.channel, _msgNr = 0;
-        var _listenerWindow = (!config.local) ? window : null, _callerWindow;
-        var _remoteUrl = config.remote + ((config.local) ? ("?endpoint=" + easyXDM.Url.resolveUrl(config.local) + "&channel=" + config.channel) : "#" + config.channel);
-        var _remoteOrigin = easyXDM.Url.getLocation(config.remote);
-        
+        var _timer, _pollInterval = config.interval || 300, _poll;
+        var _lastMsg = "#" + config.channel, _msgNr = 0, _listenerWindow, _callerWindow;
+        var _remoteUrl = config.remote, _remoteOrigin = easyXDM.Url.getLocation(config.remote);
+        if (config.local) {
+            _poll = (typeof config.container !== "undefined");
+            _remoteUrl += "?endpoint=" + easyXDM.Url.resolveUrl(config.local) + "&channel=" + config.channel;
+            if (_poll) {
+                _remoteUrl += "&poll=1";
+                // #ifdef debug
+                easyXDM.Debug.trace("using polling");
+                // #endif
+            }
+        }
+        else {
+            _listenerWindow = window;
+            _poll = (typeof easyXDM.Url.Query().poll !== "undefined");
+            // #ifdef debug
+            if (_poll) {
+                easyXDM.Debug.trace("using polling");
+            }
+            // #endif
+            
+            _remoteUrl += "#" + config.channel;
+        }
         /**
          * Checks location.hash for a new message and relays this to the receiver.
          * @private
@@ -249,9 +267,14 @@ easyXDM.transport = {
             if (config.local) {
                 _listenerWindow = easyXDM.transport.HashTransport.getWindow(config.channel);
             }
-            _timer = window.setInterval(function(){
-                _checkForMessage();
-            }, _pollInterval);
+            if (_poll) {
+                _timer = window.setInterval(function(){
+                    _checkForMessage();
+                }, _pollInterval);
+            }
+            else {
+                easyXDM.DomHelper.addEventListener(_listenerWindow, "resize", _checkForMessage);
+            }
             if (onReady) {
                 window.setTimeout(onReady, 10);
             }
@@ -267,6 +290,9 @@ easyXDM.transport = {
             easyXDM.Debug.trace("sending message '" + message + "' to " + _remoteOrigin);
             // #endif
             _callerWindow.src = _remoteUrl + "#" + (_msgNr++) + "_" + encodeURIComponent(message);
+            if (!_poll) {
+                _callerWindow.width = _callerWindow.width > 75 ? 50 : 100;
+            }
         };
         
         /**
@@ -276,7 +302,12 @@ easyXDM.transport = {
             // #ifdef debug
             easyXDM.Debug.trace("destroying transport");
             // #endif
-            window.clearInterval(_timer);
+            if (_poll) {
+                window.clearInterval(_timer);
+            }
+            else {
+                easyXDM.DomHelper.removeEventListener(_listenerWindow, "resize", _checkForMessage);
+            }
             _callerWindow.parentNode.removeChild(_callerWindow);
             _callerWindow = null;
         };
