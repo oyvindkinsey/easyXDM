@@ -176,7 +176,10 @@ easyXDM.transport = {
             // Set up the messaging differently dependin on being local or remote
             if (config.local) {
                 _window_onMessageImplementation = _waitForReady;
-                _callerWindow = easyXDM.DomHelper.createFrame(config.remote + "?endpoint=" + easyXDM.Url.resolveUrl(config.local) + "&channel=" + config.channel, config.container);
+                _callerWindow = easyXDM.DomHelper.createFrame(easyXDM.Url.appendQueryParameters(config.remote, {
+                    endpoint: easyXDM.Url.resolveUrl(config.local),
+                    channel: config.channel
+                }), config.container);
                 return function(message){
                     // #ifdef debug
                     easyXDM.Debug.trace("sending message '" + message + "' to iframe " + _targetOrigin);
@@ -218,16 +221,20 @@ easyXDM.transport = {
         // #endif
         var _timer, _pollInterval = config.interval || 300, _poll;
         var _lastMsg = "#" + config.channel, _msgNr = 0, _listenerWindow, _callerWindow;
-        var _remoteUrl = config.remote, _remoteOrigin = easyXDM.Url.getLocation(config.remote);
+        var _remoteUrl, _remoteOrigin = easyXDM.Url.getLocation(config.remote);
         if (config.local) {
+            var parameters = {
+                endpoint: easyXDM.Url.resolveUrl(config.local),
+                channel: config.channel
+            };
             _poll = (typeof config.container !== "undefined");
-            _remoteUrl += "?endpoint=" + easyXDM.Url.resolveUrl(config.local) + "&channel=" + config.channel;
             if (_poll) {
-                _remoteUrl += "&poll=1";
+                parameters.poll = 1;
                 // #ifdef debug
                 easyXDM.Debug.trace("using polling");
                 // #endif
             }
+            _remoteUrl = easyXDM.Url.appendQueryParameters(config.remote, parameters);
         }
         else {
             _listenerWindow = window;
@@ -238,7 +245,7 @@ easyXDM.transport = {
             }
             // #endif
             
-            _remoteUrl += "#" + config.channel;
+            _remoteUrl = config.remote + "#" + config.channel;
         }
         /**
          * Checks location.hash for a new message and relays this to the receiver.
@@ -268,6 +275,9 @@ easyXDM.transport = {
                 _listenerWindow = easyXDM.transport.HashTransport.getWindow(config.channel);
             }
             if (_poll) {
+                // #ifdef debug
+                easyXDM.Debug.trace("starting polling");
+                // #endif
                 _timer = window.setInterval(function(){
                     _checkForMessage();
                 }, _pollInterval);

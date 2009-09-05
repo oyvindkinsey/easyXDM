@@ -50,11 +50,11 @@ easyXDM.Url = {
         loc = loc.substring(0, loc.indexOf("/"));
         return url.substring(0, indexOf + 2) + loc;
     },
-	/**
-	 * Resolves a path to a complete url
-	 * @param {String} url The path to resolve
-	 * @return {String} The resolved url 
-	 */
+    /**
+     * Resolves a path to a complete url
+     * @param {String} url The path to resolve
+     * @return {String} The resolved url
+     */
     resolveUrl: function(url){
         // If the url is a valid url we do nothing
         if (url.match(/^(http||https):\/\//)) {
@@ -66,5 +66,20 @@ easyXDM.Url = {
         }
         // If the url is relative to the current directory
         return location.href.substring(0, location.href.lastIndexOf("/") + 1) + url;
+    },
+    /**
+     * Appends the parameters to the given url.<br/>
+     * The base url can contain existing query parameters.
+     * @param {String} url The base url
+     * @param {Object} parameters The parameters to add
+     */
+    appendQueryParameters: function(url, parameters){
+        var q = "";
+        for (var key in parameters) {
+            if (parameters.hasOwnProperty(key)) {
+                q += key + "=" + parameters[key] + "&";
+            }
+        }
+        return url + ((url.indexOf("?") == -1) ? "?" : "&") + q.substring(0, q.length - 1);
     }
 };
