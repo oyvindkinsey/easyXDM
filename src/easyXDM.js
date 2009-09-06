@@ -1,4 +1,3 @@
-
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
 /*global easyXDM: true, window, escape, unescape */
 
@@ -15,6 +14,21 @@ easyXDM = {
      * @type {String}
      */
     version: "%%version%%",
+    /**
+     * Applies properties from the source object to the target object
+     * @param {Object} target The target of the properties
+     * @param {Object} source The source of the properties
+     */
+    apply: function(target, source){
+        if (!source) {
+            return;
+        }
+        for (var key in source) {
+            if (source.hasOwnProperty(key)) {
+                target[key] = source[key];
+            }
+        }
+    },
     /** 
      * @class easyXDM.Interface
      * Creates an interface that can be used to call methods implemented

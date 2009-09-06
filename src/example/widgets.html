@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+    <head>
+        <title>easyXDM</title>
+        <script type="text/javascript" src="../easyXDM.debug.js">
+        </script>
+        <script type="text/javascript">
+            easyXDM.DomHelper.requiresJSON("../json2.js");
+        </script>
+        <script type="text/javascript" src="../easyXDM.Widgets.debug.js">
+        </script>
+        <script type="text/javascript">
+            var _widgetManager;
+            window.onload = function(){
+                _widgetManager = new easyXDM.WidgetManager({
+                    local: "../hash.html",
+                    container: document.getElementById("widgets")
+                });
+            };
+        </script>
+        <style type="text/css">
+            
+            #widgets {
+                height: 400px;
+            }
+            
+            #widgets iframe {
+                width: 200px;
+                height: 300px;
+                float: left;
+            }
+        </style>
+    </head>
+    <body>
+        <div style="border:1px solid black;padding:3px">
+            <div style="float:right">
+                <a href="http://www.addthis.com/bookmark.php?v=250&amp;pub=xa-4a6cb9890fd71978" onmouseover="return addthis_open(this, '', '[URL]', '[TITLE]');" onmouseout="addthis_close();" onclick="return addthis_sendto();"><img src="http://s7.addthis.com/static/btn/lg-share-en.gif" width="125" height="16" alt="Bookmark and Share" style="border:0"/></a>
+                <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js?pub=xa-4a6cb9890fd71978">
+                </script>
+            </div>
+            <a href="http://easyxdm.net/docs/">See easyxdm.net/docs for full documentation and more examples</a>
+            <br/>
+            The examples are executing slower than the production build due to the extensive tracing.
+        </div>
+        <!-- easyXDM.Debug.trace(msg) will output its messages to any element with the id "log" -->
+        <div id="log" style="height:100px;border:1px dotted black;overflow:auto">
+        </div>
+        <div>
+            <input type="text" id="widget1url" style="width:300px" value="http://provider.easyxdm.net/example/widget.html"/><input type="button" onclick="_widgetManager.addWidget(document.getElementById('widget1url').value,{});" value="Add Widget"/><input type="button" onclick="_widgetManager.removeWidget(document.getElementById('widget1url').value);" value="Remove Widget"/>
+        </div>
+        <div>
+            <input type="text" id="widget2url" style="width:300px" value="http://easyxdm.net/example/widget.html"/><input type="button" onclick="_widgetManager.addWidget(document.getElementById('widget2url').value,{});" value="Add Widget"/><input type="button" onclick="_widgetManager.removeWidget(document.getElementById('widget2url').value);" value="Remove Widget"/>
+        </div><input type="button" onclick="_widgetManager.publish('testtopic','abc');" value="publish"/>
+        <div id="widgets">
+        </div>
+        <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+        </script>
+        <script type="text/javascript">
+            if (location.host.indexOf("easyxdm.net") !== -1) {
+                try {
+                    var pageTracker = _gat._getTracker("UA-9535591-3");
+                    pageTracker._setDomainName(".easyxdm.net");
+                    pageTracker._trackPageview();
+                } 
+                catch (err) {
+                }
+            }
+        </script>
+    </body>
+</html>
