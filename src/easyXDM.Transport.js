@@ -230,23 +230,19 @@ easyXDM.transport = {
             _poll = (typeof config.container !== "undefined");
             if (_poll) {
                 parameters.poll = 1;
-                // #ifdef debug
-                easyXDM.Debug.trace("using polling");
-                // #endif
             }
             _remoteUrl = easyXDM.Url.appendQueryParameters(config.remote, parameters);
         }
         else {
             _listenerWindow = window;
             _poll = (typeof easyXDM.Url.Query().poll !== "undefined");
-            // #ifdef debug
-            if (_poll) {
-                easyXDM.Debug.trace("using polling");
-            }
-            // #endif
-            
             _remoteUrl = config.remote + "#" + config.channel;
         }
+        // #ifdef debug
+        if (_poll) {
+            easyXDM.Debug.trace("using polling");
+        }
+        // #endif
         /**
          * Checks location.hash for a new message and relays this to the receiver.
          * @private
@@ -274,7 +270,7 @@ easyXDM.transport = {
             if (config.local) {
                 _listenerWindow = easyXDM.transport.HashTransport.getWindow(config.channel);
             }
-            if (_poll) {
+            if (!config.local && _poll) {
                 // #ifdef debug
                 easyXDM.Debug.trace("starting polling");
                 // #endif
@@ -300,7 +296,7 @@ easyXDM.transport = {
             easyXDM.Debug.trace("sending message '" + message + "' to " + _remoteOrigin);
             // #endif
             _callerWindow.src = _remoteUrl + "#" + (_msgNr++) + "_" + encodeURIComponent(message);
-            if (!_poll) {
+            if (!config.local || !_poll) {
                 _callerWindow.width = _callerWindow.width > 75 ? 50 : 100;
             }
         };
