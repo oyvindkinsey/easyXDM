@@ -1,9 +1,6 @@
 var easyTest = (function(){
     var _messages;
-    var _tests,_testIndex;
     var _start;
-    var _scope;
-    var _finishStep;
     var MessageType = {
         Error: 1,
         Success: 2,
@@ -16,8 +13,9 @@ var easyTest = (function(){
      * @param {MessageType} type The messagetype
      */
     function _log(msg, type){
-        var el = document.createElement("div");
+        var el = _messages.appendChild(document.createElement("div"));
         el.innerHTML = msg;
+        _messages.scrollTop = _messages.scrollHeight;
         switch (type) {
             case MessageType.Error:
                 el.className = "easyTest_error";
@@ -27,128 +25,178 @@ var easyTest = (function(){
                 break;
             default:
                 el.className = "easyTest_msg";
+                break;
         }
-        _messages.appendChild(el);
     }
     
-    /**
-     * Used to notify the framework of the result of the test
-     * @param {String} name The name of the test
-     * @param {Boolean} result The result of the test
-     * @param {String} reason An optional reason why the test returned the result
-     */
-    function _notifyResult(name, result, reason){
-        var now = new Date().valueOf();
-        var times = (now - _start.valueOf()) + "ms, " + (now - _scope.startedAt.valueOf()) + "ms - ";
-        if (result) {
-            _log(times + name + " succeeded! " + (reason || ""), MessageType.Success);
+    var Assert = {
+        // Type checks
+        isTypeOf: function(type, obj){
+            return typeof obj === type;
+        },
+        isInstanceOf: function(type, obj){
+            return obj instanceof type;
+        },
+        isString: function(obj){
+            return this.isTypeOf("string", obj);
+        },
+        isNumber: function(obj){
+            return this.isTypeOf("number", obj);
+        },
+        isObject: function(obj){
+            return this.isTypeOf("object", obj);
+        },
+        isBoolean: function(obj){
+            return this.isTypeOf("boolean", obj);
+        },
+        isFunction: function(obj){
+            return this.isTypeOf("function", obj);
+        },
+        // Equality
+        areEqual: function(a, b){
+            return a == b;
+        },
+        areNotEqual: function(a, b){
+            return a != b;
+        },
+        // Identical
+        areSame: function(a, b){
+            return a === b;
+        },
+        areNotSame: function(a, b){
+            return a !== b;
         }
-        else {
-            _log(times + name + " failed! " + (reason || ""), MessageType.Error);
-        }
-        _finishStep();
-    }
-    
-    /**
-     * Runs through the test step
-     * @param {Object} step The step to run
-     */
-    function _runStep(step){
-        _scope.stepName = step.name;
         
-        if (step.timeout) {
-            _scope.timer = window.setTimeout(function(){
-                _notifyResult(step.name, false, "Failed due to timeout.");
-            }, step.timeout);
-            try {
-                step.run.call(_scope);
-            } 
-            catch (ex) {
-                window.clearTimeout(_scope.timer);
-                _notifyResult(step.name, false, "'" + ex.message + "'");
-            }
-        }
-        else {
-            try {
-                _notifyResult(step.name, step.run.call(_scope));
-            } 
-            catch (ex) {
-                _notifyResult(step.name, false, "'" + ex.message + "'");
-            }
-        }
-    }
+    };
     
-    /**
-     * Runs  the test
-     * @param {Object} test The test to run
-     */
-    function _runTest(test){
-        _scope = {
-            startedAt: new Date(),
-            notifyResult: function(result){
-                window.clearTimeout(this.timer);
-                _notifyResult(this.stepName, result);
+    function Test(test, fn){
+        var _scope, _steps = test.steps, _step, _stepIndex = 0;
+        var _timer, _runStep, _startedAt, _stepStartedAt;
+        
+        /**
+         * Used to notify the framework of the result of the test
+         * @param {String} name The name of the test
+         * @param {Boolean} result The result of the test
+         * @param {String} reason An optional reason why the test returned the result
+         */
+        function _notifyResult(name, result, reason){
+            var now = new Date().getTime();
+            var testsetTime = now - _start.getTime();
+            var testTime = now - _startedAt.getTime();
+            var stepTime = now - _stepStartedAt.getTime();
+            
+            var times = testsetTime + "ms, " + testTime + "ms, " + stepTime + "ms - ";
+            if (result) {
+                _log(times + name + " succeeded! " + (reason || ""), MessageType.Success);
+            }
+            else {
+                _log(times + name + " failed! " + (reason || ""), MessageType.Error);
+            }
+            // Go to next step
+            _stepIndex++;
+            _runStep();
+        }
+        
+        /**
+         * Clean up and tear down the test.<br/>
+         * Calls back to notify that the test is complete
+         */
+        function _endTest(){
+            for (var key in _scope) {
+                if (_scope.hasOwnProperty(key)) {
+                    delete _scope[key];
+                }
+            }
+            // Tear down the test
+            if (test.tearDown) {
+                try {
+                    test.tearDown.call(_scope);
+                } 
+                catch (ex) {
+                    _notifyResult("Teardown", false, "'" + ex.message + "'");
+                }
+            }
+            // Call back
+            fn();
+        }
+        
+        /**
+         * Runs through the test step
+         */
+        _runStep = function(){
+            if (_stepIndex < _steps.length) {
+                // We still have steps to run
+                _step = _steps[_stepIndex];
+                _stepStartedAt = new Date();
+                if (_step.timeout) {
+                    // This an asynchronous test
+                    _timer = window.setTimeout(function(){
+                        _notifyResult(_step.name, false, "Failed due to timeout.");
+                    }, _step.timeout);
+                    try {
+                        _step.run.call(_scope);
+                    } 
+                    catch (ex) {
+                        //If it fails we cancel the timeout
+                        window.clearTimeout(_timer);
+                        _notifyResult(_step.name, false, "'" + ex.message + "'");
+                    }
+                }
+                else {
+                    // This is a synchronous test
+                    try {
+                        var result = _step.run.call(_scope);
+                        _notifyResult(_step.name, result);
+                    } 
+                    catch (ex) {
+                        _notifyResult(_step.name, false, "'" + ex.message + "'");
+                    }
+                }
+            }
+            else {
+                _endTest();
             }
         };
         
-        _log("running test " + _testIndex + ", '" + test.name + "'");
-        
-        if (test.setup) {
-            try {
-                test.setup.call(_scope);
-            } 
-            catch (ex) {
-                _notifyResult(test.name, false, "'" + ex.message + "'");
+        return {
+            /**
+             * Runs the test.
+             * Will first try to execute the setup method before continuing the steps
+             */
+            run: function(){
+                _log("Running test '" + test.name + "'");
+                _scope = {
+                    Assert: Assert,
+                    notifyResult: function(result){
+                        window.clearTimeout(_timer);
+                        _notifyResult(_step.name, result);
+                    }
+                };
+                if (test.setUp) {
+                    // Setup the test
+                    try {
+                        test.setUp.call(_scope);
+                        _log("Setup succeeded", MessageType.Success);
+                    } 
+                    catch (ex) {
+                        _log("Setup failed", MessageType.Error);
+                    }
+                }
+                _startedAt = new Date();
+                _runStep();
             }
-        }
-        if (test.run) {
-            _scope.steps = [];
-            _scope.stepIndex = 0;
-            try {
-                _notifyResult(test.name, test.run());
-            } 
-            catch (ex) {
-                _notifyResult(test.name, false, "'" + ex.message + "'");
-            }
-        }
-        else {
-            _scope.steps = test.steps;
-            _scope.stepIndex = 0;
-            _runStep(_scope.steps[_scope.stepIndex++]);
-        }
+        };
     }
-    
-    /**
-     * Starts the next step or test.<br/>
-     * Will run the teardown method if it exists.
-     */
-    _finishStep = function(){
-        function tryTeardown(){
-            if (_testIndex > 0 && _tests[_testIndex - 1].teardown) {
-                _tests[_testIndex - 1].teardown.call(_scope);
-            }
-        }
-        if (_scope.stepIndex === _scope.steps.length) {
-            if (_testIndex === _tests.length) {
-                tryTeardown();
-                _log("testing completed in " + (new Date().valueOf() - _start.valueOf()) + "ms");
-            }
-            else {
-                tryTeardown();
-                _runTest(_tests[_testIndex++]);
-            }
-        }
-        else {
-            _runStep(_scope.steps[_scope.stepIndex++]);
-        }
-    };
     
     return {
         /**
          * Runs through all the tests
          * @param {Array} tests The tests to run
          */
-        test: function(tests){
+        test: function(testset){
+            var tests = [], testConfig, i = testset.length, test;
+            
+            // Prepare the messaging facilities
             if (!_messages) {
                 _messages = document.createElement("div");
                 _messages.className = "easyTest_messages";
@@ -157,10 +205,35 @@ var easyTest = (function(){
             else {
                 _messages.innerHTML = "";
             }
-            _testIndex = 0;
-            _tests = tests;
+            
+            // Convert the testset
+            while (i--) {
+                testConfig = testset[i];
+                if (!testConfig.steps) {
+                    // Convert a single step test to a proper test
+                    testConfig = {
+                        steps: testConfig
+                    };
+                }
+                
+                tests.push(new Test(testConfig, function(){
+                    // Get the next test to run
+                    test = tests.pop();
+                    if (test) {
+                        // This is needed to avoid a strange bug in Opera,
+                        window.setTimeout(function(){
+                            test.run();
+                        }, 0);
+                    }
+                    else {
+                        // No more tests to run
+                        _log("Test run complete", MessageType.Info);
+                    }
+                }));
+            }
+            // Start the first test
             _start = new Date();
-            _runTest(_tests[_testIndex++]);
+            tests.pop().run();
         }
     };
 }());

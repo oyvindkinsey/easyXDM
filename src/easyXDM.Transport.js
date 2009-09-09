@@ -62,7 +62,7 @@ easyXDM.transport = {
      */
     PostMessageTransport: function(config, onReady){
         if (!window.postMessage) {
-            throw "This browser does not support window.postMessage";
+            throw new Error("This browser does not support window.postMessage");
         }
         // #ifdef debug
         easyXDM.Debug.trace("easyXDM.transport.PostMessageTransport.constructor");
