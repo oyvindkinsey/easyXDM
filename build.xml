@@ -2,7 +2,7 @@
 <project name="easyXDM" default="build" basedir=".">
 	<property file="build.properties"/>
 	<property name="project.build.artifactdir" value=".\artifacts\"/>
-	<property name="project.build.version" value="1.5.3"/>
+	<property name="project.build.version" value="1.5.4"/>
 	
 	<!-- Setup classpath for js-build-tools ant tasks -->
 	<path id="js-build-tasks.classpath">

@@ -1,3 +1,20 @@
+1.5.4 - 11.11.09
+easyXDM.Interface can now take an new configuration parameter, 'serializer'.
+This will be used instead of the JSON object if present and has to implement the same signature as the JSON object.
+This is to enable users to use serializing methods present in their main framework. 
+Users of prototypejs will have to use this to override the serializer using the following serializer object
+{
+	stringify(obj){
+		return Object.toJSON(obj);
+	},
+	parse(str){
+		return str.evalJSON();
+	}
+}
+This is due to prototypejs adding the toJSON method to Array.prototype which causes the native JSON object to fail.
+
+The test suite has also been fixed so that it doesnt crash WebKit.
+
 1.5.3 - 06.09.09
 The transports now support using remote urls containing query parameters.
 Added the easyXDM.apply method, and also easyXMD.WidgetManager and easyXDM.Widget.

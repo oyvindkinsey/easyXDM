@@ -94,7 +94,9 @@ var easyTest = (function(){
             }
             // Go to next step
             _stepIndex++;
-            _runStep();
+            window.setTimeout(function(){
+                _runStep();
+            }, 0);
         }
         
         /**

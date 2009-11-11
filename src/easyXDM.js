@@ -147,8 +147,8 @@ easyXDM = {
                 }
             }
         }
-        
-        channelConfig.converter = JSON;
+		
+        channelConfig.converter = config.serializer || JSON;
         
         /**
          * Handles incoming data.<br/>

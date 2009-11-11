@@ -314,8 +314,9 @@ easyXDM.transport = {
             else {
                 easyXDM.DomHelper.removeEventListener(_listenerWindow, "resize", _checkForMessage);
             }
+            
             _callerWindow.parentNode.removeChild(_callerWindow);
-            _callerWindow = null;
+            _callerWindow = null;            
         };
         
         if (config.local) {
