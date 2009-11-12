@@ -4,10 +4,10 @@ This will be used instead of the JSON object if present and has to implement the
 This is to enable users to use serializing methods present in their main framework. 
 Users of prototypejs will have to use this to override the serializer using the following serializer object
 {
-	stringify:function(obj){
+	stringify(obj){
 		return Object.toJSON(obj);
 	},
-	parse:function(str){
+	parse(str){
 		return str.evalJSON();
 	}
 }
