@@ -216,6 +216,7 @@ easyXDM.transport = {
      * @constructor
      * @param {easyXDM.transport.TransportConfiguration} config The transports configuration.
      * @param {Function} onReady A method that should be called when the transport is ready
+     * @cfg {Number} readyAfter The number of milliseconds to wait before firing onReady. To support using passive hash files. 
      * @namespace easyXDM.transport
      */
     HashTransport: function(config, onReady){
