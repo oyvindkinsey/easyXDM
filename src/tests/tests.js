@@ -6,7 +6,11 @@ function runTests(){
         steps: [{
             name: "check for the presence of easyXDM",
             run: function(){
-                return this.Assert.isObject(easyXDM);
+                if (this.Assert.isObject(easyXDM) && this.Assert.isString(easyXDM.version)) {
+                    this.log("found easyXDM, version=" + easyXDM.version);
+                    return true;
+                };
+                return false;
             }
         }, {
             name: "check for the presence of easyXDM.transport",
@@ -124,7 +128,7 @@ function runTests(){
             name: "destroy",
             run: function(){
                 this.transport.destroy();
-                return true;// ((document.getElementsByTagName("iframe").length === 0));
+                return ((document.getElementsByTagName("iframe").length === 0));
             }
         }]
     }, {
@@ -159,7 +163,6 @@ function runTests(){
         }, {
             name: "destroy",
             run: function(){
-                easyXDM.Debug.trace("##destroy");
                 this.transport.destroy();
                 return ((document.getElementsByTagName("iframe").length === 0));
             }

@@ -169,6 +169,7 @@ var easyTest = (function(){
                 _log("Running test '" + test.name + "'");
                 _scope = {
                     Assert: Assert,
+                    log: _log,
                     notifyResult: function(result){
                         window.clearTimeout(_timer);
                         _notifyResult(_step.name, result);

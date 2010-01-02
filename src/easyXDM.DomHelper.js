@@ -49,7 +49,7 @@ easyXDM.DomHelper = {
         return frame;
     },
     /**
-     * Gives a consistent interface for adding eventhandlers
+     * Provides a consistent interface for adding eventhandlers
      * @param {Object} target The target to add the event to
      * @param {String} type The name of the event
      * @param {Function} listener The listener
@@ -91,8 +91,8 @@ easyXDM.DomHelper = {
         easyXDM.DomHelper.addEventListener(target, type, listener);
     },
     /**
-     * Gives a consistent interface for adding eventhandlers
-     * @param {Object} target The target to add the event to
+     * Provides a consistent interface for removing eventhandlers
+     * @param {Object} target The target to remove the event from
      * @param {String} type The name of the event
      * @param {Function} listener The listener
      */

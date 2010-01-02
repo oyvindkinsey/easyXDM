@@ -39,6 +39,10 @@ easyXDM.transport = {
         }
         else {
             var query = easyXDM.Url.Query();
+            
+            if (typeof query.endpoint !== "string") {
+                throw ("No remote specified");
+            }
             config.channel = query.channel;
             config.remote = query.endpoint;
         }
@@ -47,7 +51,6 @@ easyXDM.transport = {
             type = "PostMessageTransport";
         }
         return new easyXDM.transport[type](config, onReady);
-        
     },
     /**
      * @class easyXDM.transport.PostMessageTransport
@@ -316,7 +319,7 @@ easyXDM.transport = {
             }
             
             _callerWindow.parentNode.removeChild(_callerWindow);
-            _callerWindow = null;            
+            _callerWindow = null;
         };
         
         if (config.local) {
