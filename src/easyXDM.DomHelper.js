@@ -13,37 +13,57 @@ easyXDM.DomHelper = {
      * @return The frames DOMElement
      * @type DOMElement
      */
-    createFrame: function(url, container, onLoad){
+    createFrame: function(url, container, onLoad, name){
         // #ifdef debug
         easyXDM.Debug.trace("creating frame pointing to " + url);
         // #endif
         var frame;
         var framesets = document.getElementsByTagName("FRAMESET");
-        if (!container && framesets && framesets.length > 0) {
-            frame = document.createElement("FRAME");
-            frame.src = url;
+        if (name && window.attachEvent) {
+            // Internet Explorer does not support setting the 
+            // name om DOMElements created in Javascript.
+            // A workaround is to insert HTML and have the browser parse
+            // and instantiate the element.
+            var span = document.createElement("span");
+            document.body.appendChild(span);
+            span.innerHTML = '<iframe style="position:absolute;left:-2000px;" src="' + url + '" id="' + name + '" name="' + name + '"></iframe>';
+            frame = document.getElementById(name);
             if (onLoad) {
                 this.addEventListener(frame, "load", function(){
                     onLoad(frame.contentWindow);
                 });
             }
-            framesets[0].appendChild(frame);
         }
         else {
-            frame = document.createElement("IFRAME");
-            frame.src = url;
-            if (onLoad) {
-                this.addEventListener(frame, "load", function(){
-                    onLoad(frame.contentWindow);
-                });
-            }
-            if (container) {
-                container.appendChild(frame);
+            if (!container && framesets && framesets.length > 0) {
+                frame = document.createElement("FRAME");
+                frame.src = url;
+                if (onLoad) {
+                    this.addEventListener(frame, "load", function(){
+                        onLoad(frame.contentWindow);
+                    });
+                }
+                framesets[0].appendChild(frame);
             }
             else {
-                frame.style.position = "absolute";
-                frame.style.left = "-2000px";
-                document.body.appendChild(frame);
+                frame = document.createElement("IFRAME");
+                frame.src = url;
+                if (onLoad) {
+                    this.addEventListener(frame, "load", function(){
+                        onLoad(frame.contentWindow);
+                    });
+                }
+                if (container) {
+                    container.appendChild(frame);
+                }
+                else {
+                    frame.style.position = "absolute";
+                    frame.style.left = "-2000px";
+                    document.body.appendChild(frame);
+                }
+            }
+            if (name) {
+                frame.id = frame.name = name;
             }
         }
         return frame;

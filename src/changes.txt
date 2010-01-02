@@ -1,3 +1,9 @@
+1.5.5 - 02.01.10
+For scenarios where you are unable to place hash.html on the local domain, you can now
+set the local attribute to point at any file available on the domain, like robots.txt or favicon.ico,
+and set the readyAfter attribute to when you want the library to transition to the ready state. 
+It is important that the local file has had time to load before this.
+
 1.5.4 - 11.11.09
 easyXDM.Interface can now take an new configuration parameter, 'serializer'.
 This will be used instead of the JSON object if present and has to implement the same signature as the JSON object.

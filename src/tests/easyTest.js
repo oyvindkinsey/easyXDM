@@ -91,6 +91,9 @@ var easyTest = (function(){
             }
             else {
                 _log(times + name + " failed! " + (reason || ""), MessageType.Error);
+                if (test.failedMessage) {
+                    _log(test.failedMessage, MessageType.Info);
+                }
             }
             // Go to next step
             _stepIndex++;

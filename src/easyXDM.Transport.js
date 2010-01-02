@@ -271,7 +271,15 @@ easyXDM.transport = {
          */
         function _onReady(){
             if (config.local) {
-                _listenerWindow = easyXDM.transport.HashTransport.getWindow(config.channel);
+                if (config.readyAfter) {
+                    _listenerWindow = window.open(config.local + "#" + config.channel, "remote_" + config.channel);
+                    if (!_listenerWindow) {
+                        throw new Error("Failed to obtain a reference to the window");
+                    }
+                }
+                else {
+                    _listenerWindow = easyXDM.transport.HashTransport.getWindow(config.channel);
+                }
             }
             if (!config.local && _poll) {
                 // #ifdef debug
@@ -315,19 +323,26 @@ easyXDM.transport = {
                 window.clearInterval(_timer);
             }
             else {
-                easyXDM.DomHelper.removeEventListener(_listenerWindow, "resize", _checkForMessage);
+                if (_listenerWindow) {
+                    easyXDM.DomHelper.removeEventListener(_listenerWindow, "resize", _checkForMessage);
+                }
             }
-            
             _callerWindow.parentNode.removeChild(_callerWindow);
             _callerWindow = null;
         };
         
         if (config.local) {
-            // Register onReady callback in the library so that
-            // it can be called when hash.html has loaded.
-            easyXDM.transport.HashTransport.registerOnReady(config.channel, _onReady);
+            if (config.readyAfter) {
+                // Fire the onReady method after a set delay
+                window.setTimeout(_onReady, config.readyAfter);
+            }
+            else {
+                // Register onReady callback in the library so that
+                // it can be called when hash.html has loaded.
+                easyXDM.transport.HashTransport.registerOnReady(config.channel, _onReady);
+            }
         }
-        _callerWindow = easyXDM.DomHelper.createFrame(_remoteUrl, config.container, (config.local) ? null : _onReady);
+        _callerWindow = easyXDM.DomHelper.createFrame(_remoteUrl, config.container, (config.local) ? null : _onReady, ((config.local) ? "local_" : "remote_") + config.channel);
     }
 };
 

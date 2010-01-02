@@ -7,6 +7,9 @@
         </script>
         <script type="text/javascript">
             if (location.href.indexOf("src") !== -1) {
+                if (typeof JSON === "undefined") {
+                    document.write(unescape("%3Cscript src='../../tools/json2.js' type='text/javascript'%3E%3C/script%3E"));
+                }
                 document.write(unescape("%3Cscript src='../easyXDM.js' type='text/javascript'%3E%3C/script%3E"));
                 document.write(unescape("%3Cscript src='../easyXDM.DomHelper.js' type='text/javascript'%3E%3C/script%3E"));
                 document.write(unescape("%3Cscript src='../easyXDM.Serializing.js' type='text/javascript'%3E%3C/script%3E"));

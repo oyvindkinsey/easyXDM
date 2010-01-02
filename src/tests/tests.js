@@ -132,6 +132,44 @@ function runTests(){
             }
         }]
     }, {
+        name: "test easyXDM.transport.HashTransport using readyAfter",
+        failedMessage: "This can fail in some modern browsers like Firefox, but this is OK as it is only needed for older browsers like IE6/IE7.",
+        setUp: function(){
+            this.expectedMessage = "2abcd1234";
+        },
+        steps: [{
+            name: "onReady is fired",
+            timeout: 5000,
+            run: function(){
+                /** -----------------------------*/
+                var scope = this;
+                this.transport = new easyXDM.transport.HashTransport({
+                    channel: "default6",
+                    readyAfter: 1000,
+                    local: "../changes.txt",
+                    remote: _remoteUrl + "test_hashtransport.html",
+                    onMessage: function(message, origin){
+                        scope.notifyResult(scope.expectedMessage === message);
+                    }
+                }, function(){
+                    scope.notifyResult(true);
+                });
+                /** -----------------------------*/
+            }
+        }, {
+            name: "message is echoed back",
+            timeout: 1000,
+            run: function(){
+                this.transport.postMessage(this.expectedMessage);
+            }
+        }, {
+            name: "destroy",
+            run: function(){
+                this.transport.destroy();
+                return ((document.getElementsByTagName("iframe").length === 0));
+            }
+        }]
+    }, {
         name: "test easyXDM.transport.PostMessageTransport",
         setUp: function(){
             this.expectedMessage = "3abcd1234";
