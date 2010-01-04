@@ -29,6 +29,89 @@ easyXDM = {
             }
         }
     },
+    
+    // #ifdef debug
+    /**
+     * @class easyXDM.Debug
+     * Utilities for debugging. This class is only precent in the debug version.
+     * @singleton
+     * @namespace easyXDM
+     */
+    Debug: {
+        /**
+         * Logs the message to console.log if available
+         * @param {String} msg The message to log
+         */
+        log: function(msg){
+            // Uses memoizing to cache the implementation
+            var log;
+            if (typeof console === "undefined" || typeof console.log === "undefined") {
+                /**
+                 * Sets log to be an empty function since we have no output available
+                 * @ignore
+                 */
+                log = function(){
+                };
+            }
+            else {
+                /**
+                 * Sets log to be a wrapper around console.log
+                 * @ignore
+                 * @param {String} msg
+                 */
+                log = function(msg){
+                    console.log(location.host + ":" + msg);
+                };
+            }
+            log(msg);
+            easyXDM.Debug.log = log;
+        },
+        /**
+         * Will try to trace the given message either to a DOMElement with the id "log",
+         * or by using console.info.
+         * @param {String} msg The message to trace
+         */
+        trace: function(msg){
+            // Uses memoizing to cache the implementation
+            var trace;
+            var el = document.getElementById("log");
+            if (el) {
+                /**
+                 * Sets trace to be a function that outputs the messages to the DOMElement with id "log"
+                 * @ignore
+                 * @param {String} msg
+                 */
+                trace = function(msg){
+                    el.appendChild(document.createElement("div")).appendChild(document.createTextNode(location.host + "-" + new Date().valueOf() + ":" + msg));
+                    el.scrollTop = el.scrollHeight;
+                };
+            }
+            else {
+                if (typeof console === "undefined" || typeof console.info === "undefined") {
+                    /**
+                     * Sets trace to be an empty function
+                     * @ignore
+                     */
+                    trace = function(){
+                    };
+                }
+                else {
+                    /**
+                     * Sets trace to be a wrapper around console.info
+                     * @ignore
+                     * @param {String} msg
+                     */
+                    trace = function(msg){
+                        console.info(location.host + ":" + msg);
+                    };
+                }
+            }
+            easyXDM.Debug.trace = trace;
+            easyXDM.Debug.trace(msg);
+        }
+    },
+    
+    // #endif
     /** 
      * @class easyXDM.Interface
      * Creates an interface that can be used to call methods implemented
@@ -263,83 +346,3 @@ easyXDM = {
     }
 };
 
-// #ifdef debug
-/**
- * @class easyXDM.Debug
- * Utilities for debugging. This class is only precent in the debug version.
- * @namespace easyXDM
- */
-easyXDM.Debug = {
-    /**
-     * Logs the message to console.log if available
-     * @param {String} msg The message to log
-     */
-    log: function(msg){
-        // Uses memoizing to cache the implementation
-        var log;
-        if (typeof console === "undefined" || typeof console.log === "undefined") {
-            /**
-             * Sets log to be an empty function since we have no output available
-             * @ignore
-             */
-            log = function(){
-            };
-        }
-        else {
-            /**
-             * Sets log to be a wrapper around console.log
-             * @ignore
-             * @param {String} msg
-             */
-            log = function(msg){
-                console.log(location.host + ":" + msg);
-            };
-        }
-        log(msg);
-        easyXDM.Debug.log = log;
-    },
-    /**
-     * Will try to trace the given message either to a DOMElement with the id "log",
-     * or by using console.info.
-     * @param {String} msg The message to trace
-     */
-    trace: function(msg){
-        // Uses memoizing to cache the implementation
-        var trace;
-        var el = document.getElementById("log");
-        if (el) {
-            /**
-             * Sets trace to be a function that outputs the messages to the DOMElement with id "log"
-             * @ignore
-             * @param {String} msg
-             */
-            trace = function(msg){
-                el.appendChild(document.createElement("div")).appendChild(document.createTextNode(location.host + "-" + new Date().valueOf() + ":" + msg));
-                el.scrollTop = el.scrollHeight;
-            };
-        }
-        else {
-            if (typeof console === "undefined" || typeof console.info === "undefined") {
-                /**
-                 * Sets trace to be an empty function
-                 * @ignore
-                 */
-                trace = function(){
-                };
-            }
-            else {
-                /**
-                 * Sets trace to be a wrapper around console.info
-                 * @ignore
-                 * @param {String} msg
-                 */
-                trace = function(msg){
-                    console.info(location.host + ":" + msg);
-                };
-            }
-        }
-        easyXDM.Debug.trace = trace;
-        easyXDM.Debug.trace(msg);
-    }
-};
-// #endif
