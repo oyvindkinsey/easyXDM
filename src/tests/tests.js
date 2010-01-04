@@ -1,4 +1,5 @@
-
+/*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
+/*global easyTest, easyXDM, window*/
 var _remoteUrl = location.href.substring(0, location.href.lastIndexOf("/") + 1);
 function runTests(){
     easyTest.test([/**Tests for the presence of namespaces and classes*/{
@@ -9,7 +10,7 @@ function runTests(){
                 if (this.Assert.isObject(easyXDM) && this.Assert.isString(easyXDM.version)) {
                     this.log("found easyXDM, version=" + easyXDM.version);
                     return true;
-                };
+                }
                 return false;
             }
         }, {
@@ -58,7 +59,7 @@ function runTests(){
                 return this.Assert.isObject(easyXDM.Url);
             }
         }]
-    }, /** easyXDM.transport.HashTransport*/ {
+    }, {
         name: "test easyXDM.transport.HashTransport using polling",
         setUp: function(){
             this.expectedMessage = "1abcd1234";
@@ -67,7 +68,6 @@ function runTests(){
             name: "onReady is fired",
             timeout: 5000,
             run: function(){
-                /** -----------------------------*/
                 var scope = this;
                 this.transport = new easyXDM.transport.HashTransport({
                     channel: "default1",
@@ -80,7 +80,6 @@ function runTests(){
                 }, function(){
                     scope.notifyResult(true);
                 });
-                /** -----------------------------*/
             }
         }, {
             name: "message is echoed back",
@@ -104,7 +103,6 @@ function runTests(){
             name: "onReady is fired",
             timeout: 5000,
             run: function(){
-                /** -----------------------------*/
                 var scope = this;
                 this.transport = new easyXDM.transport.HashTransport({
                     channel: "default2",
@@ -116,7 +114,40 @@ function runTests(){
                 }, function(){
                     scope.notifyResult(true);
                 });
-                /** -----------------------------*/
+            }
+        }, {
+            name: "message is echoed back",
+            timeout: 1000,
+            run: function(){
+                this.transport.postMessage(this.expectedMessage);
+            }
+        }, {
+            name: "destroy",
+            run: function(){
+                this.transport.destroy();
+                return ((document.getElementsByTagName("iframe").length === 0));
+            }
+        }]
+    }, {
+        name: "test easyXDM.transport.HashTransport using parent",
+        setUp: function(){
+            this.expectedMessage = "2abcd1234";
+        },
+        steps: [{
+            name: "onReady is fired",
+            timeout: 5000,
+            run: function(){
+                var scope = this;
+                this.transport = new easyXDM.transport.HashTransport({
+                    channel: "default7",
+                    local: window,
+                    remote: _remoteUrl + "test_hashtransport.html",
+                    onMessage: function(message, origin){
+                        scope.notifyResult(scope.expectedMessage === message);
+                    }
+                }, function(){
+                    scope.notifyResult(true);
+                });
             }
         }, {
             name: "message is echoed back",
@@ -141,7 +172,6 @@ function runTests(){
             name: "onReady is fired",
             timeout: 5000,
             run: function(){
-                /** -----------------------------*/
                 var scope = this;
                 this.transport = new easyXDM.transport.HashTransport({
                     channel: "default6",
@@ -154,7 +184,6 @@ function runTests(){
                 }, function(){
                     scope.notifyResult(true);
                 });
-                /** -----------------------------*/
             }
         }, {
             name: "message is echoed back",
@@ -171,6 +200,7 @@ function runTests(){
         }]
     }, {
         name: "test easyXDM.transport.PostMessageTransport",
+        failedMessage: "This will fail in older browsers like IE6/IE7 as these do not support the postMessage interface.",
         setUp: function(){
             this.expectedMessage = "3abcd1234";
         },
@@ -178,7 +208,6 @@ function runTests(){
             name: "onReady is fired",
             timeout: 5000,
             run: function(){
-                /** -----------------------------*/
                 var scope = this;
                 this.transport = new easyXDM.transport.PostMessageTransport({
                     channel: "default3",
@@ -190,7 +219,6 @@ function runTests(){
                 }, function(){
                     scope.notifyResult(true);
                 });
-                /** -----------------------------*/
             }
         }, {
             name: "message is echoed back",
@@ -214,7 +242,6 @@ function runTests(){
             name: "onReady is fired",
             timeout: 5000,
             run: function(){
-                /** -----------------------------*/
                 var scope = this;
                 this.transport = new easyXDM.transport.BestAvailableTransport({
                     channel: "default4",
@@ -226,7 +253,6 @@ function runTests(){
                 }, function(){
                     scope.notifyResult(true);
                 });
-                /** -----------------------------*/
             }
         }, {
             name: "message is echoed back",
@@ -250,7 +276,6 @@ function runTests(){
             name: "onReady is fired",
             timeout: 5000,
             run: function(){
-                /** -----------------------------*/
                 var scope = this;
                 this.transport = new easyXDM.transport.BestAvailableTransport({
                     channel: "default5",
@@ -262,7 +287,6 @@ function runTests(){
                 }, function(){
                     scope.notifyResult(true);
                 });
-                /** -----------------------------*/
             }
         }, {
             name: "message is echoed back",
@@ -277,7 +301,7 @@ function runTests(){
                 return ((document.getElementsByTagName("iframe").length === 0));
             }
         }]
-    }, /** easyXDM.Interface*/ {
+    }, {
         name: "test easyXDM.Interface",
         setUp: function(){
             this.expectedMessage = "6abcd1234";
@@ -286,7 +310,6 @@ function runTests(){
             name: "onReady is fired",
             timeout: 5000,
             run: function(){
-                /** -----------------------------*/
                 var scope = this;
                 this.remote = new easyXDM.Interface({
                     channel: "default6",
@@ -311,7 +334,6 @@ function runTests(){
                 }, function(){
                     scope.notifyResult(true);
                 });
-                /** -----------------------------*/
             }
         }, {
             name: "void method",

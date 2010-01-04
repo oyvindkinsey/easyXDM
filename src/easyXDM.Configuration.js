@@ -1,6 +1,6 @@
+/*global easyXDM, window*/
 // #ifdef debug
 easyXDM.configuration = {
-
     /**
      * @class easyXDM.configuration.TransportConfiguration
      * The configuration for transport classes.
@@ -21,10 +21,8 @@ easyXDM.configuration = {
          * @param {String} origin The origin of the message
          */
         onMessage: function(message, origin){
-        
         }
     },
-    
     /**
      * @class easyXDM.configuration.ChannelConfiguration
      * The channels configuration
@@ -33,10 +31,18 @@ easyXDM.configuration = {
      */
     ChannelConfiguration: {
         /**
-         * The serializer to use
-         * @type easyXDM.serializing.ISerializer
+         * The serializer to use. This should match the HTML5 JSON specification.
+         * @type {JSON}
          */
-        converter: {}
+        serializer: {},
+        /**
+         *  The method that should handle incoming data.<br/> The method should accept two arguments, the data as an object, and the origin as a string.<br/>
+         *  This disables onMessage
+         * @param {String} data The data
+         * @param {String} origin The origin of the data
+         */
+        onData: function(data, origin){
+        }
     },
     /**
      * @class easyXDM.configuration.InterfaceConfiguration

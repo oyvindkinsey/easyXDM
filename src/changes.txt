@@ -1,3 +1,10 @@
+1.6.0 - 04.01.10
+Added the option to use the already loaded window as the local document for messaging when falling back 
+to the HashTransport. This can be done by setting 'local:window' in the transports configuration.
+The documentation has also been changed sligtly making it a bit easier to see the necessary configuration attributes
+The version is being upped to 1.6 as we now have complete support for scenarios where you are not able to upload
+the hash.html file to the local domain, something I think is a big step forward.
+
 1.5.5 - 02.01.10
 For scenarios where you are unable to place hash.html on the local domain, you can now
 set the local attribute to point at any file available on the domain, like robots.txt or favicon.ico,

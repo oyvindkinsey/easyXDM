@@ -1,32 +1,5 @@
+/*global easyXDM, window*/
 easyXDM.serializing = {
-    // #ifdef debug
-    /**
-     * @class easyXDM.serializing.ISerializer
-     * The Interface implemented by all serializers.<br/>
-     * Only available in debug mode.
-     * @namespace easyXDM.serializing
-     */
-    ISerializer: {
-        /**
-         * Serializes an object and returns it as a string
-         * @param {Object} data The data to serialize
-         * @returns The serialized string
-         * @type {String}
-         */
-        stringify: function(data){
-        
-        },
-        /**
-         * Deserializes a string and returns an object
-         * @param {String} message The string to deserialize
-         * @returns An object
-         * @type {Object}
-         */
-        parse: function(message){
-        
-        }
-    },
-    // #endif
     /**
      * @class easyXDM.serializing.hashTableSerializer
      * A serializer that can convert to and from hashtables

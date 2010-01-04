@@ -147,7 +147,7 @@ easyXDM = {
                 }
             }
         }
-		
+        
         channelConfig.converter = config.serializer || JSON;
         
         /**
@@ -208,6 +208,8 @@ easyXDM = {
      * A channel wrapping an underlying transport.
      * @constructor
      * @param {easyXDM.ChannelConfiguration} config The channels configuration
+     * @cfg {JSON} serializer The object used to serializer/deserialize the data
+     * @cfg {Function} onData The method that should handle incoming data.<br/> This method should accept two arguments, the data as an object, and the origin as a string.
      * @param {Function} onReady A method that should be called when the channel is ready
      * @namespace easyXDM
      */
@@ -215,8 +217,10 @@ easyXDM = {
         // #ifdef debug
         easyXDM.Debug.trace("easyXDM.Channel.constructor");
         // #endif
-        if (!config.converter) {
-            throw new Error("No converter present. You should use the easyXDM.transport classes directly.");
+        // For compatibility
+        config.serializer = config.serializer || config.converter;
+        if (!config.serializer) {
+            throw new Error("No serializer present. You should use the easyXDM.transport classes directly.");
         }
         /**
          * Wraps the transports onMessage method using the supplied serializer to convert.
@@ -224,7 +228,7 @@ easyXDM = {
          * @private
          */
         config.onMessage = function(message, origin){
-            this.onData(this.converter.parse(message), origin);
+            this.onData(this.serializer.parse(message), origin);
         };
         
         /**
@@ -247,7 +251,7 @@ easyXDM = {
          * @param {Object} data the data to send
          */
         this.sendData = function(data){
-            this.transport.postMessage(config.converter.stringify(data));
+            this.transport.postMessage(config.serializer.stringify(data));
         };
         
         var that = this;
