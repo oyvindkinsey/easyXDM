@@ -82,8 +82,13 @@ easyXDM = {
                  * @param {String} msg
                  */
                 trace = function(msg){
-                    el.appendChild(document.createElement("div")).appendChild(document.createTextNode(location.host + "-" + new Date().valueOf() + ":" + msg));
-                    el.scrollTop = el.scrollHeight;
+                    try {
+                        el.appendChild(document.createElement("div")).appendChild(document.createTextNode(location.host + "-" + new Date().valueOf() + ":" + msg));
+                        el.scrollTop = el.scrollHeight;
+                    } 
+                    catch (e) {
+                        //In case we are unloading
+                    }
                 };
             }
             else {
