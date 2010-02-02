@@ -18,7 +18,6 @@ easyXDM.DomHelper = {
         easyXDM.Debug.trace("creating frame pointing to " + url);
         // #endif
         var frame;
-        var framesets = document.getElementsByTagName("FRAMESET");
         function loadFn(){
             onLoad(frame.contentWindow);
         }
@@ -37,34 +36,23 @@ easyXDM.DomHelper = {
             }
         }
         else {
-            if (!container && framesets && framesets.length > 0) {
-                frame = document.createElement("FRAME");
-                frame.src = url;
-                if (onLoad) {
-                    frame.loadFn = loadFn;
-                    this.addEventListener(frame, "load", loadFn);
-                }
-                framesets[0].appendChild(frame);
+            frame = document.createElement("IFRAME");
+            frame.src = url;
+            if (onLoad) {
+                frame.loadFn = loadFn;
+                this.addEventListener(frame, "load", loadFn);
+            }
+            if (container) {
+                container.appendChild(frame);
             }
             else {
-                frame = document.createElement("IFRAME");
-                frame.src = url;
-                if (onLoad) {
-                    frame.loadFn = loadFn;
-                    this.addEventListener(frame, "load", loadFn);
-                }
-                if (container) {
-                    container.appendChild(frame);
-                }
-                else {
-                    frame.style.position = "absolute";
-                    frame.style.left = "-2000px";
-                    document.body.appendChild(frame);
-                }
+                frame.style.position = "absolute";
+                frame.style.left = "-2000px";
+                document.body.appendChild(frame);
             }
-            if (name) {
-                frame.id = frame.name = name;
-            }
+        }
+        if (name) {
+            frame.id = frame.name = name;
         }
         return frame;
     },
