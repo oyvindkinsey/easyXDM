@@ -371,6 +371,54 @@ easyXDM.transport = {
         else {
             _callerWindow = easyXDM.DomHelper.createFrame(_remoteUrl, config.container, (config.local && !useParent) ? null : _onReady, (config.local ? "local_" : "remote_") + config.channel);
         }
+    },
+    
+    NameTransport: function(config, onReady){
+        // #ifdef debug
+        easyXDM.Debug.trace("easyXDM.transport.NameTransport.constructor");
+        // #endif
+        var channel_suffix = (config.local) ? '_a' : '_b';
+        var _callerWindow, readyCount = 0;
+        var remoteOrigin = easyXDM.Url.getLocation(config.remote);
+        
+        //todo: how do we get this?
+        var localHash = easyXDM.Url.resolveUrl("../hash.html");
+        var remoteHash = easyXDM.Url.resolveUrl("../hash.html");
+        
+        
+        this.postMessage = function(message){
+            // #ifdef debug
+            easyXDM.Debug.trace("sending message '" + message + "' to " + remoteOrigin);
+            // #endif
+            _callerWindow.contentWindow.name = message;
+            _callerWindow.contentWindow.location = remoteHash + "#" + encodeURIComponent(config.remote + "#" + config.channel + channel_suffix);
+            
+        };
+        
+        /**
+         * Tries to clean up the DOM
+         */
+        this.destroy = function(){
+            // #ifdef debug
+            easyXDM.Debug.trace("destroying transport");
+            // #endif
+            _callerWindow.parentNode.removeChild(_callerWindow);
+            _callerWindow = null;
+        };
+        
+        function _onReady(){
+            if (++readyCount === 2) {
+                if (onReady) {
+                    window.setTimeout(onReady, 10);
+                }
+            }
+        }
+        
+        if (config.local) {
+            var con = window.body.appendChild(document.createElement("div"));
+            con.innerHTML = '<iframe name="' + config.channel + channel_suffix + '_a" id="' + config.channel + channel_suffix + '" src="' + config.remote + '#' + config.channel + channel_suffix + '"></iframe>';
+        } //remote uses parent.parent
+        _callerWindow = easyXDM.DomHelper.createFrame(localHash, config.container, (config.local) ? null : _onReady);
     }
 };
 

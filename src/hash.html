@@ -6,10 +6,26 @@
         <meta http-equiv="EXPIRES" content="Sat, 01 Jan 2050 00:00:00 GMT"/>
         <script type="text/javascript">
             if (location.hash) {
-                /**
-                 * Notify the library that the transport is ready
-                 */
-                window.parent.parent.easyXDM.transport.HashTransport.channelReady(location.hash.substring(1), window);
+                if (location.hash.substring(1, 2) === "_") {
+                    switch (location.hash.substring(2, 3)) {
+                        case "2":
+                            // NameTransport local
+                            window.parent.parent.easyXDM.fn.get(location.hash.substring(1))(window.name);
+                            break;
+                        case "3":
+                            // NameTransport remote
+                            var url = decodeURIComponent(location.hash.substring(1));
+                            var channel = url.substring(url.indexOf("#") + 1);
+                            var guest = window.open(url, channel);
+                            guest.easyXDM.transport.NameTransport.setData(channel, window.name);
+                            window.history.back();
+                            break;
+                    }
+                }
+                else {
+                    // The old HashTransport
+                    window.parent.parent.easyXDM.transport.HashTransport.channelReady(location.hash.substring(1), window);
+                }
             }
         </script>
     </head>
