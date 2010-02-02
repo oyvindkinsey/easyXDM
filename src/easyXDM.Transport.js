@@ -544,11 +544,7 @@ easyXDM.transport.NameTransport = function(config, onReady){
         // #ifdef debug
         easyXDM.Debug.trace("creating remote iframe '" + remoteUrl + '#' + config.channel + "'");
         // #endif
-        var con = config.container.appendChild(document.createElement("div"));
-        con.innerHTML = '<iframe name="' + config.channel + '" id="' + config.channel + '" src="' + remoteUrl + '#' + config.channel + '"></iframe>';
-        remoteWindow = con.firstChild;
-        config.container.appendChild(remoteWindow);
-        config.container.removeChild(con);
+        remoteWindow = easyXDM.DomHelper.createFrame(remoteUrl, config.container, null, config.channel);
     }
     
     _callerWindow = easyXDM.DomHelper.createFrame(config.local, null, function(){
