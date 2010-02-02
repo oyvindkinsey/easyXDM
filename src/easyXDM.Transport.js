@@ -361,7 +361,7 @@ easyXDM.transport = {
             else {
                 // Register onReady callback in the library so that
                 // it can be called when hash.html has loaded.
-                easyXDM.transport.HashTransport.registerOnReady(config.channel, _onReady);
+                easyXDM.Fn.set(config.channel, _onReady);
             }
         }
         if (!config.local && useParent) {
@@ -375,32 +375,12 @@ easyXDM.transport = {
 };
 
 /**
- * Contains the callbacks used to notify local that the remote end is ready
- * @static
- * @namespace easyXDM.transport
- */
-easyXDM.transport.HashTransport.callbacks = {};
-/**
  * Contains the proxy windows used to read messages from remote when
  * using HashTransport.
  * @static
  * @namespace easyXDM.transport
  */
 easyXDM.transport.HashTransport.windows = {};
-
-/**
- * Register a callback that should be called when the remote end of a channel is ready
- * @static
- * @param {String} channel
- * @param {Function} callback
- * @namespace easyXDM.transport
- */
-easyXDM.transport.HashTransport.registerOnReady = function(channel, callback){
-    // #ifdef debug
-    easyXDM.Debug.trace("registering onReady callback for channel " + channel);
-    // #endif
-    easyXDM.transport.HashTransport.callbacks[channel] = callback;
-};
 
 /**
  * Notify that a channel is ready and register a window to be used for reading messages
@@ -416,12 +396,7 @@ easyXDM.transport.HashTransport.channelReady = function(channel, contentWindow){
     // #ifdef debug
     easyXDM.Debug.trace("executing onReady callback for channel " + channel);
     // #endif
-    var fn = ht.callbacks[channel];
-    if (fn) {
-        fn();
-        delete ht.callbacks[channel];
-    }
-    
+    easyXDM.Fn.get(channel, true)();
 };
 
 /**
