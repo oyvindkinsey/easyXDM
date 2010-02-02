@@ -1,6 +1,12 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
 /*global easyTest, easyXDM, window*/
 var _remoteUrl = location.href.substring(0, location.href.lastIndexOf("/") + 1);
+if (_remoteUrl.indexOf("easyxdm.net") !== -1) {
+    _remoteUrl = _remoteUrl.replace("easyxdm.net", "provider.easyxdm.net");
+}
+if (_remoteUrl.indexOf("localhost") !== -1) {
+    _remoteUrl = _remoteUrl.replace("localhost", "127.0.0.1");
+}
 function runTests(){
     easyTest.test([/**Tests for the presence of namespaces and classes*/{
         name: "Check that the library is complete",
@@ -78,8 +84,8 @@ function runTests(){
                 this.transport = new easyXDM.transport.NameTransport({
                     channel: "default1",
                     local: "../hash.html",
-                    remote: "http://127.0.0.1/easyxdm/src/tests/test_transport.html",
-                    remoteHelper: "http://127.0.0.1/easyxdm/src/hash.html",
+                    remote: _remoteUrl + "test_transport.html",
+                    remoteHelper: _remoteUrl + "../hash.html",
                     onMessage: function(message, origin){
                         scope.notifyResult((scope.expectedMessage === message));
                     },
