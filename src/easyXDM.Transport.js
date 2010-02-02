@@ -14,7 +14,9 @@ easyXDM.transport = {
         // #ifdef debug
         easyXDM.Debug.trace("easyXDM.transport.BestAvailableTransport.constructor");
         // #endif
-        if (config.local) {
+        // If no protocol is set then it means this is the host
+        var isHost = (typeof easyXDM.Url.Query().p === "undefined");
+        if (isHost) {
             config.channel = (config.channel) ? config.channel : "default";
         }
         else {
@@ -51,6 +53,8 @@ easyXDM.transport = {
         // #ifdef debug
         easyXDM.Debug.trace("easyXDM.transport.PostMessageTransport.constructor");
         // #endif
+        // If no protocol is set then it means this is the host
+        var isHost = (typeof easyXDM.Url.Query().p === "undefined");
         var _callerWindow, _targetOrigin = easyXDM.Url.getLocation(config.remote), _window_onMessageImplementation;
         
         /**
@@ -145,7 +149,7 @@ easyXDM.transport = {
             easyXDM.Debug.trace("destroying transport");
             // #endif
             easyXDM.DomHelper.removeEventListener(window, "message", _window_onMessage);
-            if (config.local) {
+            if (isHost) {
                 _callerWindow.parentNode.removeChild(_callerWindow);
                 _callerWindow = null;
             }
@@ -158,11 +162,12 @@ easyXDM.transport = {
          */
         this.postMessage = (function(){
             // Set up the messaging differently dependin on being local or remote
-            if (config.local) {
+            if (isHost) {
                 _window_onMessageImplementation = _waitForReady;
                 _callerWindow = easyXDM.DomHelper.createFrame(easyXDM.Url.appendQueryParameters(config.remote, {
                     endpoint: easyXDM.Url.resolveUrl(config.local),
-                    channel: config.channel
+                    channel: config.channel,
+                    p: 1 // 1 = PostMessage
                 }), config.container);
                 return function(message){
                     // #ifdef debug
@@ -206,13 +211,16 @@ easyXDM.transport = {
         // #ifdef debug
         easyXDM.Debug.trace("easyXDM.transport.HashTransport.constructor");
         // #endif
+        // If no protocol is set then it means this is the host
+        var isHost = (typeof easyXDM.Url.Query().p === "undefined");
         var _timer, pollInterval = config.interval || 300, usePolling = false, useParent = false, useResize = true;
         var _lastMsg = "#" + config.channel, _msgNr = 0, _listenerWindow, _callerWindow;
         var _remoteUrl, _remoteOrigin = easyXDM.Url.getLocation(config.remote);
         
-        if (config.local) {
+        if (isHost) {
             var parameters = {
-                channel: config.channel
+                channel: config.channel,
+                p: 0 // 0 = HashTransport
             };
             if (config.local === window) {
                 // We are using the current window to listen to
@@ -274,7 +282,7 @@ easyXDM.transport = {
          * @private
          */
         function _onReady(){
-            if (config.local) {
+            if (isHost) {
                 if (useParent) {
                     _listenerWindow = window;
                 }
@@ -319,7 +327,7 @@ easyXDM.transport = {
             // #ifdef debug
             easyXDM.Debug.trace("sending message '" + message + "' to " + _remoteOrigin);
             // #endif
-            if (config.local || !useParent) {
+            if (isHost || !useParent) {
                 // We are referencing an iframe
                 _callerWindow.src = _remoteUrl + "#" + (_msgNr++) + "_" + encodeURIComponent(message);
                 if (useResize) {
@@ -347,13 +355,13 @@ easyXDM.transport = {
                     easyXDM.DomHelper.removeEventListener(_listenerWindow, "resize", _checkForMessage);
                 }
             }
-            if (config.local || !useParent) {
+            if (isHost || !useParent) {
                 _callerWindow.parentNode.removeChild(_callerWindow);
             }
             _callerWindow = null;
         };
         
-        if (config.local) {
+        if (isHost) {
             if (config.readyAfter) {
                 // Fire the onReady method after a set delay
                 window.setTimeout(_onReady, config.readyAfter);
@@ -364,12 +372,12 @@ easyXDM.transport = {
                 easyXDM.Fn.set(config.channel, _onReady);
             }
         }
-        if (!config.local && useParent) {
+        if (!isHost && useParent) {
             _callerWindow = parent;
             _onReady();
         }
         else {
-            _callerWindow = easyXDM.DomHelper.createFrame(_remoteUrl, config.container, (config.local && !useParent) ? null : _onReady, (config.local ? "local_" : "remote_") + config.channel);
+            _callerWindow = easyXDM.DomHelper.createFrame(_remoteUrl, config.container, (isHost && !useParent) ? null : _onReady, (isHost ? "local_" : "remote_") + config.channel);
         }
     },
     
