@@ -60,12 +60,16 @@ easyXDM.Url = {
         if (url.match(/^(http||https):\/\//)) {
             return url;
         }
-        // If the url is relative to the root  
-        if (url.substring(0, 1) == "/") {
-            return location.protocol + "//" + location.host + url;
+        
+        var path = (url.substring(0, 1) === "/") ? "" : location.pathname;
+        if (path.substring(path.length - 1) !== "/") {
+            path = path.substring(0, path.lastIndexOf("/") + 1);
         }
-        // If the url is relative to the current directory
-        return location.href.substring(0, location.href.lastIndexOf("/") + 1) + url;
+        var resolved = location.protocol + "//" + location.host + path + url;
+        // #ifdef debug
+        easyXDM.Debug.trace("resolved url '" + url + ' into ' + resolved + "'");
+        // #endif
+        return resolved;
     },
     /**
      * Appends the parameters to the given url.<br/>
