@@ -19,6 +19,9 @@ easyXDM.DomHelper = {
         // #endif
         var frame;
         var framesets = document.getElementsByTagName("FRAMESET");
+        function loadFn(){
+            onLoad(frame.contentWindow);
+        }
         if (name && window.attachEvent) {
             // Internet Explorer does not support setting the 
             // name om DOMElements created in Javascript.
@@ -29,9 +32,8 @@ easyXDM.DomHelper = {
             span.innerHTML = '<iframe style="position:absolute;left:-2000px;" src="' + url + '" id="' + name + '" name="' + name + '"></iframe>';
             frame = document.getElementById(name);
             if (onLoad) {
-                this.addEventListener(frame, "load", function(){
-                    onLoad(frame.contentWindow);
-                });
+                frame.loadFn = loadFn;
+                this.addEventListener(frame, "load", loadFn);
             }
         }
         else {
@@ -39,9 +41,8 @@ easyXDM.DomHelper = {
                 frame = document.createElement("FRAME");
                 frame.src = url;
                 if (onLoad) {
-                    this.addEventListener(frame, "load", function(){
-                        onLoad(frame.contentWindow);
-                    });
+                    frame.loadFn = loadFn;
+                    this.addEventListener(frame, "load", loadFn);
                 }
                 framesets[0].appendChild(frame);
             }
@@ -49,9 +50,8 @@ easyXDM.DomHelper = {
                 frame = document.createElement("IFRAME");
                 frame.src = url;
                 if (onLoad) {
-                    this.addEventListener(frame, "load", function(){
-                        onLoad(frame.contentWindow);
-                    });
+                    frame.loadFn = loadFn;
+                    this.addEventListener(frame, "load", loadFn);
                 }
                 if (container) {
                     container.appendChild(frame);
