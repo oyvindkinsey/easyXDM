@@ -117,6 +117,9 @@ easyXDM.DomHelper = {
              * @param {Function} listener
              */
             removeEventListener = function(target, type, listener, useCapture){
+                // #ifdef debug
+                easyXDM.Debug.trace("removing listener " + type);
+                // #endif
                 target.removeEventListener(type, listener, useCapture);
             };
         }
@@ -130,6 +133,9 @@ easyXDM.DomHelper = {
              * @param {Function} fpNotify
              */
             removeEventListener = function(object, sEvent, fpNotify){
+                // #ifdef debug
+                easyXDM.Debug.trace("removing listener " + type);
+                // #endif
                 object.detachEvent("on" + sEvent, fpNotify);
             };
         }
