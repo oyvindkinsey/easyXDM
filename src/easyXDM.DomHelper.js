@@ -7,9 +7,9 @@ easyXDM.DomHelper = {
     /**
      * Creates a frame and appends it to the DOM.
      * @param {String} url The url the frame should be set to
-     * @param {String} name The id/name the frame should get
-     * @param {DOMElement} container
-     * @param {Function} onLoad A method that should be called with the frames contentWindow as argument when the frame is fully loaded.
+     * @param {DOMElement} container Its parent element (Optional)
+     * @param {Function} onLoad A method that should be called with the frames contentWindow as argument when the frame is fully loaded. (Optional)
+     * @param {String} name The id/name the frame should get (Optional)
      * @return The frames DOMElement
      * @type DOMElement
      */
