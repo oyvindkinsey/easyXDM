@@ -218,7 +218,9 @@ easyXDM.transport = {
     
     /**
      * @class easyXDM.transport.HashTransport
-     * HashTransport is a transport class that uses the IFrame URL Technique for communication
+     * HashTransport is a transport class that uses the IFrame URL Technique for communication.<br/>
+     * This means that the amount of data that is possible to send in each message is limited to the length the browser
+     * allows for urls - the length of the url for <code>local</code>.
      * <a href="http://msdn.microsoft.com/en-us/library/bb735305.aspx">http://msdn.microsoft.com/en-us/library/bb735305.aspx</a>
      * @constructor
      * @param {easyXDM.configuration.TransportConfiguration} config The transports configuration.
@@ -248,16 +250,17 @@ easyXDM.transport = {
                 // We are using the current window to listen to
                 usePolling = true;
                 useParent = true;
-                config.local = location.protocol + "//" + location.host + location.pathname + location.search;
+                parameters.endpoint = encodeURIComponent(config.local = location.protocol + "//" + location.host + location.pathname + location.search);
                 parameters.parent = 1;
+            }
+            else {
+                parameters.endpoint = easyXDM.Url.resolveUrl(config.local);
             }
             if (config.container) {
                 useResize = false;
                 parameters.poll = 1;
             }
-            parameters.endpoint = easyXDM.Url.resolveUrl(config.local);
             _remoteUrl = easyXDM.Url.appendQueryParameters(config.remote, parameters);
-            
         }
         else {
             var query = easyXDM.Url.Query();
