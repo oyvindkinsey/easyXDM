@@ -22,19 +22,33 @@ easyXDM.DomHelper = {
         function loadFn(){
             onLoad(frame.contentWindow);
         }
-        if (name && window.attachEvent) {
+        if (name || window.attachEvent) {
             // Internet Explorer does not support setting the 
             // name om DOMElements created in Javascript.
             // A workaround is to insert HTML and have the browser parse
             // and instantiate the element.
-            var span = document.createElement("span");
-            document.body.appendChild(span);
-            span.innerHTML = '<iframe style="position:absolute;left:-2000px;" src="' + url + '" id="' + name + '" name="' + name + '"></iframe>';
-            frame = document.getElementById(name);
-            if (onLoad) {
-                frame.loadFn = loadFn;
-                this.addEventListener(frame, "load", loadFn);
+            if (false && !"ActiveXObject" in window) {
+                var doc = new ActiveXObject("htmlfile");
+                doc.open();
+                doc.write("<html><body><iframe id='iframe'></iframe></body></html>");
+                doc.close();
+                frame = doc.getElementById("iframe");
+                frame.realParent = window;
+                if (onLoad) {
+                    frame.onload = loadFn;
+                }
             }
+            else {
+                var span = document.createElement("span");
+                document.body.appendChild(span);
+                span.innerHTML = '<iframe style="position:absolute;left:-2000px;" src="' + url + '" id="' + name + '" name="' + name + '"></iframe>';
+                frame = span.firstChild;
+                if (onLoad) {
+                    frame.loadFn = loadFn;
+                    this.addEventListener(frame, "load", loadFn);
+                }
+            }
+            
         }
         else {
             if (!container && framesets && framesets.length > 0) {

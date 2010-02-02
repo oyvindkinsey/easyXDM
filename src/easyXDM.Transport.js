@@ -553,7 +553,13 @@ easyXDM.transport.NameTransport = function(config, onReady){
     
     _callerWindow = easyXDM.DomHelper.createFrame(config.local, null, function(){
         //remove the handler
-        easyXDM.DomHelper.removeEventListener(_callerWindow, "load", _callerWindow.loadFn);
+        if (_callerWindow.onload) {
+			// We are using the ActiveX document
+            _callerWindow.onload = null;
+        }
+        else {
+            easyXDM.DomHelper.removeEventListener(_callerWindow, "load", _callerWindow.loadFn);
+        }
         _onReady();
     });
     
