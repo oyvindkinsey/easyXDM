@@ -3,8 +3,10 @@ easyXDM.transport = {
     /**
      * @class easyXDM.transport.BestAvailableTransport
      * BestAvailableTransport is a transport class that uses the best transport available.<br/>
-     * Currently it will select among PostMessageTransport and HashTransport.<br/>
-     * The config parameter should should be usable by all transports.
+     * This class will first try to use the PostMessageTransport<br/>
+     * then the NameTransport if the <code>remoteHelper</code> parameter is set,<br/>
+     * and at last the HashTransport.<br/>
+     * The config parameter should contain all parameters needed for the different transports.
      * @constructor
      * @param {easyXDM.configuration.TransportConfiguration} config The transports configuration.
      * @param {Function} onReady A method that should be called when the transport is ready
@@ -15,23 +17,43 @@ easyXDM.transport = {
         easyXDM.Debug.trace("easyXDM.transport.BestAvailableTransport.constructor");
         // #endif
         // If no protocol is set then it means this is the host
-        var isHost = (typeof easyXDM.Url.Query().p === "undefined");
+        var query = easyXDM.Url.Query();
+        var isHost = (typeof query.p === "undefined");
+        var Transport;
         if (isHost) {
             config.channel = (config.channel) ? config.channel : "default";
+            if (window.postMessage) {
+                Transport = easyXDM.transport.PostMessageTransport;
+            }
+            else {
+                if (config.remoteHelper) {
+                    Transport = easyXDM.transport.NameTransport;
+                }
+                else {
+                    Transport = easyXDM.transport.HashTransport;
+                }
+            }
         }
         else {
-            var query = easyXDM.Url.Query();
             if (typeof query.endpoint !== "string") {
                 throw ("No remote specified");
             }
             config.channel = query.channel;
-            config.remote = query.endpoint;
+            config.remote = decodeURIComponent(query.endpoint);
+            switch (query.p) {
+                case "0":
+                    Transport = easyXDM.transport.HashTransport;
+                    break;
+                case "1":
+                    Transport = easyXDM.transport.PostMessageTransport;
+                    break;
+                case "2":
+                    Transport = easyXDM.transport.NameTransport;
+                    break;
+            }
         }
-        var type = "HashTransport";
-        if (window.postMessage) {
-            type = "PostMessageTransport";
-        }
-        return new easyXDM.transport[type](config, onReady);
+        
+        return new Transport(config, onReady);
     },
     /**
      * @class easyXDM.transport.PostMessageTransport
@@ -379,54 +401,6 @@ easyXDM.transport = {
         else {
             _callerWindow = easyXDM.DomHelper.createFrame(_remoteUrl, config.container, (isHost && !useParent) ? null : _onReady, (isHost ? "local_" : "remote_") + config.channel);
         }
-    },
-    
-    NameTransport: function(config, onReady){
-        // #ifdef debug
-        easyXDM.Debug.trace("easyXDM.transport.NameTransport.constructor");
-        // #endif
-        var channel_suffix = (config.local) ? '_a' : '_b';
-        var _callerWindow, readyCount = 0;
-        var remoteOrigin = easyXDM.Url.getLocation(config.remote);
-        
-        //todo: how do we get this?
-        var localHash = easyXDM.Url.resolveUrl("../hash.html");
-        var remoteHash = easyXDM.Url.resolveUrl("../hash.html");
-        
-        
-        this.postMessage = function(message){
-            // #ifdef debug
-            easyXDM.Debug.trace("sending message '" + message + "' to " + remoteOrigin);
-            // #endif
-            _callerWindow.contentWindow.name = message;
-            _callerWindow.contentWindow.location = remoteHash + "#" + encodeURIComponent(config.remote + "#" + config.channel + channel_suffix);
-            
-        };
-        
-        /**
-         * Tries to clean up the DOM
-         */
-        this.destroy = function(){
-            // #ifdef debug
-            easyXDM.Debug.trace("destroying transport");
-            // #endif
-            _callerWindow.parentNode.removeChild(_callerWindow);
-            _callerWindow = null;
-        };
-        
-        function _onReady(){
-            if (++readyCount === 2) {
-                if (onReady) {
-                    window.setTimeout(onReady, 10);
-                }
-            }
-        }
-        
-        if (config.local) {
-            var con = window.body.appendChild(document.createElement("div"));
-            con.innerHTML = '<iframe name="' + config.channel + channel_suffix + '_a" id="' + config.channel + channel_suffix + '" src="' + config.remote + '#' + config.channel + channel_suffix + '"></iframe>';
-        } //remote uses parent.parent
-        _callerWindow = easyXDM.DomHelper.createFrame(localHash, config.container, (config.local) ? null : _onReady);
     }
 };
 
@@ -464,4 +438,138 @@ easyXDM.transport.HashTransport.channelReady = function(channel, contentWindow){
  */
 easyXDM.transport.HashTransport.getWindow = function(channel){
     return easyXDM.transport.HashTransport.windows[channel];
+};
+
+
+/**
+ * @class easyXDM.transport.NameTransport
+ * NameTransport uses the window.name property to relay data - this means it can transport large amounts of data
+ * @constructor
+ * @param {easyXDM.configuration.TransportConfiguration} config The transports configuration.
+ * @param {Function} onReady A method that should be called when the transport is ready
+ * @cfg {String} local The url to the local instance of hash.html
+ * @cfg {String} remote The url to the remote document to interface with
+ * @cfg {String} remoteHelper The url to the remote instance of hash.html - this is only needed for the host.
+ * @cfg {Function} onMessage The method that should handle incoming messages.<br/> This method should accept two arguments, the message as a string, and the origin as a string.
+ * @namespace easyXDM.transport
+ */
+easyXDM.transport.NameTransport = function(config, onReady){
+    var me = this;
+    // #ifdef debug
+    easyXDM.Debug.trace("easyXDM.transport.NameTransport.constructor");
+    // #endif
+    // If no protocol is set then it means this is the host
+    var isHost = (typeof easyXDM.Url.Query().p === "undefined");
+    
+    var _callerWindow, remoteWindow, readyCount = 0;
+    var remoteOrigin = easyXDM.Url.getLocation(config.remote), remoteUrl;
+    
+    if (isHost) {
+        remoteUrl = easyXDM.Url.appendQueryParameters(config.remote, {
+            endpoint: easyXDM.Url.resolveUrl(config.local),
+            channel: config.channel,
+            p: 2
+        });
+    }
+    else {
+        config.remoteHelper = config.remote;
+    }
+    
+    config.local = easyXDM.Url.resolveUrl(config.local);
+    
+    /** 
+     * Sends a message by placing it in the <code>name</code> property of the callerwindow and then 
+     * redirecting the window to the remote instance of hash.html.<br/>
+     * hash.html will send the document back after having passed on the message.
+     * @param {String} message The message to send
+     */
+    this.postMessage = function(message){
+        // #ifdef debug
+        easyXDM.Debug.trace("sending message '" + message + "' to " + remoteOrigin);
+        // #endif
+        _callerWindow.contentWindow.name = message;
+        if (isHost) {
+            // #ifdef debug
+            easyXDM.Debug.trace("navigating to  '" + config.remoteHelper + "#_3" + encodeURIComponent(remoteUrl + "#" + config.channel) + "'");
+            // #endif
+            _callerWindow.contentWindow.location = config.remoteHelper + "#_3" + encodeURIComponent(remoteUrl + "#" + config.channel);
+        }
+        else {
+            // #ifdef debug
+            easyXDM.Debug.trace("navigating to  '" + config.remoteHelper + "#_3" + config.channel + "'");
+            // #endif
+            _callerWindow.contentWindow.location = config.remoteHelper + "#_2" + config.channel;
+        }
+    };
+    
+    /**
+     * Tries to clean up the DOM
+     */
+    this.destroy = function(){
+        // #ifdef debug
+        easyXDM.Debug.trace("destroying transport");
+        // #endif
+        _callerWindow.parentNode.removeChild(_callerWindow);
+        if (isHost) {
+            remoteWindow.parentNode.removeChild(remoteWindow);
+            remoteWindow = null;
+        }
+        _callerWindow = null;
+    };
+    
+    function _onReady(){
+        if (isHost) {
+            if (++readyCount === 2 || !isHost && onReady) {
+                window.setTimeout(onReady, 10);
+            }
+        }
+        else {
+            if (!isHost) {
+                me.postMessage("ready");
+            }
+            if (onReady) {
+                // #ifdef debug
+                easyXDM.Debug.trace("calling onReady");
+                // #endif
+                window.setTimeout(onReady, 10);
+            }
+        }
+        
+    }
+    
+    if (isHost) {
+        // #ifdef debug
+        easyXDM.Debug.trace("creating remote iframe '" + remoteUrl + '#' + config.channel + "'");
+        // #endif
+        var con = config.container.appendChild(document.createElement("div"));
+        con.innerHTML = '<iframe name="' + config.channel + '" id="' + config.channel + '" src="' + remoteUrl + '#' + config.channel + '"></iframe>';
+        remoteWindow = con.firstChild;
+        config.container.appendChild(remoteWindow);
+        config.container.removeChild(con);
+    }
+    
+    _callerWindow = easyXDM.DomHelper.createFrame(config.local, null, function(){
+        //remove the handler
+        easyXDM.DomHelper.removeEventListener(_callerWindow, "load", _callerWindow.loadFn);
+        _onReady();
+    });
+    
+    // Register the receiver
+    if (isHost) {
+        easyXDM.Fn.set(config.channel, function(message){
+            if (isHost && message === "ready") {
+                // Overwrite the handler
+                easyXDM.Fn.set(config.channel, function(message){
+                    config.onMessage(message, remoteOrigin);
+                });
+                _onReady();
+            }
+        });
+    }
+    else {
+        easyXDM.Fn.set(config.channel, function(message){
+            config.onMessage(message, remoteOrigin);
+        });
+    }
+    
 };

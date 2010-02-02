@@ -10,14 +10,15 @@
                     switch (location.hash.substring(2, 3)) {
                         case "2":
                             // NameTransport local
-                            window.parent.parent.easyXDM.fn.get(location.hash.substring(1))(window.name);
+                            window.parent.parent.easyXDM.Fn.get(location.hash.substring(3))(window.name);
+                            window.history.back();
                             break;
                         case "3":
                             // NameTransport remote
-                            var url = decodeURIComponent(location.hash.substring(1));
+                            var url = decodeURIComponent(location.hash.substring(3));
                             var channel = url.substring(url.indexOf("#") + 1);
                             var guest = window.open(url, channel);
-                            guest.easyXDM.transport.NameTransport.setData(channel, window.name);
+                            guest.easyXDM.Fn.get(channel)(window.name);
                             window.history.back();
                             break;
                     }
