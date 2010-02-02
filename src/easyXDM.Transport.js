@@ -467,9 +467,10 @@ easyXDM.transport.NameTransport = function(config, onReady){
     var _callerWindow, remoteWindow, readyCount = 0;
     var remoteOrigin = easyXDM.Url.getLocation(config.remote), remoteUrl;
     
+    config.local = easyXDM.Url.resolveUrl(config.local);
     if (isHost) {
         remoteUrl = easyXDM.Url.appendQueryParameters(config.remote, {
-            endpoint: easyXDM.Url.resolveUrl(config.local),
+            endpoint: config.local,
             channel: config.channel,
             p: 2
         });
@@ -478,10 +479,9 @@ easyXDM.transport.NameTransport = function(config, onReady){
         config.remoteHelper = config.remote;
     }
     
-    config.local = easyXDM.Url.resolveUrl(config.local);
     
     /** 
-     * Sends a message by placing it in the <code>name</code> property of the callerwindow and then 
+     * Sends a message by placing it in the <code>name</code> property of the callerwindow and then
      * redirecting the window to the remote instance of hash.html.<br/>
      * hash.html will send the document back after having passed on the message.
      * @param {String} message The message to send
