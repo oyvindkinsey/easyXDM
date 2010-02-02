@@ -1,3 +1,16 @@
+1.7.0 - 02.02.10
+Many adjustments has been made to how the transports select mode and how the BestAvailableTransport selects a transport.
+For the host the BestAvailableTransport will pick the best transport dependend on the available features and parameters.
+For the guest the BestAvailableTransport will choose the on specified in use by reading the query line.
+
+A new transport, NameTransport has also been introduced, and is now preferred over HashTransport as long as the
+correct parameters are set. This is due to its ability to transfer huge amounts of data compared to the HashTransport.
+This does on the other hand mean that the host need to specify the location of the remote hash.html.
+
+Breaking changes:
+The NameTransport will not work with users who has the old hash.html file, it is therefor adviced that you
+rename the hash.html file so that your uses will download the correct version.
+
 1.6.0 - 04.01.10
 Added the option to use the already loaded window as the local document for messaging when falling back 
 to the HashTransport. This can be done by setting 'local:window' in the transports configuration.
