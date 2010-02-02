@@ -393,3 +393,7 @@ easyXDM = {
         }
     }
 };
+
+// #ifdef debug
+easyXDM.Debug.log("easyXDM present on '" + location.href);
+// #endif

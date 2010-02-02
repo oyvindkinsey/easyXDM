@@ -464,61 +464,9 @@ easyXDM.transport.NameTransport = function(config, onReady){
     // If no protocol is set then it means this is the host
     var isHost = (typeof easyXDM.Url.Query().p === "undefined");
     
-    var _callerWindow, remoteWindow, readyCount = 0;
+    var callerWindow, remoteWindow, readyCount = 0;
     var remoteOrigin = easyXDM.Url.getLocation(config.remote), remoteUrl;
-    
     config.local = easyXDM.Url.resolveUrl(config.local);
-    if (isHost) {
-        remoteUrl = easyXDM.Url.appendQueryParameters(config.remote, {
-            endpoint: config.local,
-            channel: config.channel,
-            p: 2
-        });
-    }
-    else {
-        config.remoteHelper = config.remote;
-    }
-    
-    
-    /** 
-     * Sends a message by placing it in the <code>name</code> property of the callerwindow and then
-     * redirecting the window to the remote instance of hash.html.<br/>
-     * hash.html will send the document back after having passed on the message.
-     * @param {String} message The message to send
-     */
-    this.postMessage = function(message){
-        // #ifdef debug
-        easyXDM.Debug.trace("sending message '" + message + "' to " + remoteOrigin);
-        // #endif
-        _callerWindow.contentWindow.name = message;
-        if (isHost) {
-            // #ifdef debug
-            easyXDM.Debug.trace("navigating to  '" + config.remoteHelper + "#_3" + encodeURIComponent(remoteUrl + "#" + config.channel) + "'");
-            // #endif
-            _callerWindow.contentWindow.location = config.remoteHelper + "#_3" + encodeURIComponent(remoteUrl + "#" + config.channel);
-        }
-        else {
-            // #ifdef debug
-            easyXDM.Debug.trace("navigating to  '" + config.remoteHelper + "#_3" + config.channel + "'");
-            // #endif
-            _callerWindow.contentWindow.location = config.remoteHelper + "#_2" + config.channel;
-        }
-    };
-    
-    /**
-     * Tries to clean up the DOM
-     */
-    this.destroy = function(){
-        // #ifdef debug
-        easyXDM.Debug.trace("destroying transport");
-        // #endif
-        _callerWindow.parentNode.removeChild(_callerWindow);
-        if (isHost) {
-            remoteWindow.parentNode.removeChild(remoteWindow);
-            remoteWindow = null;
-        }
-        _callerWindow = null;
-    };
     
     function _onReady(){
         if (isHost) {
@@ -541,34 +489,76 @@ easyXDM.transport.NameTransport = function(config, onReady){
     }
     
     if (isHost) {
-        // #ifdef debug
-        easyXDM.Debug.trace("creating remote iframe '" + remoteUrl + '#' + config.channel + "'");
-        // #endif
-        remoteWindow = easyXDM.DomHelper.createFrame(remoteUrl, config.container, null, config.channel);
-    }
-    
-    _callerWindow = easyXDM.DomHelper.createFrame(config.local, null, function(){
-        //remove the handler
-        easyXDM.DomHelper.removeEventListener(_callerWindow, "load", _callerWindow.loadFn);
-        _onReady();
-    });
-    
-    // Register the receiver
-    if (isHost) {
+        // Register the callback
         easyXDM.Fn.set(config.channel, function(message){
             if (isHost && message === "ready") {
-                // Overwrite the handler
+                // Replace the handler
                 easyXDM.Fn.set(config.channel, function(message){
                     config.onMessage(message, remoteOrigin);
                 });
                 _onReady();
             }
         });
+        
+        // Set up the frame that points to the remote instance
+        remoteUrl = easyXDM.Url.appendQueryParameters(config.remote, {
+            endpoint: config.local,
+            channel: config.channel,
+            p: 2
+        });
+        
+        remoteWindow = easyXDM.DomHelper.createFrame(remoteUrl + '#' + config.channel, config.container, null, config.channel);
     }
     else {
+        config.remoteHelper = config.remote;
         easyXDM.Fn.set(config.channel, function(message){
             config.onMessage(message, remoteOrigin);
         });
     }
+    // Set up the iframe that will be used for the transport
+    callerWindow = easyXDM.DomHelper.createFrame(config.local, null, function(){
+        // Remove the handler
+        easyXDM.DomHelper.removeEventListener(callerWindow, "load", callerWindow.loadFn);
+        _onReady();
+    });
     
+    /** 
+     * Sends a message by placing it in the <code>name</code> property of the callerWindow and then
+     * redirecting the window to the remote instance of hash.html.<br/>
+     * hash.html will send the document back after having passed on the message.
+     * @param {String} message The message to send
+     */
+    this.postMessage = function(message){
+        // #ifdef debug
+        easyXDM.Debug.trace("sending message '" + message + "' to " + remoteOrigin);
+        // #endif
+        callerWindow.name = message;
+        if (isHost) {
+            // #ifdef debug
+            easyXDM.Debug.trace("navigating to '" + config.remoteHelper + "#_3" + encodeURIComponent(remoteUrl + "#" + config.channel) + "'");
+            // #endif
+            callerWindow.src = config.remoteHelper + "#_3" + encodeURIComponent(remoteUrl + "#" + config.channel);
+        }
+        else {
+            // #ifdef debug
+            easyXDM.Debug.trace("navigating to  '" + config.remoteHelper + "#_2" + config.channel + "'");
+            // #endif
+            callerWindow.src = config.remoteHelper + "#_2" + config.channel;
+        }
+    };
+    
+    /**
+     * Tries to clean up the DOM
+     */
+    this.destroy = function(){
+        // #ifdef debug
+        easyXDM.Debug.trace("destroying transport");
+        // #endif
+        callerWindow.parentNode.removeChild(callerWindow);
+        callerWindow = null;
+        if (isHost) {
+            remoteWindow.parentNode.removeChild(remoteWindow);
+            remoteWindow = null;
+        }
+    };
 };

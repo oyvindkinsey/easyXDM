@@ -29,7 +29,7 @@ easyXDM.DomHelper = {
             var span = document.createElement("span");
             document.body.appendChild(span);
             span.innerHTML = '<iframe style="position:absolute;left:-2000px;" src="' + url + '" id="' + name + '" name="' + name + '"></iframe>';
-            frame = document.getElementById(name);
+            frame = span.firstChild;
             if (onLoad) {
                 frame.loadFn = loadFn;
                 this.addEventListener(frame, "load", loadFn);
