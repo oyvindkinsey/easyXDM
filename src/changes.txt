@@ -1,3 +1,10 @@
+1.7.2 - 19.02.10
+Applied an important bugfix contributed by Bjorn Blomqvist (http://github.com/bjornblomqvist).
+The bug breaks easyXDM under the following conditions
+	the host is set up to use the BestAvailableTransport
+	the host is set up with local: window (to support HashTransport without hash.html)
+	the browser supports postMessage
+
 1.7.1 - 19.02.10
 Refactored the transport classes so that all query arguments are namespaced.
 This should avoid errors happening due to colliding argument names.
