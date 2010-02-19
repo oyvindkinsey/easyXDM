@@ -50,6 +50,9 @@ easyXDM.Url = {
     getLocation: function(url){
         var indexOf = url.indexOf("//");
         var loc = url.substring(indexOf + 2);
+        if (loc.indexOf("/") == -1) {
+            return url;
+        }
         loc = loc.substring(0, loc.indexOf("/"));
         return url.substring(0, indexOf + 2) + loc;
     },
