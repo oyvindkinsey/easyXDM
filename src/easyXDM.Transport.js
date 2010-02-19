@@ -20,7 +20,7 @@ easyXDM.transport = {
         // #endif
         // If no protocol is set then it means this is the host
         var query = easyXDM.Url.Query();
-        var isHost = (typeof query.p === "undefined");
+        var isHost = (typeof query.xdm_p === "undefined");
         var Transport;
         if (isHost) {
             config.channel = (config.channel) ? config.channel : "default";
@@ -42,7 +42,7 @@ easyXDM.transport = {
             }
             config.channel = query.channel;
             config.remote = decodeURIComponent(query.endpoint);
-            switch (query.p) {
+            switch (query.xdm_p) {
                 case "0":
                     Transport = easyXDM.transport.HashTransport;
                     break;
@@ -79,7 +79,7 @@ easyXDM.transport = {
         easyXDM.Debug.trace("easyXDM.transport.PostMessageTransport.constructor");
         // #endif
         // If no protocol is set then it means this is the host
-        var isHost = (typeof easyXDM.Url.Query().p === "undefined");
+        var isHost = (typeof easyXDM.Url.Query().xdm_p === "undefined");
         var _callerWindow, _targetOrigin = easyXDM.Url.getLocation(config.remote), _window_onMessageImplementation;
         
         /**
@@ -192,7 +192,7 @@ easyXDM.transport = {
                 _callerWindow = easyXDM.DomHelper.createFrame(easyXDM.Url.appendQueryParameters(config.remote, {
                     endpoint: easyXDM.Url.resolveUrl(config.local),
                     channel: config.channel,
-                    p: 1 // 1 = PostMessage
+                    xdm_p: 1 // 1 = PostMessage
                 }), config.container);
                 return function(message){
                     // #ifdef debug
@@ -239,7 +239,7 @@ easyXDM.transport = {
         easyXDM.Debug.trace("easyXDM.transport.HashTransport.constructor");
         // #endif
         // If no protocol is set then it means this is the host
-        var isHost = (typeof easyXDM.Url.Query().p === "undefined");
+        var isHost = (typeof easyXDM.Url.Query().xdm_p === "undefined");
         var _timer, pollInterval = config.interval || 300, usePolling = false, useParent = false, useResize = true;
         var _lastMsg = "#" + config.channel, _msgNr = 0, _listenerWindow, _callerWindow;
         var _remoteUrl, _remoteOrigin = easyXDM.Url.getLocation(config.remote);
@@ -247,7 +247,7 @@ easyXDM.transport = {
         if (isHost) {
             var parameters = {
                 channel: config.channel,
-                p: 0 // 0 = HashTransport
+                xdm_p: 0 // 0 = HashTransport
             };
             if (config.local === window) {
                 // We are using the current window to listen to
@@ -465,7 +465,7 @@ easyXDM.transport.NameTransport = function(config, onReady){
     easyXDM.Debug.trace("easyXDM.transport.NameTransport.constructor");
     // #endif
     // If no protocol is set then it means this is the host
-    var isHost = (typeof easyXDM.Url.Query().p === "undefined");
+    var isHost = (typeof easyXDM.Url.Query().xdm_p === "undefined");
     
     var callerWindow, remoteWindow, readyCount = 0;
     var remoteOrigin = easyXDM.Url.getLocation(config.remote), remoteUrl;
@@ -507,7 +507,7 @@ easyXDM.transport.NameTransport = function(config, onReady){
         remoteUrl = easyXDM.Url.appendQueryParameters(config.remote, {
             endpoint: config.local,
             channel: config.channel,
-            p: 2
+            xdm_p: 2
         });
         
         remoteWindow = easyXDM.DomHelper.createFrame(remoteUrl + '#' + config.channel, config.container, null, config.channel);
