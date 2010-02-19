@@ -7,7 +7,9 @@ if (_remoteUrl.indexOf("easyxdm.net") !== -1) {
 if (_remoteUrl.indexOf("localhost") !== -1) {
     _remoteUrl = _remoteUrl.replace("localhost", "127.0.0.1");
 }
+var channelId = 0;
 function runTests(){
+
     easyTest.test([/**Tests for the presence of namespaces and classes*/{
         name: "Check that the library is complete",
         steps: [{
@@ -82,7 +84,7 @@ function runTests(){
             run: function(){
                 var scope = this;
                 this.transport = new easyXDM.transport.NameTransport({
-                    channel: "default1",
+                    channel: "channel" + (channelId++),
                     local: "../hash.html",
                     remote: _remoteUrl + "test_transport.html",
                     remoteHelper: _remoteUrl + "../hash.html",
@@ -118,7 +120,7 @@ function runTests(){
             run: function(){
                 var scope = this;
                 this.transport = new easyXDM.transport.HashTransport({
-                    channel: "default1",
+                    channel: "channel" + (channelId++),
                     local: "../hash.html",
                     remote: _remoteUrl + "test_transport.html",
                     onMessage: function(message, origin){
@@ -153,7 +155,7 @@ function runTests(){
             run: function(){
                 var scope = this;
                 this.transport = new easyXDM.transport.HashTransport({
-                    channel: "default2",
+                    channel: "channel" + (channelId++),
                     local: "../hash.html",
                     remote: _remoteUrl + "test_transport.html",
                     onMessage: function(message, origin){
@@ -187,7 +189,7 @@ function runTests(){
             run: function(){
                 var scope = this;
                 this.transport = new easyXDM.transport.HashTransport({
-                    channel: "default7",
+                    channel: "channel" + (channelId++),
                     local: window,
                     remote: _remoteUrl + "test_transport.html",
                     onMessage: function(message, origin){
@@ -222,7 +224,7 @@ function runTests(){
             run: function(){
                 var scope = this;
                 this.transport = new easyXDM.transport.HashTransport({
-                    channel: "default6",
+                    channel: "channel" + (channelId++),
                     readyAfter: 1000,
                     local: "../changes.txt",
                     remote: _remoteUrl + "test_transport.html",
@@ -258,7 +260,7 @@ function runTests(){
             run: function(){
                 var scope = this;
                 this.transport = new easyXDM.transport.PostMessageTransport({
-                    channel: "default3",
+                    channel: "channel" + (channelId++),
                     local: "../hash.html",
                     remote: _remoteUrl + "test_transport.html",
                     onMessage: function(message, origin){
@@ -292,7 +294,7 @@ function runTests(){
             run: function(){
                 var scope = this;
                 this.transport = new easyXDM.transport.BestAvailableTransport({
-                    channel: "default4",
+                    channel: "channel" + (channelId++),
                     local: "../hash.html",
                     remote: _remoteUrl + "test_transport.html",
                     onMessage: function(message, origin){
@@ -326,7 +328,7 @@ function runTests(){
             run: function(){
                 var scope = this;
                 this.transport = new easyXDM.transport.BestAvailableTransport({
-                    channel: "default5",
+                    channel: "channel" + (channelId++),
                     local: "../hash.html",
                     remote: _remoteUrl + "test_transport.html?a=b&c=d",
                     onMessage: function(message, origin){
@@ -360,7 +362,7 @@ function runTests(){
             run: function(){
                 var scope = this;
                 this.remote = new easyXDM.Interface({
-                    channel: "default6",
+                    channel: "channel" + (channelId++),
                     local: "../hash.html",
                     remote: _remoteUrl + "test_interface.html"
                 }, {
@@ -414,8 +416,7 @@ function runTests(){
                 return ((document.getElementsByTagName("iframe").length === 0));
             }
         }]
-    }    /* Triggers bug when using config {local:window} with BestAvailableTransport that ends up using PostMessageTransport (tested in Opera 10.??,Firefox 3.5.7) */
-    , {
+    } /* Triggers bug when using config {local:window} with BestAvailableTransport that ends up using PostMessageTransport (tested in Opera 10.??,Firefox 3.5.7) */, {
         name: "test easyXDM.transport.BestAvailableTransport with local set to window",
         setUp: function(){
             this.expectedMessage = "5abcd1234";
@@ -426,7 +427,7 @@ function runTests(){
             run: function(){
                 var scope = this;
                 this.transport = new easyXDM.transport.BestAvailableTransport({
-                    channel: "default7",
+                    channel: "channel" + (channelId++),
                     local: window,
                     remote: _remoteUrl + "test_transport.html",
                     onMessage: function(message, origin){
@@ -461,7 +462,7 @@ function runTests(){
             run: function(){
                 var scope = this;
                 this.transport = new easyXDM.transport.PostMessageTransport({
-                    channel: "default8",
+                    channel: "channel" + (channelId++),
                     local: window,
                     remote: _remoteUrl + "test_transport.html",
                     onMessage: function(message, origin){
