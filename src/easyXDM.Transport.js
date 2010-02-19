@@ -190,7 +190,7 @@ easyXDM.transport = {
             if (isHost) {
                 _window_onMessageImplementation = _waitForReady;
                 _callerWindow = easyXDM.DomHelper.createFrame(easyXDM.Url.appendQueryParameters(config.remote, {
-                    xdm_e: easyXDM.Url.resolveUrl(config.local),
+                    xdm_e: location.protocol + "//" + location.host + location.pathname + location.search,
                     xdm_c: config.channel,
                     xdm_p: 1 // 1 = PostMessage
                 }), config.container);
