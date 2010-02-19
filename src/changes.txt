@@ -1,3 +1,13 @@
+1.7.1 - 19.02.10
+Refactored the transport classes so that all query arguments are namespaced.
+This should avoid errors happening due to colliding argument names.
+Examples of such errors are when using a wordpress page as the host, as wordpress' p argument (used for paging) would
+cause easyXDM to believe it was the provider instead of the consumer (host).
+
+Breaking changes:
+As longs as both parties are using the new version no errors will occur.
+But this version is unable to communicate with earlier versions.
+
 1.7.0 - 02.02.10
 Many adjustments has been made to how the transports select mode and how the BestAvailableTransport selects a transport.
 For the host the BestAvailableTransport will pick the best transport dependend on the available features and parameters.

@@ -37,11 +37,11 @@ easyXDM.transport = {
             }
         }
         else {
-            if (typeof query.endpoint !== "string") {
+            if (typeof query.xdm_e !== "string") {
                 throw ("No remote specified");
             }
-            config.channel = query.channel;
-            config.remote = decodeURIComponent(query.endpoint);
+            config.channel = query.xdm_c;
+            config.remote = decodeURIComponent(query.xdm_e);
             switch (query.xdm_p) {
                 case "0":
                     Transport = easyXDM.transport.HashTransport;
@@ -190,8 +190,8 @@ easyXDM.transport = {
             if (isHost) {
                 _window_onMessageImplementation = _waitForReady;
                 _callerWindow = easyXDM.DomHelper.createFrame(easyXDM.Url.appendQueryParameters(config.remote, {
-                    endpoint: easyXDM.Url.resolveUrl(config.local),
-                    channel: config.channel,
+                    xdm_e: easyXDM.Url.resolveUrl(config.local),
+                    xdm_c: config.channel,
                     xdm_p: 1 // 1 = PostMessage
                 }), config.container);
                 return function(message){
@@ -246,30 +246,30 @@ easyXDM.transport = {
         
         if (isHost) {
             var parameters = {
-                channel: config.channel,
+                xdm_c: config.channel,
                 xdm_p: 0 // 0 = HashTransport
             };
             if (config.local === window) {
                 // We are using the current window to listen to
                 usePolling = true;
                 useParent = true;
-                parameters.endpoint = encodeURIComponent(config.local = location.protocol + "//" + location.host + location.pathname + location.search);
-                parameters.parent = 1;
+                parameters.xdm_e = encodeURIComponent(config.local = location.protocol + "//" + location.host + location.pathname + location.search);
+                parameters.xdm_pa = 1; // use parent
             }
             else {
-                parameters.endpoint = easyXDM.Url.resolveUrl(config.local);
+                parameters.xdm_e = easyXDM.Url.resolveUrl(config.local);
             }
             if (config.container) {
                 useResize = false;
-                parameters.poll = 1;
+                parameters.xdm_po = 1; // use polling
             }
             _remoteUrl = easyXDM.Url.appendQueryParameters(config.remote, parameters);
         }
         else {
             var query = easyXDM.Url.Query();
             _listenerWindow = window;
-            useParent = (typeof query.parent !== "undefined");
-            usePolling = (typeof query.poll !== "undefined");
+            useParent = (typeof query.xdm_pa !== "undefined");
+            usePolling = (typeof query.xdm_po !== "undefined");
             _remoteUrl = config.remote + "#" + config.channel;
         }
         // #ifdef debug
@@ -505,8 +505,8 @@ easyXDM.transport.NameTransport = function(config, onReady){
         
         // Set up the frame that points to the remote instance
         remoteUrl = easyXDM.Url.appendQueryParameters(config.remote, {
-            endpoint: config.local,
-            channel: config.channel,
+            xdm_e: config.local,
+            xdm_c: config.channel,
             xdm_p: 2
         });
         
