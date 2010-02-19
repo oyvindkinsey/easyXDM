@@ -1,4 +1,6 @@
-/*global easyXDM, window*/
+/*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
+/*global easyXDM, window, escape, unescape */
+
 easyXDM.serializing = {
     /**
      * @class easyXDM.serializing.hashTableSerializer

@@ -1,3 +1,6 @@
+/*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
+/*global easyXDM, window, escape, unescape */
+
 /** 
  * @class easyXDM.DomHelper
  * Contains methods for dealing with the DOM

@@ -1,3 +1,6 @@
+/*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
+/*global easyXDM, window, escape, unescape */
+
 /** 
  * @class easyXDM.Url
  * Contains methods for dealing with url's

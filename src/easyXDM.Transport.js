@@ -1,4 +1,6 @@
-/*global easyXDM, window*/
+/*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
+/*global easyXDM, window, escape, unescape */
+
 easyXDM.transport = {
     /**
      * @class easyXDM.transport.BestAvailableTransport
@@ -65,6 +67,7 @@ easyXDM.transport = {
      * @param {Function} onReady A method that should be called when the transport is ready
      * @cfg {Mixed} local Any value that will evaluate as True
      * @cfg {String} remote The url to the remote document to interface with
+     * @cfg {String} channel The name of the channel to use
      * @cfg {Function} onMessage The method that should handle incoming messages.<br/> This method should accept two arguments, the message as a string, and the origin as a string.
      * @namespace easyXDM.transport
      */
