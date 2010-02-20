@@ -261,7 +261,6 @@ function runTests(){
                 var scope = this;
                 this.transport = new easyXDM.transport.PostMessageTransport({
                     channel: "channel" + (channelId++),
-                    local: "../hash.html",
                     remote: _remoteUrl + "test_transport.html",
                     onMessage: function(message, origin){
                         scope.notifyResult((scope.expectedMessage === message));
