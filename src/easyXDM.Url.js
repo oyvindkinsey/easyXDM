@@ -98,5 +98,32 @@ easyXDM.Url = {
             }
         }
         return url + ((url.indexOf("?") == -1) ? "?" : "&") + q.substring(0, q.length - 1);
+    },
+    findLocalResource: function(){
+        var loc = this.getLocation(location.href), tags = ["script", "img", "link"], ti = tags.length, els, el, abs = /^http(s)?\:\/\//, ei, src;
+        while (ti--) {
+            els = document.getElementsByTagName(tags[ti]);
+            ei = els.length;
+            while (ei--) {
+                el = els[ei];
+                src = el.src || el.href;
+                if (!src) {
+                    continue;
+                }
+                
+                if (abs.test(src)) {
+                    // The path is absolute, lets se if it matches
+                    if (src.substring(0, loc.length) === loc) {
+                        return src;
+                    }
+                }
+                else {
+                    // The path is relative, lets resolve and return it
+                    return this.resolveUrl(src);
+                }
+            }
+        }
+        // from server - robots.txt, favicon.ico - verify using xhr
+        return this.resolveUrl("/robots.txt");
     }
 };
