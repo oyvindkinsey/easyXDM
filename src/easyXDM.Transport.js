@@ -238,7 +238,16 @@ easyXDM.transport = {
         // #endif
         // If no protocol is set then it means this is the host
         var query = easyXDM.Url.Query(), isHost = (typeof query.xdm_p === "undefined");
-        if (!isHost) {
+        if (isHost) {
+            if (!config.local) {
+                // No local i s set, we must find a local resource and use readyAfter
+                config.local = easyXDM.Url.findLocalResource();
+                if (!config.readyAfter) {
+                    config.readyAfter = 1000;
+                }
+            }
+        }
+        else {
             config.channel = query.xdm_c;
             config.remote = decodeURIComponent(query.xdm_e);
         }
