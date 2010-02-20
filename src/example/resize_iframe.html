@@ -28,10 +28,7 @@
                      */
                     container: document.getElementById("embedded"),
                     onMessage: function(message, origin){
-                        var iframe = this.container.getElementsByTagName("iframe")[0];
-                        iframe.frameborder = 0;
-                        iframe.style.height = message + "px";
-                        
+                        this.container.getElementsByTagName("iframe")[0].style.height = message + "px";
                     }
                 });
             };
