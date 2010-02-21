@@ -60,7 +60,7 @@ easyXDM = {
                  * @param {String} msg
                  */
                 log = function(msg){
-                    console.log(location.host + ":" + msg);
+                    console.log(location.host + "-" + new Date().valueOf() + ":" + msg);
                 };
             }
             log(msg);
@@ -107,7 +107,7 @@ easyXDM = {
                      * @param {String} msg
                      */
                     trace = function(msg){
-                        console.info(location.host + ":" + msg);
+                        console.info(location.host + "-" + new Date().valueOf() + ":" + msg);
                     };
                 }
             }
