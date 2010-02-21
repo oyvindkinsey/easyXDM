@@ -28,6 +28,17 @@
                     window.parent.parent.easyXDM.transport.HashTransport.channelReady(location.hash.substring(1), window);
                 }
             }
+            else {
+                // To support the NameTransport
+                window.onunload = function(){
+                    try {
+                        window.name = window.parent.easyXDM.transport.NameTransport.message;
+                    } 
+                    catch (ex) {
+                    
+                    }
+                };
+            }
         </script>
     </head>
     <body>

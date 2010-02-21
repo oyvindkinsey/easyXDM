@@ -494,9 +494,15 @@ easyXDM.transport.NameTransport = function(config, onReady){
     if (isHost) {
         // Register the callback
         easyXDM.Fn.set(config.channel, function(message){
+            // #ifdef debug
+            easyXDM.Debug.trace("got initial message " + message);
+            // #endif
             if (isHost && message === "ready") {
                 // Replace the handler
                 easyXDM.Fn.set(config.channel, function(message){
+                    // #ifdef debug
+                    easyXDM.Debug.trace("got message " + message);
+                    // #endif
                     config.onMessage(message, remoteOrigin);
                 });
                 _onReady();
@@ -535,7 +541,7 @@ easyXDM.transport.NameTransport = function(config, onReady){
         // #ifdef debug
         easyXDM.Debug.trace("sending message '" + message + "' to " + remoteOrigin);
         // #endif
-        callerWindow.name = message;
+        easyXDM.transport.NameTransport.message = message;
         if (isHost) {
             // #ifdef debug
             easyXDM.Debug.trace("navigating to '" + config.remoteHelper + "#_3" + encodeURIComponent(remoteUrl + "#" + config.channel) + "'");
