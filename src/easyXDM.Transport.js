@@ -245,6 +245,8 @@ easyXDM.transport = {
         var _lastMsg = "#" + config.channel, _msgNr = 0, _listenerWindow, _callerWindow;
         var _remoteUrl, _remoteOrigin = easyXDM.Url.getLocation(config.remote);
         
+        var _queue = [], _queueTimer;
+        
         if (isHost) {
             var parameters = {
                 xdm_c: config.channel,
@@ -284,12 +286,44 @@ easyXDM.transport = {
             easyXDM.Debug.trace("using current window as " + (config.local ? "listenerWindow" : "callerWindow"));
         }
         // #endif
+        
+        
+        function _sendMessage(){
+            if (_queue.length === 0) {
+                _queueTimer = null;
+                return;
+            }
+            var message = _queue.pop();
+            if (isHost || !useParent) {
+                // We are referencing an iframe
+                _callerWindow.src = _remoteUrl + "#" + (_msgNr++) + "_" + encodeURIComponent(message);
+                if (useResize) {
+                    easyXDM.Debug.trace("resizing to new size " + (_callerWindow.width > 75 ? 50 : 100));
+                    _callerWindow.width = _callerWindow.width > 75 ? 50 : 100;
+                }
+            }
+            else {
+                // We are referencing the parent window
+                _callerWindow.location = _remoteUrl + "#" + (_msgNr++) + "_" + encodeURIComponent(message);
+            }
+            // #ifdef debug
+            easyXDM.Debug.trace("scheduling new send in " + (useResize ? 0 : (pollInterval * 1.5)) + "ms");
+            // #endif
+            _queueTimer = window.setTimeout(_sendMessage, useResize ? 0 : (pollInterval * 1.5));
+        }
+        function _scheduleMessage(message){
+            _queue.push(message);
+            if (!_queueTimer) {
+                _sendMessage();
+            }
+        }
         /**
          * Checks location.hash for a new message and relays this to the receiver.
          * @private
          */
         function _checkForMessage(){
             try {
+                easyXDM.Debug.trace("checking for new message");
                 if (_listenerWindow.location.hash && _listenerWindow.location.hash != _lastMsg) {
                     _lastMsg = _listenerWindow.location.hash;
                     // #ifdef debug
@@ -356,17 +390,7 @@ easyXDM.transport = {
             // #ifdef debug
             easyXDM.Debug.trace("sending message '" + message + "' to " + _remoteOrigin);
             // #endif
-            if (isHost || !useParent) {
-                // We are referencing an iframe
-                _callerWindow.src = _remoteUrl + "#" + (_msgNr++) + "_" + encodeURIComponent(message);
-                if (useResize) {
-                    _callerWindow.width = _callerWindow.width > 75 ? 50 : 100;
-                }
-            }
-            else {
-                // We are referencing the parent window
-                _callerWindow.location = _remoteUrl + "#" + (_msgNr++) + "_" + encodeURIComponent(message);
-            }
+            _scheduleMessage(message);
         };
         
         /**
