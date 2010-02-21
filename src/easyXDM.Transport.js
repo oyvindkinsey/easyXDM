@@ -221,7 +221,8 @@ easyXDM.transport = {
      * @class easyXDM.transport.HashTransport
      * HashTransport is a transport class that uses the IFrame URL Technique for communication.<br/>
      * This means that the amount of data that is possible to send in each message is limited to the length the browser
-     * allows for urls - the length of the url for <code>local</code>.
+     * allows for urls - the length of the url for <code>local</code>.<br/>
+     * The HashTransport does not guarantee that the messages are read, something that also applies to the optimistic queuing.<br/>
      * <a href="http://msdn.microsoft.com/en-us/library/bb735305.aspx">http://msdn.microsoft.com/en-us/library/bb735305.aspx</a>
      * @constructor
      * @param {easyXDM.configuration.TransportConfiguration} config The transports configuration.
@@ -291,6 +292,10 @@ easyXDM.transport = {
         // #endif
         
         
+        /**
+         * This will pop a message from the queue and send it
+         * @private
+         */
         function _sendMessage(){
             if (_queue.length === 0) {
                 _queueTimer = null;
@@ -312,14 +317,22 @@ easyXDM.transport = {
             // #ifdef debug
             easyXDM.Debug.trace("scheduling new send in " + (useResize ? 0 : (pollInterval * 1.5)) + "ms");
             // #endif
+            // We schedule a send even though the queue is empty in case a message is added to the queue before the intervall has passed
             _queueTimer = window.setTimeout(_sendMessage, useResize ? 0 : (pollInterval * 1.5));
         }
+        
+        /**
+         * This adds the message to the queue, and if no timer is in action invokes the _sendMessage method
+         * @param {String} message The message to send
+         * @private
+         */
         function _scheduleMessage(message){
             _queue.push(message);
             if (!_queueTimer) {
                 _sendMessage();
             }
         }
+        
         /**
          * Checks location.hash for a new message and relays this to the receiver.
          * @private
