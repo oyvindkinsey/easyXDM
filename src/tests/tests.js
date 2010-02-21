@@ -119,12 +119,17 @@ function runTests(){
             timeout: 5000,
             run: function(){
                 var scope = this;
+                var messages = 0;
                 this.transport = new easyXDM.transport.HashTransport({
                     channel: "channel" + (channelId++),
                     local: "../hash.html",
                     remote: _remoteUrl + "test_transport.html",
                     onMessage: function(message, origin){
-                        scope.notifyResult((scope.expectedMessage === message));
+                        if (scope.expectedMessage === message) {
+                            if (++messages === 2) {
+                                scope.notifyResult(true);
+                            }
+                        }
                     },
                     container: document.getElementById("embedded")
                 }, function(){
@@ -133,8 +138,9 @@ function runTests(){
             }
         }, {
             name: "message is echoed back",
-            timeout: 1000,
+            timeout: 2000,
             run: function(){
+                this.transport.postMessage(this.expectedMessage);
                 this.transport.postMessage(this.expectedMessage);
             }
         }, {
@@ -154,12 +160,17 @@ function runTests(){
             timeout: 5000,
             run: function(){
                 var scope = this;
+                var messages = 0;
                 this.transport = new easyXDM.transport.HashTransport({
                     channel: "channel" + (channelId++),
                     local: "../hash.html",
                     remote: _remoteUrl + "test_transport.html",
                     onMessage: function(message, origin){
-                        scope.notifyResult(scope.expectedMessage === message);
+                        if (scope.expectedMessage === message) {
+                            if (++messages === 2) {
+                                scope.notifyResult(true);
+                            }
+                        }
                     }
                 }, function(){
                     scope.notifyResult(true);
@@ -167,9 +178,11 @@ function runTests(){
             }
         }, {
             name: "message is echoed back",
-            timeout: 1000,
+            timeout: 2000,
             run: function(){
                 this.transport.postMessage(this.expectedMessage);
+                this.transport.postMessage(this.expectedMessage);
+                
             }
         }, {
             name: "destroy",
@@ -188,12 +201,15 @@ function runTests(){
             timeout: 5000,
             run: function(){
                 var scope = this;
+                var messages = 0;
                 this.transport = new easyXDM.transport.HashTransport({
                     channel: "channel" + (channelId++),
                     local: window,
                     remote: _remoteUrl + "test_transport.html",
                     onMessage: function(message, origin){
-                        scope.notifyResult(scope.expectedMessage === message);
+                        if (++messages === 2) {
+                            scope.notifyResult(true);
+                        }
                     }
                 }, function(){
                     scope.notifyResult(true);
@@ -203,6 +219,7 @@ function runTests(){
             name: "message is echoed back",
             timeout: 1000,
             run: function(){
+                this.transport.postMessage(this.expectedMessage);
                 this.transport.postMessage(this.expectedMessage);
             }
         }, {
@@ -223,13 +240,16 @@ function runTests(){
             timeout: 5000,
             run: function(){
                 var scope = this;
+                var messages = 0;
                 this.transport = new easyXDM.transport.HashTransport({
                     channel: "channel" + (channelId++),
                     readyAfter: 1000,
                     local: "../changes.txt",
                     remote: _remoteUrl + "test_transport.html",
                     onMessage: function(message, origin){
-                        scope.notifyResult(scope.expectedMessage === message);
+                        if (++messages === 2) {
+                            scope.notifyResult(true);
+                        }
                     }
                 }, function(){
                     scope.notifyResult(true);
@@ -239,6 +259,7 @@ function runTests(){
             name: "message is echoed back",
             timeout: 1000,
             run: function(){
+                this.transport.postMessage(this.expectedMessage);
                 this.transport.postMessage(this.expectedMessage);
             }
         }, {
