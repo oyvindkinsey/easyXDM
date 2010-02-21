@@ -272,6 +272,9 @@ easyXDM.transport = {
         else {
             _listenerWindow = window;
             useParent = (typeof query.xdm_pa !== "undefined");
+            if (useParent) {
+                useResize = false;
+            }
             usePolling = (typeof query.xdm_po !== "undefined");
             _remoteUrl = config.remote + "#" + config.channel;
         }
