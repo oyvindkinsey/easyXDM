@@ -62,6 +62,7 @@ easyXDM.Url = {
      * @return {String} The resolved url
      */
     resolveUrl: function(url){
+        var reParent = /\/[\d\w+%_\-]+\/\.\.\//;
         // If the url is a valid url we do nothing
         if (url.match(/^(http||https):\/\//)) {
             return url;
@@ -73,8 +74,8 @@ easyXDM.Url = {
         }
         path = path + url;
         // reduce all '/xyz/../' to just '/' 
-        while ((/\/[\d\w+%_-]+\/\.\.\//).test(path)) {
-            path = path.replace(/\/[\d\w+%_-]+\/\.\.\//, "/");
+        while (reParent.test(path)) {
+            path = path.replace(reParent, "/");
         }
         
         var resolved = location.protocol + "//" + location.host + path;

@@ -23,6 +23,7 @@
 	
 	<target name="jslint">
 		<jslint>
+			<formatter type="plain" />
 			<fileset dir="${project.src.dir}" includes="easyXDM*.js"/>
 		</jslint>
 	</target>
