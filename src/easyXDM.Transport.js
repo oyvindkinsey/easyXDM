@@ -301,7 +301,7 @@ easyXDM.transport = {
                 _queueTimer = null;
                 return;
             }
-            var message = _queue.pop();
+            var message = _queue.shift();
             if (isHost || !useParent) {
                 // We are referencing an iframe
                 _callerWindow.src = _remoteUrl + "#" + (_msgNr++) + "_" + encodeURIComponent(message);
