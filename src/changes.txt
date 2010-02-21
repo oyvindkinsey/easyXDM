@@ -1,3 +1,6 @@
+1.7.3 - 21.02.10
+Fixed NameTransport - for some unknown reason, the implementation released did not work.
+
 1.7.2 - 19.02.10
 Applied an important bugfix contributed by Bjorn Blomqvist (http://github.com/bjornblomqvist).
 The bug breaks easyXDM under the following conditions
