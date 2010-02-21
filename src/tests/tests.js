@@ -110,7 +110,7 @@ function runTests(){
             }
         }]
     }, {
-        name: "test easyXDM.transport.HashTransport using polling",
+        name: "test easyXDM.transport.HashTransport using polling and queuing",
         setUp: function(){
             this.expectedMessage = "1abcd1234";
         },
@@ -151,7 +151,7 @@ function runTests(){
             }
         }]
     }, {
-        name: "test easyXDM.transport.HashTransport using onresize",
+        name: "test easyXDM.transport.HashTransport using onresize and queuing",
         setUp: function(){
             this.expectedMessage = "2abcd1234";
         },
@@ -192,7 +192,7 @@ function runTests(){
             }
         }]
     }, {
-        name: "test easyXDM.transport.HashTransport using parent",
+        name: "test easyXDM.transport.HashTransport using parent and queuing",
         setUp: function(){
             this.expectedMessage = "2abcd1234";
         },
@@ -207,8 +207,10 @@ function runTests(){
                     local: window,
                     remote: _remoteUrl + "test_transport.html",
                     onMessage: function(message, origin){
-                        if (++messages === 2) {
-                            scope.notifyResult(true);
+                        if (scope.expectedMessage === message) {
+                            if (++messages === 2) {
+                                scope.notifyResult(true);
+                            }
                         }
                     }
                 }, function(){
@@ -230,7 +232,7 @@ function runTests(){
             }
         }]
     }, {
-        name: "test easyXDM.transport.HashTransport using readyAfter",
+        name: "test easyXDM.transport.HashTransport using readyAfter and queuing",
         failedMessage: "This can fail in some modern browsers like Firefox, but this is OK as it is only needed for older browsers like IE6/IE7.",
         setUp: function(){
             this.expectedMessage = "2abcd1234";
