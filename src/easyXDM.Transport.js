@@ -293,7 +293,8 @@ easyXDM.transport = {
         
         
         /**
-         * This will pop a message from the queue and send it
+         * This will send the first message in the queue.
+         * If the queue is empty it will just null the timer and exit .
          * @private
          */
         function _sendMessage(){
