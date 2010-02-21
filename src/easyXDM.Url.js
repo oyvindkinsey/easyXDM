@@ -71,7 +71,13 @@ easyXDM.Url = {
         if (path.substring(path.length - 1) !== "/") {
             path = path.substring(0, path.lastIndexOf("/") + 1);
         }
-        var resolved = location.protocol + "//" + location.host + path + url;
+        path = path + url;
+        // reduce all '/xyz/../' to just '/' 
+        while ((/\/[\d\w+%_-]+\/\.\.\//).test(path)) {
+            path = path.replace(/\/[\d\w+%_-]+\/\.\.\//, "/");
+        }
+        
+        var resolved = location.protocol + "//" + location.host + path;
         // #ifdef debug
         easyXDM.Debug.trace("resolved url '" + url + ' into ' + resolved + "'");
         // #endif
