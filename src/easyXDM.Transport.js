@@ -244,7 +244,7 @@ easyXDM.transport = {
             config.remote = decodeURIComponent(query.xdm_e);
         }
         var _timer, pollInterval = config.interval || 300, usePolling = false, useParent = false, useResize = true;
-        var _lastMsg = "#" + config.channel, _msgNr = 0, _listenerWindow, _callerWindow;
+        var _lastMsg = "#" + config.channel, _msgNr = 0, _listenerWindow, _callerWindow, _maxFragmentSize;
         var _remoteUrl, _remoteOrigin = easyXDM.Url.getLocation(config.remote);
         
         var _queue = [], _queueTimer, _incomming = "";
@@ -279,7 +279,10 @@ easyXDM.transport = {
             usePolling = (typeof query.xdm_po !== "undefined");
             _remoteUrl = config.remote + "#" + config.channel;
         }
+        // IE6 has a limit of 4095 - we reserve 95 for meta data etc.
+        _maxFragmentSize = 4000 - _remoteUrl.length;
         // #ifdef debug
+        easyXDM.Debug.trace("using a max fragment size of " + _maxFragmentSize + " characters");
         if (usePolling) {
             easyXDM.Debug.trace("using polling to listen");
         }
@@ -307,7 +310,7 @@ easyXDM.transport = {
             // #ifdef debug
             easyXDM.Debug.trace("sending message " + message.data);
             // #endif
-            var url = _remoteUrl + "#" + (_msgNr++) + "_" + message.more + "_" + encodeURIComponent(message.data);
+            var url = _remoteUrl + "#" + (_msgNr++) + "_" + message.more + "_" + message.data;
             
             if (isHost || !useParent) {
                 // We are referencing an iframe
@@ -343,9 +346,9 @@ easyXDM.transport = {
                     var message = _lastMsg.substring(_lastMsg.indexOf("_") + 1);
                     var indexOf = message.indexOf("_");
                     var more = parseInt(message.substring(0, indexOf), 10);
-                    _incomming += decodeURIComponent(message.substring(indexOf + 1));
+                    _incomming += message.substring(indexOf + 1);
                     if (more === 0) {
-                        config.onMessage(_incomming, _remoteOrigin);
+                        config.onMessage(decodeURIComponent(_incomming), _remoteOrigin);
                         _incomming = "";
                     }
                 }
@@ -408,8 +411,8 @@ easyXDM.transport = {
             // #ifdef debug
             easyXDM.Debug.trace("scheduling message '" + message + "' to " + _remoteOrigin);
             // #endif
-            var fragSize = 1000;
-            if (message.length <= fragSize) {
+            message = encodeURIComponent(message);
+            if (message.length <= _maxFragmentSize) {
                 _queue.push({
                     data: message,
                     more: 0
@@ -418,7 +421,7 @@ easyXDM.transport = {
             else {
                 var fragments = [], fragment;
                 while (message) {
-                    fragment = message.substring(0, fragSize);
+                    fragment = message.substring(0, _maxFragmentSize);
                     message = message.substring(fragment.length);
                     fragments.push(fragment);
                 }

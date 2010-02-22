@@ -280,9 +280,9 @@ function runTests(){
             }
         }]
     }, {
-        name: "test easyXDM.transport.HashTransport with fragmentation (4096)",
+        name: "test easyXDM.transport.HashTransport with fragmentation (8192)",
         setUp: function(){
-            var i = 10;
+            var i = 11;
             this.expectedMessage = "aaaa";
             while (i--) {
                 this.expectedMessage += this.expectedMessage;
