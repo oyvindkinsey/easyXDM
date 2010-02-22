@@ -272,6 +272,45 @@ function runTests(){
             }
         }]
     }, {
+        name: "test easyXDM.transport.HashTransport with fragmentation (4096)",
+        setUp: function(){
+            var i = 10;
+            this.expectedMessage = "aaaa";
+            while (i--) {
+                this.expectedMessage += this.expectedMessage;
+            }
+        },
+        steps: [{
+            name: "onReady is fired",
+            timeout: 5000,
+            run: function(){
+                var scope = this;
+                this.transport = new easyXDM.transport.HashTransport({
+                    channel: "channel" + (channelId++),
+                    local: "../hash.html",
+                    remote: _remoteUrl + "test_transport.html",
+                    onMessage: function(message, origin){
+                        scope.notifyResult(scope.expectedMessage === message);
+                    },
+                    container: document.getElementById("embedded")
+                }, function(){
+                    scope.notifyResult(true);
+                });
+            }
+        }, {
+            name: "message is echoed back",
+            timeout: 5000,
+            run: function(){
+                this.transport.postMessage(this.expectedMessage);
+            }
+        }, {
+            name: "destroy",
+            run: function(){
+                this.transport.destroy();
+                return ((document.getElementsByTagName("iframe").length === 0));
+            }
+        }]
+    }, {
         name: "test easyXDM.transport.PostMessageTransport",
         failedMessage: "This will fail in older browsers like IE6/IE7 as these do not support the postMessage interface.",
         setUp: function(){

@@ -247,7 +247,7 @@ easyXDM.transport = {
         var _lastMsg = "#" + config.channel, _msgNr = 0, _listenerWindow, _callerWindow;
         var _remoteUrl, _remoteOrigin = easyXDM.Url.getLocation(config.remote);
         
-        var _queue = [], _queueTimer;
+        var _queue = [], _queueTimer, _incomming = "";
         
         if (isHost) {
             var parameters = {
@@ -303,9 +303,15 @@ easyXDM.transport = {
                 return;
             }
             var message = _queue.shift();
+            
+            // #ifdef debug
+            easyXDM.Debug.trace("sending message " + message.data);
+            // #endif
+            var url = _remoteUrl + "#" + (_msgNr++) + "_" + message.more + "_" + encodeURIComponent(message.data);
+            
             if (isHost || !useParent) {
                 // We are referencing an iframe
-                _callerWindow.src = _remoteUrl + "#" + (_msgNr++) + "_" + encodeURIComponent(message);
+                _callerWindow.src = url;
                 if (useResize) {
                     easyXDM.Debug.trace("resizing to new size " + (_callerWindow.width > 75 ? 50 : 100));
                     _callerWindow.width = _callerWindow.width > 75 ? 50 : 100;
@@ -313,25 +319,13 @@ easyXDM.transport = {
             }
             else {
                 // We are referencing the parent window
-                _callerWindow.location = _remoteUrl + "#" + (_msgNr++) + "_" + encodeURIComponent(message);
+                _callerWindow.location = url;
             }
             // #ifdef debug
             easyXDM.Debug.trace("scheduling new send in " + (useResize ? 0 : (pollInterval * 1.5)) + "ms");
             // #endif
             // We schedule a send even though the queue is empty in case a message is added to the queue before the intervall has passed
             _queueTimer = window.setTimeout(_sendMessage, useResize ? 0 : (pollInterval * 1.5));
-        }
-        
-        /**
-         * This adds the message to the queue, and if no timer is in action invokes the _sendMessage method
-         * @param {String} message The message to send
-         * @private
-         */
-        function _scheduleMessage(message){
-            _queue.push(message);
-            if (!_queueTimer) {
-                _sendMessage();
-            }
         }
         
         /**
@@ -346,7 +340,14 @@ easyXDM.transport = {
                     // #ifdef debug
                     easyXDM.Debug.trace("received message '" + _lastMsg + "' from " + _remoteOrigin);
                     // #endif
-                    config.onMessage(decodeURIComponent(_lastMsg.substring(_lastMsg.indexOf("_") + 1)), _remoteOrigin);
+                    var message = _lastMsg.substring(_lastMsg.indexOf("_") + 1);
+                    var indexOf = message.indexOf("_");
+                    var more = parseInt(message.substring(0, indexOf), 10);
+                    _incomming += decodeURIComponent(message.substring(indexOf + 1));
+                    if (more === 0) {
+                        config.onMessage(_incomming, _remoteOrigin);
+                        _incomming = "";
+                    }
                 }
             } 
             catch (ex) {
@@ -405,9 +406,32 @@ easyXDM.transport = {
          */
         this.postMessage = function(message){
             // #ifdef debug
-            easyXDM.Debug.trace("sending message '" + message + "' to " + _remoteOrigin);
+            easyXDM.Debug.trace("scheduling message '" + message + "' to " + _remoteOrigin);
             // #endif
-            _scheduleMessage(message);
+            var fragSize = 1000;
+            if (message.length <= fragSize) {
+                _queue.push({
+                    data: message,
+                    more: 0
+                });
+            }
+            else {
+                var fragments = [], fragment;
+                while (message) {
+                    fragment = message.substring(0, fragSize);
+                    message = message.substring(fragment.length);
+                    fragments.push(fragment);
+                }
+                while (fragments.length > 0) {
+                    _queue.push({
+                        data: fragments.shift(),
+                        more: fragments.length
+                    });
+                }
+            }
+            if (!_queueTimer) {
+                _sendMessage();
+            }
         };
         
         /**
