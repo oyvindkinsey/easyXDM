@@ -1,3 +1,8 @@
+1.7.4 - 22.02.10
+Implemented queing for NameTransport, this also made it more reliable.
+This means that all transports now support rapid sending of messages, even within the same js thread.
+The tests has also been updated, and from tests that are supposed to fail are now skipped by default. 
+
 1.7.3 - 21.02.10
 Fixed NameTransport - for some unknown reason, the implementation released did not work.
 
