@@ -635,8 +635,8 @@ easyXDM.transport.NameTransport = function(config, onReady){
      */
     this.postMessage = function(message){
         // #ifdef debug
-        easyXDM.Debug.trace("queueing message '" + message + "' to " + remoteOrigin);
-        // #endif
+        easyXDM.Debug.trace("queing message '" + message + "' to " + remoteOrigin);
+        // #endif	
         _queue.push(message);
         if (_queue.length === 1 && !_inMotion) {
             _sendMessage();
