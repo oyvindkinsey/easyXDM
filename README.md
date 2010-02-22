@@ -3,13 +3,14 @@ easyXDM - easy Cross-Domain Messaging
 easyXDM is a javascript library created to enable web developers
 to easily communicate and expose javascript API's across domain boundaries.
 
-Some of the goals for the project are
-* easy to use!!!
-* self contained, no dependencies (not counting JSON)
-* light weight
-* flexible
-* good code quality (uses jslint etc)
-* good documentation
+Some of the goals for the project are that it should
+
+* be easy to use!!!
+* be self contained, no dependencies (not counting JSON)
+* be light weight
+* be flexible
+* have good code quality (uses jslint etc)
+* have good documentation
 
 The library provides three layers of *abstraction* that simplifies development and usage.
 
