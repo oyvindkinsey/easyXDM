@@ -86,7 +86,6 @@
 		<delete file="work\easyXDM.combined.js" quiet="true"/>
 		
 		<copy todir="${project.build.artifactdir}\v${project.build.version}">
-			<fileset dir="." includes="${project.src.dir}\header.html" />
 			<fileset dir="work"/>
 			<fileset file= "MIT-license.txt"/>
 			<fileset file= "README.txt"/>
@@ -115,8 +114,8 @@
 	</target>
 	
 	<target name="publish" depends="package">
-		<delete dir="${project.build.publishdir}\source\" quiet="true" />
-		<copy todir="${project.build.publishdir}\source\">
+		<delete dir="${project.build.publishdir}\dev\" quiet="true" />
+		<copy todir="${project.build.publishdir}\dev\">
 			<fileset dir="${project.build.artifactdir}\v${project.build.version}"/>
 		</copy>	
 		<copy todir="${project.build.publishdir}\v${project.build.version}">

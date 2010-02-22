@@ -35,5 +35,5 @@ There are several examples and demos at the [wiki](http://easyxdm.net/wiki/) and
 Tests
 -----
 You can run the tests for the latest released version [here](http://easyxdm.net/current/tests/) 
-or run the tests for the repository's master#HEAD [here](http://easyxdm.net/source/tests/)
+or run the tests for the repository's master#HEAD [here](http://easyxdm.net/dev/tests/)
 
