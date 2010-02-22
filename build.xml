@@ -2,7 +2,7 @@
 <project name="easyXDM" default="build" basedir=".">
 	<property file="build.properties"/>
 	<property name="project.build.artifactdir" value=".\artifacts\"/>
-	<property name="project.build.publishdir" value=".\publish\"/>
+	<property name="project.build.publishdir" value=".\artifacts\"/>
 	<property name="project.build.version" value="1.7.3"/>
 	
 	<!-- Setup classpath for js-build-tools ant tasks -->
@@ -119,14 +119,17 @@
 	</target>
 	
 	<target name="publish" depends="package">
-		<delete dir="${project.build.publishdir}" quiet="true" />
-		<copy todir="${project.build.publishdir}">
+		<delete dir="${project.build.publishdir}\source\" quiet="true" />
+		<copy todir="${project.build.publishdir}\source\">
 			<fileset dir="${project.build.artifactdir}\v${project.build.version}"/>
 		</copy>	
-		<copy todir="${project.build.publishdir}\docs\">
+		<copy todir="${project.build.publishdir}\v${project.build.version}">
+			<fileset dir="${project.build.artifactdir}\v${project.build.version}"/>
+		</copy>	
+		<copy todir="${project.build.publishdir}\v${project.build.version}\docs\">
 			<fileset dir="${project.build.artifactdir}\v${project.build.version}-docs"/>
 		</copy>
-		<copy file="${project.build.artifactdir}${ant.project.name}-${project.build.version}.${build.number}.zip" tofile="${project.build.publishdir}\source.zip" />
-		<copy file="${project.build.artifactdir}${ant.project.name}-${project.build.version}.${build.number}-docs.zip" tofile="${project.build.publishdir}\docs.zip" />
+		<copy file="${project.build.artifactdir}${ant.project.name}-${project.build.version}.${build.number}.zip" tofile="${project.build.publishdir}\v${project.build.version}\source.zip" />
+		<copy file="${project.build.artifactdir}${ant.project.name}-${project.build.version}.${build.number}-docs.zip" tofile="${project.build.publishdir}\v${project.build.version}\docs.zip" />
 	</target>
 </project>
