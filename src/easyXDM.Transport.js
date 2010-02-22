@@ -547,9 +547,7 @@ easyXDM.transport.NameTransport = function(config, onReady){
             }
         }
         else {
-            if (!isHost) {
-                me.postMessage("ready");
-            }
+            me.postMessage("ready");
             if (onReady) {
                 // #ifdef debug
                 easyXDM.Debug.trace("calling onReady");
@@ -570,7 +568,7 @@ easyXDM.transport.NameTransport = function(config, onReady){
                 // Replace the handler
                 easyXDM.Fn.set(config.channel, function(message){
                     // #ifdef debug
-                    easyXDM.Debug.trace("got message " + message);
+                    easyXDM.Debug.trace("received message " + message);
                     // #endif
                     config.onMessage(message, remoteOrigin);
                 });
@@ -590,6 +588,9 @@ easyXDM.transport.NameTransport = function(config, onReady){
     else {
         config.remoteHelper = config.remote;
         easyXDM.Fn.set(config.channel, function(message){
+            // #ifdef debug
+            easyXDM.Debug.trace("received message " + message);
+            // #endif
             config.onMessage(message, remoteOrigin);
         });
     }
