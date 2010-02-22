@@ -83,14 +83,10 @@
 			<fileset dir="." includes="work\easyXDM.Widgets.min.js" />
 		</concat>
 		
-		<concat destfile="${project.build.artifactdir}\v${project.build.version}\hash.html">
-			<fileset dir="." includes="${project.src.dir}\header.html" />
-			<fileset dir="." includes="work\hash.html" />
-		</concat>
-		
 		<delete file="work\easyXDM.combined.js" quiet="true"/>
 		
 		<copy todir="${project.build.artifactdir}\v${project.build.version}">
+			<fileset dir="." includes="${project.src.dir}\header.html" />
 			<fileset dir="work"/>
 			<fileset file= "MIT-license.txt"/>
 			<fileset file= "README.txt"/>
