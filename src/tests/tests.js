@@ -73,7 +73,7 @@ function runTests(){
             }
         }]
     }, {
-        name: "test easyXDM.transport.NameTransport using queing",
+        name: "test easyXDM.transport.NameTransport using queuing",
         runIf: function(){
             if (typeof window.postMessage !== "undefined") {
                 return "This test will often fail in modern browser due to window.open() not always returning existing windows";
