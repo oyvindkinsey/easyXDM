@@ -536,7 +536,7 @@ easyXDM.transport.NameTransport = function(config, onReady){
         config.channel = query.xdm_c;
         config.remote = decodeURIComponent(query.xdm_e);
     }
-    var callerWindow, remoteWindow, readyCount = 0;
+    var callerWindow, remoteWindow, readyCount = 0, _queue = [], _inMotion = false;
     var remoteOrigin = easyXDM.Url.getLocation(config.remote), remoteUrl;
     config.local = easyXDM.Url.resolveUrl(config.local);
     
@@ -594,10 +594,37 @@ easyXDM.transport.NameTransport = function(config, onReady){
             config.onMessage(message, remoteOrigin);
         });
     }
+    
+    function _sendMessage(){
+        easyXDM.Debug.trace("_sendMessage");
+        if (_queue.length === 0) {
+            easyXDM.Debug.trace("queue empty");
+            _inMotion = false;
+            return;
+        }
+        _inMotion = true;
+        var message = _queue.shift(), url;
+        // #ifdef debug
+        easyXDM.Debug.trace("sending message " + message);
+        // #endif
+        if (isHost) {
+            url = config.remoteHelper + "#_3" + encodeURIComponent(remoteUrl + "#" + config.channel);
+        }
+        else {
+            url = config.remoteHelper + "#_2" + config.channel;
+        }
+        // #ifdef debug
+        easyXDM.Debug.trace("navigating to  '" + config.remoteHelper + "#_2" + config.channel + "'");
+        // #endif
+        callerWindow.contentWindow.sendMessage(message, url);
+    }
+    
+    
     // Set up the iframe that will be used for the transport
     callerWindow = easyXDM.DomHelper.createFrame(config.local, null, function(){
         // Remove the handler
         easyXDM.DomHelper.removeEventListener(callerWindow, "load", callerWindow.loadFn);
+        easyXDM.Fn.set(config.channel + "_load", _sendMessage);
         _onReady();
     });
     
@@ -609,20 +636,11 @@ easyXDM.transport.NameTransport = function(config, onReady){
      */
     this.postMessage = function(message){
         // #ifdef debug
-        easyXDM.Debug.trace("sending message '" + message + "' to " + remoteOrigin);
+        easyXDM.Debug.trace("queueing message '" + message + "' to " + remoteOrigin);
         // #endif
-        easyXDM.transport.NameTransport.message = message;
-        if (isHost) {
-            // #ifdef debug
-            easyXDM.Debug.trace("navigating to '" + config.remoteHelper + "#_3" + encodeURIComponent(remoteUrl + "#" + config.channel) + "'");
-            // #endif
-            callerWindow.src = config.remoteHelper + "#_3" + encodeURIComponent(remoteUrl + "#" + config.channel);
-        }
-        else {
-            // #ifdef debug
-            easyXDM.Debug.trace("navigating to  '" + config.remoteHelper + "#_2" + config.channel + "'");
-            // #endif
-            callerWindow.src = config.remoteHelper + "#_2" + config.channel;
+        _queue.push(message);
+        if (_queue.length === 1 && !_inMotion) {
+            _sendMessage();
         }
     };
     

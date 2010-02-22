@@ -5,39 +5,42 @@
         <meta http-equiv="CACHE-CONTROL" content="PUBLIC"/>
         <meta http-equiv="EXPIRES" content="Sat, 01 Jan 2050 00:00:00 GMT"/>
         <script type="text/javascript">
+            var channel;
+            window.sendMessage = function(message, url){
+                window.setTimeout(function(){
+                    window.name = message;
+                    location.href = url;
+                }, 0);
+            };
             if (location.hash) {
                 if (location.hash.substring(1, 2) === "_") {
                     switch (location.hash.substring(2, 3)) {
                         case "2":
                             // NameTransport local
-                            window.parent.parent.easyXDM.Fn.get(location.hash.substring(3))(window.name);
+                            channel = location.hash.substring(3);
+                            window.parent.parent.easyXDM.Fn.get(channel)(window.name);
                             window.history.back();
                             break;
                         case "3":
                             // NameTransport remote
                             var url = decodeURIComponent(location.hash.substring(3));
-                            var channel = url.substring(url.indexOf("#") + 1);
+                            channel = url.substring(url.indexOf("#") + 1);
                             var guest = window.open(url, channel);
                             guest.easyXDM.Fn.get(channel)(window.name);
                             window.history.back();
                             break;
+                        case "4":
+                            // NameTransport idle
+                            var fn = window.parent.easyXDM.Fn.get(location.hash.substring(3) + "_load");
+                            if (fn) {
+                                fn();
+                            }
                     }
                 }
                 else {
                     // The old HashTransport
                     window.parent.parent.easyXDM.transport.HashTransport.channelReady(location.hash.substring(1), window);
                 }
-            }
-            else {
-                // To support the NameTransport
-                window.onunload = function(){
-                    try {
-                        window.name = window.parent.easyXDM.transport.NameTransport.message;
-                    } 
-                    catch (ex) {
-                    
-                    }
-                };
             }
         </script>
     </head>
