@@ -619,9 +619,8 @@ easyXDM.transport.NameTransport = function(config, onReady){
         callerWindow.contentWindow.sendMessage(message, url);
     }
     
-    
     // Set up the iframe that will be used for the transport
-    callerWindow = easyXDM.DomHelper.createFrame(config.local, null, function(){
+    callerWindow = easyXDM.DomHelper.createFrame(config.local + "#_4" + config.channel, null, function(){
         // Remove the handler
         easyXDM.DomHelper.removeEventListener(callerWindow, "load", callerWindow.loadFn);
         easyXDM.Fn.set(config.channel + "_load", _sendMessage);
