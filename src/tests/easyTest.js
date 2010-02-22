@@ -169,27 +169,37 @@ var easyTest = (function(){
              * Will first try to execute the setup method before continuing the steps
              */
             run: function(){
-                _log("Running test '" + test.name + "'");
-                _scope = {
-                    Assert: Assert,
-                    log: _log,
-                    notifyResult: function(result){
-                        window.clearTimeout(_timer);
-                        _notifyResult(_step.name, result);
-                    }
-                };
-                if (test.setUp) {
-                    // Setup the test
-                    try {
-                        test.setUp.call(_scope);
-                        _log("Setup succeeded", MessageType.Success);
-                    } 
-                    catch (ex) {
-                        _log("Setup failed", MessageType.Error);
-                    }
+                var excuse;
+                if (test.runIf) {
+                    excuse = test.runIf();
                 }
-                _startedAt = new Date();
-                _runStep();
+                if (excuse) {
+                    _log("Skipping test ' " + test.name + "'. " + excuse);
+					fn();
+                }
+                else {
+                    _log("Running test '" + test.name + "'");
+                    _scope = {
+                        Assert: Assert,
+                        log: _log,
+                        notifyResult: function(result){
+                            window.clearTimeout(_timer);
+                            _notifyResult(_step.name, result);
+                        }
+                    };
+                    if (test.setUp) {
+                        // Setup the test
+                        try {
+                            test.setUp.call(_scope);
+                            _log("Setup succeeded", MessageType.Success);
+                        } 
+                        catch (ex) {
+                            _log("Setup failed", MessageType.Error);
+                        }
+                    }
+                    _startedAt = new Date();
+                    _runStep();
+                }
             }
         };
     }

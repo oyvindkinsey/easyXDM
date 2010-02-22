@@ -74,7 +74,11 @@ function runTests(){
         }]
     }, {
         name: "test easyXDM.transport.NameTransport",
-        failedMessage: "This can fail in some modern browsers like Firefox, but this is OK as it is only needed for older browsers like IE6/IE7.",
+        runIf: function(){
+            if (typeof window.postMessage !== "undefined") {
+                return "This test will often fail in modern browser due to window.open() not always returning existing windows";
+            }
+        },
         setUp: function(){
             this.expectedMessage = "1abcd1234";
         },
@@ -233,7 +237,11 @@ function runTests(){
         }]
     }, {
         name: "test easyXDM.transport.HashTransport using readyAfter and queuing",
-        failedMessage: "This can fail in some modern browsers like Firefox, but this is OK as it is only needed for older browsers like IE6/IE7.",
+        runIf: function(){
+            if (typeof window.postMessage !== "undefined") {
+                return "This test will often fail in modern browser due to window.open() not always returning existing windows";
+            }
+        },
         setUp: function(){
             this.expectedMessage = "2abcd1234";
         },
@@ -312,7 +320,12 @@ function runTests(){
         }]
     }, {
         name: "test easyXDM.transport.PostMessageTransport",
-        failedMessage: "This will fail in older browsers like IE6/IE7 as these do not support the postMessage interface.",
+        runIf: function(){
+            if (typeof window.postMessage === "undefined") {
+                return "This test requires the HTML5 postMessage interface.";
+            }
+        },
+        
         setUp: function(){
             this.expectedMessage = "3abcd1234";
         },
