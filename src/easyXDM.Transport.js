@@ -562,7 +562,7 @@ easyXDM.transport.NameTransport = function(config, onReady){
         // Register the callback
         easyXDM.Fn.set(config.channel, function(message){
             // #ifdef debug
-            easyXDM.Debug.trace("got initial message " + message);
+            easyXDM.Debug.trace("received initial message " + message);
             // #endif
             if (isHost && message === "ready") {
                 // Replace the handler
@@ -596,25 +596,18 @@ easyXDM.transport.NameTransport = function(config, onReady){
     }
     
     function _sendMessage(){
-        easyXDM.Debug.trace("_sendMessage");
         if (_queue.length === 0) {
+            // #ifdef debug
             easyXDM.Debug.trace("queue empty");
+            // #endif
             _inMotion = false;
             return;
         }
         _inMotion = true;
-        var message = _queue.shift(), url;
+        var message = _queue.shift(), url = config.remoteHelper + (isHost ? ("#_3" + encodeURIComponent(remoteUrl + "#" + config.channel)) : ("#_2" + config.channel));
         // #ifdef debug
         easyXDM.Debug.trace("sending message " + message);
-        // #endif
-        if (isHost) {
-            url = config.remoteHelper + "#_3" + encodeURIComponent(remoteUrl + "#" + config.channel);
-        }
-        else {
-            url = config.remoteHelper + "#_2" + config.channel;
-        }
-        // #ifdef debug
-        easyXDM.Debug.trace("navigating to  '" + config.remoteHelper + "#_2" + config.channel + "'");
+        easyXDM.Debug.trace("navigating to  '" + url + "'");
         // #endif
         callerWindow.contentWindow.sendMessage(message, url);
     }
