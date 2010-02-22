@@ -3,22 +3,29 @@ easyXDM - easy Cross-Domain Messaging
 easyXDM is a javascript library created to enable web developers
 to easily communicate and expose javascript API's across domain boundaries.
 
-The library provides three layers of abstraction that simplifies development and usage.
+Some of the goals for the project are
+* easy to use!!!
+* self contained, no dependencies (not counting JSON)
+* light weight
+* flexible
+* good code quality (uses jslint etc)
+* good documentation
 
-easyXDM.transport and its contained classes all give access to 
+The library provides three layers of *abstraction* that simplifies development and usage.
+
+**easyXDM.transport** and its contained classes all give access to 
 a simple string based commmunication channel. This can be used directly 
 to send strings between the two documents. The transports does not have any
 dependencies outside the script itself and what the browser offers.
 
-easyXDM.Channel wraps a Transport and uses a serializer to enable you
+**easyXDM.Channel** wraps a Transport and uses a serializer to enable you
 to send Javascript objects over the transport. This offer the most when used with 
-the HTML5 JSON object, either via the navive implementation or through Douglas Crockfords json2 library.
+the HTML5 JSON object, either via the native implementation or through Douglas Crockfords json2 library.
 
-easyXDM.Interface wraps a Channel and enables you to define exposed and
+**easyXDM.Interface** wraps a Channel and enables you to define exposed and
 consumed methods. This then allows you to call methods, with arguments, 
 across the domain boundary and have the result returned. The underlying protocol used is quite similar to json-rpc.
-
-This also enables you to expose AJAX services in an easy way.
+Since the remote end is free to use AJAX etc the Interface class can be used to easily expose AJAX in a cross-domain fashion.
 
 Usage
 -----
