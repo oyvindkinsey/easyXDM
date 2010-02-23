@@ -337,7 +337,6 @@ easyXDM.transport = {
          */
         function _checkForMessage(){
             try {
-                easyXDM.Debug.trace("checking for new message");
                 if (_listenerWindow.location.hash && _listenerWindow.location.hash != _lastMsg) {
                     _lastMsg = _listenerWindow.location.hash;
                     // #ifdef debug
