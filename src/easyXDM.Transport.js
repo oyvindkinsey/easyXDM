@@ -244,7 +244,7 @@ easyXDM.transport = {
             config.remote = decodeURIComponent(query.xdm_e);
         }
         var _timer, pollInterval = config.interval || 300, usePolling = false, useParent = false, useResize = true;
-        var _lastMsg = "#" + config.channel, _msgNr = 0, _listenerWindow, _callerWindow, _maxFragmentSize;
+        var _lastMsg = "#" + config.channel, _msgNr = 0, _listenerWindow, _callerWindow, _maxFragmentSize, _receiving = false;
         var _remoteUrl, _remoteOrigin = easyXDM.Url.getLocation(config.remote);
         
         var _queue = [], _queueTimer, _incomming = "";
@@ -325,10 +325,10 @@ easyXDM.transport = {
                 _callerWindow.location = url;
             }
             // #ifdef debug
-            easyXDM.Debug.trace("scheduling new send in " + (useResize ? 0 : (pollInterval * 1.5)) + "ms");
+            easyXDM.Debug.trace("scheduling new send in " + (useResize ? 0 : pollInterval) + "ms");
             // #endif
             // We schedule a send even though the queue is empty in case a message is added to the queue before the intervall has passed
-            _queueTimer = window.setTimeout(_sendMessage, useResize ? 0 : (pollInterval * 1.5));
+            _queueTimer = window.setTimeout(_sendMessage, useResize ? 0 : pollInterval);
         }
         
         /**
@@ -349,6 +349,26 @@ easyXDM.transport = {
                     if (more === 0) {
                         config.onMessage(decodeURIComponent(_incomming), _remoteOrigin);
                         _incomming = "";
+                        // go into standby mode
+                        if (usePolling && _receiving) {
+                            _receiving = false;
+                            window.clearInterval(_timer);
+                            _timer = window.setInterval(function(){
+                                _checkForMessage();
+                            }, pollInterval);
+                        }
+                    }
+                    else {
+                        if (!_receiving) {
+                            _receiving = true;
+                            // go into receive mode
+                            if (usePolling) {
+                                window.clearInterval(_timer);
+                                _timer = window.setInterval(function(){
+                                    _checkForMessage();
+                                }, pollInterval / 4);
+                            }
+                        }
                     }
                 }
             } 
