@@ -413,7 +413,11 @@ easyXDM = {
             }
             return fn;
         }
-    }
+    },
+    /**
+     * Namespace for the transport classes
+     */
+    transport: {}
 };
 
 // #ifdef debug
