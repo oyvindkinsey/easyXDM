@@ -22,13 +22,13 @@ easyXDM.transport.HashTransport = function(config, onReady){
     easyXDM.Debug.trace("easyXDM.transport.HashTransport.constructor");
     // #endif
     // If no protocol is set then it means this is the host
-    var query = easyXDM.Url.Query(), isHost = (typeof query.xdm_p === "undefined");
+    var query = easyXDM.Url.Query(), isHost = (typeof query.xdm_p === "undefined"), me = this;
     if (!isHost) {
         config.channel = query.xdm_c;
         config.remote = decodeURIComponent(query.xdm_e);
     }
     var _timer, pollInterval = config.interval || 300, usePolling = false, useParent = false, useResize = true;
-    var _lastMsg = "#" + config.channel, _msgNr = 0, _listenerWindow, _callerWindow, _maxFragmentSize, _receiving = false;
+    var _lastMsg = "#" + config.channel, _msgNr = 0, _msgNummerIncomming = 0, _listenerWindow, _callerWindow, _maxFragmentSize, _receiving = false, _verification, _verified = false;
     var _remoteUrl, _remoteOrigin = easyXDM.Url.getLocation(config.remote);
     
     var _queue = [], _queueTimer, _incomming = "";
@@ -78,6 +78,13 @@ easyXDM.transport.HashTransport = function(config, onReady){
     }
     // #endif
     
+    function _sendVerification(){
+        _verification = Math.random().toString(16).substring(2);
+        // #ifdef debug
+        easyXDM.Debug.trace("sending verification " + _verification);
+        // #endif
+        me.postMessage(_verification);
+    }
     /**
      * This will send the first message in the queue.
      * If the queue is empty it will just null the timer and exit .
@@ -113,27 +120,61 @@ easyXDM.transport.HashTransport = function(config, onReady){
         easyXDM.Debug.trace("scheduling new send in " + (useResize ? 0 : pollInterval) + "ms");
         // #endif
         // We schedule a send even though the queue is empty in case a message is added to the queue before the intervall has passed
-        _queueTimer = window.setTimeout(_sendMessage, useResize ? 10 : pollInterval);
+        _queueTimer = window.setTimeout(_sendMessage, useResize ? 0 : pollInterval);
+    }
+    
+    function _handleIncomming(message){
+        if (_verified) {
+            config.onMessage(message, _remoteOrigin);
+        }
+        else if (_msgNummerIncomming === 1) {
+            // the remote verification
+            if (!isHost) {
+                _sendVerification();
+            }
+            // #ifdef debug
+            easyXDM.Debug.trace("returning verification " + message);
+            // #endif
+            me.postMessage(message);
+        }
+        else if (_msgNummerIncomming === 2) {
+            // the local verification
+            if (message === _verification) {
+                // #ifdef debug
+                easyXDM.Debug.trace("verified");
+                // #endif
+                _verified = true;
+                if (onReady) {
+                    window.setTimeout(onReady, 10);
+                }
+            }
+        }
+        
     }
     
     /**
      * Checks location.hash for a new message and relays this to the receiver.
      * @private
      */
-    function _checkForMessage(){
+    function _checkForMessage(e){
+        if (e) {
+            // #ifdef debug
+            easyXDM.Debug.trace("event resize");
+            // #endif
+        }
         try {
             if (_listenerWindow.location.hash && _listenerWindow.location.hash != _lastMsg) {
                 _lastMsg = _listenerWindow.location.hash;
+                _msgNummerIncomming++;
                 // #ifdef debug
-                easyXDM.Debug.trace("received message '" + _lastMsg + "' from " + _remoteOrigin);
+                easyXDM.Debug.trace("received message " + _msgNummerIncomming + " '" + _lastMsg + "' from " + _remoteOrigin);
                 // #endif
                 var message = _lastMsg.substring(_lastMsg.indexOf("_") + 1);
                 var indexOf = message.indexOf("_");
                 var more = parseInt(message.substring(0, indexOf), 10);
                 _incomming += message.substring(indexOf + 1);
                 if (more === 0) {
-                    config.onMessage(decodeURIComponent(_incomming), _remoteOrigin);
-                    _incomming = "";
+                    _handleIncomming(decodeURIComponent(_incomming));
                     // go into standby mode
                     if (usePolling && _receiving) {
                         _receiving = false;
@@ -142,6 +183,7 @@ easyXDM.transport.HashTransport = function(config, onReady){
                             _checkForMessage();
                         }, pollInterval);
                     }
+                    _incomming = "";
                 }
                 else {
                     if (!_receiving) {
@@ -164,33 +206,9 @@ easyXDM.transport.HashTransport = function(config, onReady){
         }
     }
     
-    /**
-     * Calls the supplied onReady method<br/>
-     * We delay this so that the the call to createChannel or createTransport will have completed.
-     * @private
-     */
-    function _onReady(){
-        if (isHost) {
-            if (useParent) {
-                _listenerWindow = window;
-            }
-            else {
-                if (config.readyAfter) {
-                    // We must try obtain a reference to the correct window, this might fail 
-                    _listenerWindow = window.open(config.local + "#" + config.channel, "remote_" + config.channel);
-                }
-                else {
-                    _listenerWindow = easyXDM.transport.HashTransport.getWindow(config.channel);
-                }
-                if (!_listenerWindow) {
-                    // #ifdef debug
-                    easyXDM.Debug.trace("Failed to obtain a reference to the window");
-                    // #endif
-                    throw new Error("Failed to obtain a reference to the window");
-                }
-            }
-        }
-        if (usePolling) {
+    
+    function _attachListeners(){
+        if ((isHost && useParent) || (!isHost && usePolling)) {
             // #ifdef debug
             easyXDM.Debug.trace("starting polling");
             // #endif
@@ -201,10 +219,39 @@ easyXDM.transport.HashTransport = function(config, onReady){
         else {
             easyXDM.DomHelper.addEventListener(_listenerWindow, "resize", _checkForMessage);
         }
-        if (onReady) {
-            window.setTimeout(onReady, 10);
-        }
+        
     }
+    
+    function _hostReady(){
+        if (useParent) {
+            _listenerWindow = window;
+        }
+        else {
+            if (config.readyAfter) {
+                // We must try obtain a reference to the correct window, this might fail 
+                _listenerWindow = window.open(config.local + "#" + config.channel, "remote_" + config.channel);
+            }
+            else {
+                _listenerWindow = easyXDM.transport.HashTransport.getWindow(config.channel);
+            }
+            if (!_listenerWindow) {
+                // #ifdef debug
+                easyXDM.Debug.trace("Failed to obtain a reference to the window");
+                // #endif
+                throw new Error("Failed to obtain a reference to the window");
+            }
+        }
+        (function getBody(){
+            if (_listenerWindow.document && _listenerWindow.document.body) {
+                _attachListeners();
+                _sendVerification();
+            }
+            else {
+                window.setTimeout(getBody, 10);
+            }
+        }());
+    }
+    
     
     /** 
      * Sends a message by encoding and placing it in the hash part of _callerWindows url.
@@ -265,20 +312,22 @@ easyXDM.transport.HashTransport = function(config, onReady){
     if (isHost) {
         if (config.readyAfter) {
             // Fire the onReady method after a set delay
-            window.setTimeout(_onReady, config.readyAfter);
+            window.setTimeout(_hostReady, config.readyAfter);
         }
         else {
             // Register onReady callback in the library so that
             // it can be called when hash.html has loaded.
-            easyXDM.Fn.set(config.channel, _onReady);
+            easyXDM.Fn.set(config.channel, _hostReady);
         }
     }
     if (!isHost && useParent) {
         _callerWindow = parent;
-        _onReady();
     }
     else {
-        _callerWindow = easyXDM.DomHelper.createFrame(_remoteUrl, config.container, (isHost && !useParent) ? null : _onReady, (isHost ? "local_" : "remote_") + config.channel);
+        _callerWindow = easyXDM.DomHelper.createFrame(_remoteUrl, config.container, (isHost && useParent) ? _hostReady : null, (isHost ? "local_" : "remote_") + config.channel);
+        if (!isHost) {
+            _attachListeners();
+        }
     }
 };
 
