@@ -78,7 +78,6 @@ easyXDM.transport.HashTransport = function(config, onReady){
     }
     // #endif
     
-    var _resize_counter = 0;
     /**
      * This will send the first message in the queue.
      * If the queue is empty it will just null the timer and exit .
@@ -100,8 +99,10 @@ easyXDM.transport.HashTransport = function(config, onReady){
             // We are referencing an iframe
             _callerWindow.src = url;
             if (useResize) {
+                // #ifdef debug
                 easyXDM.Debug.trace("resizing to new size " + (_callerWindow.width > 75 ? 50 : 100));
-                _callerWindow.width = _resize_counter > 500 ? 1 : ++_resize_counter;
+                // #endif
+                _callerWindow.width = _callerWindow.width > 75 ? 50 : 100;
             }
         }
         else {
