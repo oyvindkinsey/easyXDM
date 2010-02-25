@@ -104,7 +104,7 @@ easyXDM = {
                         doc.write("<body><div id=\"log\"></div></body></html>");
                         doc.close();
                     }
-                    var el = doc.getElementById("log");
+                    el = doc.getElementById("log");
                     trace = function(msg){
                         try {
                             el.appendChild(doc.createElement("div")).appendChild(doc.createTextNode(location.host + "-" + new Date().valueOf() + ":" + msg));
@@ -114,7 +114,9 @@ easyXDM = {
                             //In case we are unloading
                         }
                     };
+                    trace("----");
                     trace("---- new logger at " + location.href);
+                    trace("----");
                 }
                 else {
                     trace = function(){

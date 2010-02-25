@@ -1,3 +1,7 @@
+1.7.5 25.02.10
+Made several improvements to the HashTransport - this now verifies that it actually can communicate with the other end
+and thereby disables the spoofing the origin (as previously possible).
+
 1.7.4 - 22.02.10
 Implemented queing for NameTransport, this also made it more reliable.
 This means that all transports now support rapid sending of messages, even within the same js thread.
