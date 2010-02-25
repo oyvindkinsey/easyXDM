@@ -74,7 +74,7 @@ easyXDM.transport.HashTransport = function(config, onReady){
         easyXDM.Debug.trace("using resizing to call");
     }
     if (useParent) {
-        easyXDM.Debug.trace("using current window as " + (config.local ? "listenerWindow" : "callerWindow"));
+        easyXDM.Debug.trace(isHost ? "using current window as listenerWindow" : "using parent window as callerWindow");
     }
     // #endif
     
@@ -156,12 +156,12 @@ easyXDM.transport.HashTransport = function(config, onReady){
      * Checks location.hash for a new message and relays this to the receiver.
      * @private
      */
-    function _checkForMessage(e){
-        if (e) {
-            // #ifdef debug
-            easyXDM.Debug.trace("event resize");
-            // #endif
+    function _checkForMessage(ev){
+        // #ifdef debug
+        if (ev) {
+            easyXDM.Debug.trace("resize triggered");
         }
+        // #endif
         try {
             if (_listenerWindow.location.hash && _listenerWindow.location.hash != _lastMsg) {
                 _lastMsg = _listenerWindow.location.hash;
@@ -206,7 +206,10 @@ easyXDM.transport.HashTransport = function(config, onReady){
         }
     }
     
-    
+    /**
+     * Attaches/starts the necessary listeners/timers
+     * @private
+     */
     function _attachListeners(){
         if ((isHost && useParent) || (!isHost && usePolling)) {
             // #ifdef debug
@@ -219,9 +222,12 @@ easyXDM.transport.HashTransport = function(config, onReady){
         else {
             easyXDM.DomHelper.addEventListener(_listenerWindow, "resize", _checkForMessage);
         }
-        
     }
     
+    /**
+     * The hosts ready handler. This is responsible for starting the verification process.
+     * @private
+     */
     function _hostReady(){
         if (useParent) {
             _listenerWindow = window;
@@ -241,6 +247,7 @@ easyXDM.transport.HashTransport = function(config, onReady){
                 throw new Error("Failed to obtain a reference to the window");
             }
         }
+        // Make sure we can access the body before we start doing business
         (function getBody(){
             if (_listenerWindow.document && _listenerWindow.document.body) {
                 _attachListeners();
