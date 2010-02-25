@@ -91,47 +91,45 @@ easyXDM = {
                     }
                 };
             }
-            else {
-                if (typeof console === "undefined" || typeof console.info === "undefined") {
-                    /**
-                     * Create log window
-                     * @ignore
-                     */
-                    var logWin = window.open("", "easyxdm_log", "width=800,height=200,status=0,navigation=0,scrollbars=1");
-                    if (logWin) {
-                        var doc = logWin.document;
-                        if (doc.title !== "easyXDM log") {
-                            doc.write("<html><head><title>easyXDM log</title></head>");
-                            doc.write("<body><div id=\"log\"></div></body></html>");
-                            doc.close();
+            else if (typeof console === "undefined" || typeof console.info === "undefined") {
+                /**
+                 * Create log window
+                 * @ignore
+                 */
+                var logWin = window.open("", "easyxdm_log", "width=800,height=200,status=0,navigation=0,scrollbars=1");
+                if (logWin) {
+                    var doc = logWin.document;
+                    if (doc.title !== "easyXDM log") {
+                        doc.write("<html><head><title>easyXDM log</title></head>");
+                        doc.write("<body><div id=\"log\"></div></body></html>");
+                        doc.close();
+                    }
+                    var el = doc.getElementById("log");
+                    trace = function(msg){
+                        try {
+                            el.appendChild(doc.createElement("div")).appendChild(doc.createTextNode(location.host + "-" + new Date().valueOf() + ":" + msg));
+                            el.scrollTop = el.scrollHeight;
+                        } 
+                        catch (e) {
+                            //In case we are unloading
                         }
-                        var el = doc.getElementById("log");
-                        trace = function(msg){
-                            try {
-                                el.appendChild(doc.createElement("div")).appendChild(doc.createTextNode(location.host + "-" + new Date().valueOf() + ":" + msg));
-                                el.scrollTop = el.scrollHeight;
-                            } 
-                            catch (e) {
-                                //In case we are unloading
-                            }
-                        };
-                        trace("---- new logger at " + location.href);
-                    }
-                    else {
-                        trace = function(){
-                        };
-                    }
+                    };
+                    trace("---- new logger at " + location.href);
                 }
                 else {
-                    /**
-                     * Sets trace to be a wrapper around console.info
-                     * @ignore
-                     * @param {String} msg
-                     */
-                    trace = function(msg){
-                        console.info(location.host + "-" + new Date().valueOf() + ":" + msg);
+                    trace = function(){
                     };
                 }
+            }
+            else {
+                /**
+                 * Sets trace to be a wrapper around console.info
+                 * @ignore
+                 * @param {String} msg
+                 */
+                trace = function(msg){
+                    console.info(location.host + "-" + new Date().valueOf() + ":" + msg);
+                };
             }
             easyXDM.Debug.trace = trace;
             easyXDM.Debug.trace(msg);
@@ -237,24 +235,22 @@ easyXDM = {
                 // Call local method
                 method.method.apply(method.scope, params);
             }
+            else if (method.isVoid) {
+                // #ifdef debug
+                easyXDM.Debug.trace("requested to execute void method " + name);
+                // #endif
+                // Call local method 
+                method.method.apply(method.scope, params);
+            }
             else {
-                if (method.isVoid) {
-                    // #ifdef debug
-                    easyXDM.Debug.trace("requested to execute void method " + name);
-                    // #endif
-                    // Call local method 
-                    method.method.apply(method.scope, params);
-                }
-                else {
-                    // #ifdef debug
-                    easyXDM.Debug.trace("requested to execute method " + name);
-                    // #endif
-                    // Call local method and send back the response
-                    _channel.sendData({
-                        id: id,
-                        response: method.method.apply(method.scope, params)
-                    });
-                }
+                // #ifdef debug
+                easyXDM.Debug.trace("requested to execute method " + name);
+                // #endif
+                // Call local method and send back the response
+                _channel.sendData({
+                    id: id,
+                    response: method.method.apply(method.scope, params)
+                });
             }
         }
         

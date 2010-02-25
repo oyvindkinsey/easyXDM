@@ -185,16 +185,14 @@ easyXDM.transport.HashTransport = function(config, onReady){
                     }
                     _incomming = "";
                 }
-                else {
-                    if (!_receiving) {
-                        _receiving = true;
-                        // go into receive mode
-                        if (usePolling) {
-                            window.clearInterval(_timer);
-                            _timer = window.setInterval(function(){
-                                _checkForMessage();
-                            }, pollInterval / 4);
-                        }
+                else if (!_receiving) {
+                    _receiving = true;
+                    // go into receive mode
+                    if (usePolling) {
+                        window.clearInterval(_timer);
+                        _timer = window.setInterval(function(){
+                            _checkForMessage();
+                        }, pollInterval / 4);
                     }
                 }
             }
@@ -232,20 +230,18 @@ easyXDM.transport.HashTransport = function(config, onReady){
         if (useParent) {
             _listenerWindow = window;
         }
+        else if (config.readyAfter) {
+            // We must try obtain a reference to the correct window, this might fail 
+            _listenerWindow = window.open(config.local + "#" + config.channel, "remote_" + config.channel);
+        }
         else {
-            if (config.readyAfter) {
-                // We must try obtain a reference to the correct window, this might fail 
-                _listenerWindow = window.open(config.local + "#" + config.channel, "remote_" + config.channel);
-            }
-            else {
-                _listenerWindow = easyXDM.transport.HashTransport.getWindow(config.channel);
-            }
-            if (!_listenerWindow) {
-                // #ifdef debug
-                easyXDM.Debug.trace("Failed to obtain a reference to the window");
-                // #endif
-                throw new Error("Failed to obtain a reference to the window");
-            }
+            _listenerWindow = easyXDM.transport.HashTransport.getWindow(config.channel);
+        }
+        if (!_listenerWindow) {
+            // #ifdef debug
+            easyXDM.Debug.trace("Failed to obtain a reference to the window");
+            // #endif
+            throw new Error("Failed to obtain a reference to the window");
         }
         // Make sure we can access the body before we start doing business
         (function getBody(){
@@ -266,6 +262,7 @@ easyXDM.transport.HashTransport = function(config, onReady){
      * @param {String} message The message to send
      */
     this.postMessage = function(message){
+        var fragments = [], fragment;
         // #ifdef debug
         easyXDM.Debug.trace("scheduling message '" + message + "' to " + _remoteOrigin);
         // #endif
@@ -277,7 +274,6 @@ easyXDM.transport.HashTransport = function(config, onReady){
             });
         }
         else {
-            var fragments = [], fragment;
             while (message) {
                 fragment = message.substring(0, _maxFragmentSize);
                 message = message.substring(fragment.length);
@@ -305,10 +301,8 @@ easyXDM.transport.HashTransport = function(config, onReady){
         if (usePolling) {
             window.clearInterval(_timer);
         }
-        else {
-            if (_listenerWindow) {
-                easyXDM.DomHelper.removeEventListener(_listenerWindow, "resize", _checkForMessage);
-            }
+        else if (_listenerWindow) {
+            easyXDM.DomHelper.removeEventListener(_listenerWindow, "resize", _checkForMessage);
         }
         if (isHost || !useParent) {
             _callerWindow.parentNode.removeChild(_callerWindow);

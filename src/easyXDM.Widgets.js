@@ -1,4 +1,4 @@
- /*jslint browser: true, immed: true, passfail: true, undef: true, newcap: true*/
+/*jslint browser: true, immed: true, passfail: true, undef: true, newcap: true*/
 /*global easyXDM, window */
 
 /**
@@ -304,10 +304,10 @@ easyXDM.Widget = function(config){
         _widgetHost.subscribe(topic);
     };
     
-	/**
-	 * Register the method that will handle incoming messages
-	 * @param {Function} fn The handler
-	 */
+    /**
+     * Register the method that will handle incoming messages
+     * @param {Function} fn The handler
+     */
     this.registerMessageHandler = function(fn){
         _incomingMessageHandler = fn;
     };

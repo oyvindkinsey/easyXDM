@@ -25,13 +25,11 @@ easyXDM.transport.BestAvailableTransport = function(config, onReady){
         if (window.postMessage) {
             Transport = easyXDM.transport.PostMessageTransport;
         }
+        else if (config.remoteHelper) {
+            Transport = easyXDM.transport.NameTransport;
+        }
         else {
-            if (config.remoteHelper) {
-                Transport = easyXDM.transport.NameTransport;
-            }
-            else {
-                Transport = easyXDM.transport.HashTransport;
-            }
+            Transport = easyXDM.transport.HashTransport;
         }
     }
     else {
