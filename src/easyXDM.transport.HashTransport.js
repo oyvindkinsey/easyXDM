@@ -322,6 +322,7 @@ easyXDM.transport.HashTransport = function(config, onReady){
     }
     if (!isHost && useParent) {
         _callerWindow = parent;
+        _attachListeners();
     }
     else {
         _callerWindow = easyXDM.DomHelper.createFrame(_remoteUrl, config.container, (isHost && useParent) ? _hostReady : null, (isHost ? "local_" : "remote_") + config.channel);
