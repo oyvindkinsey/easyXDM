@@ -4,12 +4,11 @@ var _remoteUrl = location.href.substring(0, location.href.lastIndexOf("/") + 1);
 if (_remoteUrl.indexOf("easyxdm.net") !== -1) {
     _remoteUrl = _remoteUrl.replace("easyxdm.net", "provider.easyxdm.net");
 }
-if (_remoteUrl.indexOf("localhost") !== -1) {
-    _remoteUrl = _remoteUrl.replace("localhost", "127.0.0.1");
+if (_remoteUrl.indexOf("xdm1") !== -1) {
+    _remoteUrl = _remoteUrl.replace("xdm1", "xdm2");
 }
 var channelId = 0;
 function runTests(){
-
     easyTest.test([/**Tests for the presence of namespaces and classes*/{
         name: "Check that the library is complete",
         steps: [{
