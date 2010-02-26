@@ -3,54 +3,6 @@
 
 (function(){
 
-    function LogBehavior(){
-    
-        return {
-            incomming: function(message, origin){
-                // #ifdef debug
-                easyXDM.Debug.trace("LogBehavior: incomming");
-                // #endif
-                this.up.incomming(message, origin);
-            },
-            outgoing: function(message, origin, callback){
-                // #ifdef debug
-                easyXDM.Debug.trace("LogBehavior: outgoing");
-                // #endif
-                this.down.outgoing(message, origin, callback);
-            },
-            destroy: function(){
-                this.up.destroy();
-            },
-            callback: function(success){
-                this.up.callback(success);
-            }
-        };
-    }
-    
-    function EncodingBehavior(){
-    
-        return {
-            incomming: function(message, origin){
-                // #ifdef debug
-                easyXDM.Debug.trace("decoding");
-                // #endif
-                this.up.incomming(decodeURIComponent(message), origin);
-            },
-            outgoing: function(message, origin, callback){
-                // #ifdef debug
-                easyXDM.Debug.trace("encoding");
-                // #endif
-                this.down.outgoing(encodeURIComponent(message), origin, callback);
-            },
-            destroy: function(){
-                this.up.destroy();
-            },
-            callback: function(success){
-                this.up.callback(success);
-            }
-        };
-    }
-    
     /**
      *
      * @param {Object} settings
@@ -58,43 +10,52 @@
     function ReliableBehavior(settings){
         var pub, timer, current, msgId = 0, tryCount = 0, timeout = settings.timeout, lastMsgId, callback;
         // #ifdef debug
-        easyXDM.Debug.trace("ReliableBehavior settings.timeout=" + settings.timeout);
+        easyXDM.Debug.trace("ReliableBehavior: settings.timeout=" + settings.timeout);
         // #endif
         return (pub = {
             incomming: function(message, origin){
-                // #ifdef debug
-                easyXDM.Debug.trace("-> " + message);
-                // #endif
-                if (message.substring(0, 1) === "|") {
+                var id;
+                if (message.substring(0, 1) === "_") {
                     window.clearTimeout(timer);
+                    timer = null;
                     // #ifdef debug
-                    easyXDM.Debug.trace("message delivered");
+                    easyXDM.Debug.trace("ReliableBehavior: message delivered");
                     // #endif
                     if (callback) {
-                        callback(true);
+                        window.setTimeout(function(){
+                            callback(true);
+                        }, 0);
                     }
                 }
                 else {
-                    // Send an ack back
-                    message = message.substring(1);
-                    var msgid = message.substring(0, message.indexOf("_"));
                     // #ifdef debug
-                    easyXDM.Debug.trace("lastid " + lastMsgId + ", this " + msgid);
+                    if (timer) {
+                        easyXDM.Debug.trace("ReliableBehavior: was expecting an ack");
+                    }
                     // #endif
-                    if (msgid === lastMsgId) {
+                    message = message.substring(1);
+                    id = message.substring(0, message.indexOf("_"));
+                    // #ifdef debug
+                    easyXDM.Debug.trace("ReliableBehavior: lastid " + lastMsgId + ", this " + id);
+                    // #endif
+                    if (id !== lastMsgId) {
+                        lastMsgId = id;
+                        message = message.substring(id.length + 1);
                         // #ifdef debug
-                        easyXDM.Debug.trace("duplicate msgid " + msgid + ", resending ack");
+                        easyXDM.Debug.trace("ReliableBehavior: sending ack, passing on " + message);
                         // #endif
+                        pub.down.outgoing("_ack", origin);
+                        // we must give the other end time to pick up the ack
+                        window.setTimeout(function(){
+                            pub.up.incomming(message, origin);
+                        }, settings.timeout / 2);
                     }
+                    // #ifdef debug
                     else {
-                        lastMsgId = msgid;
-                        message = message.substring(msgid.length + 1);
-                        // #ifdef debug
-                        easyXDM.Debug.trace("sending ack, passing on " + message);
-                        // #endif
-                        pub.down.outgoing("|ack", origin);
-                        pub.up.incomming(message, origin);
+                        easyXDM.Debug.trace("ReliableBehavior: duplicate msgid " + id + ", resending ack");
+                        //pub.down.outgoing("_ack", origin);
                     }
+                    // #endif
                 }
             },
             outgoing: function(message, origin, fn){
@@ -107,17 +68,20 @@
                 
                 // Keep resending until we have an ack
                 (function send(){
+                    timer = null;
                     if (tryCount++ > 5) {
                         if (callback) {
                             // #ifdef debug
-                            easyXDM.Debug.trace("delivery failed");
+                            easyXDM.Debug.trace("ReliableBehavior: delivery failed");
                             // #endif
-                            callback(false);
+                            window.setTimeout(function(){
+                                callback(false);
+                            }, 0);
                         }
                     }
                     else {
                         // #ifdef debug
-                        easyXDM.Debug.trace((tryCount === 1 ? "sending " : "resending ") + msgId + ", tryCount " + tryCount);
+                        easyXDM.Debug.trace("ReliableBehavior: " + (tryCount === 1 ? "sending " : "resending ") + msgId + ", tryCount " + tryCount);
                         // #endif
                         pub.down.outgoing(current.data, current.origin);
                         timer = window.setTimeout(send, settings.timeout);
@@ -153,7 +117,9 @@
             pub.down.outgoing(message.data, message.origin, function(success){
                 waiting = false;
                 if (message.callback) {
-                    message.callback(success);
+                    window.setTimeout(function(){
+                        message.callback(success);
+                    }, 0);
                 }
                 dispatch();
             });
@@ -171,17 +137,13 @@
                 }
                 // #ifdef debug
                 else {
-                    easyXDM.Debug.trace("awaiting more fragments");
+                    easyXDM.Debug.trace("awaiting more fragments, seq=" + message);
                 }
                 // #endif
-            
             },
             outgoing: function(message, origin, fn){
                 var fragments = [], fragment;
                 while (message.length !== 0) {
-                    // #ifdef debug
-                    easyXDM.Debug.trace("fragmenting");
-                    // #endif
                     fragment = message.substring(0, settings.maxLength);
                     message = message.substring(fragment.length);
                     fragments.push(fragment);
@@ -319,9 +281,11 @@
         }
         var pipeUp = {
             incomming: function(message, origin){
-                config.onMessage(message, origin);
+                config.onMessage(decodeURIComponent(message), origin);
             },
-            outgoing: _sendMessage,
+            outgoing: function(message, origin){
+                _sendMessage(encodeURIComponent(message), origin);
+            },
             callback: function(succes){
                 if (onReady) {
                     window.setTimeout(onReady, 10);
@@ -348,17 +312,14 @@
         };
         
         var behaviors = [], behavior;
-        behaviors.push(new EncodingBehavior());
-        behaviors.push(new LogBehavior());
-        /*
-         behaviors.push(new ReliableBehavior({
-         timeout: ((useResize ? 50 : pollInterval * 1.5) + (usePolling ? pollInterval * 1.5 : 50))
-         }));
-         */
+        
+        behaviors.push(new ReliableBehavior({
+            timeout: ((useResize ? 50 : pollInterval * 1.5) + (usePolling ? pollInterval * 1.5 : 50))
+        }));
+        
         behaviors.push(new QueueBehavior({
             maxLength: 4000 - _remoteUrl.length
         }));
-        
         if (behaviors.length === 1) {
             behavior = behaviors[0];
             behavior.down = behavior.up = pipeUp;
@@ -410,11 +371,6 @@
                 // #endif
                 _handleHash(_listenerWindow.location.hash);
             }
-            // #ifdef debug
-            else {
-                easyXDM.Debug.trace("poll: no change");
-            }
-            // #endif
         }
         
         /**
@@ -437,7 +393,7 @@
                         // #ifdef debug
                         easyXDM.Debug.trace("Falling back to using window.open");
                         // #endif
-                        _listenerWindow = window.open(config.local + "#" + config.channel, "remote_" + config.channel);
+                        _listenerWindow = window.open("", "remote_" + config.channel);
                     }
                 }
                 else {
