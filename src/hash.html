@@ -25,7 +25,7 @@
                             // NameTransport remote
                             var url = decodeURIComponent(location.hash.substring(3));
                             channel = url.substring(url.indexOf("#") + 1);
-                            var guest = window.open(url, channel);
+                            var guest = window.parent.frames[channel];//window.open(url, channel);
                             guest.easyXDM.Fn.get(channel)(window.name);
                             window.history.back();
                             break;
