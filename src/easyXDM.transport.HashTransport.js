@@ -267,7 +267,7 @@
             
             if (isHost || !useParent) {
                 // We are referencing an iframe
-                _callerWindow.src = url;
+                _callerWindow.contentWindow.location = url;
                 if (useResize) {
                     // #ifdef debug
                     easyXDM.Debug.trace("resizing to new size " + (_callerWindow.width > 75 ? 50 : 100));
