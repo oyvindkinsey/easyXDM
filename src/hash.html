@@ -67,10 +67,9 @@
                     if (window.addEventListener) {
                         window.addEventListener('resize', onResize, false);
                     }
-                    else 
-                        if (document.body.attachEvent) {
-                            window.onresize = onResize;
-                        }
+                    else if (document.body.attachEvent) {
+                        window.onresize = onResize;
+                    }
                 }
             }
         </script>
