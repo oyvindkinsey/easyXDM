@@ -85,8 +85,9 @@
                 useResize = false;
             }
             usePolling = (typeof query.xdm_po !== "undefined");
-            _remoteUrl = config.remote + "#" + config.channel;
+            _remoteUrl = config.remote;
         }
+        
         // #ifdef debug
         if (usePolling) {
             easyXDM.Debug.trace("using polling to listen");
@@ -229,7 +230,7 @@
             _onReady();
         }
         else {
-            _callerWindow = easyXDM.DomHelper.createFrame(_remoteUrl, config.container, (isHost && !useParent) ? null : _onReady, (isHost ? "local_" : "remote_") + config.channel);
+            _callerWindow = easyXDM.DomHelper.createFrame((isHost ? _remoteUrl : _remoteUrl + "#" + config.channel), config.container, (isHost && !useParent) ? null : _onReady, (isHost ? "local_" : "remote_") + config.channel);
         }
     };
     
