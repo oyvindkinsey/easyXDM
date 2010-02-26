@@ -3,25 +3,58 @@
 
 (function(){
 
-    function EncodingBehavior(){
-        var pub;
-        
-        return (pub = {
+    function LogBehavior(){
+    
+        return {
             incomming: function(message, origin){
-                pub.nextIn.incomming(decodeURIComponent(message), origin);
+                // #ifdef debug
+                easyXDM.Debug.trace("LogBehavior: incomming");
+                // #endif
+                this.up.incomming(message, origin);
             },
             outgoing: function(message, origin){
-                pub.nextOut.outgoing(encodeURIComponent(message), origin);
+                // #ifdef debug
+                easyXDM.Debug.trace("LogBehavior: outgoing");
+                // #endif
+                this.down.outgoing(message, origin);
             },
             destroy: function(){
-                pub.nextIn.destroy();
+                this.up.destroy();
             },
             callback: function(success){
-                pub.nextIn.callback(success);
+                this.up.callback(success);
             }
-        });
+        };
     }
     
+    function EncodingBehavior(){
+    
+        return {
+            incomming: function(message, origin){
+                // #ifdef debug
+                easyXDM.Debug.trace("decoding");
+                // #endif
+                this.up.incomming(decodeURIComponent(message), origin);
+            },
+            outgoing: function(message, origin){
+                // #ifdef debug
+                easyXDM.Debug.trace("encoding");
+                // #endif
+                this.down.outgoing(encodeURIComponent(message), origin);
+            },
+            destroy: function(){
+                this.up.destroy();
+            },
+            callback: function(success){
+                this.up.callback(success);
+            }
+        };
+    }
+    
+    /**
+     *
+     * @param {Object} settings
+     */
     function ReliableBehavior(settings){
         var pub, timer, current, msgId = 0, tryCount = 0, timeout = settings.timeout, lastMsgId, callback;
         // #ifdef debug
@@ -59,8 +92,8 @@
                         // #ifdef debug
                         easyXDM.Debug.trace("sending ack, passing on " + message);
                         // #endif
-                        pub.nextOut.outgoing("|ack", origin);
-                        pub.nextIn.incomming(message, origin);
+                        pub.down.outgoing("|ack", origin);
+                        pub.up.incomming(message, origin);
                     }
                 }
             },
@@ -86,7 +119,7 @@
                         // #ifdef debug
                         easyXDM.Debug.trace((tryCount === 1 ? "sending " : "resending ") + msgId + ", tryCount " + tryCount);
                         // #endif
-                        pub.nextOut.outgoing(current.data, current.origin);
+                        pub.down.outgoing(current.data, current.origin);
                         timer = window.setTimeout(send, settings.timeout);
                     }
                     
@@ -96,10 +129,10 @@
                 if (timer) {
                     window.clearInterval(timer);
                 }
-                pub.nextIn.destroy();
+                pub.up.destroy();
             },
             callback: function(success){
-                pub.nextIn.callback(success);
+                pub.up.callback(success);
             }
         });
     }
@@ -117,7 +150,7 @@
             waiting = true;
             var message = queue.shift();
             
-            pub.nextOut.outgoing(message.data, message.origin, function(success){
+            pub.down.outgoing(message.data, message.origin, function(success){
                 waiting = false;
                 if (message.callback) {
                     message.callback(success);
@@ -133,7 +166,7 @@
                     // #ifdef debug
                     easyXDM.Debug.trace("last fragment received");
                     // #endif
-                    pub.nextIn.incomming(incomming, origin);
+                    pub.up.incomming(incomming, origin);
                 }
                 // #ifdef debug
                 else {
@@ -170,10 +203,10 @@
                 easyXDM.Debug.trace("QueueBehavior#destroy");
                 // #endif
                 destroying = true;
-                pub.nextIn.destroy();
+                pub.up.destroy();
             },
             callback: function(success){
-                pub.nextIn.callback(success);
+                pub.up.callback(success);
             }
         });
     }
@@ -255,7 +288,7 @@
         
         function _sendMessage(message, origin, fn){
             // #ifdef debug
-            easyXDM.Debug.trace("sending message '" + message + "' to " + origin);
+            easyXDM.Debug.trace("sending message '" + (_msgNr + 1) + " " + message + "' to " + origin);
             // #endif
             if (!_callerWindow) {
                 // #ifdef debug
@@ -272,7 +305,7 @@
                     // #ifdef debug
                     easyXDM.Debug.trace("resizing to new size " + (_callerWindow.width > 75 ? 50 : 100));
                     // #endif
-                    _callerWindow.width = _callerWindow.width > 200 ? 10 : 300;
+                    _callerWindow.width = _callerWindow.width > 75 ? 50 : 100;
                 }
             }
             else {
@@ -283,40 +316,11 @@
                 window.setTimeout(fn, useResize ? 0 : pollInterval);
             }
         }
-        var pipeline = {
-            incomming: function(message, origin){
-                this.nextIn.incomming(message, origin);
-            },
-            outgoing: function(message, origin){
-                this.nextOut.outgoing(message, origin);
-            },
-            callback: function(success){
-                this.nextIn.callback(success);
-            },
-            destroy: function(){
-                this.nextOut.destroy();
-            }
-        };
-        var quB = (pipeline.nextOut = new QueueBehavior({
-            maxLength: 4000 - _remoteUrl.length
-        }));
-        
-        var relB = (quB.nextOut = new ReliableBehavior({
-            timeout: ((useResize ? 50 : pollInterval * 1.5) + (usePolling ? pollInterval * 1.5 : 50))
-        }));
-        var encB = (relB.nextOut = new EncodingBehavior());
-        encB.nextOut = {
-            outgoing: function(message, origin, fn){
-                _sendMessage(message, origin, fn);
-            }
-        };
-        pipeline.nextIn = encB;
-        encB.nextIn = relB;
-        relB.nextIn = quB;
-        quB.nextIn = {
+        var pipeUp = {
             incomming: function(message, origin){
                 config.onMessage(message, origin);
             },
+            outgoing: _sendMessage,
             callback: function(succes){
                 if (onReady) {
                     window.setTimeout(onReady, 10);
@@ -324,15 +328,70 @@
             },
             destroy: function(){
             }
+        }, pipeDown = {
+            incomming: function(message, origin){
+                this.up.incomming(message, origin);
+            },
+            outgoing: function(message, origin){
+                this.down.outgoing(message, origin);
+            },
+            callback: function(success){
+                this.up.callback(success);
+            },
+            destroy: function(){
+                this.down.destroy();
+            },
+            // the default passthrough
+            up: pipeUp,
+            down: pipeUp
         };
         
+        var behaviors = [], behavior;
+        behaviors.push(new EncodingBehavior());
+        behaviors.push(new LogBehavior());
+        /*
+         behaviors.push(new ReliableBehavior({
+         timeout: ((useResize ? 50 : pollInterval * 1.5) + (usePolling ? pollInterval * 1.5 : 50))
+         }));
+         */
+        behaviors.push(new QueueBehavior({
+            maxLength: 4000 - _remoteUrl.length
+        }));
+        
+        if (behaviors.length === 1) {
+            behavior = behaviors[0];
+            behavior.down = behavior.up = pipeUp;
+            pipeDown.down = pipeDown.up = behavior;
+        }
+        else if (behaviors.length > 1) {
+            for (var i = 0, len = behaviors.length; i < len; i++) {
+                behavior = behaviors[i];
+                if (i === 0) {
+                    // this is the behavior closest to 'the metal'
+                    pipeDown.up = behavior; // override 
+                    behavior.down = pipeUp; // down to sendMessage
+                    behavior.up = behaviors[i + 1];
+                }
+                else if (i === len - 1) {
+                    // this is the behavior closes to the user
+                    pipeDown.down = behavior; //override
+                    behavior.down = behaviors[i - 1];
+                    behavior.up = pipeUp;
+                }
+                else {
+                    // intermediary behaviors
+                    behavior.up = behaviors[i + 1];
+                    behavior.down = behaviors[i - 1];
+                }
+            }
+        }
         
         function _handleHash(hash){
             _lastMsg = hash;
             // #ifdef debug
             easyXDM.Debug.trace("received message '" + _lastMsg + "' from " + _remoteOrigin);
             // #endif
-            pipeline.incomming(_lastMsg.substring(_lastMsg.indexOf("_") + 1), _remoteOrigin);
+            pipeDown.incomming(_lastMsg.substring(_lastMsg.indexOf("_") + 1), _remoteOrigin);
         }
         
         function _onResize(e){
@@ -403,7 +462,7 @@
                         easyXDM.DomHelper.addEventListener(_listenerWindow, "resize", _onResize);
                         
                     }
-                    pipeline.callback(true);
+                    pipeDown.callback(true);
                 }
                 else {
                     window.setTimeout(getBody, 10);
@@ -417,7 +476,7 @@
          * @param {String} message The message to send
          */
         this.postMessage = function(message){
-            pipeline.outgoing(message, _remoteOrigin);
+            pipeDown.outgoing(message, _remoteOrigin);
         };
         
         /**
@@ -427,7 +486,7 @@
             // #ifdef debug
             easyXDM.Debug.trace("destroying transport");
             // #endif
-            pipeline.destroy();
+            pipeDown.destroy();
             if (usePolling) {
                 window.clearInterval(_timer);
             }
@@ -458,7 +517,6 @@
         }
         else {
             _callerWindow = easyXDM.DomHelper.createFrame((isHost ? _remoteUrl : _remoteUrl + "#" + config.channel), config.container, (isHost && !useParent) ? null : _onReady, (isHost ? "local_" : "remote_") + config.channel);
-            _callerWindow.style.display = "block";
         }
     };
     
