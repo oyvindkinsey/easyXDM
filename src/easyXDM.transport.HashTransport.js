@@ -327,31 +327,34 @@
         };
         
         
+        function _handleHash(hash){
+            _lastMsg = hash;
+            // #ifdef debug
+            easyXDM.Debug.trace("received message '" + _lastMsg + "' from " + _remoteOrigin);
+            // #endif
+            pipeline.incomming(_lastMsg.substring(_lastMsg.indexOf("_") + 1), _remoteOrigin);
+        }
+        
+        function _onResize(e){
+            _handleHash(_listenerWindow.location.hash);
+        }
+        
         /**
          * Checks location.hash for a new message and relays this to the receiver.
          * @private
          */
-        function _checkForMessage(e){
+        function _pollHash(){
+            if (_listenerWindow.location.hash && _listenerWindow.location.hash != _lastMsg) {
+                // #ifdef debug
+                easyXDM.Debug.trace("poll: new message");
+                // #endif
+                _handleHash(_listenerWindow.location.hash);
+            }
             // #ifdef debug
-            if (e) {
-                easyXDM.Debug.trace("received resize event");
+            else {
+                easyXDM.Debug.trace("poll: no change");
             }
             // #endif
-            try {
-                if (_listenerWindow.location.hash && _listenerWindow.location.hash != _lastMsg) {
-                    _lastMsg = _listenerWindow.location.hash;
-                    // #ifdef debug
-                    easyXDM.Debug.trace("received message '" + _lastMsg + "' from " + _remoteOrigin);
-                    // #endif
-                    var message = _lastMsg.substring(_lastMsg.indexOf("_") + 1);
-                    pipeline.incomming(message, _remoteOrigin);
-                }
-            } 
-            catch (ex) {
-                // #ifdef debug
-                easyXDM.Debug.trace(ex.message);
-                // #endif
-            }
         }
         
         /**
@@ -393,12 +396,12 @@
                         // #ifdef debug
                         easyXDM.Debug.trace("starting polling");
                         // #endif
-                        _timer = window.setInterval(function(){
-                            _checkForMessage();
-                        }, pollInterval);
+                        _timer = window.setInterval(_pollHash, pollInterval);
                     }
-                    else {
-                        easyXDM.DomHelper.addEventListener(_listenerWindow, "resize", _checkForMessage);
+                    else if (config.readyAfter) {
+                        // This cannot handle resize on its own
+                        easyXDM.DomHelper.addEventListener(_listenerWindow, "resize", _onResize);
+                        
                     }
                     pipeline.callback(true);
                 }
@@ -428,10 +431,8 @@
             if (usePolling) {
                 window.clearInterval(_timer);
             }
-            else {
-                if (_listenerWindow) {
-                    easyXDM.DomHelper.removeEventListener(_listenerWindow, "resize", _checkForMessage);
-                }
+            else if (_listenerWindow && config.readyAfter) {
+                easyXDM.DomHelper.removeEventListener(_listenerWindow, "resize", _pollHash);
             }
             if (isHost || !useParent) {
                 _callerWindow.parentNode.removeChild(_callerWindow);
@@ -448,6 +449,7 @@
                 // Register onReady callback in the library so that
                 // it can be called when hash.html has loaded.
                 easyXDM.Fn.set(config.channel, _onReady);
+                easyXDM.Fn.set(config.channel + "_onresize", _handleHash);
             }
         }
         if (!isHost && useParent) {
