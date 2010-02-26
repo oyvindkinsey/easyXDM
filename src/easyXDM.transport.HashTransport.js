@@ -366,7 +366,16 @@
                 }
                 else if (config.readyAfter) {
                     // We must try obtain a reference to the correct window, this might fail 
-                    _listenerWindow = window.open(config.local + "#" + config.channel, "remote_" + config.channel);
+                    try {
+                        // This works in IE6
+                        _listenerWindow = _callerWindow.contentWindow.frames["remote_" + config.channel];
+                    } 
+                    catch (ex) {
+                        // #ifdef debug
+                        easyXDM.Debug.trace("Falling back to using window.open");
+                        // #endif
+                        _listenerWindow = window.open(config.local + "#" + config.channel, "remote_" + config.channel);
+                    }
                 }
                 else {
                     _listenerWindow = easyXDM.transport.HashTransport.getWindow(config.channel);

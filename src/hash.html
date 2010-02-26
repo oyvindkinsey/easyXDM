@@ -23,9 +23,15 @@
                             break;
                         case "3":
                             // NameTransport remote
-                            var url = decodeURIComponent(location.hash.substring(3));
+                            var url = decodeURIComponent(location.hash.substring(3)), guest;
                             channel = url.substring(url.indexOf("#") + 1);
-                            var guest = window.parent.frames[channel];//window.open(url, channel);
+                            try {
+                                // This works in IE
+                                guest = window.parent.frames[channel];
+                            } 
+                            catch (ex) {
+                                guest = window.open("", channel);
+                            }
                             guest.easyXDM.Fn.get(channel)(window.name);
                             window.history.back();
                             break;
