@@ -12,11 +12,11 @@
                 // #endif
                 this.up.incomming(message, origin);
             },
-            outgoing: function(message, origin){
+            outgoing: function(message, origin, callback){
                 // #ifdef debug
                 easyXDM.Debug.trace("LogBehavior: outgoing");
                 // #endif
-                this.down.outgoing(message, origin);
+                this.down.outgoing(message, origin, callback);
             },
             destroy: function(){
                 this.up.destroy();
@@ -36,11 +36,11 @@
                 // #endif
                 this.up.incomming(decodeURIComponent(message), origin);
             },
-            outgoing: function(message, origin){
+            outgoing: function(message, origin, callback){
                 // #ifdef debug
                 easyXDM.Debug.trace("encoding");
                 // #endif
-                this.down.outgoing(encodeURIComponent(message), origin);
+                this.down.outgoing(encodeURIComponent(message), origin, callback);
             },
             destroy: function(){
                 this.up.destroy();
@@ -167,6 +167,7 @@
                     easyXDM.Debug.trace("last fragment received");
                     // #endif
                     pub.up.incomming(incomming, origin);
+                    incomming = "";
                 }
                 // #ifdef debug
                 else {
