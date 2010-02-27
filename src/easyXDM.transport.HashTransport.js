@@ -76,7 +76,7 @@
         }
         // #endif
         
-        function _sendMessage(message, fn){
+        function _sendMessage(message){
             // #ifdef debug
             easyXDM.Debug.trace("sending message '" + (_msgNr + 1) + " " + message + "' to " + _remoteOrigin);
             // #endif
@@ -102,10 +102,8 @@
                 // We are referencing the parent window
                 _callerWindow.location = url;
             }
-            if (fn) {
-                window.setTimeout(fn, useResize ? 0 : pollInterval);
-            }
         }
+        
         this.up = {
             incomming: function(message, origin){
                 config.onMessage(decodeURIComponent(message), origin);
@@ -133,10 +131,7 @@
             },
             destroy: function(){
                 this.down.destroy();
-            },
-            // the default passthrough
-            up: this.up,
-            down: this.down
+            }
         };
         
         var behaviors = [], behavior;
