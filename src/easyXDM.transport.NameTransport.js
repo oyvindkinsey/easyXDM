@@ -30,8 +30,8 @@ easyXDM.transport.NameTransport = function(config, onReady){
     
     function _onReady(){
         if (isHost) {
-            if (++readyCount === 2 || !isHost && onReady) {
-                window.setTimeout(onReady, 10);
+            if (++readyCount === 2 || !isHost) {
+                me.down.callback(true);
             }
         }
         else {
@@ -40,7 +40,7 @@ easyXDM.transport.NameTransport = function(config, onReady){
                 // #ifdef debug
                 easyXDM.Debug.trace("calling onReady");
                 // #endif
-                window.setTimeout(onReady, 10);
+                me.down.callback(true);
             }
         }
         
@@ -50,7 +50,7 @@ easyXDM.transport.NameTransport = function(config, onReady){
         // #ifdef debug
         easyXDM.Debug.trace("received message " + message);
         // #endif
-        config.onMessage(message, remoteOrigin);
+        me.up.incomming(message, remoteOrigin);
     }
     
     function _onLoad(){
@@ -97,14 +97,6 @@ easyXDM.transport.NameTransport = function(config, onReady){
         callerWindow.contentWindow.sendMessage(message, url);
     }
     
-    // Set up the iframe that will be used for the transport
-    callerWindow = easyXDM.DomHelper.createFrame(config.local + "#_4" + config.channel, null, function(){
-        // Remove the handler
-        easyXDM.DomHelper.removeEventListener(callerWindow, "load", callerWindow.loadFn);
-        easyXDM.Fn.set(config.channel + "_load", _onLoad);
-        _onReady();
-    });
-    
     /** 
      * Sends a message by placing it in the <code>name</code> property of the callerWindow and then
      * redirecting the window to the remote instance of hash.html.<br/>
@@ -112,7 +104,7 @@ easyXDM.transport.NameTransport = function(config, onReady){
      * @param {String} message The message to send
      */
     this.postMessage = function(message){
-        _sendMessage(message);
+        me.down.outgoing(message, remoteOrigin);
     };
     
     /**
@@ -122,6 +114,7 @@ easyXDM.transport.NameTransport = function(config, onReady){
         // #ifdef debug
         easyXDM.Debug.trace("destroying transport");
         // #endif
+        me.down.destroy();
         callerWindow.parentNode.removeChild(callerWindow);
         callerWindow = null;
         if (isHost) {
@@ -129,4 +122,43 @@ easyXDM.transport.NameTransport = function(config, onReady){
             remoteWindow = null;
         }
     };
+    
+    this.up = {
+        incomming: function(message, origin){
+            config.onMessage(message, origin);
+        },
+        outgoing: function(message){
+            _sendMessage(message);
+        },
+        callback: function(succes){
+            if (onReady) {
+                window.setTimeout(onReady, 10);
+            }
+        },
+        destroy: function(){
+        }
+    };
+    this.down = {
+        incomming: function(message, origin){
+            this.up.incomming(message, origin);
+        },
+        outgoing: function(message, origin){
+            this.down.outgoing(message, origin);
+        },
+        callback: function(success){
+            this.up.callback(success);
+        },
+        destroy: function(){
+            this.down.destroy();
+        }
+    };
+    easyXDM.applyBehaviors(this, null);
+    // Set up the iframe that will be used for the transport
+    callerWindow = easyXDM.DomHelper.createFrame(config.local + "#_4" + config.channel, null, function(){
+        // Remove the handler
+        easyXDM.DomHelper.removeEventListener(callerWindow, "load", callerWindow.loadFn);
+        easyXDM.Fn.set(config.channel + "_load", _onLoad);
+        _onReady();
+    });
+    
 };
