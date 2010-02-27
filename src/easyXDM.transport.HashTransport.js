@@ -8,7 +8,15 @@
      * @param {Object} settings
      */
     function ReliableBehavior(settings){
-        var pub, timer, current, msgId = 0, tryCount = 0, timeout = settings.timeout, lastMsgId = 0, callback;
+        var pub, // the public interface
+ timer, // timer to wait for acks
+ current, // the current message beging sent
+ next, // the next message to be sent, to support piggybacking acks
+ sendId = 0, // the id of the last message sent
+ sendCount = 0, // how many times we hav tried resending
+ timeout = settings.timeout, // how long we should wait for an ack before retransmitting
+ receiveId = 0, // the id of the last message received
+ callback; // the callback to execute when we have a confirmed success/failure
         // #ifdef debug
         easyXDM.Debug.trace("ReliableBehavior: settings.timeout=" + settings.timeout);
         // #endif
@@ -16,7 +24,7 @@
             incomming: function(message, origin){
                 var indexOf = message.indexOf("_"), ack = parseInt(message.substring(0, indexOf), 10), id;
                 // #ifdef debug
-                easyXDM.Debug.trace("ReliableBehavior: received ack: " + ack + ", last sent was: " + msgId);
+                easyXDM.Debug.trace("ReliableBehavior: received ack: " + ack + ", last sent was: " + sendId);
                 // #endif
                 message = message.substring(indexOf + 1);
                 indexOf = message.indexOf("_");
@@ -24,9 +32,9 @@
                 indexOf = message.indexOf("_");
                 message = message.substring(indexOf + 1);
                 // #ifdef debug
-                easyXDM.Debug.trace("ReliableBehavior: lastid " + lastMsgId + ", this " + id);
+                easyXDM.Debug.trace("ReliableBehavior: lastid " + receiveId + ", this " + id);
                 // #endif
-                if (timer && ack === msgId) {
+                if (timer && ack === sendId) {
                     window.clearTimeout(timer);
                     timer = null;
                     // #ifdef debug
@@ -39,8 +47,8 @@
                     }
                 }
                 if (id !== 0) {
-                    if (id !== lastMsgId) {
-                        lastMsgId = id;
+                    if (id !== receiveId) {
+                        receiveId = id;
                         message = message.substring(id.length + 1);
                         // #ifdef debug
                         easyXDM.Debug.trace("ReliableBehavior: sending ack, passing on " + message);
@@ -61,16 +69,16 @@
             },
             outgoing: function(message, origin, fn){
                 callback = fn;
-                tryCount = 0;
+                sendCount = 0;
                 current = {
-                    data: lastMsgId + "_" + (++msgId) + "_" + message,
+                    data: receiveId + "_" + (++sendId) + "_" + message,
                     origin: origin
                 };
                 
                 // Keep resending until we have an ack
                 (function send(){
                     timer = null;
-                    if (tryCount++ > 5) {
+                    if (sendCount++ > 5) {
                         if (callback) {
                             // #ifdef debug
                             easyXDM.Debug.trace("ReliableBehavior: delivery failed");
@@ -82,7 +90,7 @@
                     }
                     else {
                         // #ifdef debug
-                        easyXDM.Debug.trace("ReliableBehavior: " + (tryCount === 1 ? "sending " : "resending ") + msgId + ", tryCount " + tryCount);
+                        easyXDM.Debug.trace("ReliableBehavior: " + (sendCount === 1 ? "sending " : "resending ") + sendId + ", tryCount " + sendCount);
                         // #endif
                         pub.down.outgoing(current.data, current.origin);
                         timer = window.setTimeout(send, settings.timeout);
@@ -321,6 +329,7 @@
         behaviors.push(new QueueBehavior({
             maxLength: 4000 - _remoteUrl.length
         }));
+        
         if (behaviors.length === 1) {
             behavior = behaviors[0];
             behavior.down = behavior.up = pipeUp;
@@ -407,6 +416,7 @@
                     throw new Error("Failed to obtain a reference to the window");
                 }
             }
+            
             (function getBody(){
                 if (_listenerWindow && _listenerWindow.document && _listenerWindow.document.body) {
                     if (usePolling) {
@@ -415,7 +425,7 @@
                         // #endif
                         _timer = window.setInterval(_pollHash, pollInterval);
                     }
-                    else if (config.readyAfter) {
+                    else if ((!isHost && !usePolling) || config.readyAfter) {
                         // This cannot handle resize on its own
                         easyXDM.DomHelper.addEventListener(_listenerWindow, "resize", _onResize);
                         
@@ -448,7 +458,7 @@
             if (usePolling) {
                 window.clearInterval(_timer);
             }
-            else if (_listenerWindow && config.readyAfter) {
+            else if ((!isHost && !usePolling) || config.readyAfter) {
                 easyXDM.DomHelper.removeEventListener(_listenerWindow, "resize", _pollHash);
             }
             if (isHost || !useParent) {
@@ -468,6 +478,9 @@
                 easyXDM.Fn.set(config.channel, _onReady);
                 easyXDM.Fn.set(config.channel + "_onresize", _handleHash);
             }
+        }
+        else {
+        
         }
         if (!isHost && useParent) {
             _callerWindow = parent;
