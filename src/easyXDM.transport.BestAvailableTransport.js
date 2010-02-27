@@ -16,7 +16,7 @@
  */
 easyXDM.transport.BestAvailableTransport = function(config, onReady){
     var query = easyXDM.Url.Query(), Transport;
-    // #ifdef debug	
+    // #ifdef debug
     easyXDM.Debug.trace("easyXDM.transport.BestAvailableTransport.constructor");
     // #endif
     
