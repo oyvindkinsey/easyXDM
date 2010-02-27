@@ -19,6 +19,7 @@ easyXDM.transport.BestAvailableTransport = function(config, onReady){
     // #ifdef debug	
     easyXDM.Debug.trace("easyXDM.transport.BestAvailableTransport.constructor");
     // #endif
+    
     // If no protocol is set then it means this is the host
     if (typeof query.xdm_p === "undefined") {
         config.channel = (config.channel) ? config.channel : "default";

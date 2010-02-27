@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape */
+/*global easyXDM, window, escape, unescape, JSON */
 
 /** 
  * @class easyXDM.DomHelper

@@ -240,8 +240,8 @@ easyXDM = {
             easyXDM.Debug.trace(msg);
         }
     },
-    
     // #endif
+    
     /** 
      * @class easyXDM.Interface
      * Creates an interface that can be used to call methods implemented
