@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM: true, window, escape, unescape */
+/*global easyXDM: true, window, escape, unescape, _FirebugCommandLine */
 
 /** 
  * @class easyXDM
@@ -26,6 +26,50 @@ easyXDM = {
         for (var key in source) {
             if (source.hasOwnProperty(key)) {
                 target[key] = source[key];
+            }
+        }
+    },
+    
+    /**
+     * Method for applying behaviors to transports.<br/>
+     * The transport must expose an <code>up</code> and <code>down</code> property
+     * each implementing the behavior interface.
+     * @param {Object} transport The transport to apply the behaviors to
+     * @param {Array} behaviors An array of initialized behaviors to apply
+     */
+    applyBehaviors: function(transport, behaviors){
+        var behavior;
+        if (!behaviors || behaviors.length === 0) {
+            transport.down.up = transport.down.down = transport.up;
+            transport.up.up = transport.up.down = transport.down;
+        }
+        else if (behaviors.length === 1) {
+            behavior = behaviors[0];
+            behavior.down = behavior.up = transport.up;
+            transport.down.down = transport.down.up = behavior;
+            transport.up.down = transport.up.up = behavior;
+            
+        }
+        else {
+            for (var i = 0, len = behaviors.length; i < len; i++) {
+                behavior = behaviors[i];
+                if (i === 0) {
+                    // this is the behavior closest to 'the metal'
+                    transport.down.up = behavior; // override 
+                    behavior.down = transport.up; // down to sendMessage
+                    behavior.up = behaviors[i + 1];
+                }
+                else if (i === len - 1) {
+                    // this is the behavior closes to the user
+                    transport.down.down = behavior; //override
+                    behavior.down = behaviors[i - 1];
+                    behavior.up = transport.up;
+                }
+                else {
+                    // intermediary behaviors
+                    behavior.up = behaviors[i + 1];
+                    behavior.down = behaviors[i - 1];
+                }
             }
         }
     },
@@ -99,7 +143,7 @@ easyXDM = {
                         doc.write("<body><div id=\"log\"></div></body></html>");
                         doc.close();
                     }
-                    var el = doc.getElementById("log");
+                    el = doc.getElementById("log");
                     clear = function(){
                         try {
                             el.innerHTML = "";
@@ -165,7 +209,7 @@ easyXDM = {
                         doc.write("<body><div id=\"log\"></div></body></html>");
                         doc.close();
                     }
-                    var el = doc.getElementById("log");
+                    el = doc.getElementById("log");
                     trace = function(msg){
                         try {
                             el.appendChild(doc.createElement("div")).appendChild(doc.createTextNode(location.host + "-" + new Date().valueOf() + ":" + msg));
@@ -471,49 +515,6 @@ easyXDM = {
                 delete this.map[name];
             }
             return fn;
-        }
-    },
-    
-    /**
-     * Method for applying behaviors to transports.<br/>
-     * The transport must expose an <code>up</code> and <code>down</code> property
-     * each implementing the behavior interface.
-     * @param {Object} transport The transport to apply the behaviors to
-     * @param {Array} behaviors An array of initialized behaviors to apply
-     */
-    applyBehaviors: function(transport, behaviors){
-        if (!behaviors || behaviors.length === 0) {
-            transport.down.up = transport.down.down = transport.up;
-            transport.up.up = transport.up.down = transport.down;
-        }
-        else if (behaviors.length === 1) {
-            behavior = behaviors[0];
-            behavior.down = behavior.up = transport.up;
-            transport.down.down = transport.down.up = behavior;
-            transport.up.down = transport.up.up = behavior;
-            
-        }
-        else {
-            for (var i = 0, len = behaviors.length; i < len; i++) {
-                behavior = behaviors[i];
-                if (i === 0) {
-                    // this is the behavior closest to 'the metal'
-                    transport.down.up = behavior; // override 
-                    behavior.down = transport.up; // down to sendMessage
-                    behavior.up = behaviors[i + 1];
-                }
-                else if (i === len - 1) {
-                    // this is the behavior closes to the user
-                    transport.down.down = behavior; //override
-                    behavior.down = behaviors[i - 1];
-                    behavior.up = transport.up;
-                }
-                else {
-                    // intermediary behaviors
-                    behavior.up = behaviors[i + 1];
-                    behavior.down = behaviors[i - 1];
-                }
-            }
         }
     }
 };

@@ -4,3 +4,4 @@ dist/
 docs/
 build.number
 .tmp_*
+src/.*

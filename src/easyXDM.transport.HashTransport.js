@@ -220,7 +220,7 @@
                 else {
                     window.setTimeout(getBody, 10);
                 }
-            })();
+            }());
         }
         
         /** 
