@@ -8,14 +8,25 @@
      * @param {Object} settings
      */
     function ReliableBehavior(settings){
-        var pub, timer, current, msgId = 0, tryCount = 0, timeout = settings.timeout, lastMsgId, callback;
+        var pub, timer, current, msgId = 0, tryCount = 0, timeout = settings.timeout, lastMsgId = 0, callback;
         // #ifdef debug
         easyXDM.Debug.trace("ReliableBehavior: settings.timeout=" + settings.timeout);
         // #endif
         return (pub = {
             incomming: function(message, origin){
-                var id;
-                if (message.substring(0, 1) === "_") {
+                var indexOf = message.indexOf("_"), ack = parseInt(message.substring(0, indexOf), 10), id;
+                // #ifdef debug
+                easyXDM.Debug.trace("ReliableBehavior: received ack: " + ack + ", last sent was: " + msgId);
+                // #endif
+                message = message.substring(indexOf + 1);
+                indexOf = message.indexOf("_");
+                id = parseInt(message.substring(0, indexOf), 10);
+                indexOf = message.indexOf("_");
+                message = message.substring(indexOf + 1);
+                // #ifdef debug
+                easyXDM.Debug.trace("ReliableBehavior: lastid " + lastMsgId + ", this " + id);
+                // #endif
+                if (timer && ack === msgId) {
                     window.clearTimeout(timer);
                     timer = null;
                     // #ifdef debug
@@ -27,24 +38,14 @@
                         }, 0);
                     }
                 }
-                else {
-                    // #ifdef debug
-                    if (timer) {
-                        easyXDM.Debug.trace("ReliableBehavior: was expecting an ack");
-                    }
-                    // #endif
-                    message = message.substring(1);
-                    id = message.substring(0, message.indexOf("_"));
-                    // #ifdef debug
-                    easyXDM.Debug.trace("ReliableBehavior: lastid " + lastMsgId + ", this " + id);
-                    // #endif
+                if (id !== 0) {
                     if (id !== lastMsgId) {
                         lastMsgId = id;
                         message = message.substring(id.length + 1);
                         // #ifdef debug
                         easyXDM.Debug.trace("ReliableBehavior: sending ack, passing on " + message);
                         // #endif
-                        pub.down.outgoing("_ack", origin);
+                        pub.down.outgoing(id + "_0_ack", origin);
                         // we must give the other end time to pick up the ack
                         window.setTimeout(function(){
                             pub.up.incomming(message, origin);
@@ -62,7 +63,7 @@
                 callback = fn;
                 tryCount = 0;
                 current = {
-                    data: "-" + (++msgId) + "_" + message,
+                    data: lastMsgId + "_" + (++msgId) + "_" + message,
                     origin: origin
                 };
                 
