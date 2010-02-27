@@ -19,6 +19,8 @@ a simple string based commmunication channel. This can be used directly
 to send strings between the two documents. The transports does not have any
 dependencies outside the script itself and what the browser offers.
 
+**All the transports offer reliability, queueing and sender-verification, making them all equal to higher level classes.**
+
 **easyXDM.Channel** wraps a Transport and uses a serializer to enable you
 to send Javascript objects over the transport. This offer the most when used with 
 the HTML5 JSON object, either via the native implementation or through Douglas Crockfords json2 library.
