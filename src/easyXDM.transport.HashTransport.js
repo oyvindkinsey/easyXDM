@@ -7,6 +7,10 @@
      * @class easyXDM.transport.HashTransport
      * HashTransport is a transport class that uses the IFrame URL Technique for communication.<br/>
      * <a href="http://msdn.microsoft.com/en-us/library/bb735305.aspx">http://msdn.microsoft.com/en-us/library/bb735305.aspx</a><br/>
+     * This requires the precense of hash.html on the hosting domain for optimal performance, but can also be used with any other 
+     * static file present. If used with static file (like an image) as the local: property, you must set the readyAfter property.<br/>
+     * The library will try to be ready earlier, so this should be set to a safe value, when you are certain that the file will be loaded.<br/>
+     * If this file is already present in the document, and therefor most likely cached, then this can be set to low value.
      * <br/>
      * The ReliableBehavior, QueueBehavior and VerifyBehavior are applied to this class.
      * @constructor
@@ -173,7 +177,7 @@
          * @private
          */
         function _onReady(){
-            if (isHost) {
+            if (isHost && !_listenerWindow) {
                 if (useParent) {
                     _listenerWindow = window;
                 }
@@ -254,7 +258,7 @@
         if (isHost) {
             if (config.readyAfter) {
                 // Fire the onReady method after a set delay
-                window.setTimeout(_onReady, config.readyAfter);
+                _timer = window.setTimeout(_onReady, config.readyAfter);
             }
             else {
                 // Register onReady callback in the library so that
@@ -272,6 +276,30 @@
         }
         else {
             _callerWindow = easyXDM.DomHelper.createFrame((isHost ? _remoteUrl : _remoteUrl + "#" + config.channel), config.container, (isHost && !useParent) ? null : _onReady, (isHost ? "local_" : "remote_") + config.channel);
+            if (isHost && config.readyAfter) {
+                var tries = 0, max = config.readyAfter / 50;
+                (function getRef(){
+                    if (++tries > max) {
+                        return;
+                    }
+                    if (_listenerWindow) {
+                        return;
+                    }
+                    try {
+                        // This works in IE6
+                        _listenerWindow = _callerWindow.contentWindow.frames["remote_" + config.channel];
+                        // #ifdef debug
+                        easyXDM.Debug.trace("got an early reference to _listenerWindow");
+                        // #endif
+                        window.clearTimeout(_timer);
+                        _onReady();
+                        return;
+                    } 
+                    catch (ex) {
+                        window.setTimeout(getRef, 50);
+                    }
+                }());
+            }
         }
     };
     
