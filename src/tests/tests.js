@@ -41,9 +41,14 @@ function runTests(){
                 return this.Assert.isFunction(easyXDM.Channel);
             }
         }, {
-            name: "check for the presence of easyXDM.transport.HashTransport",
+            name: "check for the presence of easyXDM.Channel",
             run: function(){
-                return this.Assert.isFunction(easyXDM.transport.HashTransport);
+                return this.Assert.isFunction(easyXDM.Channel);
+            }
+        }, {
+            name: "check for the presence of easyXDM.transport",
+            run: function(){
+                return this.Assert.isObject(easyXDM.transport);
             }
         }, {
             name: "check for the presence of easyXDM.transport.PostMessageTransport",
@@ -54,6 +59,11 @@ function runTests(){
             name: "check for the presence of easyXDM.transport.NameTransport",
             run: function(){
                 return this.Assert.isFunction(easyXDM.transport.NameTransport);
+            }
+        }, {
+            name: "check for the presence of easyXDM.transport.behaviors",
+            run: function(){
+                return this.Assert.isObject(easyXDM.transport.behaviors);
             }
         }, {
             name: "check for the presence of easyXDM.Debug",
@@ -86,13 +96,18 @@ function runTests(){
             timeout: 5000,
             run: function(){
                 var scope = this;
+                var messages = 0;
                 this.transport = new easyXDM.transport.NameTransport({
                     channel: "channel" + (channelId++),
                     local: "../hash.html",
                     remote: _remoteUrl + "test_transport.html",
                     remoteHelper: _remoteUrl + "../hash.html",
                     onMessage: function(message, origin){
-                        scope.notifyResult((scope.expectedMessage === message));
+                        if (scope.expectedMessage === message) {
+                            if (++messages === 2) {
+                                scope.notifyResult(true);
+                            }
+                        }
                     },
                     container: document.getElementById("embedded")
                 }, function(){
@@ -101,8 +116,9 @@ function runTests(){
             }
         }, {
             name: "message is echoed back",
-            timeout: 1000,
+            timeout: 5000,
             run: function(){
+                this.transport.postMessage(this.expectedMessage);
                 this.transport.postMessage(this.expectedMessage);
             }
         }, {
@@ -141,7 +157,7 @@ function runTests(){
             }
         }, {
             name: "message is echoed back",
-            timeout: 2000,
+            timeout: 5000,
             run: function(){
                 this.transport.postMessage(this.expectedMessage);
                 this.transport.postMessage(this.expectedMessage);
@@ -181,7 +197,7 @@ function runTests(){
             }
         }, {
             name: "message is echoed back",
-            timeout: 2000,
+            timeout: 5000,
             run: function(){
                 this.transport.postMessage(this.expectedMessage);
                 this.transport.postMessage(this.expectedMessage);
@@ -222,7 +238,7 @@ function runTests(){
             }
         }, {
             name: "message is echoed back",
-            timeout: 1000,
+            timeout: 5000,
             run: function(){
                 this.transport.postMessage(this.expectedMessage);
                 this.transport.postMessage(this.expectedMessage);
@@ -266,7 +282,7 @@ function runTests(){
             }
         }, {
             name: "message is echoed back",
-            timeout: 1000,
+            timeout: 5000,
             run: function(){
                 this.transport.postMessage(this.expectedMessage);
                 this.transport.postMessage(this.expectedMessage);
@@ -333,12 +349,17 @@ function runTests(){
             timeout: 5000,
             run: function(){
                 var scope = this;
+                var messages = 0;
                 this.transport = new easyXDM.transport.PostMessageTransport({
                     channel: "channel" + (channelId++),
                     local: "../hash.html",
                     remote: _remoteUrl + "test_transport.html",
                     onMessage: function(message, origin){
-                        scope.notifyResult((scope.expectedMessage === message));
+                        if (scope.expectedMessage === message) {
+                            if (++messages === 2) {
+                                scope.notifyResult(true);
+                            }
+                        }
                     }
                 }, function(){
                     scope.notifyResult(true);
@@ -346,8 +367,9 @@ function runTests(){
             }
         }, {
             name: "message is echoed back",
-            timeout: 1000,
+            timeout: 5000,
             run: function(){
+                this.transport.postMessage(this.expectedMessage);
                 this.transport.postMessage(this.expectedMessage);
             }
         }, {
@@ -380,7 +402,7 @@ function runTests(){
             }
         }, {
             name: "message is echoed back",
-            timeout: 1000,
+            timeout: 5000,
             run: function(){
                 this.transport.postMessage(this.expectedMessage);
             }
@@ -414,7 +436,7 @@ function runTests(){
             }
         }, {
             name: "message is echoed back",
-            timeout: 1000,
+            timeout: 5000,
             run: function(){
                 this.transport.postMessage(this.expectedMessage);
             }
@@ -461,13 +483,13 @@ function runTests(){
             }
         }, {
             name: "void method",
-            timeout: 1000,
+            timeout: 5000,
             run: function(){
                 this.remote.voidMethod(this.expectedMessage);
             }
         }, {
             name: "async method",
-            timeout: 1000,
+            timeout: 5000,
             run: function(){
                 var scope = this;
                 this.remote.asyncMethod(this.expectedMessage, function(message){
@@ -476,7 +498,7 @@ function runTests(){
             }
         }, {
             name: "regular method",
-            timeout: 1000,
+            timeout: 5000,
             run: function(){
                 var scope = this;
                 this.remote.method(this.expectedMessage, function(message){
