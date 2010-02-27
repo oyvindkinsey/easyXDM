@@ -66,6 +66,67 @@ easyXDM = {
             log(msg);
             easyXDM.Debug.log = log;
         },
+        
+        
+        clear: function(){
+            var clear;
+            var el = document.getElementById("log");
+            if (el) {
+                /**
+                 * Sets trace to be a function that outputs the messages to the DOMElement with id "log"
+                 * @ignore
+                 * @param {String} msg
+                 */
+                clear = function(){
+                    try {
+                        el.innerHTML = "";
+                    } 
+                    catch (e) {
+                        //In case we are unloading
+                    }
+                };
+            }
+            else if (typeof console === "undefined" || typeof console.info === "undefined") {
+                /**
+                 * Create log window
+                 * @ignore
+                 */
+                var logWin = window.open("", "easyxdm_log", "width=800,height=200,status=0,navigation=0,scrollbars=1");
+                if (logWin) {
+                    var doc = logWin.document;
+                    if (doc.title !== "easyXDM log") {
+                        doc.write("<html><head><title>easyXDM log</title></head>");
+                        doc.write("<body><div id=\"log\"></div></body></html>");
+                        doc.close();
+                    }
+                    var el = doc.getElementById("log");
+                    clear = function(){
+                        try {
+                            el.innerHTML = "";
+                        } 
+                        catch (e) {
+                            //In case we are unloading
+                        }
+                    };
+                }
+                else {
+                    clear = function(){
+                    };
+                }
+            }
+            else if (console.clear) {
+                clear = function(){
+                    console.clear();
+                };
+            }
+            else if (_FirebugCommandLine.clear) {
+                clear = function(){
+                    _FirebugCommandLine.clear();
+                };
+            }
+            easyXDM.Debug.clear = clear;
+        },
+        
         /**
          * Will try to trace the given message either to a DOMElement with the id "log",
          * or by using console.info.
@@ -91,47 +152,45 @@ easyXDM = {
                     }
                 };
             }
-            else {
-                if (typeof console === "undefined" || typeof console.info === "undefined") {
-                    /**
-                     * Create log window
-                     * @ignore
-                     */
-                    var logWin = window.open("", "easyxdm_log", "width=800,height=200,status=0,navigation=0,scrollbars=1");
-                    if (logWin) {
-                        var doc = logWin.document;
-                        if (doc.title !== "easyXDM log") {
-                            doc.write("<html><head><title>easyXDM log</title></head>");
-                            doc.write("<body><div id=\"log\"></div></body></html>");
-                            doc.close();
+            else if (typeof console === "undefined" || typeof console.info === "undefined") {
+                /**
+                 * Create log window
+                 * @ignore
+                 */
+                var logWin = window.open("", "easyxdm_log", "width=800,height=200,status=0,navigation=0,scrollbars=1");
+                if (logWin) {
+                    var doc = logWin.document;
+                    if (doc.title !== "easyXDM log") {
+                        doc.write("<html><head><title>easyXDM log</title></head>");
+                        doc.write("<body><div id=\"log\"></div></body></html>");
+                        doc.close();
+                    }
+                    var el = doc.getElementById("log");
+                    trace = function(msg){
+                        try {
+                            el.appendChild(doc.createElement("div")).appendChild(doc.createTextNode(location.host + "-" + new Date().valueOf() + ":" + msg));
+                            el.scrollTop = el.scrollHeight;
+                        } 
+                        catch (e) {
+                            //In case we are unloading
                         }
-                        var el = doc.getElementById("log");
-                        trace = function(msg){
-                            try {
-                                el.appendChild(doc.createElement("div")).appendChild(doc.createTextNode(location.host + "-" + new Date().valueOf() + ":" + msg));
-                                el.scrollTop = el.scrollHeight;
-                            } 
-                            catch (e) {
-                                //In case we are unloading
-                            }
-                        };
-                        trace("---- new logger at " + location.href);
-                    }
-                    else {
-                        trace = function(){
-                        };
-                    }
+                    };
+                    trace("---- new logger at " + location.href);
                 }
                 else {
-                    /**
-                     * Sets trace to be a wrapper around console.info
-                     * @ignore
-                     * @param {String} msg
-                     */
-                    trace = function(msg){
-                        console.info(location.host + "-" + new Date().valueOf() + ":" + msg);
+                    trace = function(){
                     };
                 }
+            }
+            else {
+                /**
+                 * Sets trace to be a wrapper around console.info
+                 * @ignore
+                 * @param {String} msg
+                 */
+                trace = function(msg){
+                    console.info(location.host + "-" + new Date().valueOf() + ":" + msg);
+                };
             }
             easyXDM.Debug.trace = trace;
             easyXDM.Debug.trace(msg);
