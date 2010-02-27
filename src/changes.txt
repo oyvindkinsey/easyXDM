@@ -1,3 +1,19 @@
+1.8.0 27.02.10
+Both the HashTransport and the Nametransport has received a major overhaul.
+Generic Behaviors are now implemented, and deal with reliability (making the HashTransport reliable), queueing and sender verification.
+This means that all the transports are now equal when it comes to behavior, the only difference is speed.
+They are all reliant, 
+they are all able to queue and dispatch messages automatically
+they are all secure from spoofing
+and they are all easy to use!
+
+With the new behavior architecture it will also be easier to add new functionality
+- it might even be that the transport internals will be moved into similar behaviors.  
+
+1.7.5 25.02.10
+Made several improvements to the HashTransport - this now verifies that it actually can communicate with the other end
+and thereby disables the spoofing the origin (as previously possible).
+
 1.7.4 - 22.02.10
 Implemented queing for NameTransport, this also made it more reliable.
 This means that all transports now support rapid sending of messages, even within the same js thread.
