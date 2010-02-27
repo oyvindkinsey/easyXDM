@@ -133,7 +133,7 @@ easyXDM.transport.behaviors.ReliableBehavior = function(settings){
  * @namespace easyXDM.transport.behaviors
  */
 easyXDM.transport.behaviors.QueueBehavior = function(settings){
-    var pub, queue = [], waiting = false, incomming = "", destroying, maxLength = settings.maxLength;
+    var pub, queue = [], waiting = false, incomming = "", destroying, maxLength = (settings) ? settings.maxLength : 0;
     
     function dispatch(){
         if (waiting || queue.length === 0 || destroying) {
