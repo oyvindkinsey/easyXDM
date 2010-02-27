@@ -135,23 +135,27 @@ easyXDM = {
                  * Create log window
                  * @ignore
                  */
-                var logWin = window.open("", "easyxdm_log", "width=800,height=200,status=0,navigation=0,scrollbars=1");
+                var domain = location.host;
+                var windowname = domain.replace(/\./g, "") + "easyxdm_log";
+                var logWin = window.open("", windowname, "width=800,height=200,status=0,navigation=0,scrollbars=1");
                 if (logWin) {
                     var doc = logWin.document;
                     if (doc.title !== "easyXDM log") {
-                        doc.write("<html><head><title>easyXDM log</title></head>");
+                        doc.write("<html><head><title>easyXDM log " + domain + "</title></head>");
                         doc.write("<body><div id=\"log\"></div></body></html>");
                         doc.close();
                     }
                     el = doc.getElementById("log");
-                    clear = function(){
+                    trace = function(msg){
                         try {
-                            el.innerHTML = "";
+                            el.appendChild(doc.createElement("div")).appendChild(doc.createTextNode(location.host + "-" + new Date().valueOf() + ":" + msg));
+                            el.scrollTop = el.scrollHeight;
                         } 
                         catch (e) {
                             //In case we are unloading
                         }
                     };
+                    trace("---- new logger at " + location.href);
                 }
                 else {
                     clear = function(){
