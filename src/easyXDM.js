@@ -430,7 +430,9 @@ easyXDM = {
         else if (behaviors.length === 1) {
             behavior = behaviors[0];
             behavior.down = behavior.up = transport.up;
-            transport.down.down = transport.up.up = behavior;
+            transport.down.down = transport.down.up = behavior;
+            transport.up.down = transport.up.up = behavior;
+            
         }
         else {
             for (var i = 0, len = behaviors.length; i < len; i++) {
