@@ -183,6 +183,67 @@
         });
     }
     
+    function VerifyBehavior(settings){
+        var pub, mySecret, theirSecret, verified = false;
+        
+        function startVerification(){
+            // #ifdef debug
+            easyXDM.Debug.trace("VerifyBehavior: requesting verification");
+            // #endif
+            mySecret = Math.random().toString(16).substring(2);
+            pub.down.outgoing(mySecret);
+        }
+        
+        return (pub = {
+            incomming: function(message, origin){
+                var indexOf = message.indexOf("_");
+                if (indexOf === -1) {
+                    if (message === mySecret) {
+                        // #ifdef debug
+                        easyXDM.Debug.trace("VerifyBehavior: verified, calling callback");
+                        // #endif
+                        pub.up.callback(true);
+                    }
+                    else if (!theirSecret) {
+                        // #ifdef debug
+                        easyXDM.Debug.trace("VerifyBehavior: returning secret");
+                        // #endif
+                        theirSecret = message;
+                        if (!settings.initiate) {
+                            startVerification();
+                        }
+                        pub.down.outgoing(message);
+                    }
+                }
+                else {
+                    if (message.substring(0, indexOf) === theirSecret) {
+                        // #ifdef debug
+                        easyXDM.Debug.trace("VerifyBehavior: valid");
+                        // #endif
+                        pub.up.incomming(message.substring(indexOf + 1), origin);
+                    }
+                    // #ifdef debug
+                    else {
+                        easyXDM.Debug.trace("VerifyBehavior: invalid secret:" + message.substring(0, indexOf) + ", was expecting:" + theirSecret);
+                        
+                    }
+                    // #endif
+                }
+                
+            },
+            outgoing: function(message, origin, fn){
+                pub.down.outgoing(mySecret + "_" + message, origin, fn);
+            },
+            destroy: function(){
+                pub.up.destroy();
+            },
+            callback: function(success){
+                if (settings.initiate) {
+                    startVerification();
+                }
+            }
+        });
+    }
     
     
     /**
@@ -258,9 +319,9 @@
         }
         // #endif
         
-        function _sendMessage(message, origin, fn){
+        function _sendMessage(message, fn){
             // #ifdef debug
-            easyXDM.Debug.trace("sending message '" + (_msgNr + 1) + " " + message + "' to " + origin);
+            easyXDM.Debug.trace("sending message '" + (_msgNr + 1) + " " + message + "' to " + _remoteOrigin);
             // #endif
             if (!_callerWindow) {
                 // #ifdef debug
@@ -292,8 +353,8 @@
             incomming: function(message, origin){
                 config.onMessage(decodeURIComponent(message), origin);
             },
-            outgoing: function(message, origin){
-                _sendMessage(encodeURIComponent(message), origin);
+            outgoing: function(message){
+                _sendMessage(encodeURIComponent(message));
             },
             callback: function(succes){
                 if (onReady) {
@@ -325,9 +386,11 @@
         behaviors.push(new ReliableBehavior({
             timeout: ((useResize ? 50 : pollInterval * 1.5) + (usePolling ? pollInterval * 1.5 : 50))
         }));
-        
         behaviors.push(new QueueBehavior({
             maxLength: 4000 - _remoteUrl.length
+        }));
+        behaviors.push(new VerifyBehavior({
+            initiate: isHost
         }));
         
         if (behaviors.length === 1) {
