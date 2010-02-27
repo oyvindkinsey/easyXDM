@@ -134,19 +134,14 @@
             }
         };
         
-        var behaviors = [], behavior;
         
-        behaviors.push(new easyXDM.transport.behaviors.ReliableBehavior({
+        easyXDM.applyBehaviors(this, [new easyXDM.transport.behaviors.ReliableBehavior({
             timeout: ((useResize ? 50 : pollInterval * 1.5) + (usePolling ? pollInterval * 1.5 : 50))
-        }));
-        behaviors.push(new easyXDM.transport.behaviors.QueueBehavior({
+        }), new easyXDM.transport.behaviors.QueueBehavior({
             maxLength: 4000 - _remoteUrl.length
-        }));
-        behaviors.push(new easyXDM.transport.behaviors.VerifyBehavior({
+        }), new easyXDM.transport.behaviors.VerifyBehavior({
             initiate: isHost
-        }));
-        
-        easyXDM.applyBehaviors(this, behaviors);
+        })]);
         
         function _handleHash(hash){
             _lastMsg = hash;
