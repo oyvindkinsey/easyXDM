@@ -28,6 +28,16 @@ easyXDM.transport.NameTransport = function(config, onReady){
     var remoteOrigin = easyXDM.Url.getLocation(config.remote), remoteUrl;
     config.local = easyXDM.Url.resolveUrl(config.local);
     
+    
+    function _sendMessage(message){
+        var url = config.remoteHelper + (isHost ? ("#_3" + encodeURIComponent(remoteUrl + "#" + config.channel)) : ("#_2" + config.channel));
+        // #ifdef debug
+        easyXDM.Debug.trace("sending message " + message);
+        easyXDM.Debug.trace("navigating to  '" + url + "'");
+        // #endif
+        callerWindow.contentWindow.sendMessage(message, url);
+    }
+    
     function _onReady(){
         if (isHost) {
             if (++readyCount === 2 || !isHost) {
@@ -35,7 +45,7 @@ easyXDM.transport.NameTransport = function(config, onReady){
             }
         }
         else {
-            me.postMessage("ready");
+            _sendMessage("ready");
             if (onReady) {
                 // #ifdef debug
                 easyXDM.Debug.trace("calling onReady");
@@ -50,7 +60,7 @@ easyXDM.transport.NameTransport = function(config, onReady){
         // #ifdef debug
         easyXDM.Debug.trace("received message " + message);
         // #endif
-        me.up.incomming(message, remoteOrigin);
+        me.down.incomming(message, remoteOrigin);
     }
     
     function _onLoad(){
@@ -86,15 +96,6 @@ easyXDM.transport.NameTransport = function(config, onReady){
     else {
         config.remoteHelper = config.remote;
         easyXDM.Fn.set(config.channel, _onMessage);
-    }
-    
-    function _sendMessage(message){
-        var url = config.remoteHelper + (isHost ? ("#_3" + encodeURIComponent(remoteUrl + "#" + config.channel)) : ("#_2" + config.channel));
-        // #ifdef debug
-        easyXDM.Debug.trace("sending message " + message);
-        easyXDM.Debug.trace("navigating to  '" + url + "'");
-        // #endif
-        callerWindow.contentWindow.sendMessage(message, url);
     }
     
     /** 
@@ -152,7 +153,7 @@ easyXDM.transport.NameTransport = function(config, onReady){
             this.down.destroy();
         }
     };
-    easyXDM.applyBehaviors(this, null);
+    easyXDM.applyBehaviors(this, [new easyXDM.transport.behaviors.QueueBehavior()]);
     // Set up the iframe that will be used for the transport
     callerWindow = easyXDM.DomHelper.createFrame(config.local + "#_4" + config.channel, null, function(){
         // Remove the handler
