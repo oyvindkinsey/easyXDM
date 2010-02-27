@@ -14,6 +14,7 @@ easyXDM.transport.behaviors = {};
 /**
  * @class easyXDM.transport.behaviors.ReliableBehavior
  * This is a behavior that tries to make the underlying transport reliable by using acknowledgements.
+ * @constructor
  * @param {Object} settings
  * @cfg {Number} timeout How long it should wait before resending
  * @cfg {Number} tries How many times it should try before giving up
@@ -128,6 +129,7 @@ easyXDM.transport.behaviors.ReliableBehavior = function(settings){
  * It will buffer incomming messages and will dispach these as fast as the underlying transport allows.
  * This will also fragment/defragment messages so that the outgoing message is never bigger than the
  * set length.
+ * @constructor
  * @param {Object} settings
  * @cfg {Number} maxLength The maximum length of each outgoing message. Set this to enable fragmentation.
  * @namespace easyXDM.transport.behaviors
@@ -213,6 +215,7 @@ easyXDM.transport.behaviors.QueueBehavior = function(settings){
  * @class easyXDM.transport.behaviors.VerifyBehavior
  * This behavior will verify that communication with the remote end is possible, and will also sign all outgoing,
  * and verify all incomming messages. This removes the risk of someone hijacking the iframe to send malicious messages.
+ * @constructor
  * @param {Object} settings
  * @cfg {Boolean} initiate If the verification should be initiated from this end.
  * @namespace easyXDM.transport.behaviors

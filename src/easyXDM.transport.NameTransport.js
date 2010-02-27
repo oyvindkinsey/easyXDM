@@ -3,7 +3,9 @@
 
 /**
  * @class easyXDM.transport.NameTransport
- * NameTransport uses the window.name property to relay data - this means it can transport large amounts of data
+ * NameTransport uses the window.name property to relay data - this means it can transport large amounts of data<br/>
+ * <br/>
+ * The QueueBehavior and VerifyBehavior are applied to this class.
  * @constructor
  * @param {easyXDM.configuration.TransportConfiguration} config The transports configuration.
  * @param {Function} onReady A method that should be called when the transport is ready

@@ -6,10 +6,9 @@
     /**
      * @class easyXDM.transport.HashTransport
      * HashTransport is a transport class that uses the IFrame URL Technique for communication.<br/>
-     * This means that the amount of data that is possible to send in each message is limited to the length the browser
-     * allows for urls - the length of the url for <code>local</code>.<br/>
-     * The HashTransport does not guarantee that the messages are read, something that also applies to the optimistic queuing.<br/>
-     * <a href="http://msdn.microsoft.com/en-us/library/bb735305.aspx">http://msdn.microsoft.com/en-us/library/bb735305.aspx</a>
+     * <a href="http://msdn.microsoft.com/en-us/library/bb735305.aspx">http://msdn.microsoft.com/en-us/library/bb735305.aspx</a><br/>
+     * <br/>
+     * The ReliableBehavior, QueueBehavior and VerifyBehavior are applied to this class.
      * @constructor
      * @param {easyXDM.configuration.TransportConfiguration} config The transports configuration.
      * @param {Function} onReady A method that should be called when the transport is ready
