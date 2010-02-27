@@ -154,7 +154,9 @@ easyXDM.transport.NameTransport = function(config, onReady){
             this.down.destroy();
         }
     };
-    easyXDM.applyBehaviors(this, [new easyXDM.transport.behaviors.QueueBehavior()]);
+    easyXDM.applyBehaviors(this, [new easyXDM.transport.behaviors.QueueBehavior(), new easyXDM.transport.behaviors.VerifyBehavior({
+        initiate: isHost
+    })]);
     // Set up the iframe that will be used for the transport
     callerWindow = easyXDM.DomHelper.createFrame(config.local + "#_4" + config.channel, null, function(){
         // Remove the handler
