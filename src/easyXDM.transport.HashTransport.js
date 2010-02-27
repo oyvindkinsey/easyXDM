@@ -4,8 +4,10 @@
 (function(){
 
     /**
-     *
+     * This is a behavior that tries to make the underlying transport reliable by using acknowledgements.
      * @param {Object} settings
+     * @cfg {Number} timeout How long it should wait before resending
+     * @cfg {Number} tries How many times it should try before giving up
      */
     function ReliableBehavior(settings){
         var pub, // the public interface
@@ -14,11 +16,12 @@
  next, // the next message to be sent, to support piggybacking acks
  sendId = 0, // the id of the last message sent
  sendCount = 0, // how many times we hav tried resending
- timeout = settings.timeout, // how long we should wait for an ack before retransmitting
+ maxTries = settings.tries || 5, timeout = settings.timeout, //
  receiveId = 0, // the id of the last message received
  callback; // the callback to execute when we have a confirmed success/failure
         // #ifdef debug
         easyXDM.Debug.trace("ReliableBehavior: settings.timeout=" + settings.timeout);
+        easyXDM.Debug.trace("ReliableBehavior: settings.tries=" + settings.tries);
         // #endif
         return (pub = {
             incomming: function(message, origin){
@@ -62,7 +65,7 @@
                     // #ifdef debug
                     else {
                         easyXDM.Debug.trace("ReliableBehavior: duplicate msgid " + id + ", resending ack");
-                        //pub.down.outgoing("_ack", origin);
+                        pub.down.outgoing(id + "_0_ack", origin);
                     }
                     // #endif
                 }
@@ -78,7 +81,7 @@
                 // Keep resending until we have an ack
                 (function send(){
                     timer = null;
-                    if (sendCount++ > 5) {
+                    if (++sendCount > maxTries) {
                         if (callback) {
                             // #ifdef debug
                             easyXDM.Debug.trace("ReliableBehavior: delivery failed");
@@ -95,7 +98,6 @@
                         pub.down.outgoing(current.data, current.origin);
                         timer = window.setTimeout(send, settings.timeout);
                     }
-                    
                 }());
             },
             destroy: function(){
@@ -110,8 +112,16 @@
         });
     }
     
+    /**
+     * This is a behavior that enables queueing of messages. <br/>
+     * It will buffer incomming messages and will dispach these as fast as the underlying transport allows.
+     * This will also fragment/defragment messages so that the outgoing message is never bigger than the
+     * set length.
+     * @param {Object} settings
+     * @cfg {Number} maxLength The maximum length of each outgoing message.
+     */
     function QueueBehavior(settings){
-        var pub, queue = [], waiting = false, incomming = "", destroying;
+        var pub, queue = [], waiting = false, incomming = "", destroying, maxLength = settings.maxLength || 4000;
         
         function dispatch(){
             if (waiting || queue.length === 0 || destroying) {
@@ -153,7 +163,7 @@
             outgoing: function(message, origin, fn){
                 var fragments = [], fragment;
                 while (message.length !== 0) {
-                    fragment = message.substring(0, settings.maxLength);
+                    fragment = message.substring(0, maxLength);
                     message = message.substring(fragment.length);
                     fragments.push(fragment);
                 }
@@ -183,9 +193,17 @@
         });
     }
     
+    /**
+     * This behavior will verify that communication with the remote end is possible, and will also sign all outgoing,
+     * and verify all incomming messages. This removes the risk of someone hijacking the iframe to send malicious messages.
+     * @param {Object} settings
+     * @cfg {Boolean} initiate If the verification should be initiated from this end.
+     */
     function VerifyBehavior(settings){
         var pub, mySecret, theirSecret, verified = false;
-        
+        if (typeof settings.initiate === "undefined") {
+            throw new Error("settings.initiate is not set");
+        }
         function startVerification(){
             // #ifdef debug
             easyXDM.Debug.trace("VerifyBehavior: requesting verification");
