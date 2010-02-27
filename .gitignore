@@ -5,3 +5,4 @@ docs/
 build.number
 .tmp_*
 src/.*
+*.prefs
