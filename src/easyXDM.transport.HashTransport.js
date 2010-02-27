@@ -4,267 +4,6 @@
 (function(){
 
     /**
-     * This is a behavior that tries to make the underlying transport reliable by using acknowledgements.
-     * @param {Object} settings
-     * @cfg {Number} timeout How long it should wait before resending
-     * @cfg {Number} tries How many times it should try before giving up
-     */
-    function ReliableBehavior(settings){
-        var pub, // the public interface
- timer, // timer to wait for acks
- current, // the current message beging sent
- next, // the next message to be sent, to support piggybacking acks
- sendId = 0, // the id of the last message sent
- sendCount = 0, // how many times we hav tried resending
- maxTries = settings.tries || 5, timeout = settings.timeout, //
- receiveId = 0, // the id of the last message received
- callback; // the callback to execute when we have a confirmed success/failure
-        // #ifdef debug
-        easyXDM.Debug.trace("ReliableBehavior: settings.timeout=" + settings.timeout);
-        easyXDM.Debug.trace("ReliableBehavior: settings.tries=" + settings.tries);
-        // #endif
-        return (pub = {
-            incomming: function(message, origin){
-                var indexOf = message.indexOf("_"), ack = parseInt(message.substring(0, indexOf), 10), id;
-                // #ifdef debug
-                easyXDM.Debug.trace("ReliableBehavior: received ack: " + ack + ", last sent was: " + sendId);
-                // #endif
-                message = message.substring(indexOf + 1);
-                indexOf = message.indexOf("_");
-                id = parseInt(message.substring(0, indexOf), 10);
-                indexOf = message.indexOf("_");
-                message = message.substring(indexOf + 1);
-                // #ifdef debug
-                easyXDM.Debug.trace("ReliableBehavior: lastid " + receiveId + ", this " + id);
-                // #endif
-                if (timer && ack === sendId) {
-                    window.clearTimeout(timer);
-                    timer = null;
-                    // #ifdef debug
-                    easyXDM.Debug.trace("ReliableBehavior: message delivered");
-                    // #endif
-                    if (callback) {
-                        window.setTimeout(function(){
-                            callback(true);
-                        }, 0);
-                    }
-                }
-                if (id !== 0) {
-                    if (id !== receiveId) {
-                        receiveId = id;
-                        message = message.substring(id.length + 1);
-                        // #ifdef debug
-                        easyXDM.Debug.trace("ReliableBehavior: sending ack, passing on " + message);
-                        // #endif
-                        pub.down.outgoing(id + "_0_ack", origin);
-                        // we must give the other end time to pick up the ack
-                        window.setTimeout(function(){
-                            pub.up.incomming(message, origin);
-                        }, settings.timeout / 2);
-                    }
-                    // #ifdef debug
-                    else {
-                        easyXDM.Debug.trace("ReliableBehavior: duplicate msgid " + id + ", resending ack");
-                        pub.down.outgoing(id + "_0_ack", origin);
-                    }
-                    // #endif
-                }
-            },
-            outgoing: function(message, origin, fn){
-                callback = fn;
-                sendCount = 0;
-                current = {
-                    data: receiveId + "_" + (++sendId) + "_" + message,
-                    origin: origin
-                };
-                
-                // Keep resending until we have an ack
-                (function send(){
-                    timer = null;
-                    if (++sendCount > maxTries) {
-                        if (callback) {
-                            // #ifdef debug
-                            easyXDM.Debug.trace("ReliableBehavior: delivery failed");
-                            // #endif
-                            window.setTimeout(function(){
-                                callback(false);
-                            }, 0);
-                        }
-                    }
-                    else {
-                        // #ifdef debug
-                        easyXDM.Debug.trace("ReliableBehavior: " + (sendCount === 1 ? "sending " : "resending ") + sendId + ", tryCount " + sendCount);
-                        // #endif
-                        pub.down.outgoing(current.data, current.origin);
-                        timer = window.setTimeout(send, settings.timeout);
-                    }
-                }());
-            },
-            destroy: function(){
-                if (timer) {
-                    window.clearInterval(timer);
-                }
-                pub.up.destroy();
-            },
-            callback: function(success){
-                pub.up.callback(success);
-            }
-        });
-    }
-    
-    /**
-     * This is a behavior that enables queueing of messages. <br/>
-     * It will buffer incomming messages and will dispach these as fast as the underlying transport allows.
-     * This will also fragment/defragment messages so that the outgoing message is never bigger than the
-     * set length.
-     * @param {Object} settings
-     * @cfg {Number} maxLength The maximum length of each outgoing message.
-     */
-    function QueueBehavior(settings){
-        var pub, queue = [], waiting = false, incomming = "", destroying, maxLength = settings.maxLength || 4000;
-        
-        function dispatch(){
-            if (waiting || queue.length === 0 || destroying) {
-                return;
-            }
-            // #ifdef debug
-            easyXDM.Debug.trace("dispatching from queue");
-            // #endif
-            waiting = true;
-            var message = queue.shift();
-            
-            pub.down.outgoing(message.data, message.origin, function(success){
-                waiting = false;
-                if (message.callback) {
-                    window.setTimeout(function(){
-                        message.callback(success);
-                    }, 0);
-                }
-                dispatch();
-            });
-        }
-        return (pub = {
-            incomming: function(message, origin){
-                var indexOf = message.indexOf("_"), seq = parseInt(message.substring(0, indexOf), 10);
-                incomming += message.substring(indexOf + 1);
-                if (seq === 0) {
-                    // #ifdef debug
-                    easyXDM.Debug.trace("last fragment received");
-                    // #endif
-                    pub.up.incomming(incomming, origin);
-                    incomming = "";
-                }
-                // #ifdef debug
-                else {
-                    easyXDM.Debug.trace("awaiting more fragments, seq=" + message);
-                }
-                // #endif
-            },
-            outgoing: function(message, origin, fn){
-                var fragments = [], fragment;
-                while (message.length !== 0) {
-                    fragment = message.substring(0, maxLength);
-                    message = message.substring(fragment.length);
-                    fragments.push(fragment);
-                }
-                
-                while ((fragment = fragments.shift())) {
-                    // #ifdef debug
-                    easyXDM.Debug.trace("enqueuing");
-                    // #endif
-                    queue.push({
-                        data: fragments.length + "_" + fragment,
-                        origin: origin,
-                        callback: fragments.length === 0 ? fn : null
-                    });
-                }
-                dispatch();
-            },
-            destroy: function(){
-                // #ifdef debug
-                easyXDM.Debug.trace("QueueBehavior#destroy");
-                // #endif
-                destroying = true;
-                pub.up.destroy();
-            },
-            callback: function(success){
-                pub.up.callback(success);
-            }
-        });
-    }
-    
-    /**
-     * This behavior will verify that communication with the remote end is possible, and will also sign all outgoing,
-     * and verify all incomming messages. This removes the risk of someone hijacking the iframe to send malicious messages.
-     * @param {Object} settings
-     * @cfg {Boolean} initiate If the verification should be initiated from this end.
-     */
-    function VerifyBehavior(settings){
-        var pub, mySecret, theirSecret, verified = false;
-        if (typeof settings.initiate === "undefined") {
-            throw new Error("settings.initiate is not set");
-        }
-        function startVerification(){
-            // #ifdef debug
-            easyXDM.Debug.trace("VerifyBehavior: requesting verification");
-            // #endif
-            mySecret = Math.random().toString(16).substring(2);
-            pub.down.outgoing(mySecret);
-        }
-        
-        return (pub = {
-            incomming: function(message, origin){
-                var indexOf = message.indexOf("_");
-                if (indexOf === -1) {
-                    if (message === mySecret) {
-                        // #ifdef debug
-                        easyXDM.Debug.trace("VerifyBehavior: verified, calling callback");
-                        // #endif
-                        pub.up.callback(true);
-                    }
-                    else if (!theirSecret) {
-                        // #ifdef debug
-                        easyXDM.Debug.trace("VerifyBehavior: returning secret");
-                        // #endif
-                        theirSecret = message;
-                        if (!settings.initiate) {
-                            startVerification();
-                        }
-                        pub.down.outgoing(message);
-                    }
-                }
-                else {
-                    if (message.substring(0, indexOf) === theirSecret) {
-                        // #ifdef debug
-                        easyXDM.Debug.trace("VerifyBehavior: valid");
-                        // #endif
-                        pub.up.incomming(message.substring(indexOf + 1), origin);
-                    }
-                    // #ifdef debug
-                    else {
-                        easyXDM.Debug.trace("VerifyBehavior: invalid secret:" + message.substring(0, indexOf) + ", was expecting:" + theirSecret);
-                        
-                    }
-                    // #endif
-                }
-                
-            },
-            outgoing: function(message, origin, fn){
-                pub.down.outgoing(mySecret + "_" + message, origin, fn);
-            },
-            destroy: function(){
-                pub.up.destroy();
-            },
-            callback: function(success){
-                if (settings.initiate) {
-                    startVerification();
-                }
-            }
-        });
-    }
-    
-    
-    /**
      * @class easyXDM.transport.HashTransport
      * HashTransport is a transport class that uses the IFrame URL Technique for communication.<br/>
      * This means that the amount of data that is possible to send in each message is limited to the length the browser
@@ -285,7 +24,7 @@
         easyXDM.Debug.trace("easyXDM.transport.HashTransport.constructor");
         // #endif
         // If no protocol is set then it means this is the host
-        var query = easyXDM.Url.Query(), isHost = (typeof query.xdm_p === "undefined");
+        var me = this, query = easyXDM.Url.Query(), isHost = (typeof query.xdm_p === "undefined");
         if (!isHost) {
             config.channel = query.xdm_c;
             config.remote = decodeURIComponent(query.xdm_e);
@@ -367,7 +106,7 @@
                 window.setTimeout(fn, useResize ? 0 : pollInterval);
             }
         }
-        var pipeUp = {
+        this.up = {
             incomming: function(message, origin){
                 config.onMessage(decodeURIComponent(message), origin);
             },
@@ -381,7 +120,8 @@
             },
             destroy: function(){
             }
-        }, pipeDown = {
+        };
+        this.down = {
             incomming: function(message, origin){
                 this.up.incomming(message, origin);
             },
@@ -395,56 +135,30 @@
                 this.down.destroy();
             },
             // the default passthrough
-            up: pipeUp,
-            down: pipeUp
+            up: this.up,
+            down: this.down
         };
         
         var behaviors = [], behavior;
         
-        behaviors.push(new ReliableBehavior({
+        behaviors.push(new easyXDM.transport.behaviors.ReliableBehavior({
             timeout: ((useResize ? 50 : pollInterval * 1.5) + (usePolling ? pollInterval * 1.5 : 50))
         }));
-        behaviors.push(new QueueBehavior({
+        behaviors.push(new easyXDM.transport.behaviors.QueueBehavior({
             maxLength: 4000 - _remoteUrl.length
         }));
-        behaviors.push(new VerifyBehavior({
+        behaviors.push(new easyXDM.transport.behaviors.VerifyBehavior({
             initiate: isHost
         }));
         
-        if (behaviors.length === 1) {
-            behavior = behaviors[0];
-            behavior.down = behavior.up = pipeUp;
-            pipeDown.down = pipeDown.up = behavior;
-        }
-        else if (behaviors.length > 1) {
-            for (var i = 0, len = behaviors.length; i < len; i++) {
-                behavior = behaviors[i];
-                if (i === 0) {
-                    // this is the behavior closest to 'the metal'
-                    pipeDown.up = behavior; // override 
-                    behavior.down = pipeUp; // down to sendMessage
-                    behavior.up = behaviors[i + 1];
-                }
-                else if (i === len - 1) {
-                    // this is the behavior closes to the user
-                    pipeDown.down = behavior; //override
-                    behavior.down = behaviors[i - 1];
-                    behavior.up = pipeUp;
-                }
-                else {
-                    // intermediary behaviors
-                    behavior.up = behaviors[i + 1];
-                    behavior.down = behaviors[i - 1];
-                }
-            }
-        }
+        easyXDM.applyBehaviors(this, behaviors);
         
         function _handleHash(hash){
             _lastMsg = hash;
             // #ifdef debug
             easyXDM.Debug.trace("received message '" + _lastMsg + "' from " + _remoteOrigin);
             // #endif
-            pipeDown.incomming(_lastMsg.substring(_lastMsg.indexOf("_") + 1), _remoteOrigin);
+            me.down.incomming(_lastMsg.substring(_lastMsg.indexOf("_") + 1), _remoteOrigin);
         }
         
         function _onResize(e){
@@ -511,7 +225,7 @@
                         easyXDM.DomHelper.addEventListener(_listenerWindow, "resize", _onResize);
                         
                     }
-                    pipeDown.callback(true);
+                    me.down.callback(true);
                 }
                 else {
                     window.setTimeout(getBody, 10);
@@ -525,7 +239,7 @@
          * @param {String} message The message to send
          */
         this.postMessage = function(message){
-            pipeDown.outgoing(message, _remoteOrigin);
+            me.down.outgoing(message, _remoteOrigin);
         };
         
         /**
@@ -535,7 +249,7 @@
             // #ifdef debug
             easyXDM.Debug.trace("destroying transport");
             // #endif
-            pipeDown.destroy();
+            me.down.destroy();
             if (usePolling) {
                 window.clearInterval(_timer);
             }

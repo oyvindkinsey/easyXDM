@@ -36,6 +36,7 @@
 		<concat destfile="work\easyXDM.combined.js">	
 			<fileset dir="." includes="${project.src.dir}\easyXDM.js" />
 			<fileset dir="." includes="${project.src.dir}\easyXDM.DomHelper.js" />
+			<fileset dir="." includes="${project.src.dir}\easyXDM.transport.js" />
 			<fileset dir="." includes="${project.src.dir}\easyXDM.transport.HashTransport.js" />
 			<fileset dir="." includes="${project.src.dir}\easyXDM.transport.PostMessageTransport.js" />
 			<fileset dir="." includes="${project.src.dir}\easyXDM.transport.NameTransport.js" />
