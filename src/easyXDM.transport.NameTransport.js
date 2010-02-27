@@ -128,7 +128,8 @@ easyXDM.transport.NameTransport = function(config, onReady){
         incomming: function(message, origin){
             config.onMessage(message, origin);
         },
-        outgoing: function(message){
+        outgoing: function(message, origin, fn){
+            callback = fn;
             _sendMessage(message);
         },
         callback: function(succes){
