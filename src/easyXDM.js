@@ -18,13 +18,14 @@ easyXDM = {
      * Applies properties from the source object to the target object
      * @param {Object} target The target of the properties
      * @param {Object} source The source of the properties
+     * @param {Boolean} onlyNew Set to True to only set non-existing properties
      */
-    apply: function(target, source){
+    apply: function(target, source, onlyNew){
         if (!source) {
             return;
         }
         for (var key in source) {
-            if (source.hasOwnProperty(key)) {
+            if (source.hasOwnProperty(key) && (!onlyNew || !target[key])) {
                 target[key] = source[key];
             }
         }
