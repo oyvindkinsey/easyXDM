@@ -49,29 +49,29 @@
 		<replace file="work\easyXDM.combined.js" token="%%version%%" value="${project.build.version}.${build.number}"/>
 		
 		<!-- Process pre proccesing instructions like #if/#endif etc -->
-		<preprocess infile="work\easyXDM.combined.js" outfile="work\easyXDM.js"/>
-		<preprocess infile="work\easyXDM.combined.js" outfile="work\easyXDM.debug.js" defines="debug"/>
-		<preprocess infile="work\easyXDM.combined.js" outfile="work\easyXDM.contracts.js" defines="contracts"/>
-		<preprocess infile="${project.src.dir}\hash.html" outfile="work\hash.html"/>
-		<preprocess infile="${project.src.dir}\easyXDM.Widgets.js" outfile="work\easyXDM.Widgets.js"/>
-		<preprocess infile="${project.src.dir}\easyXDM.Widgets.js" outfile="work\easyXDM.Widgets.debug.js" defines="debug"/>
+		<preprocess infile="work/easyXDM.combined.js" outfile="work/easyXDM.js"/>
+		<preprocess infile="work/easyXDM.combined.js" outfile="work/easyXDM.debug.js" defines="debug"/>
+		<preprocess infile="work/easyXDM.combined.js" outfile="work/easyXDM.contracts.js" defines="contracts"/>
+		<preprocess infile="${project.src.dir}/hash.html" outfile="work/hash.html"/>
+		<preprocess infile="${project.src.dir}/easyXDM.Widgets.js" outfile="work/easyXDM.Widgets.js"/>
+		<preprocess infile="${project.src.dir}/easyXDM.Widgets.js" outfile="work/easyXDM.Widgets.debug.js" defines="debug"/>
 		
 		<!-- Compress the file using the YUI Compressor -->
-		<yuicompress infile="work\easyXDM.js" outfile="work\easyXDM.min.js" />
-		<yuicompress infile="${project.src.dir}\easyXDM.Widgets.js" outfile="work\easyXDM.Widgets.min.js" />
+		<yuicompress infile="work/easyXDM.js" outfile="work/easyXDM.min.js" />
+		<yuicompress infile="${project.src.dir}/easyXDM.Widgets.js" outfile="work/easyXDM.Widgets.min.js" />
 		
 		<!-- concat header files -->
-		<concat destfile="${project.build.artifactdir}\v${project.build.version}\easyXDM.js">
-			<fileset dir="." includes="${project.src.dir}\header.js" />
-			<fileset dir="." includes="work\easyXDM.js" />
+		<concat destfile="${project.build.artifactdir}/v${project.build.version}/easyXDM.js">
+			<fileset dir="." includes="${project.src.dir}/header.js" />
+			<fileset dir="." includes="work/easyXDM.js" />
 		</concat>
-		<concat destfile="${project.build.artifactdir}\v${project.build.version}\easyXDM.debug.js">
-			<fileset dir="." includes="${project.src.dir}\header.js" />
-			<fileset dir="." includes="work\easyXDM.debug.js" />
+		<concat destfile="${project.build.artifactdir}/v${project.build.version}/easyXDM.debug.js">
+			<fileset dir="." includes="${project.src.dir}/header.js" />
+			<fileset dir="." includes="work/easyXDM.debug.js" />
 		</concat>
-		<concat destfile="${project.build.artifactdir}\v${project.build.version}\easyXDM.min.js">
-			<fileset dir="." includes="${project.src.dir}\header.js" />
-			<fileset dir="." includes="work\easyXDM.min.js" />
+		<concat destfile="${project.build.artifactdir}/v${project.build.version}/easyXDM.min.js">
+			<fileset dir="." includes="${project.src.dir}/header.js" />
+			<fileset dir="." includes="work/easyXDM.min.js" />
 		</concat>
 		
 		<concat destfile="${project.build.artifactdir}\v${project.build.version}\easyXDM.Widgets.js">
