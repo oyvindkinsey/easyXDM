@@ -1,7 +1,6 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
 /*global easyXDM, window, escape, unescape */
 
-easyXDM.behaviors = {};
 /**
  * The namespace for the transports
  */
@@ -16,7 +15,7 @@ easyXDM.behaviors.transports = {};
  */
 easyXDM.behaviors.transports.PostMessageBehavior = function(config){
     var pub, // the public interface
-    frame, // the remote frame, if any
+ frame, // the remote frame, if any
  callerWindow, // the window that we will call with
  targetOrigin; // the domain to communicate with
     /**
@@ -66,8 +65,8 @@ easyXDM.behaviors.transports.PostMessageBehavior = function(config){
     }
     
     return (pub = {
-        outgoing: function(message, domain, fn){
-            callerWindow.postMessage(config.channel + " " + message, domain);
+        outgoing: function(message, domain){
+            callerWindow.postMessage(config.channel + " " + message, domain || targetOrigin);
         },
         destroy: function(){
             // #ifdef debug
@@ -75,9 +74,9 @@ easyXDM.behaviors.transports.PostMessageBehavior = function(config){
             // #endif
             easyXDM.DomHelper.removeEventListener(window, "message", _window_onMessage);
             if (frame) {
-                callerWindow=null;
-				frame.parentNode.removeChild(frame);
-				frame = null;
+                callerWindow = null;
+                frame.parentNode.removeChild(frame);
+                frame = null;
             }
         },
         init: function(){

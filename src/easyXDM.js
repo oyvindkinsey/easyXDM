@@ -271,167 +271,34 @@ easyXDM = {
      * @namespace easyXDM
      */
     Interface: function(channelConfig, config, onReady){
+        var stack, query = easyXDM.Url.Query(), isHost = (typeof query.xdm_p === "undefined"), recipient;
+        if (!isHost) {
+            channelConfig.channel = query.xdm_c;
+            channelConfig.remote = decodeURIComponent(query.xdm_e);
+        }
         // #ifdef debug
         easyXDM.Debug.trace("creating new interface");
         // #endif
-        var _channel;
-        var _callbackCounter = 0, _callbacks = {};
         
-        /**
-         * Creates a method that implements the given definition
-         * @private
-         * @param {easyXDM.configuration.Methods.Method} The method configuration
-         * @param {String} name The name of the method
-         */
-        function _createMethod(definition, name){
-            // Add the scope so that calling the methods will work as expected
-            if (typeof definition.scope === "undefined") {
-                definition.scope = window;
-            }
-            if (definition.isVoid) {
-                // #ifdef debug
-                easyXDM.Debug.trace("creating void method " + name);
-                // #endif
-                // No need to register a callback
-                return function(){
-                    // #ifdef debug
-                    easyXDM.Debug.trace("executing void method " + name);
-                    // #endif
-                    var params = Array.prototype.slice.call(arguments, 0);
-                    // Send the method request
-                    window.setTimeout(function(){
-                        _channel.sendData({
-                            name: name,
-                            params: params
-                        });
-                    }, 0);
-                };
-            }
-            else {
-                // #ifdef debug
-                easyXDM.Debug.trace("creating method " + name);
-                // #endif
-                // We need to extract and register the callback
-                return function(){
-                    // #ifdef debug
-                    easyXDM.Debug.trace("executing method " + name);
-                    // #endif
-                    _callbacks["" + (++_callbackCounter)] = arguments[arguments.length - 1];
-                    var request = {
-                        name: name,
-                        id: (_callbackCounter),
-                        params: Array.prototype.slice.call(arguments, 0, arguments.length - 1)
-                    };
-                    // Send the method request
-                    window.setTimeout(function(){
-                        _channel.sendData(request);
-                    }, 0);
-                };
-            }
-        }
-        
-        /**
-         * Executes the exposed method
-         * @private
-         * @param {String} name The name of the method
-         * @param {Number} id The callback id to use
-         * @param {Function} method The exposed implementation
-         * @param {Array} params The parameters supplied by the remote end
-         */
-        function _executeMethod(name, id, method, params){
-            if (!method) {
-                throw new Error("The method " + name + " is not implemented.");
-            }
-            if (method.isAsync) {
-                // #ifdef debug
-                easyXDM.Debug.trace("requested to execute async method " + name);
-                // #endif
-                // The method is async, we need to add a callback
-                params.push(function(result){
-                    // Send back the result
-                    _channel.sendData({
-                        id: id,
-                        response: result
-                    });
-                });
-                // Call local method
-                method.method.apply(method.scope, params);
-            }
-            else {
-                if (method.isVoid) {
-                    // #ifdef debug
-                    easyXDM.Debug.trace("requested to execute void method " + name);
-                    // #endif
-                    // Call local method 
-                    method.method.apply(method.scope, params);
-                }
-                else {
-                    // #ifdef debug
-                    easyXDM.Debug.trace("requested to execute method " + name);
-                    // #endif
-                    // Call local method and send back the response
-                    _channel.sendData({
-                        id: id,
-                        response: method.method.apply(method.scope, params)
-                    });
-                }
-            }
-        }
-        
-        channelConfig.converter = config.serializer || JSON;
-        
-        /**
-         * Handles incoming data.<br/>
-         * This can be either a request a method invocation, the response to one.
-         * @private
-         * @param {Object} data The JSON data object
-         * @param {String} origin The origin of the message
-         */
-        channelConfig.onData = function(data, origin){
-            if (data.name) {
-                // #ifdef debug
-                easyXDM.Debug.trace("received request to execute method " + data.name + (data.id ? (" using callback id " + data.id) : ""));
-                // #endif
-                // A method call from the remote end
-                _executeMethod(data.name, data.id, config.local[data.name], data.params);
-            }
-            else {
-                // #ifdef debug
-                easyXDM.Debug.trace("received return value destined to callback with id " + data.id);
-                // #endif
-                // A method response from the other end
-                _callbacks[data.id](data.response);
-                delete _callbacks[data.id];
-            }
-        };
-        
-        /**
-         * Tries to destroy the underlying channel and to remove all traces of the interface.
-         */
         this.destroy = function(){
-            _channel.destroy();
-            for (var x in this) {
-                if (this.hasOwnProperty(x)) {
-                    delete this[x];
-                }
-            }
-        };
-        
-        if (config.remote) {
-            // #ifdef debug
-            easyXDM.Debug.trace("creating concrete implementations");
-            // #endif
-            // Implement the remote sides exposed methods
-            for (var name in config.remote) {
-                if (config.remote.hasOwnProperty(name)) {
-                    this[name] = _createMethod(config.remote[name], name);
-                }
-            }
+            stack.destroy();
         }
-        // Delay setting up the channel until the interface has been returned
-        window.setTimeout(function(){
-            _channel = new easyXDM.Channel(channelConfig, onReady);
-        }, 5);
+        
+        stack = easyXDM.createStack([new easyXDM.behaviors.transports.PostMessageBehavior({
+            isHost: isHost,
+            channel: channelConfig.channel,
+            remote: channelConfig.remote
+        }), new easyXDM.behaviors.RPCBehavior(this, config), {
+            incoming: function(message, origin){
+                config.onMessage(message, origin);
+            },
+            callback: function(success){
+                if (onReady) {
+                    onReady(success);
+                }
+            }
+        }]);
+        stack.init();
     },
     /**
      * @class easyXDM.Channel
