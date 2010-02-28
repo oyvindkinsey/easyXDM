@@ -128,12 +128,6 @@ easyXDM.behaviors.RPCBehavior = function(proxy, settings){
                 delete _callbacks[data.id];
             }
         },
-        outgoing: function(message, recipient){
-            throw new Error("not implemented");
-        },
-        callback: function(success){
-            pub.up.callback(success);
-        },
         init: function(){
             if (settings.remote) {
                 // #ifdef debug

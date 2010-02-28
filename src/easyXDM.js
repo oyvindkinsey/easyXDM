@@ -75,19 +75,15 @@ easyXDM = {
         }
     },
     createStack: function(behaviors){
-        var behavior, stack;
-        for (var i = 0, len = behaviors.length; i < len; i++) {
-            behavior = behaviors[i];
-            if (i !== 0) {
-                behavior.down = behaviors[i - 1];
-            }
-            if (i !== len - 1) {
-                behavior.up = behaviors[i + 1];
-            }
-        }
-        this.apply(behavior, {
-            outgoing: function(message, domain){
-                this.down.outgoing(message, domain);
+        var behavior, stack, defaults = {
+            incoming: function(message, origin){
+                this.up.incoming(message, origin);
+            },
+            outgoing: function(message, recipient){
+                this.down.outgoing(message, recipient);
+            },
+            callback: function(success){
+                this.up.callback(success);
             },
             init: function(){
                 this.down.init();
@@ -95,7 +91,17 @@ easyXDM = {
             destroy: function(){
                 this.down.destroy();
             }
-        })
+        }
+        for (var i = 0, len = behaviors.length; i < len; i++) {
+            behavior = behaviors[i];
+            this.apply(behavior, defaults, true);
+            if (i !== 0) {
+                behavior.down = behaviors[i - 1];
+            }
+            if (i !== len - 1) {
+                behavior.up = behaviors[i + 1];
+            }
+        }
         return behavior;
     },
     // #ifdef debug
