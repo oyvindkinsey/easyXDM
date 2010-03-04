@@ -32,11 +32,11 @@ easyXDM.transport.PostMessageTransport = function(config, onReady){
         stack.outgoing(message, recipient);
     };
     
-    stack = easyXDM.createStack([new easyXDM.behaviors.transports.PostMessageBehavior({
+    stack = easyXDM.createStack(easyXDM.getTransportBehaviors({
         isHost: isHost,
         channel: config.channel,
         remote: config.remote
-    }), {
+    }).concat([{
         incoming: function(message, origin){
             config.onMessage(message, origin);
         },
@@ -45,6 +45,6 @@ easyXDM.transport.PostMessageTransport = function(config, onReady){
                 onReady(success);
             }
         }
-    }]);
+    }]));
     stack.init();
 };

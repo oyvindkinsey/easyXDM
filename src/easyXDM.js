@@ -74,6 +74,37 @@ easyXDM = {
             }
         }
     },
+    getTransportBehaviors: function(config){
+        var query = easyXDM.Url.Query(), Transport, protocol;
+        // If no protocol is set then it means this is the host
+        if (typeof query.xdm_p !== "undefined") {
+            protocol = query.xdm_p;
+        }
+        else {
+            if (window.postMessage) {
+                protocol = "1";
+            }
+            else if (config.remoteHelper) {
+                protocol = "2";
+            }
+            else {
+                protocol = "0";
+            }
+        }
+        
+        config.channel = config.channel || "default";
+        
+        switch (protocol) {
+            case "0":
+                
+                break;
+            case "1":
+                return [new easyXDM.behaviors.transports.PostMessageBehavior(config)];
+                break;
+            case "2":
+                break;
+        }
+    },
     createStack: function(behaviors){
         var behavior, stack, defaults = {
             incoming: function(message, origin){
