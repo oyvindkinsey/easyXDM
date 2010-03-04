@@ -2,18 +2,13 @@
 /*global easyXDM, window, escape, unescape */
 
 /**
- * The namespace for the transports
- */
-easyXDM.behaviors.transports = {};
-
-/**
  *
  * @param {Object} config
  * @cfg {Boolean} isHost
  * @cfg {String} channel
  * @cfg {String} remote
  */
-easyXDM.behaviors.transports.PostMessageBehavior = function(config){
+easyXDM.behaviors.PostMessageBehavior = function(config){
     var pub, // the public interface
  frame, // the remote frame, if any
  callerWindow, // the window that we will call with

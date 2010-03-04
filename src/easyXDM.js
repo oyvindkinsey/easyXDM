@@ -75,12 +75,12 @@ easyXDM = {
         }
     },
     getTransportBehaviors: function(config){
-        var query = easyXDM.Url.Query(), Transport, protocol;
+        var query = easyXDM.Url.Query(), isHost = (typeof query.xdm_p === "undefined"), Transport, protocol = config.protocol;
         // If no protocol is set then it means this is the host
         if (typeof query.xdm_p !== "undefined") {
             protocol = query.xdm_p;
         }
-        else {
+        else if (typeof protocol === "undefined") {
             if (window.postMessage) {
                 protocol = "1";
             }
@@ -96,6 +96,47 @@ easyXDM = {
         
         switch (protocol) {
             case "0":
+                config.interval = config.interval || 300;
+                config.useResize = true;
+                config.useParent = false;
+                config.usePolling = false;
+                if (isHost) {
+                    var parameters = {
+                        xdm_c: config.channel,
+                        xdm_p: 0 // 0 = HashTransport
+                    };
+                    if (config.local === window) {
+                        // We are using the current window to listen to
+                        config.usePolling = true;
+                        config.useParent = true;
+                        parameters.xdm_e = encodeURIComponent(config.local = location.protocol + "//" + location.host + location.pathname + location.search);
+                        parameters.xdm_pa = 1; // use parent
+                    }
+                    else {
+                        parameters.xdm_e = easyXDM.Url.resolveUrl(config.local);
+                    }
+                    if (config.container) {
+                        config.useResize = false;
+                        parameters.xdm_po = 1; // use polling
+                    }
+                    config.remote = easyXDM.Url.appendQueryParameters(config.remote, parameters);
+                }
+                else {
+                    config.channel = query.xdm_c;
+                    config.remote = decodeURIComponent(query.xdm_e);
+                    config.useParent = (typeof query.xdm_pa !== "undefined");
+                    if (config.useParent) {
+                        config.useResize = false;
+                    }
+                    config.usePolling = (typeof query.xdm_po !== "undefined");
+                }
+                return [new easyXDM.behaviors.transports.HashTransportBehavior(config), new easyXDM.transport.behaviors.ReliableBehavior({
+                    timeout: ((config.useResize ? 50 : config.interval * 1.5) + (config.usePolling ? config.interval * 1.5 : 50))
+                }), new easyXDM.transport.behaviors.QueueBehavior({
+                    maxLength: 4000 - config.remote.length
+                }), new easyXDM.transport.behaviors.VerifyBehavior({
+                    initiate: isHost
+                })];
                 
                 break;
             case "1":

@@ -35,7 +35,7 @@ easyXDM.transport.behaviors.ReliableBehavior = function(settings){
     easyXDM.Debug.trace("ReliableBehavior: settings.tries=" + settings.tries);
     // #endif
     return (pub = {
-        incomming: function(message, origin){
+        incoming: function(message, origin){
             var indexOf = message.indexOf("_"), ack = parseInt(message.substring(0, indexOf), 10), id;
             // #ifdef debug
             easyXDM.Debug.trace("ReliableBehavior: received ack: " + ack + ", last sent was: " + sendId);
@@ -70,7 +70,7 @@ easyXDM.transport.behaviors.ReliableBehavior = function(settings){
                     pub.down.outgoing(id + "_0_ack", origin);
                     // we must give the other end time to pick up the ack
                     window.setTimeout(function(){
-                        pub.up.incomming(message, origin);
+                        pub.up.incoming(message, origin);
                     }, settings.timeout / 2);
                 }
                 // #ifdef debug
@@ -115,10 +115,7 @@ easyXDM.transport.behaviors.ReliableBehavior = function(settings){
             if (timer) {
                 window.clearInterval(timer);
             }
-            pub.up.destroy();
-        },
-        callback: function(success){
-            pub.up.callback(success);
+            pub.down.destroy();
         }
     });
 };
@@ -126,7 +123,7 @@ easyXDM.transport.behaviors.ReliableBehavior = function(settings){
 /**
  * @class easyXDM.transport.behaviors.QueueBehavior
  * This is a behavior that enables queueing of messages. <br/>
- * It will buffer incomming messages and will dispach these as fast as the underlying transport allows.
+ * It will buffer incoming messages and will dispach these as fast as the underlying transport allows.
  * This will also fragment/defragment messages so that the outgoing message is never bigger than the
  * set length.
  * @constructor
@@ -135,7 +132,7 @@ easyXDM.transport.behaviors.ReliableBehavior = function(settings){
  * @namespace easyXDM.transport.behaviors
  */
 easyXDM.transport.behaviors.QueueBehavior = function(settings){
-    var pub, queue = [], waiting = false, incomming = "", destroying, maxLength = (settings) ? settings.maxLength : 0;
+    var pub, queue = [], waiting = false, incoming = "", destroying, maxLength = (settings) ? settings.maxLength : 0;
     
     function dispatch(){
         if (waiting || queue.length === 0 || destroying) {
@@ -158,15 +155,15 @@ easyXDM.transport.behaviors.QueueBehavior = function(settings){
         });
     }
     return (pub = {
-        incomming: function(message, origin){
+        incoming: function(message, origin){
             var indexOf = message.indexOf("_"), seq = parseInt(message.substring(0, indexOf), 10);
-            incomming += message.substring(indexOf + 1);
+            incoming += message.substring(indexOf + 1);
             if (seq === 0) {
                 // #ifdef debug
                 easyXDM.Debug.trace("last fragment received");
                 // #endif
-                pub.up.incomming(incomming, origin);
-                incomming = "";
+                pub.up.incoming(incoming, origin);
+                incoming = "";
             }
             // #ifdef debug
             else {
@@ -203,10 +200,7 @@ easyXDM.transport.behaviors.QueueBehavior = function(settings){
             easyXDM.Debug.trace("QueueBehavior#destroy");
             // #endif
             destroying = true;
-            pub.up.destroy();
-        },
-        callback: function(success){
-            pub.up.callback(success);
+            pub.down.destroy();
         }
     });
 };
@@ -214,7 +208,7 @@ easyXDM.transport.behaviors.QueueBehavior = function(settings){
 /**
  * @class easyXDM.transport.behaviors.VerifyBehavior
  * This behavior will verify that communication with the remote end is possible, and will also sign all outgoing,
- * and verify all incomming messages. This removes the risk of someone hijacking the iframe to send malicious messages.
+ * and verify all incoming messages. This removes the risk of someone hijacking the iframe to send malicious messages.
  * @constructor
  * @param {Object} settings
  * @cfg {Boolean} initiate If the verification should be initiated from this end.
@@ -234,7 +228,7 @@ easyXDM.transport.behaviors.VerifyBehavior = function(settings){
     }
     
     return (pub = {
-        incomming: function(message, origin){
+        incoming: function(message, origin){
             var indexOf = message.indexOf("_");
             if (indexOf === -1) {
                 if (message === mySecret) {
@@ -259,7 +253,7 @@ easyXDM.transport.behaviors.VerifyBehavior = function(settings){
                     // #ifdef debug
                     easyXDM.Debug.trace("VerifyBehavior: valid");
                     // #endif
-                    pub.up.incomming(message.substring(indexOf + 1), origin);
+                    pub.up.incoming(message.substring(indexOf + 1), origin);
                 }
                 // #ifdef debug
                 else {
@@ -272,9 +266,6 @@ easyXDM.transport.behaviors.VerifyBehavior = function(settings){
         },
         outgoing: function(message, origin, fn){
             pub.down.outgoing(mySecret + "_" + message, origin, fn);
-        },
-        destroy: function(){
-            pub.up.destroy();
         },
         callback: function(success){
             if (settings.initiate) {
