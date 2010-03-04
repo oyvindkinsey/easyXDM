@@ -118,7 +118,7 @@ var easyTest = (function(){
                     test.tearDown.call(_scope);
                 } 
                 catch (ex) {
-                    _notifyResult("Teardown", false, "'" + ex.message + "'");
+                    _notifyResult("Teardown", false, "'" + ex.message + "(" + ex.fileName + ", " + ex.lineNumber  + ")" + "'");
                 }
             }
             // Call back
@@ -144,7 +144,7 @@ var easyTest = (function(){
                     catch (ex) {
                         //If it fails we cancel the timeout
                         window.clearTimeout(_timer);
-                        _notifyResult(_step.name, false, "'" + ex.message + "'");
+                        _notifyResult(_step.name, false, "'" + ex.message + "(" + ex.fileName + ", " + ex.lineNumber  + ")" + "'");
                     }
                 }
                 else {
@@ -154,7 +154,7 @@ var easyTest = (function(){
                         _notifyResult(_step.name, result);
                     } 
                     catch (ex) {
-                        _notifyResult(_step.name, false, "'" + ex.message + "'");
+                        _notifyResult(_step.name, false, "'" + ex.message + "(" + ex.fileName + ", " + ex.lineNumber  + ")" + "'");
                     }
                 }
             }
@@ -175,7 +175,7 @@ var easyTest = (function(){
                 }
                 if (excuse) {
                     _log("Skipping test ' " + test.name + "'. " + excuse);
-					fn();
+                    fn();
                 }
                 else {
                     _log("Running test '" + test.name + "'");
