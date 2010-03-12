@@ -19,6 +19,7 @@
              * remote web application and can serve as a bridge between the two applications.
              */
             var proxy;
+            var remoteUrl = location.protocol + "//" + location.host.replace("consumer", "provider") + location.pathname.substring(0, location.pathname.lastIndexOf("/"));
             
             window.onload = function(){
                 /**
@@ -55,7 +56,7 @@
                      * Register the url to the remote interface
                      * @field
                      */
-                    remote: "http://provider.easyxdm.net/example/remote.html"
+                    remote: remoteUrl + "/remote.html"
                 });
             }
         </script>

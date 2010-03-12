@@ -12,6 +12,7 @@
         </script>
         <script type="text/javascript">
             var remote;
+            var remoteUrl = location.protocol + "//" + location.host.replace("consumer", "provider") + location.pathname.substring(0, location.pathname.lastIndexOf("/"));
             window.onload = function(){
                 /**
                  * When the window is finished loading start setting up the interface
@@ -27,7 +28,7 @@
                      * Register the url to the remote interface
                      * @field
                      */
-                    remote: "http://provider.easyxdm.net/example/remotemethods.html",
+                    remote: remoteUrl + "/remotemethods.html",
                     /**
                      * Register the DOMElement that the generated IFrame should be inserted into
                      */
@@ -71,7 +72,9 @@
         <style type="text/css">
             #embedded {
                 height: 200px;
-            } #embedded iframe {
+            }
+            
+            #embedded iframe {
                 width: 100%;
                 height: 100%;
             }
