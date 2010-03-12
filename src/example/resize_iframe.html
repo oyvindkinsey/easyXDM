@@ -6,6 +6,7 @@
         </script>
         <script type="text/javascript">
             var transport;
+            var remoteUrl = location.protocol + "//" + location.host.replace("consumer", "provider") + location.pathname.substring(0, location.pathname.lastIndexOf("/"));
             
             window.onload = function(){
                 /**
@@ -22,7 +23,7 @@
                      * Register the url to the remote interface
                      * @field
                      */
-                    remote: "http://provider.easyxdm.net/example/resized_iframe.html",
+                    remote: remoteUrl + "/resized_iframe.html",
                     /**
                      * Register the DOMElement that the generated IFrame should be inserted into
                      */

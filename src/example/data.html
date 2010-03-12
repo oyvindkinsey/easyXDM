@@ -6,6 +6,7 @@
         </script>
         <script type="text/javascript">
             var channel;
+            var remoteUrl = location.protocol + "//" + location.host.replace("consumer", "provider") + location.pathname.substring(0, location.pathname.lastIndexOf("/"));
             window.onload = function(){
                 /**
                  * When the window is finished loading start setting up the channel
@@ -21,7 +22,7 @@
                      * Register the url to the remote interface
                      * @field
                      */
-                    remote: "http://provider.easyxdm.net/example/remotedata.html",
+                    remote: remoteUrl + "/remotedata.html",
                     
                     /**
                      * Register the serializer to use for converting messages
@@ -42,37 +43,40 @@
         </script>
     </head>
     <body>
-        <div style="border:1px solid black;padding:3px">
-            <div style="float:right">
-                <a href="http://www.addthis.com/bookmark.php?v=250&amp;pub=xa-4a6cb9890fd71978" onmouseover="return addthis_open(this, '', '[URL]', '[TITLE]');" onmouseout="addthis_close();" onclick="return addthis_sendto();"><img src="http://s7.addthis.com/static/btn/lg-share-en.gif" width="125" height="16" alt="Bookmark and Share" style="border:0"/></a>
-                <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js?pub=xa-4a6cb9890fd71978">
-                </script>
-            </div>
-            <a href="http://easyxdm.net/docs/">See easyxdm.net/docs for full documentation and more examples</a>
-            <br/>
-            The examples are executing slower than the production build due to the extensive tracing.
+    <div style="border:1px solid black;padding:3px">
+        <div style="float:right">
+            <a href="http://www.addthis.com/bookmark.php?v=250&amp;pub=xa-4a6cb9890fd71978" onmouseover="return addthis_open(this, '', '[URL]', '[TITLE]');" onmouseout="addthis_close();" onclick="return addthis_sendto();"><img src="http://s7.addthis.com/static/btn/lg-share-en.gif" width="125" height="16" alt="Bookmark and Share" style="border:0"/></a>
+            <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js?pub=xa-4a6cb9890fd71978">
+            </script>
         </div>
-        <!-- easyXDM.Debug.trace(msg) will output its messages to any element with the id "log" -->
-        <div id="log" style="height:100px;border:1px dotted black;overflow:auto">
-        </div>
-        </div>
-		<br/>
-		<br/>
-		<input type="text" id="code" size="100" value="channel.sendData({propC:'c',procD:'d',propE:88})"/><button onclick="eval(document.getElementById('code').value);">eval code</button>
-        <script type="text/javascript">
-            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-        </script>
-        <script type="text/javascript">
-            if (location.host.indexOf("easyxdm.net") !== -1) {
-                try {
-                    var pageTracker = _gat._getTracker("UA-9535591-3");
-                    pageTracker._setDomainName(".easyxdm.net");
-                    pageTracker._trackPageview();
-                } 
-                catch (err) {
-                }
+        <a href="http://easyxdm.net/docs/">See easyxdm.net/docs for full documentation and more examples</a>
+        <br/>
+        The examples are executing slower than the production build due to the extensive tracing.
+    </div>
+    <!-- easyXDM.Debug.trace(msg) will output its messages to any element with the id "log" -->
+    <div id="log" style="height:100px;border:1px dotted black;overflow:auto">
+    </div>
+    </div>
+    <br/>
+    <br/>
+    <input type="text" id="code" size="100" value="channel.sendData({propC:'c',procD:'d',propE:88})"/>
+    <button onclick="eval(document.getElementById('code').value);">
+        eval code
+    </button>
+    <script type="text/javascript">
+        var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+        document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+        if (location.host.indexOf("easyxdm.net") !== -1) {
+            try {
+                var pageTracker = _gat._getTracker("UA-9535591-3");
+                pageTracker._setDomainName(".easyxdm.net");
+                pageTracker._trackPageview();
+            } 
+            catch (err) {
             }
-        </script>
-    </body>
+        }
+    </script>
+</body>
 </html>
