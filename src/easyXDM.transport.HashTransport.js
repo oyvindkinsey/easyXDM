@@ -112,7 +112,7 @@
                 config.onMessage(decodeURIComponent(message), origin);
             },
             outgoing: function(message){
-                _sendMessage(encodeURIComponent(message));
+                _sendMessage(message);
             },
             callback: function(succes){
                 if (onReady) {
@@ -232,7 +232,7 @@
          * @param {String} message The message to send
          */
         this.postMessage = function(message){
-            me.down.outgoing(message, _remoteOrigin);
+            me.down.outgoing(encodeURIComponent(message), _remoteOrigin);
         };
         
         /**
