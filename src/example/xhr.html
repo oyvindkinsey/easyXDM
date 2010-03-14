@@ -11,62 +11,33 @@
             easyXDM.DomHelper.requiresJSON("../json2.js");
         </script>
         <script type="text/javascript">
-            var remote;
+            var xhr;
             var remoteUrl = location.protocol + "//" + location.host.replace("consumer", "provider") + location.pathname.substring(0, location.pathname.lastIndexOf("/"));
             window.onload = function(){
-                /**
-                 * When the window is finished loading start setting up the interface
-                 */
-                remote = new easyXDM.Interface(/** The channel configuration */{
-                    /**
-                     * Register the url to hash.html, this must be an absolute path
-                     * or a path relative to the root.
-                     * @field
-                     */
+            
+                xhr = new easyXDM.Interface({
                     local: "../hash.html",
-                    /**
-                     * Register the url to the remote interface
-                     * @field
-                     */
-                    remote: remoteUrl + "/xhr_remote.html",
-                    /**
-                     * Register the DOMElement that the generated IFrame should be inserted into
-                     */
-                    container: document.getElementById("embedded")
-                }, /** The interface configuration */ {
+                    remote: remoteUrl + "/../xhr.html",
+                    remoteHelper: remoteUrl + "/../hash.html"
+                }, {
                     remote: {
-                        getGlossary: {},
-                        ajax: {}
+                        post: {}
                     }
-                },/**The onReady handler*/ function(){
-                
-                
                 });
-            }
-            function getGlossary(){
-                remote.getGlossary(function(json){
-                    alert(json.glossary.title);
-                });
+                
             }
             
-            function getGlossaryUsingAjax(){
-                remote.ajax("glossary.json", {
-                    name: "sometitle"
+            function getGlossary(){
+				
+                xhr.post("example/glossary.json", {
+                    param1: "a",
+                    param2: "b"
                 }, function(json){
                     alert(json.glossary.title);
                 });
+				
             }
         </script>
-        <style type="text/css">
-            #embedded {
-                height: 200px;
-            }
-            
-            #embedded iframe {
-                width: 100%;
-                height: 100%;
-            }
-        </style>
     </head>
     <body>
         <div style="border:1px solid black;padding:3px">
@@ -90,14 +61,9 @@
         <div>
             This example shows how to use easyXDM to call regular ajax services (no JSONP) from remote domains.
             <br/>
-            This is shown both by having the remote end expose a wrapper around a specific ajax call, but also
-            by exposing a generic ajax(url,data,callback) method that can be used to call any service on the domain.
-            <br/>
-            The remote end is using jQuery for the ajax request, but any library could be used.
+			This is done by exposing a method post with the familiar signature 'String url, Object data, Function callback'.
             <br/>
             <input type="button" onclick="getGlossary()" value="Call getGlossary using the exposed method"/>
-            <br/>
-            <input type="button" onclick="getGlossaryUsingAjax()" value="Call getGlossary using the exposed ajax wrapper"/>
         </div>
         <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");

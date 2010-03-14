@@ -3,7 +3,7 @@
 	<property file="build.properties"/>
 	<property name="project.build.artifactdir" value=".\artifacts\"/>
 	<property name="project.build.publishdir" value=".\artifacts\"/>
-	<property name="project.build.version" value="1.8.0"/>
+	<property name="project.build.version" value="1.8.1"/>
 	
 	<!-- Setup classpath for js-build-tools ant tasks -->
 	<path id="js-build-tasks.classpath">
@@ -53,6 +53,7 @@
 		<preprocess infile="work/easyXDM.combined.js" outfile="work/easyXDM.debug.js" defines="debug"/>
 		<preprocess infile="work/easyXDM.combined.js" outfile="work/easyXDM.contracts.js" defines="contracts"/>
 		<preprocess infile="${project.src.dir}/hash.html" outfile="work/hash.html"/>
+		<preprocess infile="${project.src.dir}/xhr.html" outfile="work/xhr.html"/>
 		<preprocess infile="${project.src.dir}/easyXDM.Widgets.js" outfile="work/easyXDM.Widgets.js"/>
 		<preprocess infile="${project.src.dir}/easyXDM.Widgets.js" outfile="work/easyXDM.Widgets.debug.js" defines="debug"/>
 		

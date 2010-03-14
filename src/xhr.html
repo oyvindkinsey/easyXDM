@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+    <head>
+        <title>easyXDM cross-domain XHMLHttpRequest provider</title>
+        <script type="text/javascript" src="easyXDM.debug.js">
+        </script>
+        <script type="text/javascript">
+            easyXDM.DomHelper.requiresJSON("json2.js");
+        </script>
+        <script type="text/javascript">
+            
+            function createXMLHTTPObject(){
+                var xmlHttp, XMLHttpFactories = [function(){
+                    return new ActiveXObject("Microsoft.XMLHTTP");
+                }, function(){
+                    return new ActiveXObject("Msxml3.XMLHTTP");
+                }, function(){
+                    return new ActiveXObject("Msxml2.XMLHTTP");
+                }, function(){
+                    return new XMLHttpRequest();
+                }
+            ], i = XMLHttpFactories.length;
+                
+                if (this._factory) {
+                    return this._factory();
+                }
+                while (i--) {
+                    try {
+                        xmlHttp = XMLHttpFactories[i]();
+                        // Use memoization to cache the factory
+                        this._factory = XMLHttpFactories[i];
+                        return xmlHttp;
+                    } 
+                    catch (e) {
+                    }
+                }
+            }
+            
+            var remote;
+            window.onload = function(){
+                remote = new easyXDM.Interface({}, {
+                    local: {
+                        post: {
+                            isAsync: true,
+                            method: function(url, data, fn){
+                                var xhrObj = createXMLHTTPObject();
+                                xhrObj.onreadystatechange = function(){
+                                    if (xhrObj.readyState != 4) {
+                                        return;
+                                    }
+                                    fn(JSON.parse(xhrObj.responseText));
+                                };
+                                xhrObj.open('POST', url, true);
+                                xhrObj.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                                var encodedData = easyXDM.Url.appendQueryParameters("", data).substring(1);
+                                xhrObj.send(encodedData);
+                            }
+                        }
+                    }
+                });
+            }
+        </script>
+    </head>
+    <body>
+    </body>
+</html>
