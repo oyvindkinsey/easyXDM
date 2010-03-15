@@ -2,13 +2,14 @@
 /*global easyXDM, window, escape, unescape */
 
 // #ifdef debug
+
 easyXDM.configuration = {
     /**
-     * @class easyXDM.configuration.InterfaceConfiguration
+     * @class easyXDM.configuration.RpcConfiguration
      * The interface configuration
      * @namespace easyXDM.configuration
      */
-    InterfaceConfiguration: {
+    RpcConfiguration: {
         /**
          * The local property is of type {@link easyXDM.configuration.LocalConfiguration}
          * @link {easyXDM.configuration.LocalConfiguration}

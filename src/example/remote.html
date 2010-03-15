@@ -18,6 +18,7 @@
              */
             var proxy;
             var remoteapp;
+            
             /**
              * When the window is finished loading start setting up the channel
              */
@@ -33,33 +34,33 @@
                     /**
                      * We start by creating a channel
                      */
-                    proxy = new easyXDM.Channel(/** The configuration */{
+                    proxy = new easyXDM.Transport(/** The configuration */{
                         /**
                          * Register the method that should handle incoming data
                          * @param {Object} data
                          * @param {String} origin
                          */
-                        onData: function(data, origin){
+                        onMessage: function(data, origin){
+                            data = JSON.parse(data);
                             remoteapp.focus();
                             var div = remoteapp.document.createElement("div");
                             div.innerHTML = "data from '" + origin + "'";
                             remoteapp.document.body.appendChild(div);
-                            for (key in data) {
-                                var div = remoteapp.document.createElement("div");
+                            for (var key in data) {
+                                div = remoteapp.document.createElement("div");
                                 div.innerHTML = key + "=" + data[key];
                                 remoteapp.document.body.appendChild(div);
                             }
-                        },
-                        /**
-                         * Register the serializer to use for converting messages
-                         * @field
-                         */
-                        converter: JSON
+                        }
                     });
                 }
                 else {
                     alert("you need to allow opening popups for this to work");
                 }
+            };
+            
+            function sendData(data){
+                proxy.postMessage(JSON.stringify(data));
             }
         </script>
     </head>

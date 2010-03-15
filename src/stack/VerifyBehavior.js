@@ -5,16 +5,18 @@
  * @class easyXDM.stack.VerifyBehavior
  * This behavior will verify that communication with the remote end is possible, and will also sign all outgoing,
  * and verify all incoming messages. This removes the risk of someone hijacking the iframe to send malicious messages.
- * @constructor
- * @param {Object} settings
- * @cfg {Boolean} initiate If the verification should be initiated from this end.
+ * @extends easyXDM.stack.StackElement
  * @namespace easyXDM.stack
+ * @constructor
+ * @param {Object} config The behaviors configuration.
+ * @cfg {Boolean} initiate If the verification should be initiated from this end.
  */
-easyXDM.stack.VerifyBehavior = function(settings){
+easyXDM.stack.VerifyBehavior = function(config){
     var pub, mySecret, theirSecret, verified = false;
-    if (typeof settings.initiate === "undefined") {
+    if (typeof config.initiate === "undefined") {
         throw new Error("settings.initiate is not set");
     }
+    
     function startVerification(){
         // #ifdef debug
         easyXDM.Debug.trace("VerifyBehavior: requesting verification");
@@ -33,17 +35,16 @@ easyXDM.stack.VerifyBehavior = function(settings){
                     // #endif
                     pub.up.callback(true);
                 }
-                else 
-                    if (!theirSecret) {
-                        // #ifdef debug
-                        easyXDM.Debug.trace("VerifyBehavior: returning secret");
-                        // #endif
-                        theirSecret = message;
-                        if (!settings.initiate) {
-                            startVerification();
-                        }
-                        pub.down.outgoing(message);
+                else if (!theirSecret) {
+                    // #ifdef debug
+                    easyXDM.Debug.trace("VerifyBehavior: returning secret");
+                    // #endif
+                    theirSecret = message;
+                    if (!config.initiate) {
+                        startVerification();
                     }
+                    pub.down.outgoing(message);
+                }
             }
             else {
                 if (message.substring(0, indexOf) === theirSecret) {
@@ -65,7 +66,7 @@ easyXDM.stack.VerifyBehavior = function(settings){
             pub.down.outgoing(mySecret + "_" + message, origin, fn);
         },
         callback: function(success){
-            if (settings.initiate) {
+            if (config.initiate) {
                 startVerification();
             }
         }

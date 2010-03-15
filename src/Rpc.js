@@ -3,14 +3,14 @@
 
 /** 
  * @class easyXDM.Rpc
- * Creates an interface that can be used to call methods implemented
- * on the remote end of the channel, and also to provide the implementation
- * of methods to be called from the remote end.
- * @constructor
- * @param {easyXDM.configuration.ChannelConfiguration} channelConfig The underlying channels configuration.
- * @param {easyXDM.configuration.InterfaceConfiguration} config The description of the interface to implement
- * @param {Function} onReady A method that should be called when the interface is ready
+ * Creates a proxy object that can be used to call methods implemented on the remote end of the channel, and also to provide the implementation
+ * of methods to be called from the remote end.<br/>
+ * The instantiated object will have methods matching those specified in <code>config.remote</code>.<br/>
+ * This requires the JSON object present in the document, either natively, using json.org's json2 or as a wrapper around library spesific methods.
  * @namespace easyXDM
+ * @constructor
+ * @param {Object} config The underlying transports configuration. See easyXDM.Transport for available parameters.
+ * @param {easyXDM.configuration.RpcConfiguration} jsonRpcConfig The description of the interface to implement.
  */
 easyXDM.Rpc = function(config, jsonRpcConfig){
     var stack = easyXDM.createStack(easyXDM.prepareTransportStack(config).concat([new easyXDM.stack.RpcBehavior(this, jsonRpcConfig), {
@@ -20,7 +20,10 @@ easyXDM.Rpc = function(config, jsonRpcConfig){
             }
         }
     }]));
-	
+    
+    /**
+     * Initiates the destruction of the stack.
+     */
     this.destroy = function(){
         stack.destroy();
     };

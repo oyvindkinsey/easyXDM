@@ -2,15 +2,20 @@
 /*global easyXDM, window, escape, unescape */
 
 /**
+ * @class easyXDM.stack.HashTransport
+ * HashTransport is a transport class that uses the IFrame URL Technique for communication.<br/>
+ * This requires the precense of hash.html on the hosting domain for optimal performance, but can also be used with any other
+ * static file present. If used with a static file (like an image) as the local: property, you must set the readyAfter property.<br/>
+ * The library will try to be ready earlier, so this should be set to a safe value, when you are certain that the file will be loaded.<br/>
+ * If this file is already present in the document, and therefor most likely cached, then this can be set to low value.<br/>
+ * <a href="http://msdn.microsoft.com/en-us/library/bb735305.aspx">http://msdn.microsoft.com/en-us/library/bb735305.aspx</a><br/>
+ * @extends easyXDM.stack.TransportStackElement
+ * @namespace easyXDM.stack
+ * @constructor
+ * @param {Object} config The transports configuration.
+ * @cfg {String/Window} local The url to the local file used for proxying messages, or the local window.
+ * @cfg {Number} readyAfter The number of milliseconds to wait before firing onReady. To support using files other than hash.html for proxying messages.
  *
- * @param {Object} config
- * @cfg {Boolean} isHost
- * @cfg {String} channel
- * @cfg {String} remote
- * @cfg {Boolean} useParent
- * @cfg {Boolean} usePolling
- * @cfg {Boolean} useResize
- * @cfg {Number} readyAfter
  */
 easyXDM.stack.HashTransport = function(config){
     // #ifdef debug
@@ -80,12 +85,11 @@ easyXDM.stack.HashTransport = function(config){
             // #endif
             _timer = window.setInterval(_pollHash, pollInterval);
         }
-        else 
-            if ((!isHost && !usePolling) || config.readyAfter) {
-                // This cannot handle resize on its own
-                easyXDM.DomHelper.addEventListener(_listenerWindow, "resize", _onResize);
-                
-            }
+        else if ((!isHost && !usePolling) || config.readyAfter) {
+            // This cannot handle resize on its own
+            easyXDM.DomHelper.on(_listenerWindow, "resize", _onResize);
+            
+        }
     }
     
     /**
@@ -98,23 +102,22 @@ easyXDM.stack.HashTransport = function(config){
             if (useParent) {
                 _listenerWindow = window;
             }
-            else 
-                if (config.readyAfter) {
-                    // We must try obtain a reference to the correct window, this might fail 
-                    try {
-                        // This works in IE6
-                        _listenerWindow = _callerWindow.contentWindow.frames["remote_" + config.channel];
-                    } 
-                    catch (ex) {
-                        // #ifdef debug
-                        easyXDM.Debug.trace("Falling back to using window.open");
-                        // #endif
-                        _listenerWindow = window.open("", "remote_" + config.channel);
-                    }
+            else if (config.readyAfter) {
+                // We must try obtain a reference to the correct window, this might fail 
+                try {
+                    // This works in IE6
+                    _listenerWindow = _callerWindow.contentWindow.frames["remote_" + config.channel];
+                } 
+                catch (ex) {
+                    // #ifdef debug
+                    easyXDM.Debug.trace("Falling back to using window.open");
+                    // #endif
+                    _listenerWindow = window.open("", "remote_" + config.channel);
                 }
-                else {
-                    _listenerWindow = easyXDM.stack.HashTransport.getWindow(config.channel);
-                }
+            }
+            else {
+                _listenerWindow = easyXDM.stack.HashTransport.getWindow(config.channel);
+            }
             if (!_listenerWindow) {
                 // #ifdef debug
                 easyXDM.Debug.trace("Failed to obtain a reference to the window");
@@ -144,10 +147,9 @@ easyXDM.stack.HashTransport = function(config){
             if (usePolling) {
                 window.clearInterval(_timer);
             }
-            else 
-                if ((!isHost && !usePolling) || config.readyAfter) {
-                    easyXDM.DomHelper.removeEventListener(_listenerWindow, "resize", _pollHash);
-                }
+            else if ((!isHost && !usePolling) || config.readyAfter) {
+                easyXDM.DomHelper.un(_listenerWindow, "resize", _pollHash);
+            }
             if (isHost || !useParent) {
                 _callerWindow.parentNode.removeChild(_callerWindow);
             }

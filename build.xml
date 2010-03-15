@@ -3,7 +3,7 @@
 	<property file="build.properties"/>
 	<property name="project.build.artifactdir" value="./artifacts/"/>
 	<property name="project.build.publishdir" value="./artifacts/"/>
-	<property name="project.build.version" value="1.8.0"/>
+	<property name="project.build.version" value="2.0.0"/>
 	
 	<!-- Setup classpath for js-build-tools ant tasks -->
 	<path id="js-build-tasks.classpath">
@@ -36,8 +36,9 @@
 		<concat destfile="work/easyXDM.combined.js">	
 			<fileset dir="." includes="${project.src.dir}/easyXDM.js" />
 			<fileset dir="." includes="${project.src.dir}/Debug.js" />
-			<fileset dir="." includes="${project.src.dir}/Configuration.js" />
+			<fileset dir="." includes="${project.src.dir}/configuration.js" />
 			<fileset dir="." includes="${project.src.dir}/DomHelper.js" />
+			<fileset dir="." includes="${project.src.dir}/Fn.js" />
 			<fileset dir="." includes="${project.src.dir}/Url.js" />
 			<fileset dir="." includes="${project.src.dir}/Transport.js" />
 			<fileset dir="." includes="${project.src.dir}/Rpc.js" />
@@ -57,6 +58,7 @@
 		<preprocess infile="work/easyXDM.combined.js" outfile="work/easyXDM.debug.js" defines="debug"/>
 		<preprocess infile="work/easyXDM.combined.js" outfile="work/easyXDM.contracts.js" defines="contracts"/>
 		<preprocess infile="${project.src.dir}/hash.html" outfile="work/hash.html"/>
+		<preprocess infile="${project.src.dir}/xhr.html" outfile="work/xhr.html"/>
 		<preprocess infile="${project.src.dir}/widgets/Widgets.js" outfile="work/easyXDM.Widgets.js"/>
 		<preprocess infile="${project.src.dir}/widgets/Widgets.js" outfile="work/easyXDM.Widgets.debug.js" defines="debug"/>
 		

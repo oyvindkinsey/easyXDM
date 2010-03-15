@@ -7,10 +7,11 @@
  * @singleton
  */
 easyXDM.Url = {
+
     /**
-     * A hashtable that gives access to the documents query string
-     * The hashtable is cached internally
-     * @returns A hashtable populated with keys and values from the querystring
+     * A hashtable that gives access to the documents query string.<br/>
+     * The hashtable is cached internally.
+     * @returns A hashtable populated with keys and values from the querystring.
      * @type {Object}
      */
     Query: function(){
@@ -27,10 +28,11 @@ easyXDM.Url = {
         }
         return this._query;
     },
+    
     /**
-     * Get the domain name from a url
-     * @param {String} url The url to extract the domain from
-     * @returns The domain part of the url
+     * Get the domain name from a url.
+     * @param {String} url The url to extract the domain from.
+     * @returns The domain part of the url.
      * @type {String}
      */
     getDomainName: function(url){
@@ -42,6 +44,7 @@ easyXDM.Url = {
         }
         return domain;
     },
+    
     /**
      * Returns  a string containing the schema, domain and if present the port
      * @param {String} url The url to extract the location from
@@ -56,10 +59,11 @@ easyXDM.Url = {
         loc = loc.substring(0, loc.indexOf("/"));
         return url.substring(0, indexOf + 2) + loc;
     },
+    
     /**
-     * Resolves a path to a complete url
-     * @param {String} url The path to resolve
-     * @return {String} The resolved url
+     * Resolves a relative url into an absolute one.
+     * @param {String} url The path to resolve.
+     * @return {String} The resolved url.
      */
     resolveUrl: function(url){
         var reParent = /\/[\d\w+%_\-]+\/\.\.\//;
@@ -84,11 +88,13 @@ easyXDM.Url = {
         // #endif
         return resolved;
     },
+    
     /**
      * Appends the parameters to the given url.<br/>
      * The base url can contain existing query parameters.
-     * @param {String} url The base url
-     * @param {Object} parameters The parameters to add
+     * @param {String} url The base url.
+     * @param {Object} parameters The parameters to add.
+     * @return {String} A new valid url with the parameters appended.
      */
     appendQueryParameters: function(url, parameters){
         var q = "";

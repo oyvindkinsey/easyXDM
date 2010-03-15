@@ -13,7 +13,7 @@
                 /**
                  * We start by creating a transport
                  */
-                transport = new easyXDM.transport.BestAvailableTransport(/** The configuration */{
+                transport = new easyXDM.Transport(/** The configuration */{
                     /**
                      * Register the method that should handle incoming messages
                      * @param {String} data
@@ -23,7 +23,7 @@
                         alert("Received '" + message + "' from '" + origin + "'");
                     }
                 });
-            }
+            };
         </script>
     </head>
     <body>

@@ -25,27 +25,23 @@
                 /**
                  * When the window is finished loading start setting up the channel
                  */
-                proxy = new easyXDM.Channel(/** The configuration */{
+                proxy = new easyXDM.Transport(/** The configuration */{
                     /**
                      * Register the method that should handle incoming data
                      * @param {Object} data
                      * @param {String} origin
                      */
-                    onData: function(data, origin){
+                    onMessage: function(data, origin){
+                        data = JSON.parse(data);
                         var div = document.createElement("div");
                         div.innerHTML = "data from '" + origin + "'";
                         document.body.appendChild(div);
-                        for (key in data) {
-                            var div = document.createElement("div");
+                        for (var key in data) {
+                            div = document.createElement("div");
                             div.innerHTML = key + "=" + data[key];
                             document.body.appendChild(div);
                         }
                     },
-                    /**
-                     * Register the serializer to use for converting messages
-                     * @field
-                     */
-                    converter: JSON,
                     /**
                      * Register the url to hash.html, this must be an absolute path
                      * or a path relative to the root.
@@ -58,7 +54,7 @@
                      */
                     remote: remoteUrl + "/remote.html"
                 });
-            }
+            };
         </script>
     </head>
     <body>
@@ -75,7 +71,7 @@
         <!-- easyXDM.Debug.trace(msg) will output its messages to any element with the id "log" -->
         <div id="log" style="height:100px;border:1px dotted black;overflow:auto">
         </div>
-        <!-- Send som data to the other side --><input type="button" onclick="proxy.sendData({a:'b',c:'d',e:'f'});" value="send data to remote"/>
+        <!-- Send som data to the other side --><input type="button" onclick="proxy.postMessage(JSON.stringify({a:'b',c:'d',e:'f'}));" value="send data to remote"/>
         <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));

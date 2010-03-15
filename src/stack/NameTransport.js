@@ -1,6 +1,17 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
 /*global easyXDM, window, escape, unescape */
 
+/**
+ * @class easyXDM.stack.NameTransport
+ * NameTransport uses the window.name property to relay data.
+ * The <code>local</code> parameter needs to be set on both the consumer and provider,<br/>
+ * and the <code>remoteHelper</code> parameter needs to be set on the consumer.
+ * @extends easyXDM.stack.TransportStackElement
+ * @constructor
+ * @param {Object} config The transports configuration.
+ * @cfg {String} remoteHelper The url to the remote instance of hash.html - this is only needed for the host.
+ * @namespace easyXDM.stack
+ */
 easyXDM.stack.NameTransport = function(config){
     var pub; // the public interface
     var isHost, callerWindow, remoteWindow, readyCount, callback, remoteOrigin, remoteUrl;
@@ -98,7 +109,7 @@ easyXDM.stack.NameTransport = function(config){
             // Set up the iframe that will be used for the transport
             callerWindow = easyXDM.DomHelper.createFrame(config.local + "#_4" + config.channel, null, function(){
                 // Remove the handler
-                easyXDM.DomHelper.removeEventListener(callerWindow, "load", callerWindow.loadFn);
+                easyXDM.DomHelper.un(callerWindow, "load", callerWindow.loadFn);
                 easyXDM.Fn.set(config.channel + "_load", _onLoad);
                 _onReady();
             });

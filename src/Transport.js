@@ -3,17 +3,19 @@
 
 /**
  * @class easyXDM.Transport
- * PostMessageTransport is a transport class that uses HTML5 postMessage for communication
- * <a href="http://msdn.microsoft.com/en-us/library/ms644944(VS.85).aspx">http://msdn.microsoft.com/en-us/library/ms644944(VS.85).aspx</a>
- * <a href="https://developer.mozilla.org/en/DOM/window.postMessage">https://developer.mozilla.org/en/DOM/window.postMessage</a>
+ * This class creates a transport channel between two domains that is usable for sending and receiving string-based messages.<br/>
+ * The channel is reliable, supports queueing, and ensures that the message originates from the expected domain.<br/>
+ * Internally different stacks will be used depending on the browsers features and the available parameters. 
+ * @namespace easyXDM
  * @constructor
- * @param {easyXDM.configuration.TransportConfiguration} config The transports configuration.
- * @param {Function} onReady A method that should be called when the transport is ready
- * @cfg {Mixed} local Any value that will evaluate as True
- * @cfg {String} remote The url to the remote document to interface with
- * @cfg {String} channel The name of the channel to use
- * @cfg {Function} onMessage The method that should handle incoming messages.<br/> This method should accept two arguments, the message as a string, and the origin as a string.
- * @namespace easyXDM.transport
+ * @cfg {String/Window} local The url to the local hash.html document, a local static file, or a reference to the local window.
+ * @cfg {String} remote The url to the providers document.
+ * @cfg {String} remoteHelper The url to the remote hash.html file. This is to support NameTransport as a fallback. Optional.
+ * @cfg {Number} readyAfter The number of milliseconds to wait before firing onReady. To support using static files instead of hash.html. Optional.
+ * @cfg {String} channel The name of the channel to use. Must be unique. Optional if only a single channel is expected in the document.
+ * @cfg {Function} onMessage The method that should handle incoming messages.<br/> This method should accept two arguments, the message as a string, and the origin as a string. Optional.
+ * @cfg {Function} onReady A method that should be called when the transport is ready. Optional.
+ * @cfg {DOMElement} container The element that the primary iframe should be inserted into. If not set then the iframe will be positioned off-screen. Optional.
  */
 easyXDM.Transport = function(config){
     var stack = easyXDM.createStack(easyXDM.prepareTransportStack(config).concat([{
@@ -26,11 +28,21 @@ easyXDM.Transport = function(config){
             }
         }
     }])), recipient = easyXDM.Url.getLocation(config.remote);
+	
+	/**
+	 * Initiates the destruction of the stack.
+	 */
     this.destroy = function(){
         stack.destroy();
     };
+	
+	/**
+	 * Posts a message to the remote end of the channel
+	 * @param {String} message The message to send
+	 */
     this.postMessage = function(message){
         stack.outgoing(message, recipient);
     };
+	
     stack.init();
 };

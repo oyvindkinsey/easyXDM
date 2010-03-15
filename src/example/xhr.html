@@ -15,7 +15,7 @@
             var remoteUrl = location.protocol + "//" + location.host.replace("consumer", "provider") + location.pathname.substring(0, location.pathname.lastIndexOf("/"));
             window.onload = function(){
             
-                xhr = new easyXDM.Interface({
+                xhr = new easyXDM.Rpc({
                     local: "../hash.html",
                     remote: remoteUrl + "/../xhr.html",
                     remoteHelper: remoteUrl + "/../hash.html"

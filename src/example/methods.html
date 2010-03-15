@@ -17,7 +17,7 @@
                 /**
                  * When the window is finished loading start setting up the interface
                  */
-                remote = new easyXDM.Interface(/** The channel configuration */{
+                remote = new easyXDM.Rpc(/** The channel configuration */{
                     /**
                      * Register the url to hash.html, this must be an absolute path
                      * or a path relative to the root.
@@ -32,7 +32,13 @@
                     /**
                      * Register the DOMElement that the generated IFrame should be inserted into
                      */
-                    container: document.getElementById("embedded")
+                    container: document.getElementById("embedded"),
+                    onReady: function(){
+                        /**
+                         * Call a method on the other side
+                         */
+                        remote.noOp();
+                    }
                 }, /** The interface configuration */ {
                     remote: {
                         addNumbers: {},
@@ -49,13 +55,8 @@
                             isVoid: true
                         }
                     }
-                },/**The onReady handler*/ function(){
-                    /**
-                     * Call a method on the other side
-                     */
-                    remote.noOp();
                 });
-            }
+            };
             
             function add(a, b){
                 remote.addNumbers(a, b, function(result){
@@ -66,7 +67,7 @@
             function multiply(a, b){
                 remote.multiplyNumbers(a, b, function(result){
                     alert(a + " x " + b + " = " + result);
-                })
+                });
             }
         </script>
         <style type="text/css">
@@ -102,19 +103,19 @@
         <div>
             The remote implementation is synchronous and will return immediately
             <br/>
-            <input type="button" onclick="add(3,5)" value="call addNumbers on remote domain"/>
+            <input type="button" onclick="add(3,5);" value="call addNumbers on remote domain"/>
             <br/>
             <br/>
             The remote implementation of multiplyNumbers is asynchronous and will return after 5seconds
             <br/>
             This shows that you can use async calls in the remote method, eg. XHR calls
             <br/>
-            <input type="button" onclick="multiply(3,5)" value="call multiplyNumbers on remote domain"/>
+            <input type="button" onclick="multiply(3,5);" value="call multiplyNumbers on remote domain"/>
             <br/>
             <br/>
             This calls a non-returning method on the remote side
             <br/>
-            <input type="button" onclick="remote.noOp()" value="call noOp on the remote domain"/>
+            <input type="button" onclick="remote.noOp();" value="call noOp on the remote domain"/>
         </div>
         <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");

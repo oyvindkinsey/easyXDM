@@ -1,3 +1,13 @@
+2.0 xx.xx.xx
+Refactored all the transport classes into stack elements.
+The transports are now exposed as a single Transport that selects the appropriate stack to initialize based on the avaiable features and config parameters.
+Removed the Channel class as this can easily be implemented when needed using the Transport class and JSON.parse/stringify.
+Refactored the Interface class and renamed it Rpc as this is more descriptive.
+The optional onReady method is now a member of the config argument instead of being a separate one.
+Removed the serializing namespace as this was not used internally, and as it can easily be injected when needed.
+Renamed the methods for adding and removing events to on and un.
+  
+
 1.8.0 27.02.10
 Both the HashTransport and the Nametransport has received a major overhaul.
 Generic Behaviors are now implemented, and deal with reliability (making the HashTransport reliable), queueing and sender verification.

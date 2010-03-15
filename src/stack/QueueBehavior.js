@@ -4,16 +4,17 @@
 /**
  * @class easyXDM.stack.QueueBehavior
  * This is a behavior that enables queueing of messages. <br/>
- * It will buffer incoming messages and will dispach these as fast as the underlying transport allows.
+ * It will buffer incoming messages and dispach these as fast as the underlying transport allows.
  * This will also fragment/defragment messages so that the outgoing message is never bigger than the
  * set length.
- * @constructor
- * @param {Object} settings
- * @cfg {Number} maxLength The maximum length of each outgoing message. Set this to enable fragmentation.
+ * @extends easyXDM.stack.StackElement
  * @namespace easyXDM.stack
+ * @constructor
+ * @param {Object} config The behaviors configuration. Optional.
+ * @cfg {Number} maxLength The maximum length of each outgoing message. Set this to enable fragmentation.
  */
-easyXDM.stack.QueueBehavior = function(settings){
-    var pub, queue = [], waiting = false, incoming = "", destroying, maxLength = (settings) ? settings.maxLength : 0;
+easyXDM.stack.QueueBehavior = function(config){
+    var pub, queue = [], waiting = false, incoming = "", destroying, maxLength = (config) ? config.maxLength : 0;
     
     function dispatch(){
         if (waiting || queue.length === 0 || destroying) {

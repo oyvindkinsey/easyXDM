@@ -1,7 +1,20 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
 /*global easyXDM, window, escape, unescape, JSON */
 
-easyXDM.stack.RpcBehavior = function(proxy, settings){
+/**
+ * @class easyXDM.stack.RpcBehavior
+ * This uses a protocol similar to JSON-RPC to expose local methods and to invoke remote methods and have responses returned over the the string based transport stack.<br/>
+ * Local methods can be both asynchronous and synchronous.<br/>
+ * Remote methods can be set up to return a response or not.
+ * @extends easyXDM.stack.StackElement
+ * @namespace easyXDM.stack
+ * @constructor
+ * @param {Object} proxy The object to apply the methods to.
+ * @param {easyXDM.configuration.RpcConfiguration} config The definition of the local and remote interface to implement.
+ * @cfg {easyXDM.configuration.LocalConfiguration} local The local interface to expose.
+ * @cfg {easyXDM.configuration.RemoteConfiguration} remote The remote methods to expose through the proxy.
+ */
+easyXDM.stack.RpcBehavior = function(proxy, config){
     var pub;
     var _callbackCounter = 0, _callbacks = {};
     
@@ -112,7 +125,7 @@ easyXDM.stack.RpcBehavior = function(proxy, settings){
                 easyXDM.Debug.trace("received request to execute method " + data.name + (data.id ? (" using callback id " + data.id) : ""));
                 // #endif
                 // A method call from the remote end
-                _executeMethod(data.name, data.id, settings.local[data.name], data.params);
+                _executeMethod(data.name, data.id, config.local[data.name], data.params);
             }
             else {
                 // #ifdef debug
@@ -127,14 +140,14 @@ easyXDM.stack.RpcBehavior = function(proxy, settings){
             // #ifdef debug
             easyXDM.Debug.trace("RpcBehavior#init");
             // #endif
-            if (settings.remote) {
+            if (config.remote) {
                 // #ifdef debug
                 easyXDM.Debug.trace("creating concrete implementations");
                 // #endif
                 // Implement the remote sides exposed methods
-                for (var name in settings.remote) {
-                    if (settings.remote.hasOwnProperty(name)) {
-                        proxy[name] = _createMethod(settings.remote[name], name);
+                for (var name in config.remote) {
+                    if (config.remote.hasOwnProperty(name)) {
+                        proxy[name] = _createMethod(config.remote[name], name);
                     }
                 }
             }

@@ -7,6 +7,7 @@
  * @singleton
  */
 easyXDM.DomHelper = {
+	
     /**
      * Creates a frame and appends it to the DOM.
      * @param {String} url The url the frame should be set to
@@ -44,7 +45,7 @@ easyXDM.DomHelper = {
             
             if (onLoad) {
                 frame.loadFn = loadFn;
-                this.addEventListener(frame, "load", loadFn);
+                this.on(frame, "load", loadFn);
             }
         }
         else {
@@ -52,7 +53,7 @@ easyXDM.DomHelper = {
             frame.src = url;
             if (onLoad) {
                 frame.loadFn = loadFn;
-                this.addEventListener(frame, "load", loadFn);
+                this.on(frame, "load", loadFn);
             }
             if (container) {
                 container.appendChild(frame);
@@ -68,67 +69,69 @@ easyXDM.DomHelper = {
         }
         return frame;
     },
+	
     /**
      * Provides a consistent interface for adding eventhandlers
      * @param {Object} target The target to add the event to
      * @param {String} type The name of the event
      * @param {Function} listener The listener
      */
-    addEventListener: function(target, type, listener, useCapture){
+    on: function(target, type, listener, useCapture){
         // Uses memoizing to cache the implementation
         if (window.addEventListener) {
             /**
-             * Set addEventListener to use the DOM level 2 addEventListener
-             * https://developer.mozilla.org/en/DOM/element.addEventListener
+             * Set on to use the DOM level 2 on
+             * https://developer.mozilla.org/en/DOM/element.on
              * @ignore
              * @param {Object} target
              * @param {String} type
              * @param {Function} listener
              */
-            easyXDM.DomHelper.addEventListener = function(target, type, listener, useCapture){
+            easyXDM.DomHelper.on = function(target, type, listener){
                 // #ifdef debug
                 easyXDM.Debug.trace("adding listener " + type);
                 // #endif
-                target.addEventListener(type, listener, useCapture);
+                target.addEventListener(type, listener, false);
             };
         }
         else {
             /**
-             * Set addEventlistener to a wrapper around the IE spesific attachEvent
+             * Set on to a wrapper around the IE spesific attachEvent
              * http://msdn.microsoft.com/en-us/library/ms536343%28VS.85%29.aspx
              * @ignore
              * @param {Object} object
              * @param {String} sEvent
              * @param {Function} fpNotify
              */
-            easyXDM.DomHelper.addEventListener = function(object, sEvent, fpNotify){
+            easyXDM.DomHelper.on = function(object, sEvent, fpNotify){
                 // #ifdef debug
                 easyXDM.Debug.trace("adding listener " + sEvent);
                 // #endif
                 object.attachEvent("on" + sEvent, fpNotify);
             };
         }
-        easyXDM.DomHelper.addEventListener(target, type, listener);
+        easyXDM.DomHelper.on(target, type, listener);
     },
+	
     /**
      * Provides a consistent interface for removing eventhandlers
      * @param {Object} target The target to remove the event from
      * @param {String} type The name of the event
      * @param {Function} listener The listener
      */
-    removeEventListener: function(target, type, listener, useCapture){
+    un: function(target, type, listener, useCapture){
         // Uses memoizing to cache the implementation
-        var removeEventListener;
+        var un;
         if (window.removeEventListener) {
             /**
-             * Set removeEventListener to use the DOM level 2 removeEventListener
-             * https://developer.mozilla.org/en/DOM/element.removeEventListener
+             * Set un to use the DOM level 2 un
+             * https://developer.mozilla.org/en/DOM/element.un
              * @ignore
              * @param {Object} target
              * @param {String} type
              * @param {Function} listener
              */
-            removeEventListener = function(target, type, listener, useCapture){
+            un = function(target, type, listener, useCapture){
                 // #ifdef debug
                 easyXDM.Debug.trace("removing listener " + type);
                 // #endif
@@ -137,23 +140,24 @@ easyXDM.DomHelper = {
         }
         else {
             /**
-             * Set removeEventlistener to a wrapper around the IE spesific detachEvent
+             * Set un to a wrapper around the IE spesific detachEvent
              * http://msdn.microsoft.com/en-us/library/ms536411%28VS.85%29.aspx
              * @ignore
              * @param {Object} object
              * @param {String} sEvent
              * @param {Function} fpNotify
              */
-            removeEventListener = function(object, sEvent, fpNotify){
+            un = function(object, sEvent, fpNotify){
                 // #ifdef debug
                 easyXDM.Debug.trace("removing listener " + type);
                 // #endif
                 object.detachEvent("on" + sEvent, fpNotify);
             };
         }
-        removeEventListener(target, type, listener);
-        easyXDM.DomHelper.removeEventListener = removeEventListener;
+        un(target, type, listener);
+        easyXDM.DomHelper.un = un;
     },
+	
     /**
      * Checks for the precense of the JSON object.
      * If it is not precent it will use the supplied path to load the JSON2 library.

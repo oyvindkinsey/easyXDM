@@ -4,7 +4,7 @@
 // #ifdef debug
 /**
  * @class easyXDM.Debug
- * Utilities for debugging. This class is only precent in the debug version.
+ * Utilities for debugging. This class is only present in the debug version.
  * @singleton
  * @namespace easyXDM
  */
@@ -38,7 +38,9 @@ easyXDM.Debug = {
         easyXDM.Debug.log = log;
     },
     
-    
+    /**
+     * Clears the current output element.
+     */
     clear: function(){
         var clear;
         var el = document.getElementById("log");

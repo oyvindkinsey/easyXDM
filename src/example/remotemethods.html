@@ -20,7 +20,7 @@
                 /**
                  * When the channel is ready we create the interface
                  */
-                remote = new easyXDM.Interface(/** The channel configuration*/{}, /** The configuration */ {
+                remote = new easyXDM.Rpc(/** The channel configuration*/{}, /** The configuration */ {
                     remote: {
                         alertMessage: {
                             isVoid: true
@@ -48,7 +48,7 @@
                         }
                     }
                 });
-            }
+            };
         </script>
     </head>
     <body>

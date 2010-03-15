@@ -5,13 +5,49 @@
         <script type="text/javascript" src="../easyXDM.debug.js">
         </script>
         <script type="text/javascript">
+            var serializer = {
+                /**
+                 * Serializes a hashtable and returns it as a string
+                 * @param {Object} data The data to serialize
+                 * @returns The serialized string
+                 * @type {String}
+                 */
+                stringify: function(data){
+                    var message = "";
+                    for (var key in data) {
+                        if (data.hasOwnProperty(key)) {
+                            message += key + "=" + escape(data[key]) + "&";
+                        }
+                    }
+                    return message.substring(0, message.length - 1);
+                },
+                /**
+                 * Deserializes a string and returns a hashtable
+                 * @param {String} message The string to deserialize
+                 * @returns An hashtable populated with key-value pairs
+                 * @type {Object}
+                 */
+                parse: function(message){
+                    var data = {};
+                    var d = message.split("&");
+                    var pair, key, value;
+                    for (var i = 0, len = d.length; i < len; i++) {
+                        pair = d[i];
+                        key = pair.substring(0, pair.indexOf("="));
+                        value = pair.substring(key.length + 1);
+                        data[key] = unescape(value);
+                    }
+                    return data;
+                }
+            };
+            
             var channel;
             var remoteUrl = location.protocol + "//" + location.host.replace("consumer", "provider") + location.pathname.substring(0, location.pathname.lastIndexOf("/"));
             window.onload = function(){
                 /**
                  * When the window is finished loading start setting up the channel
                  */
-                channel = new easyXDM.Channel(/** The configuration */{
+                channel = new easyXDM.Transport(/** The configuration */{
                     /**
                      * Register the url to hash.html, this must be an absolute path
                      * or a path relative to the root.
@@ -23,23 +59,18 @@
                      * @field
                      */
                     remote: remoteUrl + "/remotedata.html",
-                    
-                    /**
-                     * Register the serializer to use for converting messages
-                     * @field
-                     */
-                    converter: easyXDM.serializing.hashTableSerializer
-                },/**The onReady handler*/ function(){
-                    /**
-                     * Send some data to the other side
-                     */
-                    channel.sendData({
-                        propA: "abc",
-                        propB: "def",
-                        propC: 44
-                    });
+                    onReady: function(){
+                        /**
+                         * Send some data to the other side
+                         */
+                        channel.postMessage(serializer.stringify({
+                            propA: "abc",
+                            propB: "def",
+                            propC: 44
+                        }));
+                    }
                 });
-            }
+            };
         </script>
     </head>
     <body>

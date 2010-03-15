@@ -2,11 +2,15 @@
 /*global easyXDM, window, escape, unescape */
 
 /**
- *
- * @param {Object} config
- * @cfg {Boolean} isHost
- * @cfg {String} channel
- * @cfg {String} remote
+ * @class easyXDM.stack.PostMessageTransport
+ * PostMessageTransport is a transport class that uses HTML5 postMessage for communication.<br/>
+ * <a href="http://msdn.microsoft.com/en-us/library/ms644944(VS.85).aspx">http://msdn.microsoft.com/en-us/library/ms644944(VS.85).aspx</a><br/>
+ * <a href="https://developer.mozilla.org/en/DOM/window.postMessage">https://developer.mozilla.org/en/DOM/window.postMessage</a>
+ * @extends easyXDM.stack.TransportStackElement
+ * @namespace easyXDM.stack
+ * @constructor
+ * @param {Object} config The transports configuration.
+ * @cfg {String} remote The remote domain to communicate with.
  */
 easyXDM.stack.PostMessageTransport = function(config){
     var pub, // the public interface
@@ -67,7 +71,7 @@ easyXDM.stack.PostMessageTransport = function(config){
             // #ifdef debug
             easyXDM.Debug.trace("destroying transport");
             // #endif
-            easyXDM.DomHelper.removeEventListener(window, "message", _window_onMessage);
+            easyXDM.DomHelper.un(window, "message", _window_onMessage);
             if (frame) {
                 callerWindow = null;
                 frame.parentNode.removeChild(frame);
@@ -78,14 +82,14 @@ easyXDM.stack.PostMessageTransport = function(config){
             targetOrigin = easyXDM.Url.getLocation(config.remote);
             if (config.isHost) {
                 // add the event handler for listening
-                easyXDM.DomHelper.addEventListener(window, "message", function waitForReady(event){
+                easyXDM.DomHelper.on(window, "message", function waitForReady(event){
                     if (event.data == config.channel + "-ready") {
                         // #ifdef debug
                         easyXDM.Debug.trace("firing onReady");
                         // #endif
                         // replace the eventlistener
-                        easyXDM.DomHelper.removeEventListener(window, "message", waitForReady);
-                        easyXDM.DomHelper.addEventListener(window, "message", _window_onMessage);
+                        easyXDM.DomHelper.un(window, "message", waitForReady);
+                        easyXDM.DomHelper.on(window, "message", _window_onMessage);
                         window.setTimeout(function(){
                             pub.up.callback(true);
                         }, 0);
@@ -102,7 +106,7 @@ easyXDM.stack.PostMessageTransport = function(config){
             }
             else {
                 // add the event handler for listening
-                easyXDM.DomHelper.addEventListener(window, "message", _window_onMessage);
+                easyXDM.DomHelper.on(window, "message", _window_onMessage);
                 callerWindow = window.parent;
                 callerWindow.postMessage(config.channel + "-ready", targetOrigin);
                 window.setTimeout(function(){
