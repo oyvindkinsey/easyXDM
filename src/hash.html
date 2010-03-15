@@ -62,7 +62,7 @@
                 else {
                     // The old HashTransport
                     channel = location.hash.substring(1);
-                    window.parent.parent.easyXDM.transport.HashTransport.channelReady(channel, window);
+                    window.parent.parent.easyXDM.stack.HashTransport.channelReady(channel, window);
                     
                     if (window.addEventListener) {
                         window.addEventListener('resize', onResize, false);

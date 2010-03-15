@@ -1,12 +1,7 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
 /*global easyXDM, window, escape, unescape, JSON */
 
-/**
- * The namespace for the behaviors
- */
-easyXDM.behaviors = {};
-
-easyXDM.behaviors.RPCBehavior = function(proxy, settings){
+easyXDM.stack.RpcBehavior = function(proxy, settings){
     var pub;
     var _callbackCounter = 0, _callbacks = {};
     
@@ -129,6 +124,9 @@ easyXDM.behaviors.RPCBehavior = function(proxy, settings){
             }
         },
         init: function(){
+            // #ifdef debug
+            easyXDM.Debug.trace("RpcBehavior#init");
+            // #endif
             if (settings.remote) {
                 // #ifdef debug
                 easyXDM.Debug.trace("creating concrete implementations");

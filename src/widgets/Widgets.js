@@ -132,11 +132,14 @@ easyXDM.WidgetManager = function(config){
         // #ifdef debug
         easyXDM.Debug.trace("setting up widget");
         // #endif
-        var widget = new easyXDM.Interface({
+        var widget = new easyXDM.Rpc({
             channel: "widget" + _channelNr++,
             local: _hashUrl,
             remote: url,
-            container: widgetConfig.container || _container
+            container: widgetConfig.container || _container,
+            onReady: function(){
+                _initializeWidget(widget, url, widgetConfig);
+            }
         }, {
             local: {
                 subscribe: {
@@ -158,8 +161,6 @@ easyXDM.WidgetManager = function(config){
                     isVoid: true
                 }
             }
-        }, function(){
-            _initializeWidget(widget, url, widgetConfig);
         });
     }
     
@@ -251,7 +252,7 @@ easyXDM.WidgetManager = function(config){
 easyXDM.Widget = function(config){
     var _widget = this;
     var _incomingMessageHandler;
-    var _widgetHost = new easyXDM.Interface({}, {
+    var _widgetHost = new easyXDM.Rpc({}, {
         remote: {
             subscribe: {
                 isVoid: true

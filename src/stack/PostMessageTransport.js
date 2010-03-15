@@ -8,7 +8,7 @@
  * @cfg {String} channel
  * @cfg {String} remote
  */
-easyXDM.behaviors.PostMessageBehavior = function(config){
+easyXDM.stack.PostMessageTransport = function(config){
     var pub, // the public interface
  frame, // the remote frame, if any
  callerWindow, // the window that we will call with

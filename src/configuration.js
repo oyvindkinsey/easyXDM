@@ -4,49 +4,6 @@
 // #ifdef debug
 easyXDM.configuration = {
     /**
-     * @class easyXDM.configuration.TransportConfiguration
-     * The configuration for transport classes.
-     * @namespace easyXDM.configuration
-     */
-    TransportConfiguration: {
-        /**
-         * The url of the remote endpoint
-         */
-        remote: "",
-        /**
-         * The url of the local copy of hash.html
-         */
-        local: "",
-        /**
-         * The method that should handle incoming messages
-         * @param {String} message The message
-         * @param {String} origin The origin of the message
-         */
-        onMessage: function(message, origin){
-        }
-    },
-    /**
-     * @class easyXDM.configuration.ChannelConfiguration
-     * The channels configuration
-     * @extends easyXDM.configuration.TransportConfiguration
-     * @namespace easyXDM.configuration
-     */
-    ChannelConfiguration: {
-        /**
-         * The serializer to use. This should match the HTML5 JSON specification.
-         * @type {JSON}
-         */
-        serializer: {},
-        /**
-         *  The method that should handle incoming data.<br/> The method should accept two arguments, the data as an object, and the origin as a string.<br/>
-         *  This disables onMessage
-         * @param {String} data The data
-         * @param {String} origin The origin of the data
-         */
-        onData: function(data, origin){
-        }
-    },
-    /**
      * @class easyXDM.configuration.InterfaceConfiguration
      * The interface configuration
      * @namespace easyXDM.configuration
