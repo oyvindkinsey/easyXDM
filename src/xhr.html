@@ -3,8 +3,10 @@
     <head>
         <title>easyXDM cross-domain XHMLHttpRequest provider</title>
         <script type="text/javascript" src="easyXDM.debug.js">
+        	// This should be changed so that it points to the minified version before use in production.
         </script>
         <script type="text/javascript">
+        	// Update to point to your copy
             easyXDM.DomHelper.requiresJSON("json2.js");
         </script>
         <script type="text/javascript">
@@ -36,19 +38,20 @@
                 }
             }
             
-            var remote;
             window.onload = function(){
-                remote = new easyXDM.Rpc({}, {
+                var remote = new easyXDM.Rpc({
+                    local: "hash.html"
+                }, {
                     local: {
                         post: {
                             isAsync: true,
                             method: function(url, data, fn){
+                                // You really should add some filtering to only allow certain url's
                                 var xhrObj = createXMLHTTPObject();
                                 xhrObj.onreadystatechange = function(){
-                                    if (xhrObj.readyState != 4) {
-                                        return;
+                                    if (xhrObj.readyState === 4 && xhrObj.status === 200) {
+                                        fn(JSON.parse(xhrObj.responseText));
                                     }
-                                    fn(JSON.parse(xhrObj.responseText));
                                 };
                                 xhrObj.open('POST', url, true);
                                 xhrObj.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -58,7 +61,7 @@
                         }
                     }
                 });
-            }
+            };
         </script>
     </head>
     <body>
