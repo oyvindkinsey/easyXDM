@@ -11,25 +11,25 @@ Some of the goals for the project are that it should
 * be flexible
 * have good code quality (uses jslint etc)
 * have good documentation
+* be the best xdm-library in existence
 
 The library provides three layers of *abstraction* that simplifies development and usage.
 
-**easyXDM.transport** and its contained classes all give access to 
-a simple string based commmunication channel. This can be used directly 
-to send strings between the two documents. The transports does not have any
-dependencies outside the script itself and what the browser offers.
+**easyXDM.Transport** 
+gives access to a simple string based transport stack which can be used to send strings between two documents in different domains. 
+The underlying transport stacks does not have any dependencies outside the script itself and what the browser offers.
 
-**All the transports offer reliability, queueing and sender-verification, making them all equal to higher level classes.**
+**The transport stacks all offer reliability, queueing and sender-verification.**
 
-**easyXDM.Channel** wraps a Transport and uses a serializer to enable you
-to send Javascript objects over the transport. This offer the most when used with 
-the HTML5 JSON object, either via the native implementation or through Douglas Crockfords json2 library.
+**easyXDM.Rpc** 
+lets you call methods with arguments and return values across the domain boundary. 
+The underlying protocol used is quite similar to JSON-RPC.
+Since the remote end is free to use AJAX etc the Rpc class can be used to easily expose AJAX in a cross-domain fashion.
 
-**easyXDM.Interface** wraps a Channel and enables you to define exposed and
-consumed methods. This then allows you to call methods, with arguments, 
-across the domain boundary and have the result returned. The underlying protocol used is quite similar to json-rpc.
-Since the remote end is free to use AJAX etc the Interface class can be used to easily expose AJAX in a cross-domain fashion.
+The library also supplies a default xhr.html document that exposes a method 'post(String url, [Object data], function fn)'.
 
+** The xhr.html document should be extended to filter the incoming requests to only allowed resources.**
+ 
 Usage
 -----
 There are several examples and demos at the [wiki](http://easyxdm.net/wiki/) and in the [documentation](http://easyxdm.net/docs).
