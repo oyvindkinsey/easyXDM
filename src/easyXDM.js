@@ -42,7 +42,7 @@ easyXDM = {
     prepareTransportStack: function(config){
         // If no protocol is set then it means this is the host
         var query = easyXDM.Url.Query(), protocol = config.protocol, stackEls;
-        config.isHost = (typeof query.xdm_p === "undefined");
+        config.isHost = config.isHost || (typeof query.xdm_p === "undefined");
         
         if (!config.isHost) {
             config.channel = query.xdm_c;
