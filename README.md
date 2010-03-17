@@ -15,7 +15,7 @@ Some of the goals for the project are that it should
 
 The library provides three layers of *abstraction* that simplifies development and usage.
 
-**easyXDM.Transport** 
+**easyXDM.Socket** 
 gives access to a simple string based transport stack which can be used to send strings between two documents in different domains. 
 The underlying transport stacks does not have any dependencies outside the script itself and what the browser offers.
 
