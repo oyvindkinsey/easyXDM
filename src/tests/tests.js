@@ -41,9 +41,9 @@ function runTests(){
                 return this.Assert.isObject(easyXDM.Url);
             }
         }, {
-            name: "check for the presence of easyXDM.Transport",
+            name: "check for the presence of easyXDM.Socket",
             run: function(){
-                return this.Assert.isFunction(easyXDM.Transport);
+                return this.Assert.isFunction(easyXDM.Socket);
             }
         }, {
             name: "check for the presence of easyXDM.Rpc",
@@ -92,7 +92,7 @@ function runTests(){
             }
         }]
     }, {
-        name: "test easyXDM.Transport{PostMessageTransport}",
+        name: "test easyXDM.Socket{PostMessageTransport}",
         runIf: function(){
             if (typeof window.postMessage === "undefined") {
                 return "This test requires the HTML5 postMessage interface.";
@@ -108,7 +108,7 @@ function runTests(){
             run: function(){
                 var scope = this;
                 var messages = 0;
-                this.transport = new easyXDM.Transport({
+                this.transport = new easyXDM.Socket({
                     protocol: "1",
                     channel: "channel" + (channelId++),
                     local: "../hash.html",
@@ -140,7 +140,7 @@ function runTests(){
             }
         }]
     }, {
-        name: "test easyXDM.Transport{NameTransport} using queuing",
+        name: "test easyXDM.Socket{NameTransport} using queuing",
         runIf: function(){
             if (typeof window.postMessage !== "undefined") {
                 return "This test will often fail in modern browser due to window.open() not always returning existing windows";
@@ -155,7 +155,7 @@ function runTests(){
             run: function(){
                 var scope = this;
                 var messages = 0;
-                this.transport = new easyXDM.Transport({
+                this.transport = new easyXDM.Socket({
                     protocol: "2",
                     channel: "channel" + (channelId++),
                     local: "../hash.html",
@@ -189,7 +189,7 @@ function runTests(){
             }
         }]
     }, {
-        name: "test easyXDM.Transport{HashTransport} using polling and queuing",
+        name: "test easyXDM.Socket{HashTransport} using polling and queuing",
         setUp: function(){
             this.expectedMessage = "1abcd1234";
         },
@@ -199,7 +199,7 @@ function runTests(){
             run: function(){
                 var scope = this;
                 var messages = 0;
-                this.transport = new easyXDM.Transport({
+                this.transport = new easyXDM.Socket({
                     protocol: "0",
                     channel: "channel" + (channelId++),
                     local: "../hash.html",
@@ -232,7 +232,7 @@ function runTests(){
             }
         }]
     }, {
-        name: "test easyXDM.Transport{HashTransport} using onresize and queuing",
+        name: "test easyXDM.Socket{HashTransport} using onresize and queuing",
         setUp: function(){
             this.expectedMessage = "2abcd1234";
         },
@@ -242,7 +242,7 @@ function runTests(){
             run: function(){
                 var scope = this;
                 var messages = 0;
-                this.transport = new easyXDM.Transport({
+                this.transport = new easyXDM.Socket({
                     protocol: "0",
                     channel: "channel" + (channelId++),
                     local: "../hash.html",
@@ -275,7 +275,7 @@ function runTests(){
             }
         }]
     }, {
-        name: "test easyXDM.Transport{HashTransport} using parent and queuing",
+        name: "test easyXDM.Socket{HashTransport} using parent and queuing",
         setUp: function(){
             this.expectedMessage = "2abcd1234";
         },
@@ -285,7 +285,7 @@ function runTests(){
             run: function(){
                 var scope = this;
                 var messages = 0;
-                this.transport = new easyXDM.Transport({
+                this.transport = new easyXDM.Socket({
                     protocol: "0",
                     channel: "channel" + (channelId++),
                     local: window,
@@ -317,7 +317,7 @@ function runTests(){
             }
         }]
     }, {
-        name: "test easyXDM.Transport{HashTransport} using readyAfter and queuing",
+        name: "test easyXDM.Socket{HashTransport} using readyAfter and queuing",
         runIf: function(){
             if (typeof window.postMessage !== "undefined") {
                 return "This test will often fail in modern browser due to window.open() not always returning existing windows";
@@ -332,7 +332,7 @@ function runTests(){
             run: function(){
                 var scope = this;
                 var messages = 0;
-                this.transport = new easyXDM.Transport({
+                this.transport = new easyXDM.Socket({
                     protocol: "0",
                     channel: "channel" + (channelId++),
                     readyAfter: 1000,
@@ -363,7 +363,7 @@ function runTests(){
             }
         }]
     }, {
-        name: "test easyXDM.Transport{HashTransport} with fragmentation (8192)",
+        name: "test easyXDM.Socket{HashTransport} with fragmentation (8192)",
         setUp: function(){
             var i = 11;
             this.expectedMessage = "aaaa";
@@ -376,7 +376,7 @@ function runTests(){
             timeout: 5000,
             run: function(){
                 var scope = this;
-                this.transport = new easyXDM.Transport({
+                this.transport = new easyXDM.Socket({
                     protocol: "0",
                     channel: "channel" + (channelId++),
                     local: "../hash.html",
@@ -404,7 +404,7 @@ function runTests(){
             }
         }]
     }, {
-        name: "test easyXDM.Transport{}",
+        name: "test easyXDM.Socket{}",
         setUp: function(){
             this.expectedMessage = "4abcd1234";
         },
@@ -413,7 +413,7 @@ function runTests(){
             timeout: 5000,
             run: function(){
                 var scope = this;
-                this.transport = new easyXDM.Transport({
+                this.transport = new easyXDM.Socket({
                     channel: "channel" + (channelId++),
                     local: "../hash.html",
                     remote: _remoteUrl + "test_transport.html",
@@ -439,7 +439,7 @@ function runTests(){
             }
         }]
     }, {
-        name: "test easyXDM.Transport{} with query parameters",
+        name: "test easyXDM.Socket{} with query parameters",
         setUp: function(){
             this.expectedMessage = "5abcd1234";
         },
@@ -448,7 +448,7 @@ function runTests(){
             timeout: 5000,
             run: function(){
                 var scope = this;
-                this.transport = new easyXDM.Transport({
+                this.transport = new easyXDM.Socket({
                     channel: "channel" + (channelId++),
                     local: "../hash.html",
                     remote: _remoteUrl + "test_transport.html?a=b&c=d",

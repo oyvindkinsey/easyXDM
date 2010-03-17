@@ -10,7 +10,7 @@
 				document.write(unescape("%3Cscript src='../DomHelper.js' type='text/javascript'%3E%3C/script%3E"));
                 document.write(unescape("%3Cscript src='../Fn.js' type='text/javascript'%3E%3C/script%3E"));
                 document.write(unescape("%3Cscript src='../Url.js' type='text/javascript'%3E%3C/script%3E"));
-                document.write(unescape("%3Cscript src='../Transport.js' type='text/javascript'%3E%3C/script%3E"));
+                document.write(unescape("%3Cscript src='../Socket.js' type='text/javascript'%3E%3C/script%3E"));
                 document.write(unescape("%3Cscript src='../Rpc.js' type='text/javascript'%3E%3C/script%3E"));
                 document.write(unescape("%3Cscript src='../stack/PostMessageTransport.js' type='text/javascript'%3E%3C/script%3E"));
                 document.write(unescape("%3Cscript src='../stack/NameTransport.js' type='text/javascript'%3E%3C/script%3E"));
@@ -30,7 +30,7 @@
         <script type="text/javascript">
             var transport;
             window.onload = function(){
-                transport = new easyXDM.Transport({
+                transport = new easyXDM.Socket({
                     local: "../hash.html",
                     onMessage: function(message, origin){
                         // Echo back the message

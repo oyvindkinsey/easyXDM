@@ -9,7 +9,7 @@
  * This requires the JSON object present in the document, either natively, using json.org's json2 or as a wrapper around library spesific methods.
  * @namespace easyXDM
  * @constructor
- * @param {Object} config The underlying transports configuration. See easyXDM.Transport for available parameters.
+ * @param {Object} config The underlying transports configuration. See easyXDM.Socket for available parameters.
  * @param {easyXDM.configuration.RpcConfiguration} jsonRpcConfig The description of the interface to implement.
  */
 easyXDM.Rpc = function(config, jsonRpcConfig){

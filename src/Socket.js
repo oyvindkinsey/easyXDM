@@ -2,7 +2,7 @@
 /*global easyXDM, window, escape, unescape */
 
 /**
- * @class easyXDM.Transport
+ * @class easyXDM.Socket
  * This class creates a transport channel between two domains that is usable for sending and receiving string-based messages.<br/>
  * The channel is reliable, supports queueing, and ensures that the message originates from the expected domain.<br/>
  * Internally different stacks will be used depending on the browsers features and the available parameters. 
@@ -17,7 +17,7 @@
  * @cfg {Function} onReady A method that should be called when the transport is ready. Optional.
  * @cfg {DOMElement} container The element that the primary iframe should be inserted into. If not set then the iframe will be positioned off-screen. Optional.
  */
-easyXDM.Transport = function(config){
+easyXDM.Socket = function(config){
     var stack = easyXDM.createStack(easyXDM.prepareTransportStack(config).concat([{
         incoming: function(message, origin){
             config.onMessage(message, origin);

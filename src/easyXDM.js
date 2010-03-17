@@ -36,8 +36,8 @@ easyXDM = {
     
     /**
      * Prepares an array of stack-elements suitable for the current configuration
-     * @param {Object} config The Transports configuration. See easyXDM.Transport for more.
-     * @return {Array} An array of stack-elements with the Transport element at index 0.
+     * @param {Object} config The Transports configuration. See easyXDM.Socket for more.
+     * @return {Array} An array of stack-elements with the TransportElement at index 0.
      */
     prepareTransportStack: function(config){
         // If no protocol is set then it means this is the host
