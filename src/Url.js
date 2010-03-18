@@ -116,9 +116,6 @@ easyXDM.Url = {
      */
     appendQueryParameters: function(url, parameters){
         // #ifdef debug
-        if (!url) {
-            throw new Error("url is undefined or empty");
-        }
         if (!parameters) {
             throw new Error("parameters is undefined or null");
         }
