@@ -4,17 +4,13 @@
 /**
  * @class easyXDM.stack.HashTransport
  * HashTransport is a transport class that uses the IFrame URL Technique for communication.<br/>
- * This requires the precense of hash.html on the hosting domain for optimal performance, but can also be used with any other
- * static file present. If used with a static file (like an image) as the local: property, you must set the readyAfter property.<br/>
- * The library will try to be ready earlier, so this should be set to a safe value, when you are certain that the file will be loaded.<br/>
- * If this file is already present in the document, and therefor most likely cached, then this can be set to low value.<br/>
  * <a href="http://msdn.microsoft.com/en-us/library/bb735305.aspx">http://msdn.microsoft.com/en-us/library/bb735305.aspx</a><br/>
  * @extends easyXDM.stack.TransportStackElement
  * @namespace easyXDM.stack
  * @constructor
  * @param {Object} config The transports configuration.
  * @cfg {String/Window} local The url to the local file used for proxying messages, or the local window.
- * @cfg {Number} readyAfter The number of milliseconds to wait before firing onReady. To support using files other than hash.html for proxying messages.
+ * @cfg {Number} delay The number of milliseconds to wait before firing onReady. To support using files other than hash.html for proxying messages.
  *
  */
 easyXDM.stack.HashTransport = function(config){
@@ -63,6 +59,9 @@ easyXDM.stack.HashTransport = function(config){
     }
     
     function _onResize(e){
+        // #ifdef debug
+        trace("onresize: new message");
+        // #endif
         _handleHash(_listenerWindow.location.hash);
     }
     
@@ -97,11 +96,8 @@ easyXDM.stack.HashTransport = function(config){
      * @private
      */
     function _onReady(){
-        if (isHost && !_listenerWindow) {
-            if (useParent) {
-                _listenerWindow = window;
-            }
-            else {
+        if (!_listenerWindow) {
+            if (!useParent) {
                 // We must try obtain a reference to the correct window, this might fail 
                 try {
                     // This works in IE6
@@ -121,18 +117,10 @@ easyXDM.stack.HashTransport = function(config){
                 throw new Error("Failed to obtain a reference to the window");
             }
         }
-        
-        (function getBody(){
-            if (_listenerWindow && _listenerWindow.document && _listenerWindow.document.body) {
-                if (isHost) {
-                    _attachListeners();
-                }
-                pub.up.callback(true);
-            }
-            else {
-                window.setTimeout(getBody, 10);
-            }
-        }());
+        if (isHost) {
+            _attachListeners();
+        }
+        pub.up.callback(true);
     }
     
     return (pub = {
@@ -162,8 +150,13 @@ easyXDM.stack.HashTransport = function(config){
             _remoteOrigin = easyXDM.Url.getLocation(config.remote);
             
             if (isHost) {
-                // Fire the onReady method after a set delay
-                _timer = window.setTimeout(_onReady, 1000);
+                if (useParent) {
+                    _listenerWindow = window;
+                }
+                else {
+                    // Fire the onReady method after a set delay
+                    _timer = window.setTimeout(_onReady, config.delay);
+                }
             }
             else {
                 _listenerWindow = window;
@@ -175,8 +168,8 @@ easyXDM.stack.HashTransport = function(config){
             }
             else {
                 _callerWindow = easyXDM.DomHelper.createFrame((isHost ? config.remote : config.remote + "#" + config.channel), config.container, (isHost && !useParent) ? null : _onReady, (isHost ? "local_" : "remote_") + config.channel);
-                if (isHost) {
-                    var tries = 0, max = 1000 / 50;
+                if (isHost && !useParent) {
+                    var tries = 0, max = config.delay / 50;
                     (function getRef(){
                         if (++tries > max) {
                             return;

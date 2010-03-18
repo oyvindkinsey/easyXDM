@@ -77,6 +77,7 @@ easyXDM = {
         switch (protocol) {
             case "0":// 0 = HashTransport
                 config.interval = config.interval || 300;
+                config.delay = config.delay || 1000;
                 config.useResize = true;
                 config.useParent = false;
                 config.usePolling = false;

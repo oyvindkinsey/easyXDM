@@ -8,10 +8,10 @@
  * Internally different stacks will be used depending on the browsers features and the available parameters.
  * @namespace easyXDM
  * @constructor
- * @cfg {String/Window} local The url to the local hash.html document, a local static file, or a reference to the local window.
+ * @cfg {String/Window} local The url to the local name.html document, a local static file, or a reference to the local window.
  * @cfg {String} remote The url to the providers document.
- * @cfg {String} remoteHelper The url to the remote hash.html file. This is to support NameTransport as a fallback. Optional.
- * @cfg {Number} readyAfter The number of milliseconds to wait before firing onReady. To support using static files instead of hash.html. Optional.
+ * @cfg {String} remoteHelper The url to the remote name.html file. This is to support NameTransport as a fallback. Optional.
+ * @cfg {Number} delay The number of milliseconds to wait before firing onReady.  Optional.
  * @cfg {String} channel The name of the channel to use. Must be unique. Optional if only a single channel is expected in the document.
  * @cfg {Function} onMessage The method that should handle incoming messages.<br/> This method should accept two arguments, the message as a string, and the origin as a string. Optional.
  * @cfg {Function} onReady A method that should be called when the transport is ready. Optional.
