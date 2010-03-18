@@ -157,14 +157,12 @@ easyXDM = {
     }
 };
 
-
-// #ifdef debug
 /**
  * The namespace for all stack elements.
  * @private
  */
 easyXDM.stack = {
-
+    // #ifdef debug
     /**
      * @class easyXDM.stack.StackElement
      * The base interface that all stack elements should follow.<br/>
@@ -223,6 +221,5 @@ easyXDM.stack = {
      */
     TransportStackElement: function(config){
     }
-    
+    // #endif
 };
-// #endif
