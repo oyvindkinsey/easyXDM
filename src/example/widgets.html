@@ -16,6 +16,8 @@
                     local: "../hash.html",
                     container: document.getElementById("widgets")
                 });
+                document.getElementById("widget1url").value = location.href.replace("consumer", "provider").replace("widgets.html", "widget.html");
+                document.getElementById("widget2url").value = location.href.replace("consumer.", "").replace("widgets.html", "widget.html");
             };
         </script>
         <style type="text/css">
@@ -46,10 +48,10 @@
         <div id="log" style="height:100px;border:1px dotted black;overflow:auto">
         </div>
         <div>
-            <input type="text" id="widget1url" style="width:300px" value="http://provider.easyxdm.net/example/widget.html"/><input type="button" onclick="_widgetManager.addWidget(document.getElementById('widget1url').value,{});" value="Add Widget"/><input type="button" onclick="_widgetManager.removeWidget(document.getElementById('widget1url').value);" value="Remove Widget"/>
+            <input type="text" id="widget1url" style="width:300px" value=""/><input type="button" onclick="_widgetManager.addWidget(document.getElementById('widget1url').value,{});" value="Add Widget"/><input type="button" onclick="_widgetManager.removeWidget(document.getElementById('widget1url').value);" value="Remove Widget"/>
         </div>
         <div>
-            <input type="text" id="widget2url" style="width:300px" value="http://easyxdm.net/example/widget.html"/><input type="button" onclick="_widgetManager.addWidget(document.getElementById('widget2url').value,{});" value="Add Widget"/><input type="button" onclick="_widgetManager.removeWidget(document.getElementById('widget2url').value);" value="Remove Widget"/>
+            <input type="text" id="widget2url" style="width:300px" value=""/><input type="button" onclick="_widgetManager.addWidget(document.getElementById('widget2url').value,{});" value="Add Widget"/><input type="button" onclick="_widgetManager.removeWidget(document.getElementById('widget2url').value);" value="Remove Widget"/>
         </div><input type="button" onclick="_widgetManager.publish('testtopic','abc');" value="publish"/>
         <div id="widgets">
         </div>
