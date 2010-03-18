@@ -13,7 +13,7 @@ Some of the goals for the project are that it should
 * have good documentation
 * be the best xdm-library in existence
 
-The library provides three layers of *abstraction* that simplifies development and usage.
+The library provides two layers of *abstraction* that simplifies development and usage.
 
 **easyXDM.Socket** 
 gives access to a simple string based transport stack which can be used to send strings between two documents in different domains. 
