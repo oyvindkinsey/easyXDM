@@ -18,6 +18,9 @@ easyXDM.Url = {
         if (this._query) {
             return this._query;
         }
+        // #ifdef debug
+        this._trace("parsing location.search: '" + location.search);
+        // #endif
         this._query = {};
         var pair, key, value, search = location.search.substring(1).split("&");
         for (var i = 0, len = search.length; i < len; i++) {
@@ -36,6 +39,11 @@ easyXDM.Url = {
      * @type {String}
      */
     getDomainName: function(url){
+        // #ifdef debug
+        if (!url) {
+            throw new Error("url is undefined or empty");
+        }
+        // #endif
         var domain = url.substring(url.indexOf("//") + 2);
         domain = domain.substring(0, domain.indexOf("/"));
         var _indexOf = domain.indexOf(":");
@@ -51,6 +59,11 @@ easyXDM.Url = {
      * @return {String} The location part of the url
      */
     getLocation: function(url){
+        // #ifdef debug
+        if (!url) {
+            throw new Error("url is undefined or empty");
+        }
+        // #endif
         var indexOf = url.indexOf("//");
         var loc = url.substring(indexOf + 2);
         if (loc.indexOf("/") == -1) {
@@ -66,6 +79,11 @@ easyXDM.Url = {
      * @return {String} The resolved url.
      */
     resolveUrl: function(url){
+        // #ifdef debug
+        if (!url) {
+            throw new Error("url is undefined or empty");
+        }
+        // #endif
         var reParent = /\/[\d\w+%_\-]+\/\.\.\//;
         // If the url is a valid url we do nothing
         if (url.match(/^(http||https):\/\//)) {
@@ -84,7 +102,7 @@ easyXDM.Url = {
         
         var resolved = location.protocol + "//" + location.host + path;
         // #ifdef debug
-        easyXDM.Debug.trace("resolved url '" + url + ' into ' + resolved + "'");
+        this._trace("resolved url '" + url + ' into ' + resolved + "'");
         // #endif
         return resolved;
     },
@@ -97,6 +115,14 @@ easyXDM.Url = {
      * @return {String} A new valid url with the parameters appended.
      */
     appendQueryParameters: function(url, parameters){
+        // #ifdef debug
+        if (!url) {
+            throw new Error("url is undefined or empty");
+        }
+        if (!parameters) {
+            throw new Error("parameters is undefined or null");
+        }
+        // #endif
         var q = "";
         for (var key in parameters) {
             if (parameters.hasOwnProperty(key)) {
@@ -106,3 +132,7 @@ easyXDM.Url = {
         return url + ((url.indexOf("?") == -1) ? "?" : "&") + q.substring(0, q.length - 1);
     }
 };
+
+// #ifdef debug
+easyXDM.Url._trace = easyXDM.Debug.getTracer("easyXDM.Url");
+// #endif

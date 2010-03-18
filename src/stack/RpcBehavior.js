@@ -15,6 +15,9 @@
  * @cfg {easyXDM.configuration.RemoteConfiguration} remote The remote methods to expose through the proxy.
  */
 easyXDM.stack.RpcBehavior = function(proxy, config){
+    // #ifdef debug
+    var trace = easyXDM.Debug.getTracer("easyXDM.stack.RpcBehavior");
+    // #endif
     var pub;
     var _callbackCounter = 0, _callbacks = {};
     
@@ -31,12 +34,12 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
         }
         if (definition.isVoid) {
             // #ifdef debug
-            easyXDM.Debug.trace("creating void method " + name);
+            trace("creating void method " + name);
             // #endif
             // No need to register a callback
             return function(){
                 // #ifdef debug
-                easyXDM.Debug.trace("executing void method " + name);
+                trace("executing void method " + name);
                 // #endif
                 var params = Array.prototype.slice.call(arguments, 0);
                 // Send the method request
@@ -50,12 +53,12 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
         }
         else {
             // #ifdef debug
-            easyXDM.Debug.trace("creating method " + name);
+            trace("creating method " + name);
             // #endif
             // We need to extract and register the callback
             return function(){
                 // #ifdef debug
-                easyXDM.Debug.trace("executing method " + name);
+                trace("executing method " + name);
                 // #endif
                 _callbacks["" + (++_callbackCounter)] = arguments[arguments.length - 1];
                 var request = {
@@ -83,7 +86,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
         }
         if (method.isAsync) {
             // #ifdef debug
-            easyXDM.Debug.trace("requested to execute async method " + name);
+            trace("requested to execute async method " + name);
             // #endif
             // The method is async, we need to add a callback
             params.push(function(result){
@@ -99,14 +102,14 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
         else {
             if (method.isVoid) {
                 // #ifdef debug
-                easyXDM.Debug.trace("requested to execute void method " + name);
+                trace("requested to execute void method " + name);
                 // #endif
                 // Call local method 
                 method.method.apply(method.scope, params);
             }
             else {
                 // #ifdef debug
-                easyXDM.Debug.trace("requested to execute method " + name);
+                trace("requested to execute method " + name);
                 // #endif
                 // Call local method and send back the response
                 pub.down.outgoing(JSON.stringify({
@@ -122,14 +125,14 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
             var data = JSON.parse(message);
             if (data.name) {
                 // #ifdef debug
-                easyXDM.Debug.trace("received request to execute method " + data.name + (data.id ? (" using callback id " + data.id) : ""));
+                trace("received request to execute method " + data.name + (data.id ? (" using callback id " + data.id) : ""));
                 // #endif
                 // A method call from the remote end
                 _executeMethod(data.name, data.id, config.local[data.name], data.params);
             }
             else {
                 // #ifdef debug
-                easyXDM.Debug.trace("received return value destined to callback with id " + data.id);
+                trace("received return value destined to callback with id " + data.id);
                 // #endif
                 // A method response from the other end
                 _callbacks[data.id](data.response);
@@ -138,11 +141,11 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
         },
         init: function(){
             // #ifdef debug
-            easyXDM.Debug.trace("RpcBehavior#init");
+            trace("init");
             // #endif
             if (config.remote) {
                 // #ifdef debug
-                easyXDM.Debug.trace("creating concrete implementations");
+                trace("creating concrete implementations");
                 // #endif
                 // Implement the remote sides exposed methods
                 for (var name in config.remote) {
@@ -154,6 +157,9 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
             pub.down.init();
         },
         destroy: function(){
+            // #ifdef debug
+            trace("destroy");
+            // #endif
             for (var x in proxy) {
                 if (proxy.hasOwnProperty(x)) {
                     delete proxy[x];

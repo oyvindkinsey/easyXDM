@@ -40,11 +40,15 @@ easyXDM = {
      * @return {Array} An array of stack-elements with the TransportElement at index 0.
      */
     prepareTransportStack: function(config){
-        // If no protocol is set then it means this is the host
         var query = easyXDM.Url.Query(), protocol = config.protocol, stackEls;
         config.isHost = config.isHost || (typeof query.xdm_p === "undefined");
-        
+        // #ifdef debug
+        this._trace("preparing transport stack");
+        // #endif
         if (!config.isHost) {
+            // #ifdef debug
+            this._trace("using parameters from query");
+            // #endif
             config.channel = query.xdm_c;
             config.remote = decodeURIComponent(query.xdm_e);
             protocol = query.xdm_p;
@@ -60,7 +64,15 @@ easyXDM = {
                 protocol = "0";
             }
             config.channel = config.channel || "default";
+            // #ifdef debug
+            this._trace("selecting protocol: " + protocol);
+            // #endif
         }
+        // #ifdef debug
+        else {
+            this._trace("using protocol: " + protocol);
+        }
+        // #endif
         
         switch (protocol) {
             case "0":// 0 = HashTransport

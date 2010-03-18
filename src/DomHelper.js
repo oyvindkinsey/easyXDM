@@ -7,7 +7,7 @@
  * @singleton
  */
 easyXDM.DomHelper = {
-	
+
     /**
      * Creates a frame and appends it to the DOM.
      * @param {String} url The url the frame should be set to
@@ -19,7 +19,7 @@ easyXDM.DomHelper = {
      */
     createFrame: function(url, container, onLoad, name){
         // #ifdef debug
-        easyXDM.Debug.trace("creating frame pointing to " + url);
+        this._trace("creating frame: " + url);
         // #endif
         var frame;
         function loadFn(){
@@ -69,7 +69,7 @@ easyXDM.DomHelper = {
         }
         return frame;
     },
-	
+    
     /**
      * Provides a consistent interface for adding eventhandlers
      * @param {Object} target The target to add the event to
@@ -78,6 +78,9 @@ easyXDM.DomHelper = {
      */
     on: function(target, type, listener, useCapture){
         // Uses memoizing to cache the implementation
+        // #ifdef debug
+        var trace = this._trace;
+        // #endif
         if (window.addEventListener) {
             /**
              * Set on to use the DOM level 2 on
@@ -89,7 +92,7 @@ easyXDM.DomHelper = {
              */
             easyXDM.DomHelper.on = function(target, type, listener){
                 // #ifdef debug
-                easyXDM.Debug.trace("adding listener " + type);
+                trace("adding listener " + type);
                 // #endif
                 target.addEventListener(type, listener, false);
             };
@@ -105,14 +108,14 @@ easyXDM.DomHelper = {
              */
             easyXDM.DomHelper.on = function(object, sEvent, fpNotify){
                 // #ifdef debug
-                easyXDM.Debug.trace("adding listener " + sEvent);
+                trace("adding listener " + sEvent);
                 // #endif
                 object.attachEvent("on" + sEvent, fpNotify);
             };
         }
         easyXDM.DomHelper.on(target, type, listener);
     },
-	
+    
     /**
      * Provides a consistent interface for removing eventhandlers
      * @param {Object} target The target to remove the event from
@@ -122,6 +125,9 @@ easyXDM.DomHelper = {
     un: function(target, type, listener, useCapture){
         // Uses memoizing to cache the implementation
         var un;
+        // #ifdef debug
+        var trace = this._trace;
+        // #endif
         if (window.removeEventListener) {
             /**
              * Set un to use the DOM level 2 un
@@ -133,7 +139,7 @@ easyXDM.DomHelper = {
              */
             un = function(target, type, listener, useCapture){
                 // #ifdef debug
-                easyXDM.Debug.trace("removing listener " + type);
+                trace("removing listener " + type);
                 // #endif
                 target.removeEventListener(type, listener, useCapture);
             };
@@ -149,7 +155,7 @@ easyXDM.DomHelper = {
              */
             un = function(object, sEvent, fpNotify){
                 // #ifdef debug
-                easyXDM.Debug.trace("removing listener " + type);
+                trace("removing listener " + type);
                 // #endif
                 object.detachEvent("on" + sEvent, fpNotify);
             };
@@ -157,7 +163,7 @@ easyXDM.DomHelper = {
         un(target, type, listener);
         easyXDM.DomHelper.un = un;
     },
-	
+    
     /**
      * Checks for the precense of the JSON object.
      * If it is not precent it will use the supplied path to load the JSON2 library.
@@ -179,3 +185,7 @@ easyXDM.DomHelper = {
         // #endif
     }
 };
+
+// #ifdef debug
+easyXDM.DomHelper._trace = easyXDM.Debug.getTracer("easyXDM.DomHelper");
+// #endif

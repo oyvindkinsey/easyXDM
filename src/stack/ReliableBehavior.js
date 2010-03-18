@@ -12,6 +12,10 @@
  * @cfg {Number} tries How many times it should try before giving up.
  */
 easyXDM.stack.ReliableBehavior = function(config){
+    // #ifdef debug
+    var trace = easyXDM.Debug.getTracer("easyXDM.stack.ReliableBehavior");
+    trace("constructor");
+    // #endif
     var pub, // the public interface
  timer, // timer to wait for acks
  current, // the current message beging sent
@@ -25,21 +29,18 @@ easyXDM.stack.ReliableBehavior = function(config){
         incoming: function(message, origin){
             var indexOf = message.indexOf("_"), ack = parseInt(message.substring(0, indexOf), 10), id;
             // #ifdef debug
-            easyXDM.Debug.trace("ReliableBehavior: received ack: " + ack + ", last sent was: " + sendId);
+            trace("received ack: " + ack + ", last sent was: " + sendId);
             // #endif
             message = message.substring(indexOf + 1);
             indexOf = message.indexOf("_");
             id = parseInt(message.substring(0, indexOf), 10);
             indexOf = message.indexOf("_");
             message = message.substring(indexOf + 1);
-            // #ifdef debug
-            easyXDM.Debug.trace("ReliableBehavior: lastid " + receiveId + ", this " + id);
-            // #endif
             if (timer && ack === sendId) {
                 window.clearTimeout(timer);
                 timer = null;
                 // #ifdef debug
-                easyXDM.Debug.trace("ReliableBehavior: message delivered");
+                trace("message delivered");
                 // #endif
                 if (callback) {
                     window.setTimeout(function(){
@@ -52,7 +53,7 @@ easyXDM.stack.ReliableBehavior = function(config){
                     receiveId = id;
                     message = message.substring(id.length + 1);
                     // #ifdef debug
-                    easyXDM.Debug.trace("ReliableBehavior: sending ack, passing on " + message);
+                    trace("sending ack, passing on " + message);
                     // #endif
                     pub.down.outgoing(id + "_0_ack", origin);
                     // we must give the other end time to pick up the ack
@@ -60,12 +61,12 @@ easyXDM.stack.ReliableBehavior = function(config){
                         pub.up.incoming(message, origin);
                     }, config.timeout / 2);
                 }
-                // #ifdef debug
                 else {
-                    easyXDM.Debug.trace("ReliableBehavior: duplicate msgid " + id + ", resending ack");
+                    // #ifdef debug
+                    trace("duplicate msgid " + id + ", resending ack");
+                    // #endif
                     pub.down.outgoing(id + "_0_ack", origin);
                 }
-                // #endif
             }
         },
         outgoing: function(message, origin, fn){
@@ -82,7 +83,7 @@ easyXDM.stack.ReliableBehavior = function(config){
                 if (++sendCount > maxTries) {
                     if (callback) {
                         // #ifdef debug
-                        easyXDM.Debug.trace("ReliableBehavior: delivery failed");
+                        trace("delivery failed");
                         // #endif
                         window.setTimeout(function(){
                             callback(false);
@@ -91,7 +92,7 @@ easyXDM.stack.ReliableBehavior = function(config){
                 }
                 else {
                     // #ifdef debug
-                    easyXDM.Debug.trace("ReliableBehavior: " + (sendCount === 1 ? "sending " : "resending ") + sendId + ", tryCount " + sendCount);
+                    trace((sendCount === 1 ? "sending " : "resending ") + sendId + ", tryCount " + sendCount);
                     // #endif
                     pub.down.outgoing(current.data, current.origin);
                     timer = window.setTimeout(send, config.timeout);

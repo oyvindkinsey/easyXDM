@@ -12,14 +12,18 @@
  * @cfg {Boolean} initiate If the verification should be initiated from this end.
  */
 easyXDM.stack.VerifyBehavior = function(config){
-    var pub, mySecret, theirSecret, verified = false;
+    // #ifdef debug
+    var trace = easyXDM.Debug.getTracer("easyXDM.stack.VerifyBehavior");
+    trace("constructor");
     if (typeof config.initiate === "undefined") {
         throw new Error("settings.initiate is not set");
     }
+    // #endif
+    var pub, mySecret, theirSecret, verified = false;
     
     function startVerification(){
         // #ifdef debug
-        easyXDM.Debug.trace("VerifyBehavior: requesting verification");
+        trace("requesting verification");
         // #endif
         mySecret = Math.random().toString(16).substring(2);
         pub.down.outgoing(mySecret);
@@ -31,13 +35,13 @@ easyXDM.stack.VerifyBehavior = function(config){
             if (indexOf === -1) {
                 if (message === mySecret) {
                     // #ifdef debug
-                    easyXDM.Debug.trace("VerifyBehavior: verified, calling callback");
+                    trace("verified, calling callback");
                     // #endif
                     pub.up.callback(true);
                 }
                 else if (!theirSecret) {
                     // #ifdef debug
-                    easyXDM.Debug.trace("VerifyBehavior: returning secret");
+                    trace("returning secret");
                     // #endif
                     theirSecret = message;
                     if (!config.initiate) {
@@ -48,19 +52,9 @@ easyXDM.stack.VerifyBehavior = function(config){
             }
             else {
                 if (message.substring(0, indexOf) === theirSecret) {
-                    // #ifdef debug
-                    easyXDM.Debug.trace("VerifyBehavior: valid");
-                    // #endif
                     pub.up.incoming(message.substring(indexOf + 1), origin);
                 }
-                // #ifdef debug
-                else {
-                    easyXDM.Debug.trace("VerifyBehavior: invalid secret:" + message.substring(0, indexOf) + ", was expecting:" + theirSecret);
-                    
-                }
-                // #endif
             }
-            
         },
         outgoing: function(message, origin, fn){
             pub.down.outgoing(mySecret + "_" + message, origin, fn);

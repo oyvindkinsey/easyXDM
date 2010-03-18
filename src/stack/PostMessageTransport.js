@@ -13,6 +13,10 @@
  * @cfg {String} remote The remote domain to communicate with.
  */
 easyXDM.stack.PostMessageTransport = function(config){
+    // #ifdef debug
+    var trace = easyXDM.Debug.getTracer("easyXDM.stack.PostMessageTransport");
+    trace("constructor");
+    // #endif
     var pub, // the public interface
  frame, // the remote frame, if any
  callerWindow, // the window that we will call with
@@ -49,18 +53,11 @@ easyXDM.stack.PostMessageTransport = function(config){
     function _window_onMessage(event){
         var origin = _getOrigin(event);
         // #ifdef debug
-        easyXDM.Debug.trace("received message '" + event.data + "' from " + origin);
+        trace("received message '" + event.data + "' from " + origin);
         // #endif
         if (origin == targetOrigin && event.data.substring(0, config.channel.length + 1) == config.channel + " ") {
             pub.up.incoming(event.data.substring(config.channel.length + 1), origin);
         }
-    }
-    
-    // #ifdef debug
-    easyXDM.Debug.trace("easyXDM.transport.PostMessageTransport.constructor");
-    // #endif
-    if (!window.postMessage) {
-        throw new Error("This browser does not support window.postMessage");
     }
     
     return (pub = {
@@ -69,7 +66,7 @@ easyXDM.stack.PostMessageTransport = function(config){
         },
         destroy: function(){
             // #ifdef debug
-            easyXDM.Debug.trace("destroying transport");
+            trace("destroy");
             // #endif
             easyXDM.DomHelper.un(window, "message", _window_onMessage);
             if (frame) {
@@ -79,13 +76,16 @@ easyXDM.stack.PostMessageTransport = function(config){
             }
         },
         init: function(){
+            // #ifdef debug
+            trace("init");
+            // #endif
             targetOrigin = easyXDM.Url.getLocation(config.remote);
             if (config.isHost) {
                 // add the event handler for listening
                 easyXDM.DomHelper.on(window, "message", function waitForReady(event){
                     if (event.data == config.channel + "-ready") {
                         // #ifdef debug
-                        easyXDM.Debug.trace("firing onReady");
+                        trace("firing onReady");
                         // #endif
                         // replace the eventlistener
                         easyXDM.DomHelper.un(window, "message", waitForReady);

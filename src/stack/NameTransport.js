@@ -13,17 +13,19 @@
  * @namespace easyXDM.stack
  */
 easyXDM.stack.NameTransport = function(config){
+    // #ifdef debug
+    var trace = easyXDM.Debug.getTracer("easyXDM.stack.NameTransport");
+    trace("constructor");
+    // #endif
+    
     var pub; // the public interface
     var isHost, callerWindow, remoteWindow, readyCount, callback, remoteOrigin, remoteUrl;
-    // #ifdef debug
-    easyXDM.Debug.trace("easyXDM.transport.NameTransport.constructor");
-    // #endif
     
     function _sendMessage(message){
         var url = config.remoteHelper + (isHost ? ("#_3" + encodeURIComponent(remoteUrl + "#" + config.channel)) : ("#_2" + config.channel));
         // #ifdef debug
-        easyXDM.Debug.trace("sending message " + message);
-        easyXDM.Debug.trace("navigating to  '" + url + "'");
+        trace("sending message " + message);
+        trace("navigating to  '" + url + "'");
         // #endif
         callerWindow.contentWindow.sendMessage(message, url);
     }
@@ -37,7 +39,7 @@ easyXDM.stack.NameTransport = function(config){
         else {
             _sendMessage("ready");
             // #ifdef debug
-            easyXDM.Debug.trace("calling onReady");
+            trace("calling onReady");
             // #endif
             pub.up.callback(true);
         }
@@ -45,7 +47,7 @@ easyXDM.stack.NameTransport = function(config){
     
     function _onMessage(message){
         // #ifdef debug
-        easyXDM.Debug.trace("received message " + message);
+        trace("received message " + message);
         // #endif
         pub.up.incoming(message, remoteOrigin);
     }
@@ -73,7 +75,7 @@ easyXDM.stack.NameTransport = function(config){
         },
         init: function(){
             // #ifdef debug
-            easyXDM.Debug.trace("NameTransport#init");
+            trace("init");
             // #endif
             isHost = config.isHost;
             readyCount = 0;
@@ -84,7 +86,7 @@ easyXDM.stack.NameTransport = function(config){
                 // Register the callback
                 easyXDM.Fn.set(config.channel, function(message){
                     // #ifdef debug
-                    easyXDM.Debug.trace("received initial message " + message);
+                    trace("received initial message " + message);
                     // #endif
                     if (isHost && message === "ready") {
                         // Replace the handler

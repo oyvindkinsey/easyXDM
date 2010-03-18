@@ -19,19 +19,20 @@
  */
 easyXDM.stack.HashTransport = function(config){
     // #ifdef debug
-    easyXDM.Debug.trace("easyXDM.behaviors.transports.HashTransportBehavior");
-    // #endif
+    var trace = easyXDM.Debug.getTracer("easyXDM.stack.HashTransport");
+    trace("constructor");
+    // #endif    
     var pub;
     var me = this, isHost, _timer, pollInterval, _lastMsg, _msgNr, _listenerWindow, _callerWindow;
     var usePolling, useParent, useResize, _remoteOrigin;
     
     function _sendMessage(message){
         // #ifdef debug
-        easyXDM.Debug.trace("sending message '" + (_msgNr + 1) + " " + message + "' to " + _remoteOrigin);
+        trace("sending message '" + (_msgNr + 1) + " " + message + "' to " + _remoteOrigin);
         // #endif
         if (!_callerWindow) {
             // #ifdef debug
-            easyXDM.Debug.trace("no caller window");
+            trace("no caller window");
             // #endif
             return;
         }
@@ -42,7 +43,7 @@ easyXDM.stack.HashTransport = function(config){
             _callerWindow.contentWindow.location = url;
             if (useResize) {
                 // #ifdef debug
-                easyXDM.Debug.trace("resizing to new size " + (_callerWindow.width > 75 ? 50 : 100));
+                trace("resizing to new size " + (_callerWindow.width > 75 ? 50 : 100));
                 // #endif
                 _callerWindow.width = _callerWindow.width > 75 ? 50 : 100;
             }
@@ -56,7 +57,7 @@ easyXDM.stack.HashTransport = function(config){
     function _handleHash(hash){
         _lastMsg = hash;
         // #ifdef debug
-        easyXDM.Debug.trace("received message '" + _lastMsg + "' from " + _remoteOrigin);
+        trace("received message '" + _lastMsg + "' from " + _remoteOrigin);
         // #endif
         pub.up.incoming(_lastMsg.substring(_lastMsg.indexOf("_") + 1), _remoteOrigin);
     }
@@ -72,7 +73,7 @@ easyXDM.stack.HashTransport = function(config){
     function _pollHash(){
         if (_listenerWindow.location.hash && _listenerWindow.location.hash != _lastMsg) {
             // #ifdef debug
-            easyXDM.Debug.trace("poll: new message");
+            trace("poll: new message");
             // #endif
             _handleHash(_listenerWindow.location.hash);
         }
@@ -81,7 +82,7 @@ easyXDM.stack.HashTransport = function(config){
     function _attachListeners(){
         if (usePolling) {
             // #ifdef debug
-            easyXDM.Debug.trace("starting polling");
+            trace("starting polling");
             // #endif
             _timer = window.setInterval(_pollHash, pollInterval);
         }
@@ -110,7 +111,7 @@ easyXDM.stack.HashTransport = function(config){
                 } 
                 catch (ex) {
                     // #ifdef debug
-                    easyXDM.Debug.trace("Falling back to using window.open");
+                    trace("Falling back to using window.open");
                     // #endif
                     _listenerWindow = window.open("", "remote_" + config.channel);
                 }
@@ -120,7 +121,7 @@ easyXDM.stack.HashTransport = function(config){
             }
             if (!_listenerWindow) {
                 // #ifdef debug
-                easyXDM.Debug.trace("Failed to obtain a reference to the window");
+                trace("Failed to obtain a reference to the window");
                 // #endif
                 throw new Error("Failed to obtain a reference to the window");
             }
@@ -200,7 +201,7 @@ easyXDM.stack.HashTransport = function(config){
                             // This works in IE6
                             _listenerWindow = _callerWindow.contentWindow.frames["remote_" + config.channel];
                             // #ifdef debug
-                            easyXDM.Debug.trace("got an early reference to _listenerWindow");
+                            trace("got an early reference to _listenerWindow");
                             // #endif
                             window.clearTimeout(_timer);
                             _onReady();
@@ -215,13 +216,13 @@ easyXDM.stack.HashTransport = function(config){
             
             // #ifdef debug
             if (usePolling) {
-                easyXDM.Debug.trace("using polling to listen");
+                trace("using polling to listen");
             }
             if (useResize) {
-                easyXDM.Debug.trace("using resizing to call");
+                trace("using resizing to call");
             }
             if (useParent) {
-                easyXDM.Debug.trace("using current window as " + (config.local ? "listenerWindow" : "callerWindow"));
+                trace("using current window as " + (config.local ? "listenerWindow" : "callerWindow"));
             }
             // #endif
         }

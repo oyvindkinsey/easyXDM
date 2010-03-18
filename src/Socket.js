@@ -5,7 +5,7 @@
  * @class easyXDM.Socket
  * This class creates a transport channel between two domains that is usable for sending and receiving string-based messages.<br/>
  * The channel is reliable, supports queueing, and ensures that the message originates from the expected domain.<br/>
- * Internally different stacks will be used depending on the browsers features and the available parameters. 
+ * Internally different stacks will be used depending on the browsers features and the available parameters.
  * @namespace easyXDM
  * @constructor
  * @cfg {String/Window} local The url to the local hash.html document, a local static file, or a reference to the local window.
@@ -18,6 +18,11 @@
  * @cfg {DOMElement} container The element that the primary iframe should be inserted into. If not set then the iframe will be positioned off-screen. Optional.
  */
 easyXDM.Socket = function(config){
+    // #ifdef debug
+    var trace = easyXDM.Debug.getTracer("easyXDM.Socket");
+    trace("constructor");
+    // #endif
+    
     var stack = easyXDM.createStack(easyXDM.prepareTransportStack(config).concat([{
         incoming: function(message, origin){
             config.onMessage(message, origin);
@@ -28,21 +33,21 @@ easyXDM.Socket = function(config){
             }
         }
     }])), recipient = easyXDM.Url.getLocation(config.remote);
-	
-	/**
-	 * Initiates the destruction of the stack.
-	 */
+    
+    /**
+     * Initiates the destruction of the stack.
+     */
     this.destroy = function(){
         stack.destroy();
     };
-	
-	/**
-	 * Posts a message to the remote end of the channel
-	 * @param {String} message The message to send
-	 */
+    
+    /**
+     * Posts a message to the remote end of the channel
+     * @param {String} message The message to send
+     */
     this.postMessage = function(message){
         stack.outgoing(message, recipient);
     };
-	
+    
     stack.init();
 };

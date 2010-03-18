@@ -14,6 +14,10 @@
  * @cfg {Number} maxLength The maximum length of each outgoing message. Set this to enable fragmentation.
  */
 easyXDM.stack.QueueBehavior = function(config){
+    // #ifdef debug
+    var trace = easyXDM.Debug.getTracer("easyXDM.stack.QueueBehavior");
+    trace("constructor");
+    // #endif
     var pub, queue = [], waiting = false, incoming = "", destroying, maxLength = (config) ? config.maxLength : 0;
     
     function dispatch(){
@@ -21,7 +25,7 @@ easyXDM.stack.QueueBehavior = function(config){
             return;
         }
         // #ifdef debug
-        easyXDM.Debug.trace("dispatching from queue");
+        trace("dispatching from queue");
         // #endif
         waiting = true;
         var message = queue.shift();
@@ -42,14 +46,14 @@ easyXDM.stack.QueueBehavior = function(config){
             incoming += message.substring(indexOf + 1);
             if (seq === 0) {
                 // #ifdef debug
-                easyXDM.Debug.trace("last fragment received");
+                trace("received the last fragment");
                 // #endif
                 pub.up.incoming(incoming, origin);
                 incoming = "";
             }
             // #ifdef debug
             else {
-                easyXDM.Debug.trace("awaiting more fragments, seq=" + message);
+                trace("waiting for more fragments, seq=" + message);
             }
             // #endif
         },
@@ -67,7 +71,7 @@ easyXDM.stack.QueueBehavior = function(config){
             }
             while ((fragment = fragments.shift())) {
                 // #ifdef debug
-                easyXDM.Debug.trace("enqueuing");
+                trace("enqueuing");
                 // #endif
                 queue.push({
                     data: fragments.length + "_" + fragment,
@@ -79,7 +83,7 @@ easyXDM.stack.QueueBehavior = function(config){
         },
         destroy: function(){
             // #ifdef debug
-            easyXDM.Debug.trace("QueueBehavior#destroy");
+            trace("destroy");
             // #endif
             destroying = true;
             pub.down.destroy();

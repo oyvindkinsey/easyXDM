@@ -21,7 +21,7 @@ easyXDM.Fn = {
      */
     set: function(name, fn){
         // #ifdef debug
-        easyXDM.Debug.trace("storing function " + name);
+        this._trace("storing function " + name);
         // #endif
         this.map[name] = fn;
     },
@@ -34,7 +34,7 @@ easyXDM.Fn = {
      */
     get: function(name, del){
         // #ifdef debug
-        easyXDM.Debug.trace("retrieving function " + name);
+        this._trace("retrieving function " + name);
         // #endif
         var fn = this.map[name];
         if (del) {
@@ -43,3 +43,7 @@ easyXDM.Fn = {
         return fn;
     }
 };
+
+// #ifdef debug
+easyXDM.Fn._trace = easyXDM.Debug.getTracer("easyXDM.Fn");
+// #endif

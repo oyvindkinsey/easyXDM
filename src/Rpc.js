@@ -13,6 +13,11 @@
  * @param {easyXDM.configuration.RpcConfiguration} jsonRpcConfig The description of the interface to implement.
  */
 easyXDM.Rpc = function(config, jsonRpcConfig){
+    // #ifdef debug
+    var trace = easyXDM.Debug.getTracer("easyXDM.Rpc");
+    trace("constructor");
+    // #endif
+    
     var stack = easyXDM.createStack(easyXDM.prepareTransportStack(config).concat([new easyXDM.stack.RpcBehavior(this, jsonRpcConfig), {
         callback: function(success){
             if (config.onReady) {
