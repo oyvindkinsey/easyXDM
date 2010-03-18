@@ -10,8 +10,8 @@
  * @constructor
  * @param {Object} config The transports configuration.
  * @cfg {String/Window} local The url to the local file used for proxying messages, or the local window.
- * @cfg {Number} delay The number of milliseconds to wait before firing onReady. To support using files other than hash.html for proxying messages.
- *
+ * @cfg {Number} delay The number of milliseconds to wait before firing onReady.  Optional, defaults to 1000.
+ * @cfg {Number} interval The interval used when polling for messages. Optional, defaults to 300. 
  */
 easyXDM.stack.HashTransport = function(config){
     // #ifdef debug
