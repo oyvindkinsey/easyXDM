@@ -86,10 +86,8 @@ easyXDM.stack.HashTransport = function(config){
             // #endif
             _timer = window.setInterval(_pollHash, pollInterval);
         }
-        else if ((!isHost && !usePolling) || config.readyAfter) {
-            // This cannot handle resize on its own
+        else {
             easyXDM.DomHelper.on(_listenerWindow, "resize", _onResize);
-            
         }
     }
     
@@ -103,7 +101,7 @@ easyXDM.stack.HashTransport = function(config){
             if (useParent) {
                 _listenerWindow = window;
             }
-            else if (config.readyAfter) {
+            else {
                 // We must try obtain a reference to the correct window, this might fail 
                 try {
                     // This works in IE6
@@ -115,9 +113,6 @@ easyXDM.stack.HashTransport = function(config){
                     // #endif
                     _listenerWindow = window.open("", "remote_" + config.channel);
                 }
-            }
-            else {
-                _listenerWindow = easyXDM.stack.HashTransport.getWindow(config.channel);
             }
             if (!_listenerWindow) {
                 // #ifdef debug
@@ -148,7 +143,7 @@ easyXDM.stack.HashTransport = function(config){
             if (usePolling) {
                 window.clearInterval(_timer);
             }
-            else if ((!isHost && !usePolling) || config.readyAfter) {
+            else {
                 easyXDM.DomHelper.un(_listenerWindow, "resize", _pollHash);
             }
             if (isHost || !useParent) {
@@ -167,16 +162,8 @@ easyXDM.stack.HashTransport = function(config){
             _remoteOrigin = easyXDM.Url.getLocation(config.remote);
             
             if (isHost) {
-                if (config.readyAfter) {
-                    // Fire the onReady method after a set delay
-                    _timer = window.setTimeout(_onReady, config.readyAfter);
-                }
-                else {
-                    // Register onReady callback in the library so that
-                    // it can be called when hash.html has loaded.
-                    easyXDM.Fn.set(config.channel, _onReady);
-                    easyXDM.Fn.set(config.channel + "_onresize", _handleHash);
-                }
+                // Fire the onReady method after a set delay
+                _timer = window.setTimeout(_onReady, 1000);
             }
             else {
                 _listenerWindow = window;
@@ -188,8 +175,8 @@ easyXDM.stack.HashTransport = function(config){
             }
             else {
                 _callerWindow = easyXDM.DomHelper.createFrame((isHost ? config.remote : config.remote + "#" + config.channel), config.container, (isHost && !useParent) ? null : _onReady, (isHost ? "local_" : "remote_") + config.channel);
-                if (isHost && config.readyAfter) {
-                    var tries = 0, max = config.readyAfter / 50;
+                if (isHost) {
+                    var tries = 0, max = 1000 / 50;
                     (function getRef(){
                         if (++tries > max) {
                             return;
@@ -227,42 +214,4 @@ easyXDM.stack.HashTransport = function(config){
             // #endif
         }
     });
-};
-
-
-
-/**
- * Contains the proxy windows used to read messages from remote when
- * using HashTransport.
- * @static
- * @namespace easyXDM.transport
- */
-easyXDM.stack.HashTransport.windows = {};
-
-/**
- * Notify that a channel is ready and register a window to be used for reading messages
- * for on the channel.
- * @static
- * @param {String} channel
- * @param {Window} contentWindow
- * @namespace easyXDM.transport
- */
-easyXDM.stack.HashTransport.channelReady = function(channel, contentWindow){
-    var ht = easyXDM.stack.HashTransport;
-    ht.windows[channel] = contentWindow;
-    // #ifdef debug
-    easyXDM.Debug.trace("executing onReady callback for channel " + channel);
-    // #endif
-    easyXDM.Fn.get(channel, true)();
-};
-
-/**
- * Returns the window associated with a channel
- * @static
- * @param {String} channel
- * @return {Window} The window
- * @namespace easyXDM.transport
- */
-easyXDM.stack.HashTransport.getWindow = function(channel){
-    return easyXDM.stack.HashTransport.windows[channel];
 };

@@ -31,7 +31,7 @@
             var transport;
             window.onload = function(){
                 transport = new easyXDM.Socket({
-                    local: "../hash.html",
+                    local: "../name.html",
                     onMessage: function(message, origin){
                         // Echo back the message
                         transport.postMessage(message);

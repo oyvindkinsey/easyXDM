@@ -111,7 +111,7 @@ function runTests(){
                 this.transport = new easyXDM.Socket({
                     protocol: "1",
                     channel: "channel" + (channelId++),
-                    local: "../hash.html",
+                    local: "../name.html",
                     remote: _remoteUrl + "test_transport.html",
                     onMessage: function(message, origin){
                         if (scope.expectedMessage === message) {
@@ -140,7 +140,7 @@ function runTests(){
             }
         }]
     }, {
-        name: "test easyXDM.Socket{NameTransport} using queuing",
+        name: "test easyXDM.Socket{NameTransport}",
         runIf: function(){
             if (typeof window.postMessage !== "undefined") {
                 return "This test will often fail in modern browser due to window.open() not always returning existing windows";
@@ -158,9 +158,9 @@ function runTests(){
                 this.transport = new easyXDM.Socket({
                     protocol: "2",
                     channel: "channel" + (channelId++),
-                    local: "../hash.html",
+                    local: "../name.html",
                     remote: _remoteUrl + "test_transport.html",
-                    remoteHelper: _remoteUrl + "../hash.html",
+                    remoteHelper: _remoteUrl + "../name.html",
                     onMessage: function(message, origin){
                         if (scope.expectedMessage === message) {
                             if (++messages === 2) {
@@ -189,95 +189,9 @@ function runTests(){
             }
         }]
     }, {
-        name: "test easyXDM.Socket{HashTransport} using polling and queuing",
+        name: "test easyXDM.Socket{HashTransport} using window",
         setUp: function(){
             this.expectedMessage = "1abcd1234";
-        },
-        steps: [{
-            name: "onReady is fired",
-            timeout: 5000,
-            run: function(){
-                var scope = this;
-                var messages = 0;
-                this.transport = new easyXDM.Socket({
-                    protocol: "0",
-                    channel: "channel" + (channelId++),
-                    local: "../hash.html",
-                    remote: _remoteUrl + "test_transport.html",
-                    onMessage: function(message, origin){
-                        if (scope.expectedMessage === message) {
-                            if (++messages === 2) {
-                                scope.notifyResult(true);
-                            }
-                        }
-                    },
-                    container: document.getElementById("embedded"),
-                    onReady: function(){
-                        scope.notifyResult(true);
-                    }
-                });
-            }
-        }, {
-            name: "message is echoed back",
-            timeout: 5000,
-            run: function(){
-                this.transport.postMessage(this.expectedMessage);
-                this.transport.postMessage(this.expectedMessage);
-            }
-        }, {
-            name: "destroy",
-            run: function(){
-                this.transport.destroy();
-                return ((document.getElementsByTagName("iframe").length === 0));
-            }
-        }]
-    }, {
-        name: "test easyXDM.Socket{HashTransport} using onresize and queuing",
-        setUp: function(){
-            this.expectedMessage = "2abcd1234";
-        },
-        steps: [{
-            name: "onReady is fired",
-            timeout: 5000,
-            run: function(){
-                var scope = this;
-                var messages = 0;
-                this.transport = new easyXDM.Socket({
-                    protocol: "0",
-                    channel: "channel" + (channelId++),
-                    local: "../hash.html",
-                    remote: _remoteUrl + "test_transport.html",
-                    onMessage: function(message, origin){
-                        if (scope.expectedMessage === message) {
-                            if (++messages === 2) {
-                                scope.notifyResult(true);
-                            }
-                        }
-                    },
-                    onReady: function(){
-                        scope.notifyResult(true);
-                    }
-                });
-            }
-        }, {
-            name: "message is echoed back",
-            timeout: 5000,
-            run: function(){
-                this.transport.postMessage(this.expectedMessage);
-                this.transport.postMessage(this.expectedMessage);
-                
-            }
-        }, {
-            name: "destroy",
-            run: function(){
-                this.transport.destroy();
-                return ((document.getElementsByTagName("iframe").length === 0));
-            }
-        }]
-    }, {
-        name: "test easyXDM.Socket{HashTransport} using parent and queuing",
-        setUp: function(){
-            this.expectedMessage = "2abcd1234";
         },
         steps: [{
             name: "onReady is fired",
@@ -297,6 +211,7 @@ function runTests(){
                             }
                         }
                     },
+                    container: document.getElementById("embedded"),
                     onReady: function(){
                         scope.notifyResult(true);
                     }
@@ -317,7 +232,7 @@ function runTests(){
             }
         }]
     }, {
-        name: "test easyXDM.Socket{HashTransport} using readyAfter and queuing",
+        name: "test easyXDM.Socket{HashTransport} with changes.txt and resize",
         runIf: function(){
             if (typeof window.postMessage !== "undefined") {
                 return "This test will often fail in modern browser due to window.open() not always returning existing windows";
@@ -335,14 +250,61 @@ function runTests(){
                 this.transport = new easyXDM.Socket({
                     protocol: "0",
                     channel: "channel" + (channelId++),
-                    readyAfter: 1000,
                     local: "../changes.txt",
+                    readyAfter: 1000,
                     remote: _remoteUrl + "test_transport.html",
                     onMessage: function(message, origin){
                         if (++messages === 2) {
                             scope.notifyResult(true);
                         }
                     },
+                    onReady: function(){
+                        scope.notifyResult(true);
+                    }
+                });
+            }
+        }, {
+            name: "message is echoed back",
+            timeout: 5000,
+            run: function(){
+                this.transport.postMessage(this.expectedMessage);
+                this.transport.postMessage(this.expectedMessage);
+            }
+        }, {
+            name: "destroy",
+            run: function(){
+                this.transport.destroy();
+                return ((document.getElementsByTagName("iframe").length === 0));
+            }
+        }]
+    }, {
+        name: "test easyXDM.Socket{HashTransport} with changes.txt and polling",
+        runIf: function(){
+            if (typeof window.postMessage !== "undefined") {
+                return "This test will often fail in modern browser due to window.open() not always returning existing windows";
+            }
+        },
+        setUp: function(){
+            this.expectedMessage = "2abcd1234";
+        },
+        steps: [{
+            name: "onReady is fired",
+            timeout: 5000,
+            run: function(){
+                var scope = this;
+                var messages = 0;
+                this.transport = new easyXDM.Socket({
+                    protocol: "0",
+                    channel: "channel" + (channelId++),
+                    local: "../changes.txt",
+                    readyAfter: 1000,
+                    remote: _remoteUrl + "test_transport.html",
+                    onMessage: function(message, origin){
+                        if (++messages === 2) {
+                            scope.notifyResult(true);
+                        }
+                    },
+                    container: document.getElementById("embedded"),
                     onReady: function(){
                         scope.notifyResult(true);
                     }
@@ -379,7 +341,7 @@ function runTests(){
                 this.transport = new easyXDM.Socket({
                     protocol: "0",
                     channel: "channel" + (channelId++),
-                    local: "../hash.html",
+                    local: "../name.html",
                     remote: _remoteUrl + "test_transport.html",
                     onMessage: function(message, origin){
                         scope.notifyResult(scope.expectedMessage === message);
@@ -415,7 +377,7 @@ function runTests(){
                 var scope = this;
                 this.transport = new easyXDM.Socket({
                     channel: "channel" + (channelId++),
-                    local: "../hash.html",
+                    local: "../name.html",
                     remote: _remoteUrl + "test_transport.html",
                     onMessage: function(message, origin){
                         scope.notifyResult((scope.expectedMessage === message));
@@ -450,7 +412,7 @@ function runTests(){
                 var scope = this;
                 this.transport = new easyXDM.Socket({
                     channel: "channel" + (channelId++),
-                    local: "../hash.html",
+                    local: "../name.html",
                     remote: _remoteUrl + "test_transport.html?a=b&c=d",
                     onMessage: function(message, origin){
                         scope.notifyResult((scope.expectedMessage === message));
@@ -485,9 +447,9 @@ function runTests(){
                 var scope = this;
                 this.remote = new easyXDM.Rpc({
                     channel: "channel" + (channelId++),
-                    local: "../hash.html",
+                    local: "../name.html",
                     remote: _remoteUrl + "test_rpc.html",
-                    remoteHelper: _remoteUrl + "../hash.html",
+                    remoteHelper: _remoteUrl + "../name.html",
                     container: document.getElementById("embedded"),
                     onReady: function(){
                         scope.notifyResult(true);
