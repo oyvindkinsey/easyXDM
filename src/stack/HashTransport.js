@@ -90,39 +90,6 @@ easyXDM.stack.HashTransport = function(config){
         }
     }
     
-    /**
-     * Calls the supplied onReady method<br/>
-     * We delay this so that the the call to createChannel or createTransport will have completed.
-     * @private
-     */
-    function _onReady(){
-        if (!_listenerWindow) {
-            if (!useParent) {
-                // We must try obtain a reference to the correct window, this might fail 
-                try {
-                    // This works in IE6
-                    _listenerWindow = _callerWindow.contentWindow.frames["remote_" + config.channel];
-                } 
-                catch (ex) {
-                    // #ifdef debug
-                    trace("Falling back to using window.open");
-                    // #endif
-                    _listenerWindow = window.open("", "remote_" + config.channel);
-                }
-            }
-            if (!_listenerWindow) {
-                // #ifdef debug
-                trace("Failed to obtain a reference to the window");
-                // #endif
-                throw new Error("Failed to obtain a reference to the window");
-            }
-        }
-        if (isHost) {
-            _attachListeners();
-        }
-        pub.up.callback(true);
-    }
-    
     return (pub = {
         outgoing: function(message, domain){
             _sendMessage(encodeURIComponent(message));
@@ -149,25 +116,20 @@ easyXDM.stack.HashTransport = function(config){
             useResize = config.useResize;
             _remoteOrigin = easyXDM.Url.getLocation(config.remote);
             
-            if (isHost) {
-                if (useParent) {
-                    _listenerWindow = window;
-                }
-                else {
-                    // Fire the onReady method after a set delay
-                    _timer = window.setTimeout(_onReady, config.delay);
-                }
-            }
-            else {
-                _listenerWindow = window;
-                _attachListeners();
-            }
             if (!isHost && useParent) {
+                _listenerWindow = window;
                 _callerWindow = parent;
-                _onReady();
+                _attachListeners();
+                pub.up.callback(true);
             }
             else {
-                _callerWindow = easyXDM.DomHelper.createFrame((isHost ? config.remote : config.remote + "#" + config.channel), config.container, (isHost && !useParent) ? null : _onReady, (isHost ? "local_" : "remote_") + config.channel);
+                _callerWindow = easyXDM.DomHelper.createFrame((isHost ? config.remote : config.remote + "#" + config.channel), config.container, (isHost && useParent || !isHost) ? function(){
+                    _listenerWindow = window;
+                    _attachListeners();
+                    pub.up.callback(true);
+                }
+ : null, (isHost ? "local_" : "remote_") + config.channel);
+                
                 if (isHost && !useParent) {
                     var tries = 0, max = config.delay / 50;
                     (function getRef(){
@@ -184,7 +146,8 @@ easyXDM.stack.HashTransport = function(config){
                             trace("got an early reference to _listenerWindow");
                             // #endif
                             window.clearTimeout(_timer);
-                            _onReady();
+                            _attachListeners();
+                            pub.up.callback(true);
                             return;
                         } 
                         catch (ex) {
@@ -193,18 +156,6 @@ easyXDM.stack.HashTransport = function(config){
                     }());
                 }
             }
-            
-            // #ifdef debug
-            if (usePolling) {
-                trace("using polling to listen");
-            }
-            if (useResize) {
-                trace("using resizing to call");
-            }
-            if (useParent) {
-                trace("using current window as " + (config.local ? "listenerWindow" : "callerWindow"));
-            }
-            // #endif
         }
     });
 };
