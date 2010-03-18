@@ -13,6 +13,9 @@
         <script type="text/javascript">
             var remote;
             var remoteUrl = location.protocol + "//" + location.host.replace("consumer", "provider") + location.pathname.substring(0, location.pathname.lastIndexOf("/"));
+            if (remoteUrl.indexOf("xdm1") !== -1) {
+                remoteUrl = remoteUrl.replace("xdm1", "xdm2");
+            }
             window.onload = function(){
                 /**
                  * When the window is finished loading start setting up the interface
@@ -23,12 +26,13 @@
                      * or a path relative to the root.
                      * @field
                      */
-                    local: "../hash.html",
+                    local: "../name.html",
                     /**
                      * Register the url to the remote interface
                      * @field
                      */
                     remote: remoteUrl + "/remotemethods.html",
+                    remoteHelper: remoteUrl + "/../name.html",
                     /**
                      * Register the DOMElement that the generated IFrame should be inserted into
                      */

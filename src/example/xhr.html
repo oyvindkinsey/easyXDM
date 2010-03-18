@@ -13,12 +13,15 @@
         <script type="text/javascript">
             var xhr;
             var remoteUrl = location.protocol + "//" + location.host.replace("consumer", "provider") + location.pathname.substring(0, location.pathname.lastIndexOf("/"));
+            if (remoteUrl.indexOf("xdm1") !== -1) {
+                remoteUrl = remoteUrl.replace("xdm1", "xdm2");
+            }
             window.onload = function(){
             
                 xhr = new easyXDM.Rpc({
-                    local: "../hash.html",
+                    local: "../name.html",
                     remote: remoteUrl + "/../xhr.html",
-                    remoteHelper: remoteUrl + "/../hash.html"
+                    remoteHelper: remoteUrl + "/../name.html"
                 }, {
                     remote: {
                         post: {}
