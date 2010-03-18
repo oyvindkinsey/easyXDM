@@ -326,6 +326,11 @@ function runTests(){
         }]
     }, {
         name: "test easyXDM.Socket{HashTransport} with fragmentation (8192)",
+        runIf: function(){
+            if (typeof window.postMessage !== "undefined") {
+                return "This test will often fail in modern browser due to window.open() not always returning existing windows";
+            }
+        },
         setUp: function(){
             var i = 11;
             this.expectedMessage = "aaaa";

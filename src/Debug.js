@@ -148,6 +148,11 @@ easyXDM.Debug = {
                 };
                 trace("---- new logger at " + location.href);
             }
+            else {
+                // We are unable to use any logging
+                trace = function(){
+                };
+            }
         }
         else {
             /**
