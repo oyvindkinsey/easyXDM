@@ -21,7 +21,7 @@
                         _container = document.body.appendChild(document.createElement("div"));
                         _btnPublish = _container.appendChild(document.createElement("button"));
                         _btnPublish.innerHTML = "Publish";
-                        easyXDM.DomHelper.addEventListener(_btnPublish, "click", function(){
+                        easyXDM.DomHelper.on(_btnPublish, "click", function(){
                             widget.publish("testtopic", {
                                 latitude: 1,
                                 longitude: 2
