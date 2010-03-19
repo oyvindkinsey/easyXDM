@@ -7,47 +7,40 @@
     </head>
     <body>
         <script type="text/javascript">
-            var channel, callback;
-            window.sendMessage = function(message, url){
-                window.setTimeout(function(){
-                    window.name = message;
-                    location.href = url;
-                }, 0);
-            };
-            
-            if (location.hash) {
-                if (location.hash.substring(1, 2) === "_") {
-                    switch (location.hash.substring(2, 3)) {
-                        case "2":
-                            // NameTransport local
-                            channel = location.hash.substring(3);
-                            window.parent.parent.easyXDM.Fn.get(channel)(window.name);
-                            window.history.back();
-                            break;
-                        case "3":
-                            // NameTransport remote
-                            var url = decodeURIComponent(location.hash.substring(3)), guest;
-                            channel = url.substring(url.indexOf("#") + 1);
-                            try {
-                                // This works in IE
-                                guest = window.parent.frames[channel];
-                            } 
-                            catch (ex) {
-                                guest = window.open("", channel);
-                            }
-                            guest.easyXDM.Fn.get(channel)(window.name);
-                            window.history.back();
-                            break;
-                        case "4":
-                            // NameTransport idle
-                            var fn = window.parent.easyXDM.Fn.get(location.hash.substring(3) + "_load");
-                            if (fn) {
-                                fn();
-                            }
-                            break;
-                    }
+        
+        window.sendMessage = function(message, url){
+            window.setTimeout(function(){
+                window.name = message;
+                location.href = url;
+            }, 0);
+        };
+        
+        if (location.hash) {
+            if (location.hash.substring(1, 2) === "_") {
+                switch (location.hash.substring(2, 3)) {
+                    case "2":
+                        // NameTransport local
+                        window.parent.parent.easyXDM.Fn.get(location.hash.substring(3))(window.name);
+                        window.history.back();
+                        break;
+                    case "3":
+                        // NameTransport remote
+                        var url = decodeURIComponent(location.hash.substring(3)), channel, guest;
+                        channel = url.substring(url.indexOf("#") + 1);
+                        guest = window.parent.frames[channel];
+                        if (!guest) {
+                            throw new Error("unable to reference window");
+                        }
+                        guest.easyXDM.Fn.get(channel)(window.name);
+                        window.history.back();
+                        break;
+                    case "4":
+                        // NameTransport idle
+                        window.parent.easyXDM.Fn.get(location.hash.substring(3) + "_load")();
+                        break;
                 }
             }
+        }
         </script>
     </body>
 </html>

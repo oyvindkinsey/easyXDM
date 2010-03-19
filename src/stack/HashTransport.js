@@ -10,8 +10,8 @@
  * @constructor
  * @param {Object} config The transports configuration.
  * @cfg {String/Window} local The url to the local file used for proxying messages, or the local window.
- * @cfg {Number} delay The number of milliseconds to wait before firing onReady.  Optional, defaults to 1000.
- * @cfg {Number} interval The interval used when polling for messages. Optional, defaults to 300.
+ * @cfg {Number} delay The number of milliseconds easyXDM should try to get a reference to the local window.
+ * @cfg {Number} interval The interval used when polling for messages.
  */
 easyXDM.stack.HashTransport = function(config){
     // #ifdef debug
@@ -134,7 +134,10 @@ easyXDM.stack.HashTransport = function(config){
                     var tries = 0, max = config.delay / 50;
                     (function getRef(){
                         if (++tries > max) {
-                            return;
+                            // #ifdef debug
+                            trace("unable to get reference to _listenerWindow, giving up");
+                            // #endif
+                            throw new Error("Unable to reference listenerwindow");
                         }
                         if (_listenerWindow) {
                             return;
@@ -143,7 +146,7 @@ easyXDM.stack.HashTransport = function(config){
                             // This works in IE6
                             _listenerWindow = _callerWindow.contentWindow.frames["remote_" + config.channel];
                             // #ifdef debug
-                            trace("got an early reference to _listenerWindow");
+                            trace("got a reference to _listenerWindow");
                             // #endif
                             window.clearTimeout(_timer);
                             _attachListeners();
