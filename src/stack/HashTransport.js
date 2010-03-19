@@ -11,7 +11,7 @@
  * @param {Object} config The transports configuration.
  * @cfg {String/Window} local The url to the local file used for proxying messages, or the local window.
  * @cfg {Number} delay The number of milliseconds to wait before firing onReady.  Optional, defaults to 1000.
- * @cfg {Number} interval The interval used when polling for messages. Optional, defaults to 300. 
+ * @cfg {Number} interval The interval used when polling for messages. Optional, defaults to 300.
  */
 easyXDM.stack.HashTransport = function(config){
     // #ifdef debug
@@ -98,7 +98,7 @@ easyXDM.stack.HashTransport = function(config){
             if (usePolling) {
                 window.clearInterval(_timer);
             }
-            else {
+            else if (_listenerWindow) {
                 easyXDM.DomHelper.un(_listenerWindow, "resize", _pollHash);
             }
             if (isHost || !useParent) {
