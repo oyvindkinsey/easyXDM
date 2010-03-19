@@ -86,6 +86,28 @@ easyXDM = {
                         xdm_c: config.channel,
                         xdm_p: 0
                     };
+                    if (!config.local) {
+                        // #ifdef debug
+                        this._trace("looking for image to use as local");
+                        // #endif
+                        // If no local is set then we need to find an image hosted on the current domain
+                        var domain = location.protocol + "//" + location.host, images = document.body.getElementsByTagName("img"), i = images.length, image;
+                        while (i--) {
+                            image = images[i];
+                            if (image.src.substring(0, domain.length) === domain) {
+                                config.local = image.src;
+                                break;
+                            }
+                        }
+                        if (!config.local) {
+                            // #ifdef debug
+                            this._trace("no image found, defaulting to using the window");
+                            // #endif
+                            // If no local was set, and we are unable to find a suitable file, then we resort to using the current window 
+                            config.local = window;
+                        }
+                    }
+                    
                     if (config.local === window) {
                         // We are using the current window to listen to
                         config.usePolling = true;
