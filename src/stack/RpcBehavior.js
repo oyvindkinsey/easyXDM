@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, JSON */
+/*global easyXDM, window, escape, unescape*/
 
 /**
  * @class easyXDM.stack.RpcBehavior
@@ -13,12 +13,13 @@
  * @param {easyXDM.configuration.RpcConfiguration} config The definition of the local and remote interface to implement.
  * @cfg {easyXDM.configuration.LocalConfiguration} local The local interface to expose.
  * @cfg {easyXDM.configuration.RemoteConfiguration} remote The remote methods to expose through the proxy.
+ * @cfg {Object} serializer The serializer to use for serializing and deserializing the JSON. Should be compatible with the HTML5 JSON object. Optional, will default to window.JSON.
  */
 easyXDM.stack.RpcBehavior = function(proxy, config){
     // #ifdef debug
     var trace = easyXDM.Debug.getTracer("easyXDM.stack.RpcBehavior");
     // #endif
-    var pub;
+    var pub, serializer = config.serializer || window.JSON;
     var _callbackCounter = 0, _callbacks = {};
     
     /**
@@ -44,7 +45,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                 var params = Array.prototype.slice.call(arguments, 0);
                 // Send the method request
                 window.setTimeout(function(){
-                    pub.down.outgoing(JSON.stringify({
+                    pub.down.outgoing(serializer.stringify({
                         name: name,
                         params: params
                     }));
@@ -67,7 +68,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                     params: Array.prototype.slice.call(arguments, 0, arguments.length - 1)
                 };
                 // Send the method request
-                pub.down.outgoing(JSON.stringify(request));
+                pub.down.outgoing(serializer.stringify(request));
             };
         }
     }
@@ -91,7 +92,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
             // The method is async, we need to add a callback
             params.push(function(result){
                 // Send back the result
-                pub.down.outgoing(JSON.stringify({
+                pub.down.outgoing(serializer.stringify({
                     id: id,
                     response: result
                 }));
@@ -112,7 +113,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                 trace("requested to execute method " + name);
                 // #endif
                 // Call local method and send back the response
-                pub.down.outgoing(JSON.stringify({
+                pub.down.outgoing(serializer.stringify({
                     id: id,
                     response: method.method.apply(method.scope, params)
                 }));
@@ -122,7 +123,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
     
     return (pub = {
         incoming: function(message, origin){
-            var data = JSON.parse(message);
+            var data = serializer.parse(message);
             if (data.name) {
                 // #ifdef debug
                 trace("received request to execute method " + data.name + (data.id ? (" using callback id " + data.id) : ""));
