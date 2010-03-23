@@ -134,7 +134,7 @@
 		<copy todir="${project.build.publishdir}/v${project.build.version}/docs/">
 			<fileset dir="${project.build.artifactdir}/v${project.build.version}-docs"/>
 		</copy>
-		<copy file="${project.build.artifactdir}${ant.project.name}-${project.build.version}.${build.number}.zip" tofile="${project.build.publishdir}/v${project.build.version}/source.zip" />
-		<copy file="${project.build.artifactdir}${ant.project.name}-${project.build.version}.${build.number}-docs.zip" tofile="${project.build.publishdir}/v${project.build.version}/docs.zip" />
+		<copy file="${project.build.artifactdir}${ant.project.name}-${project.build.version}.${build.number}.zip" tofile="${project.build.publishdir}/dev/source.zip" />
+		<copy file="${project.build.artifactdir}${ant.project.name}-${project.build.version}.${build.number}-docs.zip" tofile="${project.build.publishdir}/dev/docs.zip" />
 	</target>
 </project>
