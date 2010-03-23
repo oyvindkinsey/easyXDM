@@ -1,12 +1,21 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
 /*global easyTest, easyXDM, window*/
-var _remoteUrl = location.href.substring(0, location.href.lastIndexOf("/") + 1);
-if (_remoteUrl.indexOf("easyxdm.net") !== -1) {
-    _remoteUrl = _remoteUrl.replace("easyxdm.net", "provider.easyxdm.net");
-}
-if (_remoteUrl.indexOf("xdm1") !== -1) {
-    _remoteUrl = _remoteUrl.replace("xdm1", "xdm2");
-}
+var REMOTE = (function(){
+    var remote = location.href;
+    switch (location.host) {
+        case "provider.easyxdm.net":
+            location.href = remote.replace("provider", "consumer");
+            break;
+        case "easyxdm.net":
+            remote = remote.replace("easyxdm.net", "consumer.easyxdm.net");
+            break;
+        case "xdm1":
+            remote = remote.replace("xdm1", "xdm2");
+            break;
+    }
+    return remote.substring(0, remote.lastIndexOf("/") + 1);
+}());
+
 var channelId = 0;
 function runTests(){
     easyTest.test([/**Tests for the presence of namespaces and classes*/{
@@ -112,7 +121,7 @@ function runTests(){
                     protocol: "1",
                     channel: "channel" + (channelId++),
                     local: "../name.html",
-                    remote: _remoteUrl + "test_transport.html",
+                    remote: REMOTE + "test_transport.html",
                     onMessage: function(message, origin){
                         if (scope.expectedMessage === message) {
                             if (++messages === 2) {
@@ -161,8 +170,8 @@ function runTests(){
                     protocol: "2", // This is just to override the automatic selection
                     channel: "channel" + (channelId++),
                     local: "../name.html",
-                    remote: _remoteUrl + "test_transport.html",
-                    remoteHelper: _remoteUrl + "../name.html",
+                    remote: REMOTE + "test_transport.html",
+                    remoteHelper: REMOTE + "../name.html",
                     onMessage: function(message, origin){
                         if (scope.expectedMessage === message) {
                             if (++messages === 2) {
@@ -205,7 +214,7 @@ function runTests(){
                     protocol: "0", // This is just to override the automatic selection
                     channel: "channel" + (channelId++),
                     local: window,
-                    remote: _remoteUrl + "test_transport.html",
+                    remote: REMOTE + "test_transport.html",
                     onMessage: function(message, origin){
                         if (scope.expectedMessage === message) {
                             if (++messages === 2) {
@@ -252,7 +261,7 @@ function runTests(){
                 this.transport = new easyXDM.Socket({
                     protocol: "0", // This is just to override the automatic selection
                     channel: "channel" + (channelId++),
-                    remote: _remoteUrl + "test_transport.html",
+                    remote: REMOTE + "test_transport.html",
                     onMessage: function(message, origin){
                         if (++messages === 2) {
                             scope.notifyResult(true);
@@ -293,7 +302,7 @@ function runTests(){
                     protocol: "0", // This is just to override the automatic selection
                     channel: "channel" + (channelId++),
                     local: "s.gif",
-                    remote: _remoteUrl + "test_transport.html",
+                    remote: REMOTE + "test_transport.html",
                     onMessage: function(message, origin){
                         if (++messages === 2) {
                             scope.notifyResult(true);
@@ -338,7 +347,7 @@ function runTests(){
                     protocol: "0", // This is just to override the automatic selection
                     channel: "channel" + (channelId++),
                     local: "../name.html",
-                    remote: _remoteUrl + "test_transport.html",
+                    remote: REMOTE + "test_transport.html",
                     onMessage: function(message, origin){
                         scope.notifyResult(scope.expectedMessage === message);
                     },
@@ -374,7 +383,7 @@ function runTests(){
                 this.transport = new easyXDM.Socket({
                     channel: "channel" + (channelId++),
                     local: "../name.html",
-                    remote: _remoteUrl + "test_transport.html",
+                    remote: REMOTE + "test_transport.html",
                     onMessage: function(message, origin){
                         scope.notifyResult((scope.expectedMessage === message));
                     },
@@ -409,7 +418,7 @@ function runTests(){
                 this.transport = new easyXDM.Socket({
                     channel: "channel" + (channelId++),
                     local: "../name.html",
-                    remote: _remoteUrl + "test_transport.html?a=b&c=d",
+                    remote: REMOTE + "test_transport.html?a=b&c=d",
                     onMessage: function(message, origin){
                         scope.notifyResult((scope.expectedMessage === message));
                     },
@@ -444,8 +453,8 @@ function runTests(){
                 this.remote = new easyXDM.Rpc({
                     channel: "channel" + (channelId++),
                     local: "../name.html",
-                    remote: _remoteUrl + "test_rpc.html",
-                    remoteHelper: _remoteUrl + "../name.html",
+                    remote: REMOTE + "test_rpc.html",
+                    remoteHelper: REMOTE + "../name.html",
                     container: document.getElementById("embedded"),
                     onReady: function(){
                         scope.notifyResult(true);

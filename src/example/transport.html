@@ -6,10 +6,21 @@
         </script>
         <script type="text/javascript">
             var transport;
-            var remoteUrl = location.protocol + "//" + location.host.replace("consumer", "provider") + location.pathname.substring(0, location.pathname.lastIndexOf("/"));
-            if (remoteUrl.indexOf("xdm1") !== -1) {
-                remoteUrl = remoteUrl.replace("xdm1", "xdm2");
-            }
+            var REMOTE = (function(){
+                var remote = location.href;
+                switch (location.host) {
+                    case "provider.easyxdm.net":
+                        location.href = remote.replace("provider", "consumer");
+                        break;
+                    case "easyxdm.net":
+                        remote = remote.replace("easyxdm.net", "consumer.easyxdm.net");
+                        break;
+                    case "xdm1":
+                        remote = remote.replace("xdm1", "xdm2");
+                        break;
+                }
+                return remote.substring(0, remote.lastIndexOf("/") + 1);
+            }());
             window.onload = function(){
                 /**
                  * When the window is finished loading start setting up the transport
@@ -25,8 +36,8 @@
                      * Register the url to the remote interface
                      * @field
                      */
-                    remote: remoteUrl + "/remotetransport.html",
-                    remoteHelper: remoteUrl + "/../name.html",
+                    remote: REMOTE + "/remotetransport.html",
+                    remoteHelper: REMOTE + "/../name.html",
                     onReady: function(){
                         /**
                          * Send a message to the other side
