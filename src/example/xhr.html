@@ -25,7 +25,7 @@
                         remote = remote.replace("xdm1", "xdm2");
                         break;
                 }
-                return remote.substring(0, remote.lastIndexOf("/") + 1);
+                return remote.substring(0, remote.lastIndexOf("/"));
             }());
             window.onload = function(){
             
