@@ -53,25 +53,29 @@ easyXDM = {
             config.remote = decodeURIComponent(query.xdm_e);
             protocol = query.xdm_p;
         }
-        else if (typeof protocol === "undefined") {
-            if (window.postMessage) {
-                protocol = "1";
-            }
-            else if (config.remoteHelper) {
-                protocol = "2";
-            }
-            else {
-                protocol = "0";
-            }
-            config.channel = config.channel || "default";
-            // #ifdef debug
-            this._trace("selecting protocol: " + protocol);
+        else 
+            if (typeof protocol === "undefined") {
+                config.remote = easyXDM.Url.resolveUrl(config.remote);
+                if (window.postMessage) {
+                    protocol = "1";
+                }
+                else 
+                    if (config.remoteHelper) {
+                        config.remoteHelper = easyXDM.Url.resolveUrl(config.remoteHelper);
+                        protocol = "2";
+                    }
+                    else {
+                        protocol = "0";
+                    }
+                config.channel = config.channel || "default";
+                // #ifdef debug
+                this._trace("selecting protocol: " + protocol);
             // #endif
-        }
-        // #ifdef debug
-        else {
-            this._trace("using protocol: " + protocol);
-        }
+            }
+            // #ifdef debug
+            else {
+                this._trace("using protocol: " + protocol);
+            }
         // #endif
         
         switch (protocol) {

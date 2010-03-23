@@ -84,23 +84,28 @@ easyXDM.Url = {
             throw new Error("url is undefined or empty");
         }
         // #endif
-        var reParent = /\/[\d\w+%_\-]+\/\.\.\//;
+        var reParent = /\/[\d\w+%_\-]+\/\.\.\//, reDoubleSlash = /([^:])\/\//g;
+        
+        // replace all // except the one in proto with /
+        url = url.replace(reDoubleSlash, "$1/");
+        
+        // reduce all '/xyz/../' to just '/' 
+        while (reParent.test(url)) {
+            url = url.replace(reParent, "/");
+        }
+        
         // If the url is a valid url we do nothing
         if (url.match(/^(http||https):\/\//)) {
             return url;
         }
         
+        // If this is a relative path
         var path = (url.substring(0, 1) === "/") ? "" : location.pathname;
         if (path.substring(path.length - 1) !== "/") {
             path = path.substring(0, path.lastIndexOf("/") + 1);
         }
-        path = path + url;
-        // reduce all '/xyz/../' to just '/' 
-        while (reParent.test(path)) {
-            path = path.replace(reParent, "/");
-        }
         
-        var resolved = location.protocol + "//" + location.host + path;
+        var resolved = location.protocol + "//" + location.host + path + url;
         // #ifdef debug
         this._trace("resolved url '" + url + ' into ' + resolved + "'");
         // #endif
