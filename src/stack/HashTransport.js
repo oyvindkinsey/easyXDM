@@ -145,11 +145,11 @@ easyXDM.stack.HashTransport = function(config){
                         try {
                             // This works in IE6
                             _listenerWindow = _callerWindow.contentWindow.frames["remote_" + config.channel];
+                            window.clearTimeout(_timer);
+                            _attachListeners();
                             // #ifdef debug
                             trace("got a reference to _listenerWindow");
                             // #endif
-                            window.clearTimeout(_timer);
-                            _attachListeners();
                             pub.up.callback(true);
                             return;
                         } 
