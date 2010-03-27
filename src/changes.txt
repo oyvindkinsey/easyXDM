@@ -1,3 +1,7 @@
+2.0.1 27.03.10
+See commit log at github
+github.com/oyvindkinsey/easyXDM
+
 2.0 18.03.10
 Refactored all the transport classes into stack elements.
 The transports are now exposed as a single Socket that selects the appropriate stack to initialize based on the available features and config parameters.
