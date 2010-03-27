@@ -92,7 +92,7 @@ easyXDM.stack.HashTransport = function(config){
     
     return (pub = {
         outgoing: function(message, domain){
-            _sendMessage(encodeURIComponent(message));
+            _sendMessage(message);
         },
         destroy: function(){
             if (usePolling) {

@@ -140,6 +140,7 @@ easyXDM = {
                 stackEls = [new easyXDM.stack.HashTransport(config), new easyXDM.stack.ReliableBehavior({
                     timeout: ((config.useResize ? 50 : config.interval * 1.5) + (config.usePolling ? config.interval * 1.5 : 50))
                 }), new easyXDM.stack.QueueBehavior({
+                    encode: true,
                     maxLength: 4000 - config.remote.length
                 }), new easyXDM.stack.VerifyBehavior({
                     initiate: config.isHost
