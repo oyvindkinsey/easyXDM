@@ -7,12 +7,6 @@
             case "provider.easyxdm.net":
                 location.href = remote.replace("provider", "consumer");
                 break;
-            case "easyxdm.net":
-                remote = remote.replace("easyxdm.net", "consumer.easyxdm.net");
-                break;
-            case "consumer.easyxdm.net":
-                remote = remote.replace("consumer", "provider");
-                break;
             case "xdm1":
                 remote = remote.replace("xdm1", "xdm2");
                 break;
