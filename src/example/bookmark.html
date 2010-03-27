@@ -23,6 +23,10 @@
                 }
             }
         </script>
-        <a href='javascript:(function(){var script = document.createElement("script");script.type = "text/javascript";script.src = "bookmark.js";document.getElementsByTagName("head")[0].appendChild(script);})();'>bookmark</a>
+        <a id="bookmark" src="">Bookmark</a>
+        <script type="text/javascript">
+            var baseUrl = location.href.substring(0, location.href.lastIndexOf("/") + 1);
+            document.getElementById("bookmark").href = 'javascript:(function(){var script = document.createElement("script");script.type = "text/javascript";script.src = "' + baseUrl + 'bookmark.js";document.getElementsByTagName("head")[0].appendChild(script);})();';
+        </script>
     </body>
 </html>

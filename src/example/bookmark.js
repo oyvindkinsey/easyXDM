@@ -1,6 +1,6 @@
 (function(){
     var s1, s2, isLoaded = false, xhr, head = document.getElementsByTagName('head')[0];
-    
+    var scripts = document.getElementsByTagName("script");
     var REMOTE = (function(){
         var remote = location.href;
         switch (location.host) {
@@ -16,6 +16,8 @@
             case "xdm1":
                 remote = remote.replace("xdm1", "xdm2");
                 break;
+            default:
+                remote = "http://provider.easyxdm.net/current/example/";
         }
         return remote.substring(0, remote.lastIndexOf("/"));
     }());
@@ -44,7 +46,7 @@
     }
     s1 = document.createElement("script");
     s1.type = "text/javascript";
-    s1.src = "../easyXDM.debug.js";
+    s1.src = REMOTE + "/../easyXDM.debug.js";
     s1.onreadystatechange = function(){
         if (this.readyState === "complete" || this.readyState === "loaded") {
             scriptOnLoad();
@@ -56,7 +58,7 @@
     if (typeof JSON === "undefined" || !JSON) {
         s2 = document.createElement("script");
         s2.type = "text/javascript";
-        s2.src = "../json2.js";
+        s2.src = REMOTE + "/../json2.js";
         s2.onreadystatechange = function(){
             if (this.readyState === "complete" || this.readyState === "loaded") {
                 scriptOnLoad();
