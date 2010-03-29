@@ -1,6 +1,18 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
 /*global easyXDM: true, window, escape, unescape */
 
+// From http://peter.michaux.ca/articles/feature-detection-state-of-the-art-browser-scripting
+function isHostMethod(object, property){
+    var t = typeof object[property];
+    return t == 'function' ||
+    (!!(t == 'object' && object[property])) ||
+    t == 'unknown';
+}
+
+function isHostObject(object, property){
+    return !!(typeof(object[property]) == 'object' && object[property]);
+}
+
 /** 
  * @class easyXDM
  * A javascript library providing cross-browser, cross-domain messaging/RPC.<br/>
@@ -55,7 +67,7 @@ easyXDM = {
         }
         else if (typeof protocol === "undefined") {
             config.remote = easyXDM.Url.resolveUrl(config.remote);
-            if (window.postMessage) {
+            if (isHostMethod(window, "postMessage")) {
                 protocol = "1";
             }
             else if (config.remoteHelper) {
@@ -114,7 +126,8 @@ easyXDM = {
                         // We are using the current window to listen to
                         config.usePolling = true;
                         config.useParent = true;
-                        parameters.xdm_e = encodeURIComponent(config.local = location.protocol + "//" + location.host + location.pathname + location.search);
+                        config.local = location.protocol + "//" + location.host + location.pathname + location.search;
+                        parameters.xdm_e = encodeURIComponent(config.local);
                         parameters.xdm_pa = 1; // use parent
                     }
                     else {

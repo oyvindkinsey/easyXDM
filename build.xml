@@ -34,6 +34,7 @@
 		<mkdir dir="work"/>
 		
 		<concat destfile="work/easyXDM.combined.js">	
+			<fileset dir="." includes="${project.src.dir}/begin_scope.txt" />
 			<fileset dir="." includes="${project.src.dir}/easyXDM.js" />
 			<fileset dir="." includes="${project.src.dir}/Debug.js" />
 			<fileset dir="." includes="${project.src.dir}/configuration.js" />
@@ -49,6 +50,7 @@
 			<fileset dir="." includes="${project.src.dir}/stack/QueueBehavior.js" />
 			<fileset dir="." includes="${project.src.dir}/stack/VerifyBehavior.js" />
 			<fileset dir="." includes="${project.src.dir}/stack/RpcBehavior.js" />
+			<fileset dir="." includes="${project.src.dir}/end_scope.txt" />
 		</concat>
 		
 		<replace file="work/easyXDM.combined.js" token="%%version%%" value="${project.build.version}.${build.number}"/>

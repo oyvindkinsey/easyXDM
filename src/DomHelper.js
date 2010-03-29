@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, JSON */
+/*global easyXDM, window, escape, unescape, isHostObject, isHostMethod */
 
 /** 
  * @class easyXDM.DomHelper
@@ -55,9 +55,9 @@ easyXDM.DomHelper = {
         // #ifdef debug
         var trace = this._trace;
         // #endif
-        if (window.addEventListener) {
+        if (isHostMethod(window, "addEventListener")) {
             /**
-             * Set on to use the DOM level 2 on
+             * Set on to use the DOM level 2 addEventListener
              * https://developer.mozilla.org/en/DOM/element.on
              * @ignore
              * @param {Object} target
@@ -102,9 +102,9 @@ easyXDM.DomHelper = {
         // #ifdef debug
         var trace = this._trace;
         // #endif
-        if (window.removeEventListener) {
+        if (isHostMethod(window, "removeEventListener")) {
             /**
-             * Set un to use the DOM level 2 un
+             * Set un to use the DOM level 2 removeEventListener
              * https://developer.mozilla.org/en/DOM/element.un
              * @ignore
              * @param {Object} target
@@ -146,7 +146,7 @@ easyXDM.DomHelper = {
      * @param {String} path A valid path to json2.js
      */
     requiresJSON: function(path){
-        if (typeof JSON == "undefined" || !JSON) {
+        if (isHostObject(window, "JSON")) {
             // #ifdef debug
             easyXDM.Debug.log("loading external JSON");
             // #endif
