@@ -21,51 +21,25 @@ easyXDM.DomHelper = {
         // #ifdef debug
         this._trace("creating frame: " + url);
         // #endif
-        var frame;
-        function loadFn(){
-            onLoad(frame.contentWindow);
-        }
-        if (name && window.attachEvent) {
-            // Internet Explorer does not support setting the 
-            // name om DOMElements created in Javascript.
-            // A workaround is to insert HTML and have the browser parse
-            // and instantiate the element.
-            var span = document.createElement("span");
-            document.body.appendChild(span);
-            if (container) {
-                span.innerHTML = '<iframe src="' + url + '" id="' + name + '" name="' + name + '"></iframe>';
-                frame = span.firstChild;
-                container.appendChild(frame);
-                document.body.removeChild(span);
-            }
-            else {
-                span.innerHTML = '<iframe style="position:absolute;left:-2000px;" src="' + url + '" id="' + name + '" name="' + name + '"></iframe>';
-                frame = span.firstChild;
-            }
-            
-            if (onLoad) {
-                frame.loadFn = loadFn;
-                this.on(frame, "load", loadFn);
-            }
-        }
-        else {
-            frame = document.createElement("IFRAME");
-            frame.src = url;
-            if (onLoad) {
-                frame.loadFn = loadFn;
-                this.on(frame, "load", loadFn);
-            }
-            if (container) {
-                container.appendChild(frame);
-            }
-            else {
-                frame.style.position = "absolute";
-                frame.style.left = "-2000px";
-                document.body.appendChild(frame);
-            }
-        }
+        var frame = document.createElement("IFRAME");
+        frame.src = url;
         if (name) {
             frame.id = frame.name = name;
+        }
+        if (onLoad) {
+            frame.loadFn = function(){
+                onLoad(frame.contentWindow);
+            };
+            this.on(frame, "load", frame.loadFn);
+        }
+        if (container) {
+            container.appendChild(frame);
+        }
+        else {
+			// This needs to be hidden like this, simply setting display:none and the like will cause failures in some browsers.
+            frame.style.position = "absolute";
+            frame.style.left = "-2000px";
+            document.body.appendChild(frame);
         }
         return frame;
     },
