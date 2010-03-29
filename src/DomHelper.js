@@ -64,7 +64,7 @@ easyXDM.DomHelper = {
              * @param {String} type
              * @param {Function} listener
              */
-            easyXDM.DomHelper.on = function(target, type, listener){
+            this.on = function(target, type, listener){
                 // #ifdef debug
                 trace("adding listener " + type);
                 // #endif
@@ -80,14 +80,14 @@ easyXDM.DomHelper = {
              * @param {String} sEvent
              * @param {Function} fpNotify
              */
-            easyXDM.DomHelper.on = function(object, sEvent, fpNotify){
+            this.on = function(object, sEvent, fpNotify){
                 // #ifdef debug
                 trace("adding listener " + sEvent);
                 // #endif
                 object.attachEvent("on" + sEvent, fpNotify);
             };
         }
-        easyXDM.DomHelper.on(target, type, listener);
+        this.on(target, type, listener);
     },
     
     /**
@@ -98,7 +98,6 @@ easyXDM.DomHelper = {
      */
     un: function(target, type, listener, useCapture){
         // Uses memoizing to cache the implementation
-        var un;
         // #ifdef debug
         var trace = this._trace;
         // #endif
@@ -111,7 +110,7 @@ easyXDM.DomHelper = {
              * @param {String} type
              * @param {Function} listener
              */
-            un = function(target, type, listener, useCapture){
+            this.un = function(target, type, listener, useCapture){
                 // #ifdef debug
                 trace("removing listener " + type);
                 // #endif
@@ -127,15 +126,14 @@ easyXDM.DomHelper = {
              * @param {String} sEvent
              * @param {Function} fpNotify
              */
-            un = function(object, sEvent, fpNotify){
+            this.un = function(object, sEvent, fpNotify){
                 // #ifdef debug
                 trace("removing listener " + type);
                 // #endif
                 object.detachEvent("on" + sEvent, fpNotify);
             };
         }
-        un(target, type, listener);
-        easyXDM.DomHelper.un = un;
+        this.un(target, type, listener);
     },
     
     /**

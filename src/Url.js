@@ -15,9 +15,6 @@ easyXDM.Url = {
      * @type {Object}
      */
     Query: function(){
-        if (this._query) {
-            return this._query;
-        }
         // #ifdef debug
         this._trace("parsing location.search: '" + location.search);
         // #endif
@@ -28,7 +25,10 @@ easyXDM.Url = {
             value = pair.substring(key.length + 1);
             query[key] = value;
         }
-        return (this._query = query);
+        this.Query = function(){
+            return query;
+        };
+        return query;
     },
     
     /**

@@ -15,13 +15,12 @@ easyXDM.Debug = {
      */
     log: function(msg){
         // Uses memoizing to cache the implementation
-        var log;
         if (!isHostObject(window, "console") || undef(console.log)) {
             /**
              * Sets log to be an empty function since we have no output available
              * @ignore
              */
-            log = function(){
+            this.log = function(){
             };
         }
         else {
@@ -30,19 +29,17 @@ easyXDM.Debug = {
              * @ignore
              * @param {String} msg
              */
-            log = function(msg){
+            this.log = function(msg){
                 console.log(location.host + "-" + new Date().valueOf() + ":" + msg);
             };
         }
-        log(msg);
-        easyXDM.Debug.log = log;
+        this.log(msg);
     },
     
     /**
      * Clears the current output element.
      */
     clear: function(){
-        var clear;
         var el = document.getElementById("log");
         if (el) {
             /**
@@ -50,7 +47,7 @@ easyXDM.Debug = {
              * @ignore
              * @param {String} msg
              */
-            clear = function(){
+            this.clear = function(){
                 try {
                     el.innerHTML = "";
                 } 
@@ -69,7 +66,7 @@ easyXDM.Debug = {
             var logWin = window.open("", windowname, "width=800,height=200,status=0,navigation=0,scrollbars=1");
             if (logWin) {
                 el = logWin.document.getElementById("log");
-                clear = function(){
+                this.clear = function(){
                     try {
                         el.innerHTML = "";
                     } 
@@ -79,21 +76,21 @@ easyXDM.Debug = {
                 };
             }
             else {
-                clear = function(){
+                this.clear = function(){
                 };
             }
         }
         else if (console.clear) {
-            clear = function(){
+            this.clear = function(){
                 console.clear();
             };
         }
         else if (_FirebugCommandLine.clear) {
-            clear = function(){
+            this.clear = function(){
                 _FirebugCommandLine.clear();
             };
         }
-        easyXDM.Debug.clear = clear;
+        this.clear();
     },
     
     /**
@@ -103,7 +100,6 @@ easyXDM.Debug = {
      */
     trace: function(msg){
         // Uses memoizing to cache the implementation
-        var trace;
         var el = document.getElementById("log");
         if (el) {
             /**
@@ -111,7 +107,7 @@ easyXDM.Debug = {
              * @ignore
              * @param {String} msg
              */
-            trace = function(msg){
+            this.trace = function(msg){
                 try {
                     el.appendChild(document.createElement("div")).appendChild(document.createTextNode(location.host + "-" + new Date().valueOf() + ":" + msg));
                     el.scrollTop = el.scrollHeight;
@@ -126,8 +122,7 @@ easyXDM.Debug = {
              * Create log window
              * @ignore
              */
-            var domain = location.host;
-            var windowname = domain.replace(/\./g, "") + "easyxdm_log";
+            var domain = location.host, windowname = domain.replace(/\./g, "") + "easyxdm_log";
             var logWin = window.open("", windowname, "width=800,height=200,status=0,navigation=0,scrollbars=1");
             if (logWin) {
                 var doc = logWin.document;
@@ -137,7 +132,7 @@ easyXDM.Debug = {
                     doc.close();
                 }
                 el = doc.getElementById("log");
-                trace = function(msg){
+                this.trace = function(msg){
                     try {
                         el.appendChild(doc.createElement("div")).appendChild(doc.createTextNode(location.host + "-" + new Date().valueOf() + ":" + msg));
                         el.scrollTop = el.scrollHeight;
@@ -146,11 +141,11 @@ easyXDM.Debug = {
                         //In case we are unloading
                     }
                 };
-                trace("---- new logger at " + location.href);
+                this.trace("---- new logger at " + location.href);
             }
             else {
                 // We are unable to use any logging
-                trace = function(){
+                this.trace = function(){
                 };
             }
         }
@@ -160,12 +155,11 @@ easyXDM.Debug = {
              * @ignore
              * @param {String} msg
              */
-            trace = function(msg){
+            this.trace = function(msg){
                 console.info(location.host + "-" + new Date().valueOf() + ":" + msg);
             };
         }
-        easyXDM.Debug.trace = trace;
-        easyXDM.Debug.trace(msg);
+        this.trace(msg);
     },
     /**
      * Creates a method usable for tracing.
