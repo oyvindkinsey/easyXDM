@@ -24,7 +24,7 @@ easyXDM.DomHelper = {
         var frame = document.createElement("IFRAME");
         frame.src = url;
         if (name) {
-            frame.id = frame.name = name;
+            frame.name = name;
         }
         if (onLoad) {
             frame.loadFn = function(){
@@ -36,7 +36,7 @@ easyXDM.DomHelper = {
             container.appendChild(frame);
         }
         else {
-			// This needs to be hidden like this, simply setting display:none and the like will cause failures in some browsers.
+            // This needs to be hidden like this, simply setting display:none and the like will cause failures in some browsers.
             frame.style.position = "absolute";
             frame.style.left = "-2000px";
             document.body.appendChild(frame);

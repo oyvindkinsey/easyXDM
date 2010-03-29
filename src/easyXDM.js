@@ -13,6 +13,14 @@ function isHostObject(object, property){
     return !!(typeof(object[property]) == 'object' && object[property]);
 }
 
+function defer(fn, time){
+    return window.setTimeout(fn, time || 0);
+}
+
+function undef(v){
+    return typeof v === "undefined";
+}
+
 /** 
  * @class easyXDM
  * A javascript library providing cross-browser, cross-domain messaging/RPC.<br/>
@@ -53,7 +61,7 @@ easyXDM = {
      */
     prepareTransportStack: function(config){
         var query = easyXDM.Url.Query(), protocol = config.protocol, stackEls;
-        config.isHost = config.isHost || (typeof query.xdm_p === "undefined");
+        config.isHost = config.isHost || undef(query.xdm_p);
         // #ifdef debug
         this._trace("preparing transport stack");
         // #endif
@@ -65,7 +73,7 @@ easyXDM = {
             config.remote = decodeURIComponent(query.xdm_e);
             protocol = query.xdm_p;
         }
-        else if (typeof protocol === "undefined") {
+        else if (undef(protocol)) {
             config.remote = easyXDM.Url.resolveUrl(config.remote);
             if (isHostMethod(window, "postMessage")) {
                 protocol = "1";
@@ -142,11 +150,11 @@ easyXDM = {
                 else {
                     config.channel = query.xdm_c;
                     config.remote = decodeURIComponent(query.xdm_e);
-                    config.useParent = (typeof query.xdm_pa !== "undefined");
+                    config.useParent = !undef(query.xdm_pa);
                     if (config.useParent) {
                         config.useResize = false;
                     }
-                    config.usePolling = (typeof query.xdm_po !== "undefined");
+                    config.usePolling = !undef(query.xdm_po);
                 }
                 stackEls = [new easyXDM.stack.HashTransport(config), new easyXDM.stack.ReliableBehavior({
                     timeout: ((config.useResize ? 50 : config.interval * 1.5) + (config.usePolling ? config.interval * 1.5 : 50))

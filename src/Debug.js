@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global console, _FirebugCommandLine,  easyXDM, window, escape, unescape, JSON */
+/*global console, _FirebugCommandLine,  easyXDM, window, escape, unescape, isHostObject, undef */
 
 // #ifdef debug
 /**
@@ -16,7 +16,7 @@ easyXDM.Debug = {
     log: function(msg){
         // Uses memoizing to cache the implementation
         var log;
-        if (typeof console === "undefined" || typeof console.log === "undefined") {
+        if (!isHostObject(window, "console") || undef(console.log)) {
             /**
              * Sets log to be an empty function since we have no output available
              * @ignore
@@ -59,7 +59,7 @@ easyXDM.Debug = {
                 }
             };
         }
-        else if (typeof console === "undefined" || typeof console.info === "undefined") {
+        else if (!isHostObject(window, "console") || undef(console.info)) {
             /**
              * Create log window
              * @ignore
@@ -121,7 +121,7 @@ easyXDM.Debug = {
                 }
             };
         }
-        else if (typeof console === "undefined" || typeof console.info === "undefined") {
+        else if (!isHostObject(window, "console") || undef(console.info)) {
             /**
              * Create log window
              * @ignore

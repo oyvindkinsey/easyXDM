@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape */
+/*global easyXDM, window, escape, unescape , defer */
 
 /**
  * @class easyXDM.stack.QueueBehavior
@@ -33,9 +33,9 @@ easyXDM.stack.QueueBehavior = function(config){
         pub.down.outgoing(message.data, message.origin, function(success){
             waiting = false;
             if (message.callback) {
-                window.setTimeout(function(){
+                defer(function(){
                     message.callback(success);
-                }, 0);
+                });
             }
             dispatch();
         });

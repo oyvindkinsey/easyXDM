@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape */
+/*global easyXDM, window, escape, unescape, defer */
 
 /**
  * @class easyXDM.stack.ReliableBehavior
@@ -43,9 +43,9 @@ easyXDM.stack.ReliableBehavior = function(config){
                 trace("message delivered");
                 // #endif
                 if (callback) {
-                    window.setTimeout(function(){
+                    defer(function(){
                         callback(true);
-                    }, 0);
+                    });
                 }
             }
             if (id !== 0) {
@@ -57,7 +57,7 @@ easyXDM.stack.ReliableBehavior = function(config){
                     // #endif
                     pub.down.outgoing(id + "_0_ack", origin);
                     // we must give the other end time to pick up the ack
-                    window.setTimeout(function(){
+                    defer(function(){
                         pub.up.incoming(message, origin);
                     }, config.timeout / 2);
                 }
@@ -95,7 +95,7 @@ easyXDM.stack.ReliableBehavior = function(config){
                     trace((sendCount === 1 ? "sending " : "resending ") + sendId + ", tryCount " + sendCount);
                     // #endif
                     pub.down.outgoing(current.data, current.origin);
-                    timer = window.setTimeout(send, config.timeout);
+                    timer = defer(send, config.timeout);
                 }
             }());
         },

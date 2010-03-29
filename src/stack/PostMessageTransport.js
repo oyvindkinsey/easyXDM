@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape */
+/*global easyXDM, window, escape, unescape , defer*/
 
 /**
  * @class easyXDM.stack.PostMessageTransport
@@ -21,6 +21,7 @@ easyXDM.stack.PostMessageTransport = function(config){
  frame, // the remote frame, if any
  callerWindow, // the window that we will call with
  targetOrigin; // the domain to communicate with
+    var dh = easyXDM.DomHelper, u = easyXDM.Url;
     /**
      * Resolves the origin from the event object
      * @private
@@ -34,7 +35,7 @@ easyXDM.stack.PostMessageTransport = function(config){
         }
         if (event.uri) {
             // From earlier implementations 
-            return easyXDM.Url.getLocation(event.uri);
+            return u.getLocation(event.uri);
         }
         if (event.domain) {
             // This is the last option and will fail if the 
@@ -68,7 +69,7 @@ easyXDM.stack.PostMessageTransport = function(config){
             // #ifdef debug
             trace("destroy");
             // #endif
-            easyXDM.DomHelper.un(window, "message", _window_onMessage);
+            dh.un(window, "message", _window_onMessage);
             if (frame) {
                 callerWindow = null;
                 frame.parentNode.removeChild(frame);
@@ -79,24 +80,24 @@ easyXDM.stack.PostMessageTransport = function(config){
             // #ifdef debug
             trace("init");
             // #endif
-            targetOrigin = easyXDM.Url.getLocation(config.remote);
+            targetOrigin = u.getLocation(config.remote);
             if (config.isHost) {
                 // add the event handler for listening
-                easyXDM.DomHelper.on(window, "message", function waitForReady(event){
+                dh.on(window, "message", function waitForReady(event){
                     if (event.data == config.channel + "-ready") {
                         // #ifdef debug
                         trace("firing onReady");
                         // #endif
                         // replace the eventlistener
-                        easyXDM.DomHelper.un(window, "message", waitForReady);
-                        easyXDM.DomHelper.on(window, "message", _window_onMessage);
-                        window.setTimeout(function(){
+                        dh.un(window, "message", waitForReady);
+                        dh.on(window, "message", _window_onMessage);
+                        defer(function(){
                             pub.up.callback(true);
-                        }, 0);
+                        });
                     }
                 });
                 // set up the iframe
-                frame = easyXDM.DomHelper.createFrame(easyXDM.Url.appendQueryParameters(config.remote, {
+                frame = dh.createFrame(u.appendQueryParameters(config.remote, {
                     xdm_e: location.protocol + "//" + location.host,
                     xdm_c: config.channel,
                     xdm_p: 1 // 1 = PostMessage
@@ -106,12 +107,12 @@ easyXDM.stack.PostMessageTransport = function(config){
             }
             else {
                 // add the event handler for listening
-                easyXDM.DomHelper.on(window, "message", _window_onMessage);
+                dh.on(window, "message", _window_onMessage);
                 callerWindow = window.parent;
                 callerWindow.postMessage(config.channel + "-ready", targetOrigin);
-                window.setTimeout(function(){
+                defer(function(){
                     pub.up.callback(true);
-                }, 0);
+                });
             }
         }
     });

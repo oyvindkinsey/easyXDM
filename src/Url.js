@@ -21,15 +21,14 @@ easyXDM.Url = {
         // #ifdef debug
         this._trace("parsing location.search: '" + location.search);
         // #endif
-        this._query = {};
-        var pair, key, value, search = location.search.substring(1).split("&");
-        for (var i = 0, len = search.length; i < len; i++) {
+        var query, pair, key, value, search = location.search.substring(1).split("&"), i = search.length;
+        while (i--) {
             pair = search[i];
             key = pair.substring(0, pair.indexOf("="));
             value = pair.substring(key.length + 1);
-            this._query[key] = value;
+            query[key] = value;
         }
-        return this._query;
+        return (this._query = query);
     },
     
     /**
@@ -46,11 +45,8 @@ easyXDM.Url = {
         // #endif
         var domain = url.substring(url.indexOf("//") + 2);
         domain = domain.substring(0, domain.indexOf("/"));
-        var _indexOf = domain.indexOf(":");
-        if (_indexOf != -1) {
-            domain = domain.substring(0, _indexOf);
-        }
-        return domain;
+        var indexOf = domain.indexOf(":");
+        return (indexOf === -1) ? domain : domain = domain.substring(0, indexOf);
     },
     
     /**
@@ -64,13 +60,8 @@ easyXDM.Url = {
             throw new Error("url is undefined or empty");
         }
         // #endif
-        var indexOf = url.indexOf("//");
-        var loc = url.substring(indexOf + 2);
-        if (loc.indexOf("/") == -1) {
-            return url;
-        }
-        loc = loc.substring(0, loc.indexOf("/"));
-        return url.substring(0, indexOf + 2) + loc;
+        var indexOf = url.indexOf("//"), loc = url.substring(indexOf + 2);
+        return (loc.indexOf("/") === -1) ? url : url.substring(0, indexOf + 2) + loc.substring(0, loc.indexOf("/"));
     },
     
     /**
@@ -125,13 +116,13 @@ easyXDM.Url = {
             throw new Error("parameters is undefined or null");
         }
         // #endif
-        var q = "";
+        var q = [];
         for (var key in parameters) {
             if (parameters.hasOwnProperty(key)) {
-                q += key + "=" + parameters[key] + "&";
+                q.push(key + "=" + parameters[key]);
             }
         }
-        return url + ((url.indexOf("?") == -1) ? "?" : "&") + q.substring(0, q.length - 1);
+        return url + ((url.indexOf("?") === -1) ? "?" : "&") + q.join("&");
     }
 };
 

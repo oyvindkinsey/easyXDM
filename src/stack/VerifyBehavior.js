@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape */
+/*global easyXDM, window, escape, unescape, undef */
 
 /**
  * @class easyXDM.stack.VerifyBehavior
@@ -15,7 +15,7 @@ easyXDM.stack.VerifyBehavior = function(config){
     // #ifdef debug
     var trace = easyXDM.Debug.getTracer("easyXDM.stack.VerifyBehavior");
     trace("constructor");
-    if (typeof config.initiate === "undefined") {
+    if (undef(config.initiate)) {
         throw new Error("settings.initiate is not set");
     }
     // #endif

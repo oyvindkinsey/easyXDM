@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape*/
+/*global easyXDM, window, escape, unescape, defer, undef */
 
 /**
  * @class easyXDM.stack.RpcBehavior
@@ -30,7 +30,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
      */
     function _createMethod(definition, name){
         // Add the scope so that calling the methods will work as expected
-        if (typeof definition.scope === "undefined") {
+        if (undef(definition.scope)) {
             definition.scope = window;
         }
         if (definition.isVoid) {
@@ -44,12 +44,12 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                 // #endif
                 var params = Array.prototype.slice.call(arguments, 0);
                 // Send the method request
-                window.setTimeout(function(){
+                defer(function(){
                     pub.down.outgoing(serializer.stringify({
                         name: name,
                         params: params
                     }));
-                }, 0);
+                });
             };
         }
         else {

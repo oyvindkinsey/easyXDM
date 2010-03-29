@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape */
+/*global easyXDM, window, escape, unescape, defer */
 
 /**
  * @class easyXDM.stack.HashTransport
@@ -58,7 +58,7 @@ easyXDM.stack.HashTransport = function(config){
         pub.up.incoming(_lastMsg.substring(_lastMsg.indexOf("_") + 1), _remoteOrigin);
     }
     
-    function _onResize(e){
+    function _onResize(){
         // #ifdef debug
         trace("onresize: new message");
         // #endif
@@ -154,7 +154,7 @@ easyXDM.stack.HashTransport = function(config){
                             return;
                         } 
                         catch (ex) {
-                            window.setTimeout(getRef, 50);
+                            defer(getRef, 50);
                         }
                     }());
                 }
