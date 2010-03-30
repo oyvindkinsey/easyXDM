@@ -125,11 +125,11 @@
 	</target>
 	
 	<target name="publish" depends="package">
-		<delete dir="${project.build.publishdir}/dev/" quiet="true" />
-		<copy todir="${project.build.publishdir}/dev/">
+		<delete dir="${project.build.publishdir}/" quiet="true" />
+		<copy todir="${project.build.publishdir}/">
 			<fileset dir="${project.build.artifactdir}/v${project.build.version}"/>
 		</copy>	
-		<copy todir="${project.build.publishdir}/dev/docs/">
+		<copy todir="${project.build.publishdir}/docs/">
 			<fileset dir="${project.build.artifactdir}/v${project.build.version}-docs"/>
 		</copy>
 		<copy file="${project.build.artifactdir}${ant.project.name}-${project.build.version}.${build.number}.zip" tofile="${project.build.publishdir}/dev/source.zip" />
