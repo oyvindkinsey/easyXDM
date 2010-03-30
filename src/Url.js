@@ -18,12 +18,10 @@ easyXDM.Url = {
         // #ifdef debug
         this._trace("parsing location.search: '" + location.search);
         // #endif
-        var query = {}, pair, key, value, search = location.search.substring(1).split("&"), i = search.length;
+        var query = {}, pair, search = location.search.substring(1).split("&"), i = search.length;
         while (i--) {
-            pair = search[i];
-            key = pair.substring(0, pair.indexOf("="));
-            value = pair.substring(key.length + 1);
-            query[key] = value;
+            pair = search[i].split("=");
+            query[pair[0]] = (pair.length === 2) ? pair[1] : "";
         }
         this.Query = function(){
             return query;
@@ -46,7 +44,7 @@ easyXDM.Url = {
         var domain = url.substring(url.indexOf("//") + 2);
         domain = domain.substring(0, domain.indexOf("/"));
         var indexOf = domain.indexOf(":");
-        return (indexOf === -1) ? domain : domain = domain.substring(0, indexOf);
+        return (indexOf === -1) ? domain : domain.substring(0, indexOf);
     },
     
     /**
@@ -75,32 +73,31 @@ easyXDM.Url = {
             throw new Error("url is undefined or empty");
         }
         // #endif
-        var reParent = /\/[\d\w+%_\-]+\/\.\.\//, reDoubleSlash = /([^:])\/\//g;
+        var reParent = /[-\w]+\/\.\.\//, reDoubleSlash = /([^:])\/\//g;
         
         // replace all // except the one in proto with /
         url = url.replace(reDoubleSlash, "$1/");
         
-        // reduce all '/xyz/../' to just '/' 
-        while (reParent.test(url)) {
-            url = url.replace(reParent, "/");
-        }
-        
         // If the url is a valid url we do nothing
-        if (url.match(/^(http||https):\/\//)) {
-            return url;
+        if (!url.match(/^(http||https):\/\//)) {
+            // If this is a relative path
+            var path = (url.substring(0, 1) === "/") ? "" : location.pathname;
+            if (path.substring(path.length - 1) !== "/") {
+                path = path.substring(0, path.lastIndexOf("/") + 1);
+            }
+            
+            url = location.protocol + "//" + location.host + path + url;
         }
         
-        // If this is a relative path
-        var path = (url.substring(0, 1) === "/") ? "" : location.pathname;
-        if (path.substring(path.length - 1) !== "/") {
-            path = path.substring(0, path.lastIndexOf("/") + 1);
+        // reduce all 'xyz/../' to just '' 
+        while (reParent.test(url)) {
+            url = url.replace(reParent, "");
         }
         
-        var resolved = location.protocol + "//" + location.host + path + url;
         // #ifdef debug
-        this._trace("resolved url '" + url + ' into ' + resolved + "'");
+        this._trace("resolved url '" + url + "'");
         // #endif
-        return resolved;
+        return url;
     },
     
     /**
