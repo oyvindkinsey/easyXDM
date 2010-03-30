@@ -24,7 +24,8 @@ easyXDM.DomHelper = {
         var frame = document.createElement("IFRAME");
         frame.src = url;
         if (name) {
-            frame.name = name;
+            //id needs to be set for the references to work reliably
+            frame.id = frame.name = name;
         }
         if (onLoad) {
             frame.loadFn = function(){
