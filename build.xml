@@ -129,10 +129,7 @@
 		<copy todir="${project.build.publishdir}/dev/">
 			<fileset dir="${project.build.artifactdir}/v${project.build.version}"/>
 		</copy>	
-		<copy todir="${project.build.publishdir}/v${project.build.version}">
-			<fileset dir="${project.build.artifactdir}/v${project.build.version}"/>
-		</copy>	
-		<copy todir="${project.build.publishdir}/v${project.build.version}/docs/">
+		<copy todir="${project.build.publishdir}/dev/docs/">
 			<fileset dir="${project.build.artifactdir}/v${project.build.version}-docs"/>
 		</copy>
 		<copy file="${project.build.artifactdir}${ant.project.name}-${project.build.version}.${build.number}.zip" tofile="${project.build.publishdir}/dev/source.zip" />
