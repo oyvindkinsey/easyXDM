@@ -13,10 +13,6 @@ function isHostObject(object, property){
     return !!(typeof(object[property]) == 'object' && object[property]);
 }
 
-function defer(fn, time){
-    return window.setTimeout(fn, time || 0);
-}
-
 function undef(v){
     return typeof v === "undefined";
 }

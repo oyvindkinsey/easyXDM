@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, defer */
+/*global easyXDM, window, escape, unescape*/
 
 /**
  * @class easyXDM.stack.HashTransport
@@ -154,7 +154,7 @@ easyXDM.stack.HashTransport = function(config){
                             return;
                         } 
                         catch (ex) {
-                            defer(getRef, 50);
+                            setTimeout(getRef, 50);
                         }
                     }());
                 }

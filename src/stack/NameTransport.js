@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, defer */
+/*global easyXDM, window, escape, unescape*/
 
 /**
  * @class easyXDM.stack.NameTransport
@@ -54,9 +54,9 @@ easyXDM.stack.NameTransport = function(config){
     
     function _onLoad(){
         if (callback) {
-            defer(function(){
+            setTimeout(function(){
                 callback(true);
-            });
+            }, 0);
         }
     }
     

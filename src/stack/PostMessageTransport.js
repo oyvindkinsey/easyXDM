@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape , defer*/
+/*global easyXDM, window, escape, unescape*/
 
 /**
  * @class easyXDM.stack.PostMessageTransport
@@ -91,9 +91,9 @@ easyXDM.stack.PostMessageTransport = function(config){
                         // replace the eventlistener
                         dh.un(window, "message", waitForReady);
                         dh.on(window, "message", _window_onMessage);
-                        defer(function(){
+                        setTimeout(function(){
                             pub.up.callback(true);
-                        });
+                        }, 0);
                     }
                 });
                 // set up the iframe
@@ -110,9 +110,9 @@ easyXDM.stack.PostMessageTransport = function(config){
                 dh.on(window, "message", _window_onMessage);
                 callerWindow = window.parent;
                 callerWindow.postMessage(config.channel + "-ready", targetOrigin);
-                defer(function(){
+                setTimeout(function(){
                     pub.up.callback(true);
-                });
+                }, 0);
             }
         }
     });

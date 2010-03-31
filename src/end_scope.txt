@@ -1,1 +1,1 @@
-})();
+})(window, document, location, window.setTimeout);

@@ -12,7 +12,7 @@
  * @cfg {String} remote The url to the providers document.
  * @cfg {String} remoteHelper The url to the remote name.html file. This is to support NameTransport as a fallback. Optional.
  * @cfg {Number} delay The number of milliseconds easyXDM should try to get a reference to the local window.  Optional, defaults to 2000.
- * @cfg {Number} interval The interval used when polling for messages. Optional, defaults to 300. 
+ * @cfg {Number} interval The interval used when polling for messages. Optional, defaults to 300.
  * @cfg {String} channel The name of the channel to use. Must be unique. Optional if only a single channel is expected in the document.
  * @cfg {Function} onMessage The method that should handle incoming messages.<br/> This method should accept two arguments, the message as a string, and the origin as a string. Optional.
  * @cfg {Function} onReady A method that should be called when the transport is ready. Optional.
