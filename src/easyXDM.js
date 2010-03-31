@@ -71,6 +71,7 @@ easyXDM = {
         }
         else if (undef(protocol)) {
             config.remote = easyXDM.Url.resolveUrl(config.remote);
+            config.channel = config.channel || "default";
             if (isHostMethod(window, "postMessage")) {
                 protocol = "1";
             }
@@ -81,7 +82,6 @@ easyXDM = {
             else {
                 protocol = "0";
             }
-            config.channel = config.channel || "default";
             // #ifdef debug
             this._trace("selecting protocol: " + protocol);
             // #endif
@@ -94,16 +94,14 @@ easyXDM = {
         
         switch (protocol) {
             case "0":// 0 = HashTransport
-                config.interval = config.interval || 300;
-                config.delay = config.delay || 2000;
-                config.useResize = true;
-                config.useParent = false;
-                config.usePolling = false;
+                this.apply(config, {
+                    interval: 300,
+                    delay: 2000,
+                    useResize: true,
+                    useParent: false,
+                    usePolling: false
+                }, true);
                 if (config.isHost) {
-                    var parameters = {
-                        xdm_c: config.channel,
-                        xdm_p: 0
-                    };
                     if (!config.local) {
                         // #ifdef debug
                         this._trace("looking for image to use as local");
@@ -126,6 +124,11 @@ easyXDM = {
                         }
                     }
                     
+                    var parameters = {
+                        xdm_c: config.channel,
+                        xdm_p: 0
+                    };
+                    
                     if (config.local === window) {
                         // We are using the current window to listen to
                         config.usePolling = true;
@@ -137,6 +140,7 @@ easyXDM = {
                     else {
                         parameters.xdm_e = easyXDM.Url.resolveUrl(config.local);
                     }
+                    
                     if (config.container) {
                         config.useResize = false;
                         parameters.xdm_po = 1; // use polling
@@ -144,13 +148,13 @@ easyXDM = {
                     config.remote = easyXDM.Url.appendQueryParameters(config.remote, parameters);
                 }
                 else {
-                    config.channel = query.xdm_c;
-                    config.remote = decodeURIComponent(query.xdm_e);
-                    config.useParent = !undef(query.xdm_pa);
-                    if (config.useParent) {
-                        config.useResize = false;
-                    }
-                    config.usePolling = !undef(query.xdm_po);
+                    this.apply(config, {
+                        channel: query.xdm_c,
+                        remote: decodeURIComponent(query.xdm_e),
+                        useParent: !undef(query.xdm_pa),
+                        usePolling: !undef(query.xdm_po),
+                        useResize: config.useParent ? false : config.useResize
+                    });
                 }
                 stackEls = [new easyXDM.stack.HashTransport(config), new easyXDM.stack.ReliableBehavior({
                     timeout: ((config.useResize ? 50 : config.interval * 1.5) + (config.usePolling ? config.interval * 1.5 : 50))
