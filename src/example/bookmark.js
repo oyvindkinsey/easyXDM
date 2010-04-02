@@ -1,4 +1,4 @@
-(function(){
+var myBookmark = (function(){
     var s1, s2, isLoaded = false, xhr, head = document.getElementsByTagName('head')[0];
     var scripts = document.getElementsByTagName("script");
     var REMOTE = (function(){
@@ -16,6 +16,18 @@
         return remote.substring(0, remote.lastIndexOf("/"));
     }());
     
+    function run(){
+        if (typeof xhr === "undefined") {
+            return;
+        }
+        xhr.post("example/glossary.php", {
+            param1: "a",
+            param2: "b"
+        }, function(json){
+            alert(json.glossary.title);
+        });
+    }
+    
     function scriptOnLoad(){
         if (isLoaded || typeof easyXDM === "undefined" || typeof JSON === "undefined") {
             return;
@@ -24,12 +36,7 @@
         xhr = new easyXDM.Rpc({
             remote: REMOTE + "/../xhr.html",
             onReady: function(){
-                xhr.post("example/glossary.php", {
-                    param1: "a",
-                    param2: "b"
-                }, function(json){
-                    alert(json.glossary.title);
-                });
+                run();
             }
         }, {
             remote: {
@@ -61,5 +68,7 @@
         s2.onload = scriptOnLoad;
         head.appendChild(s2);
     }
-    
+    return {
+        run: run
+    };
 })();
