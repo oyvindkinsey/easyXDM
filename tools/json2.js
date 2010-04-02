@@ -1,12 +1,20 @@
 /*
     http://www.JSON.org/json2.js
-    2009-06-18
+    2010-03-20
 
     Public Domain.
 
     NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
 
     See http://www.JSON.org/js.html
+
+
+    This code should be minified before deployment.
+    See http://javascript.crockford.com/jsmin.html
+
+    USE YOUR OWN COPY. IT IS EXTREMELY UNWISE TO LOAD CODE FROM SERVERS YOU DO
+    NOT CONTROL.
+
 
     This file creates a global JSON object containing two methods: stringify
     and parse.
@@ -33,7 +41,7 @@
             value represented by the name/value pair that should be serialized,
             or undefined if nothing should be serialized. The toJSON method
             will be passed the key associated with the value, and this will be
-            bound to the object holding the key.
+            bound to the value
 
             For example, this would serialize Dates as ISO strings.
 
@@ -136,15 +144,9 @@
 
     This is a reference implementation. You are free to copy, modify, or
     redistribute.
-
-    This code should be minified before deployment.
-    See http://javascript.crockford.com/jsmin.html
-
-    USE YOUR OWN COPY. IT IS EXTREMELY UNWISE TO LOAD CODE FROM SERVERS YOU DO
-    NOT CONTROL.
 */
 
-/*jslint evil: true */
+/*jslint evil: true, strict: false */
 
 /*members "", "\b", "\t", "\n", "\f", "\r", "\"", JSON, "\\", apply,
     call, charCodeAt, getUTCDate, getUTCFullYear, getUTCHours,
@@ -153,10 +155,13 @@
     test, toJSON, toString, valueOf
 */
 
+
 // Create a JSON object only if one does not already exist. We create the
 // methods in a closure to avoid creating global variables.
 
-var JSON = JSON || {};
+if (!this.JSON) {
+    this.JSON = {};
+}
 
 (function () {
 
@@ -169,7 +174,8 @@ var JSON = JSON || {};
 
         Date.prototype.toJSON = function (key) {
 
-            return this.valueOf() ? this.getUTCFullYear()   + '-' +
+            return isFinite(this.valueOf()) ?
+                   this.getUTCFullYear()   + '-' +
                  f(this.getUTCMonth() + 1) + '-' +
                  f(this.getUTCDate())      + 'T' +
                  f(this.getUTCHours())     + ':' +
@@ -427,6 +433,7 @@ var JSON = JSON || {};
 // Unicode characters with escape sequences. JavaScript handles many characters
 // incorrectly, either silently deleting them, or treating them as line endings.
 
+            text = String(text);
             cx.lastIndex = 0;
             if (cx.test(text)) {
                 text = text.replace(cx, function (a) {
