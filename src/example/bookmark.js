@@ -39,6 +39,15 @@ var myBookmark = (function(){
                 run();
             }
         }, {
+            // If we detect prototype.js then we use its implementation, if not JSON
+            serializer: Object.toJSON ? {
+                stringify: function(obj){
+                    return Object.toJSON(obj);
+                },
+                parse: function(string){
+                    return string.evalJSON();
+                }
+            } : JSON,
             remote: {
                 post: {}
             }

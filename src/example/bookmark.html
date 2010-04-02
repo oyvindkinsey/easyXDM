@@ -42,7 +42,7 @@
             
             // and then we include it using .toString().
             document.getElementById("bookmark").href = 'javascript:(' +
-            (bookmark.toString().replace('function bookmark', 'function').replace('baseUrl + "', '"' + baseUrl)).replace(/\s+/g, " ") +
+            (bookmark.toString().replace('baseUrl + "', '"' + baseUrl)).replace(/\s+/g, " ") +
             ')();';
             // when finished, you just copy the url from the rendered page
         </script>
