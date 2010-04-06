@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape */
+/*global easyXDM, window, escape, unescape, undef, JSON */
 
 /** 
  * @class easyXDM.Rpc
@@ -17,6 +17,46 @@ easyXDM.Rpc = function(config, jsonRpcConfig){
     var trace = easyXDM.Debug.getTracer("easyXDM.Rpc");
     trace("constructor");
     // #endif
+    
+    //code to work around libraries like PrototypeJS that extend native objects and thereby breaks JSON's stringify method
+    if (undef(jsonRpcConfig.serializer)) {
+        var obj = {
+            a: [1, 2, 3]
+        }, res, ver1 = "{\"a\":[1,2,3]}", ver2 = "{\"a\": [1, 2, 3]}", impl;
+        
+        if (JSON && typeof JSON.stringify === "function") {
+            res = JSON.stringify(obj);
+            if (res === ver1 || res === ver2) {
+                // this is a working JSON instance
+                impl = JSON;
+            }
+        }
+        
+        if (!impl) {
+            impl = {};
+            if (Object.toJSON) {
+                res = Object.toJSON(obj);
+                if (res === ver1 || res === ver2) {
+                    // this is a working stringify method
+                    impl.stringify = Object.toJSON;
+                }
+            }
+            
+            if (typeof String.prototype.evalJSON === "function") {
+                obj = ver1.evalJSON();
+                if (obj.a && obj.a.length === 3 && obj.a[2] === 3) {
+                    // this is a working parse method           
+                    impl.parse = function(str){
+                        return str.evalJSON();
+                    };
+                }
+            }
+            if (!impl.stringify || !impl.parse) {
+                throw new Error("No usable JSON implementation");
+            }
+        }
+        easyXDM.apply(jsonRpcConfig, impl);
+    }
     
     var stack = easyXDM.createStack(easyXDM.prepareTransportStack(config).concat([new easyXDM.stack.RpcBehavior(this, jsonRpcConfig), {
         callback: function(success){
