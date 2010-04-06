@@ -37,6 +37,12 @@ easyXDM.Fn = {
         this._trace("retrieving function " + name);
         // #endif
         var fn = this.map[name];
+        // #ifdef debug
+        if (!fn) {
+            this._trace(name + " not found");
+        }
+        // #endif
+        
         if (del) {
             delete this.map[name];
         }

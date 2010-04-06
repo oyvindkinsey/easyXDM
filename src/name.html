@@ -36,7 +36,10 @@
                         break;
                     case "4":
                         // NameTransport idle
-                        window.parent.easyXDM.Fn.get(location.hash.substring(3) + "_load")();
+                        var fn = window.parent.easyXDM.Fn.get(location.hash.substring(3) + "_load");
+                        if (fn) {
+                            fn();
+                        }
                         break;
                 }
             }

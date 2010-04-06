@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape*/
+/*global easyXDM, window, escape, unescape, undef */
 
 /**
  * @class easyXDM.stack.NameTransport
@@ -16,6 +16,10 @@ easyXDM.stack.NameTransport = function(config){
     // #ifdef debug
     var trace = easyXDM.Debug.getTracer("easyXDM.stack.NameTransport");
     trace("constructor");
+    if (config.isHost && undef(config.remoteHelper)) {
+        trace("missing remoteHelper");
+        throw new Error("missing remoteHelper");
+    }
     // #endif
     
     var pub; // the public interface
