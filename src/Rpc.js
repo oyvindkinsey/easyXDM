@@ -55,7 +55,7 @@ easyXDM.Rpc = function(config, jsonRpcConfig){
                 throw new Error("No usable JSON implementation");
             }
         }
-        easyXDM.apply(jsonRpcConfig, impl);
+        jsonRpcConfig.serializer = impl;
     }
     
     var stack = easyXDM.createStack(easyXDM.prepareTransportStack(config).concat([new easyXDM.stack.RpcBehavior(this, jsonRpcConfig), {
