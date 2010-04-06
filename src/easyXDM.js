@@ -56,7 +56,7 @@ easyXDM = {
      * @return {Array} An array of stack-elements with the TransportElement at index 0.
      */
     prepareTransportStack: function(config){
-        var query = easyXDM.Url.Query(), protocol = config.protocol, stackEls;
+        var query = easyXDM.Url.Query(), u = easyXDM.Url, protocol = config.protocol, stackEls;
         config.isHost = config.isHost || undef(query.xdm_p);
         // #ifdef debug
         this._trace("preparing transport stack");
@@ -70,13 +70,13 @@ easyXDM = {
             protocol = query.xdm_p;
         }
         else if (undef(protocol)) {
-            config.remote = easyXDM.Url.resolveUrl(config.remote);
+            config.remote = u.resolveUrl(config.remote);
             config.channel = config.channel || "default";
             if (isHostMethod(window, "postMessage")) {
                 protocol = "1";
             }
             else if (config.remoteHelper) {
-                config.remoteHelper = easyXDM.Url.resolveUrl(config.remoteHelper);
+                config.remoteHelper = u.resolveUrl(config.remoteHelper);
                 protocol = "2";
             }
             else {
@@ -138,14 +138,14 @@ easyXDM = {
                         parameters.xdm_pa = 1; // use parent
                     }
                     else {
-                        parameters.xdm_e = easyXDM.Url.resolveUrl(config.local);
+                        parameters.xdm_e = u.resolveUrl(config.local);
                     }
                     
                     if (config.container) {
                         config.useResize = false;
                         parameters.xdm_po = 1; // use polling
                     }
-                    config.remote = easyXDM.Url.appendQueryParameters(config.remote, parameters);
+                    config.remote = u.appendQueryParameters(config.remote, parameters);
                 }
                 else {
                     this.apply(config, {
