@@ -138,14 +138,14 @@ easyXDM.DomHelper = {
     },
     
     /**
-     * Checks for the precense of the JSON object.
-     * If it is not precent it will use the supplied path to load the JSON2 library.
+     * Checks for the presence of the JSON object.
+     * If it is not present it will use the supplied path to load the JSON2 library.
      * This should be called in the documents head right after the easyXDM script tag.
      * http://json.org/json2.js
      * @param {String} path A valid path to json2.js
      */
     requiresJSON: function(path){
-        if (isHostObject(window, "JSON")) {
+        if (!isHostObject(window, "JSON")) {
             // #ifdef debug
             easyXDM.Debug.log("loading external JSON");
             // #endif
