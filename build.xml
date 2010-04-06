@@ -19,7 +19,7 @@
 	
 	<target name="clean" depends="" description="Cleans up the project from temporary files">
 		<delete dir="work" quiet="true"/>
-		<delete dir="${project.build.artifactdir}/v${project.build.version}" quiet="true"/>
+		<delete dir="${project.build.artifactdir}v${project.build.version}" quiet="true"/>
 	</target>
 	
 	<target name="jslint">
@@ -68,35 +68,35 @@
 		<yuicompress infile="${project.src.dir}/widgets/Widgets.js" outfile="work/easyXDM.Widgets.min.js" />
 		
 		<!-- concat header files -->
-		<concat destfile="${project.build.artifactdir}/v${project.build.version}/easyXDM.js">
+		<concat destfile="${project.build.artifactdir}v${project.build.version}/easyXDM.js">
 			<fileset dir="." includes="${project.src.dir}/header.js" />
 			<fileset dir="." includes="work/easyXDM.js" />
 		</concat>
-		<concat destfile="${project.build.artifactdir}/v${project.build.version}/easyXDM.debug.js">
+		<concat destfile="${project.build.artifactdir}v${project.build.version}/easyXDM.debug.js">
 			<fileset dir="." includes="${project.src.dir}/header.js" />
 			<fileset dir="." includes="work/easyXDM.debug.js" />
 		</concat>
-		<concat destfile="${project.build.artifactdir}/v${project.build.version}/easyXDM.min.js">
+		<concat destfile="${project.build.artifactdir}v${project.build.version}/easyXDM.min.js">
 			<fileset dir="." includes="${project.src.dir}/header.js" />
 			<fileset dir="." includes="work/easyXDM.min.js" />
 		</concat>
 		
-		<concat destfile="${project.build.artifactdir}/v${project.build.version}/easyXDM.Widgets.js">
+		<concat destfile="${project.build.artifactdir}v${project.build.version}/easyXDM.Widgets.js">
 			<fileset dir="." includes="${project.src.dir}/header.js" />
 			<fileset dir="." includes="work/easyXDM.Widgets.js" />
 		</concat>
-		<concat destfile="${project.build.artifactdir}/v${project.build.version}/easyXDM.Widgets.debug.js">
+		<concat destfile="${project.build.artifactdir}v${project.build.version}/easyXDM.Widgets.debug.js">
 			<fileset dir="." includes="${project.src.dir}/header.js" />
 			<fileset dir="." includes="work/easyXDM.Widgets.debug.js" />
 		</concat>
-		<concat destfile="${project.build.artifactdir}/v${project.build.version}/easyXDM.Widgets.min.js">
+		<concat destfile="${project.build.artifactdir}v${project.build.version}/easyXDM.Widgets.min.js">
 			<fileset dir="." includes="${project.src.dir}/header.js" />
 			<fileset dir="." includes="work/easyXDM.Widgets.min.js" />
 		</concat>
 		
 		<delete file="work/easyXDM.combined.js" quiet="true"/>
 		
-		<copy todir="${project.build.artifactdir}/v${project.build.version}">
+		<copy todir="${project.build.artifactdir}v${project.build.version}">
 			<fileset dir="work"/>
 			<fileset file= "MIT-license.txt"/>
 			<fileset file= "README.txt"/>
@@ -104,33 +104,33 @@
 			<fileset file= "tools/json2.js"/>
 		</copy>
 		
-		<copy todir="${project.build.artifactdir}/v${project.build.version}/example">
+		<copy todir="${project.build.artifactdir}v${project.build.version}/example">
 			<fileset dir="${project.src.dir}/example"/>
 		</copy>
-		<copy todir="${project.build.artifactdir}/v${project.build.version}/tests">
+		<copy todir="${project.build.artifactdir}v${project.build.version}/tests">
 			<fileset dir="${project.src.dir}/tests"/>
 		</copy>	
 	</target>
 	
 	<target name="document" depends="build">
-		<delete dir="${project.build.artifactdir}/v${project.build.version}-docs" quiet="true"/>
-		<java jar="tools/ext-doc-1.0.131/ext-doc.jar" fork="true" failonerror="true" maxmemory="128m" >
-			<arg line="-p docs.xml -o ${project.build.artifactdir}/v${project.build.version}-docs -t tools/ext-doc-1.0.131/template/ext/template.xml"/>
+		<delete dir="${project.build.artifactdir}v${project.build.version}-docs" quiet="true"/>
+		<java jar="tools/ext-doc/ext-doc.jar" fork="true" failonerror="true" maxmemory="128m" >
+			<arg line="-p docs.xml -o ${project.build.artifactdir}v${project.build.version}-docs -t tools/ext-doc/template/ext/template.xml"/>
 		</java>
 	</target>
 	
 	<target name="package" depends="document">
-		<zip destfile="${project.build.artifactdir}${ant.project.name}-${project.build.version}.${build.number}.zip" basedir="${project.build.artifactdir}/v${project.build.version}"/>
-		<zip destfile="${project.build.artifactdir}${ant.project.name}-${project.build.version}.${build.number}-docs.zip" basedir="${project.build.artifactdir}/v${project.build.version}-docs"/>
+		<zip destfile="${project.build.artifactdir}${ant.project.name}-${project.build.version}.${build.number}.zip" basedir="${project.build.artifactdir}v${project.build.version}"/>
+		<zip destfile="${project.build.artifactdir}${ant.project.name}-${project.build.version}.${build.number}-docs.zip" basedir="${project.build.artifactdir}v${project.build.version}-docs"/>
 	</target>
 	
 	<target name="publish" depends="package">
 		<delete dir="${project.build.publishdir}/" quiet="true" />
 		<copy todir="${project.build.publishdir}/">
-			<fileset dir="${project.build.artifactdir}/v${project.build.version}"/>
+			<fileset dir="${project.build.artifactdir}v${project.build.version}"/>
 		</copy>	
 		<copy todir="${project.build.publishdir}/docs/">
-			<fileset dir="${project.build.artifactdir}/v${project.build.version}-docs"/>
+			<fileset dir="${project.build.artifactdir}v${project.build.version}-docs"/>
 		</copy>
 		<copy file="${project.build.artifactdir}${ant.project.name}-${project.build.version}.${build.number}.zip" tofile="${project.build.publishdir}/dev/source.zip" />
 		<copy file="${project.build.artifactdir}${ant.project.name}-${project.build.version}.${build.number}-docs.zip" tofile="${project.build.publishdir}/dev/docs.zip" />
