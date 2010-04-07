@@ -22,28 +22,23 @@ easyXDM.Rpc = function(config, jsonRpcConfig){
     if (undef(jsonRpcConfig.serializer)) {
         var obj = {
             a: [1, 2, 3]
-        }, res, ver1 = "{\"a\":[1,2,3]}", ver2 = "{\"a\": [1, 2, 3]}", impl;
+        }, json = "{\"a\":[1,2,3]}", impl;
         
-        if (JSON && typeof JSON.stringify === "function") {
-            res = JSON.stringify(obj);
-            if (res === ver1 || res === ver2) {
-                // this is a working JSON instance
-                impl = JSON;
-            }
+        if (JSON && typeof JSON.stringify === "function" && JSON.stringify(obj).replace((/\s/g), "") === json) {
+            // this is a working JSON instance
+            impl = JSON;
         }
-        
-        if (!impl) {
+        else {
             impl = {};
             if (Object.toJSON) {
-                res = Object.toJSON(obj);
-                if (res === ver1 || res === ver2) {
+                if (Object.toJSON(obj).replace((/\s/g), "") === json) {
                     // this is a working stringify method
                     impl.stringify = Object.toJSON;
                 }
             }
             
             if (typeof String.prototype.evalJSON === "function") {
-                obj = ver1.evalJSON();
+                obj = json.evalJSON();
                 if (obj.a && obj.a.length === 3 && obj.a[2] === 3) {
                     // this is a working parse method           
                     impl.parse = function(str){
@@ -51,6 +46,7 @@ easyXDM.Rpc = function(config, jsonRpcConfig){
                     };
                 }
             }
+            
             if (!impl.stringify || !impl.parse) {
                 throw new Error("No usable JSON implementation");
             }
