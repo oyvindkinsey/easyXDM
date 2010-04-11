@@ -44,12 +44,10 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                 // #endif
                 var params = Array.prototype.slice.call(arguments, 0);
                 // Send the method request
-                setTimeout(function(){
-                    pub.down.outgoing(serializer.stringify({
-                        name: name,
-                        params: params
-                    }));
-                }, 0);
+                pub.down.outgoing(serializer.stringify({
+                    name: name,
+                    params: params
+                }));
             };
         }
         else {
@@ -62,13 +60,12 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                 trace("executing method " + name);
                 // #endif
                 _callbacks["" + (++_callbackCounter)] = arguments[arguments.length - 1];
-                var request = {
-                    name: name,
-                    id: (_callbackCounter),
-                    params: Array.prototype.slice.call(arguments, 0, arguments.length - 1)
-                };
                 // Send the method request
-                pub.down.outgoing(serializer.stringify(request));
+                pub.down.outgoing(serializer.stringify({
+                    name: name,
+                    id: _callbackCounter,
+                    params: Array.prototype.slice.call(arguments, 0, arguments.length - 1)
+                }));
             };
         }
     }
@@ -161,9 +158,9 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
             // #ifdef debug
             trace("destroy");
             // #endif
-            for (var x in proxy) {
-                if (proxy.hasOwnProperty(x)) {
-                    delete proxy[x];
+            for (var name in config.remote) {
+                if (config.remote.hasOwnProperty(name) && proxy.hasOwnProperty(name)) {
+                    delete proxy[name];
                 }
             }
             pub.down.destroy();

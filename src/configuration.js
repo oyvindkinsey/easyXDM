@@ -20,7 +20,13 @@ easyXDM.configuration = {
          * The remote property contains a list of method-definitions in the form of methodname:{description}
          * @type easyXDM.configuration.RemoteConfiguration
          */
-        remote: {}
+        remote: {},
+        /**
+         * The serializer to use instead of the globally available JSON (if present).
+         * Must implement a signature identical to JSON.
+         * @type Object
+         */
+        serializer: {}
     },
     /**
      * @class easyXDM.configuration.LocalConfiguration
