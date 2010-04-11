@@ -18,7 +18,7 @@
                             item = list[i];
                             var obj = new ActiveXObject(item);
                             return function(){
-                                new ActiveXObject(item);
+                                return new ActiveXObject(item);
                             };
                         } 
                         catch (e) {
