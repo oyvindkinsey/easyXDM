@@ -69,28 +69,30 @@ easyXDM = {
             config.remote = decodeURIComponent(query.xdm_e);
             protocol = query.xdm_p;
         }
-        else if (undef(protocol)) {
+        else {
             config.remote = u.resolveUrl(config.remote);
             config.channel = config.channel || "default";
-            if (isHostMethod(window, "postMessage")) {
-                protocol = "1";
-            }
-            else if (config.remoteHelper) {
-                config.remoteHelper = u.resolveUrl(config.remoteHelper);
-                protocol = "2";
-            }
-            else {
-                protocol = "0";
+            if (undef(protocol)) {
+                if (isHostMethod(window, "postMessage")) {
+                    protocol = "1";
+                }
+                else if (config.remoteHelper) {
+                    config.remoteHelper = u.resolveUrl(config.remoteHelper);
+                    protocol = "2";
+                }
+                else {
+                    protocol = "0";
+                }
+                // #ifdef debug
+                this._trace("selecting protocol: " + protocol);
+                // #endif
             }
             // #ifdef debug
-            this._trace("selecting protocol: " + protocol);
+            else {
+                this._trace("using protocol: " + protocol);
+            }
             // #endif
         }
-        // #ifdef debug
-        else {
-            this._trace("using protocol: " + protocol);
-        }
-        // #endif
         
         switch (protocol) {
             case "0":// 0 = HashTransport
