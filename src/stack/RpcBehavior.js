@@ -26,45 +26,60 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
      * Creates a method that implements the given definition
      * @private
      * @param {easyXDM.configuration.Methods.Method} The method configuration
-     * @param {String} name The name of the method
+     * @param {String} method The name of the method
      */
-    function _createMethod(definition, name){
+    function _createMethod(definition, method){
         // Add the scope so that calling the methods will work as expected
         if (undef(definition.scope)) {
             definition.scope = window;
         }
         if (definition.isVoid) {
             // #ifdef debug
-            trace("creating void method " + name);
+            trace("creating void method " + method);
             // #endif
             // No need to register a callback
             return function(){
                 // #ifdef debug
-                trace("executing void method " + name);
+                trace("executing void method " + method);
                 // #endif
                 var params = Array.prototype.slice.call(arguments, 0);
                 // Send the method request
                 pub.down.outgoing(serializer.stringify({
-                    name: name,
+                    id: null,
+                    method: method,
                     params: params
                 }));
             };
         }
         else {
             // #ifdef debug
-            trace("creating method " + name);
+            trace("creating method " + method);
             // #endif
             // We need to extract and register the callback
             return function(){
                 // #ifdef debug
-                trace("executing method " + name);
+                trace("executing method " + method);
                 // #endif
-                _callbacks["" + (++_callbackCounter)] = arguments[arguments.length - 1];
+                var l = arguments.length, callback, args, slice = Array.prototype.slice;
+                if (l > 1 && typeof arguments[l - 2] === "function") {
+                    callback = {
+                        success: arguments[l - 2],
+                        error: arguments[l - 1]
+                    };
+                    args = slice.call(arguments, 0, l - 2);
+                }
+                else if (l > 0) {
+                    callback = {
+                        success: arguments[l - 1]
+                    };
+                    args = slice.call(arguments, 0, l - 1);
+                }
+                _callbacks["" + (++_callbackCounter)] = callback;
                 // Send the method request
                 pub.down.outgoing(serializer.stringify({
-                    name: name,
+                    method: method,
                     id: _callbackCounter,
-                    params: Array.prototype.slice.call(arguments, 0, arguments.length - 1)
+                    params: args
                 }));
             };
         }
@@ -73,47 +88,68 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
     /**
      * Executes the exposed method
      * @private
-     * @param {String} name The name of the method
+     * @param {String} method The name of the method
      * @param {Number} id The callback id to use
      * @param {Function} method The exposed implementation
      * @param {Array} params The parameters supplied by the remote end
      */
-    function _executeMethod(name, id, method, params){
+    function _executeMethod(method, id, fn, params){
         if (!method) {
-            throw new Error("The method " + name + " is not implemented.");
+            throw new Error("The method " + method + " is not implemented.");
         }
-        if (method.isAsync) {
+        if (fn.isAsync) {
             // #ifdef debug
-            trace("requested to execute async method " + name);
+            trace("requested to execute async method " + method);
             // #endif
             // The method is async, we need to add a callback
             params.push(function(result){
                 // Send back the result
                 pub.down.outgoing(serializer.stringify({
                     id: id,
-                    response: result
+                    result: result,
+                    error: null
+                }));
+            });
+            params.push(function(error){
+                // Send back the result
+                pub.down.outgoing(serializer.stringify({
+                    id: id,
+                    result: null,
+                    error: error
                 }));
             });
             // Call local method
-            method.method.apply(method.scope, params);
+            fn.method.apply(fn.scope, params);
         }
         else {
-            if (method.isVoid) {
+            if (fn.isVoid) {
                 // #ifdef debug
-                trace("requested to execute void method " + name);
+                trace("requested to execute void method " + method);
                 // #endif
                 // Call local method 
-                method.method.apply(method.scope, params);
+                fn.method.apply(fn.scope, params);
             }
             else {
                 // #ifdef debug
-                trace("requested to execute method " + name);
+                trace("requested to execute method " + method);
                 // #endif
                 // Call local method and send back the response
-                pub.down.outgoing(serializer.stringify({
-                    id: id,
-                    response: method.method.apply(method.scope, params)
-                }));
+                var response;
+                try {
+                    response = {
+                        id: id,
+                        result: fn.method.apply(fn.scope, params),
+                        error: null
+                    };
+                } 
+                catch (ex) {
+                    response = {
+                        id: id,
+                        result: null,
+                        error: ex.message
+                    };
+                }
+                pub.down.outgoing(serializer.stringify(response));
             }
         }
     }
@@ -121,19 +157,32 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
     return (pub = {
         incoming: function(message, origin){
             var data = serializer.parse(message);
-            if (data.name) {
+            if (data.method) {
                 // #ifdef debug
-                trace("received request to execute method " + data.name + (data.id ? (" using callback id " + data.id) : ""));
+                trace("received request to execute method " + data.method + (data.id ? (" using callback id " + data.id) : ""));
                 // #endif
                 // A method call from the remote end
-                _executeMethod(data.name, data.id, config.local[data.name], data.params);
+                _executeMethod(data.method, data.id, config.local[data.method], data.params);
             }
             else {
                 // #ifdef debug
                 trace("received return value destined to callback with id " + data.id);
                 // #endif
                 // A method response from the other end
-                _callbacks[data.id](data.response);
+                var callback = _callbacks[data.id];
+                if (data.result && callback.success) {
+                    callback.success(data.result);
+                }
+                else if (data.error) {
+                    if (callback.error) {
+                        callback.error(data.error);
+                    }
+                    // #ifdef debug
+                    else {
+                        trace("unhandled error returned.");
+                    }
+                    // #endif
+                }
                 delete _callbacks[data.id];
             }
         },
@@ -146,9 +195,9 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                 trace("creating concrete implementations");
                 // #endif
                 // Implement the remote sides exposed methods
-                for (var name in config.remote) {
-                    if (config.remote.hasOwnProperty(name)) {
-                        proxy[name] = _createMethod(config.remote[name], name);
+                for (var method in config.remote) {
+                    if (config.remote.hasOwnProperty(method)) {
+                        proxy[method] = _createMethod(config.remote[method], method);
                     }
                 }
             }
@@ -158,9 +207,9 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
             // #ifdef debug
             trace("destroy");
             // #endif
-            for (var name in config.remote) {
-                if (config.remote.hasOwnProperty(name) && proxy.hasOwnProperty(name)) {
-                    delete proxy[name];
+            for (var method in config.remote) {
+                if (config.remote.hasOwnProperty(method) && proxy.hasOwnProperty(method)) {
+                    delete proxy[method];
                 }
             }
             pub.down.destroy();
