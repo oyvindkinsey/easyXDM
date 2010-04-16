@@ -94,8 +94,15 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
      * @param {Array} params The parameters supplied by the remote end
      */
     function _executeMethod(method, id, fn, params){
-        if (!method) {
-            throw new Error("The method " + method + " is not implemented.");
+        if (!fn) {
+            pub.down.outgoing(serializer.stringify({
+                jsonrpc: "2.0",
+                id: id,
+                error: {
+                    code: -32601
+                }
+            }));
+            return
         }
         if (fn.isAsync) {
             // #ifdef debug
@@ -105,21 +112,36 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
             params.push(function(result){
                 // Send back the result
                 pub.down.outgoing(serializer.stringify({
+                    jsonrpc: "2.0",
                     id: id,
-                    result: result,
-                    error: null
+                    result: result
                 }));
             });
-            params.push(function(error){
+            params.push(function(message){
                 // Send back the result
                 pub.down.outgoing(serializer.stringify({
+                    jsonrpc: "2.0",
                     id: id,
-                    result: null,
-                    error: error
+                    error: {
+                        code: 32099,
+                        message: message
+                    }
                 }));
             });
             // Call local method
-            fn.method.apply(fn.scope, params);
+            try {
+                fn.method.apply(fn.scope, params);
+            } 
+            catch (ex1) {
+                pub.down.outgoing(serializer.stringify({
+                    jsonrpc: "2.0",
+                    id: id,
+                    error: {
+                        code: 32099,
+                        message: ex1.message
+                    }
+                }));
+            }
         }
         else {
             if (fn.isVoid) {
@@ -137,16 +159,19 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                 var response;
                 try {
                     response = {
+                        jsonrpc: "2.0",
                         id: id,
-                        result: fn.method.apply(fn.scope, params),
-                        error: null
+                        result: fn.method.apply(fn.scope, params)
                     };
                 } 
-                catch (ex) {
+                catch (ex2) {
                     response = {
+                        jsonrpc: "2.0",
                         id: id,
-                        result: null,
-                        error: ex.message
+                        error: {
+                            code: 32099,
+                            message: ex2.message
+                        }
                     };
                 }
                 pub.down.outgoing(serializer.stringify(response));
