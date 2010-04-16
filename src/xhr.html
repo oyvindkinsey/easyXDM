@@ -17,6 +17,8 @@
                         try {
                             item = list[i];
                             var obj = new ActiveXObject(item);
+                            // we are still here!
+                            obj = list = null;
                             return function(){
                                 return new ActiveXObject(item);
                             };
@@ -35,6 +37,7 @@
                 req.onreadystatechange = function(){
                     if (req.readyState == 4) {
                         req.onreadystatechange = null;
+                        delete req.onreadystatechange;
                         if (req.status >= 200 && req.status < 300) {
                             var contentType = req.getResponseHeader("Content-Type");
                             if (contentType.startsWith("application/json")) {
