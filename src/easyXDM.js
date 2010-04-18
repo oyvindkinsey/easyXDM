@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM: true, window, escape, unescape */
+/*global easyXDM: true, window, escape, unescape, ActiveXObject */
 
 // From http://peter.michaux.ca/articles/feature-detection-state-of-the-art-browser-scripting
 function isHostMethod(object, property){
@@ -48,6 +48,81 @@ easyXDM = {
                 target[key] = source[key];
             }
         }
+    },
+    
+    /**
+     * Creates a cross-browser XMLHttpRequest object
+     * @return {XMLHttpRequest} A XMLHttpRequest object.
+     */
+    createXmlHttpRequest: function(){
+        if (undef(XMLHttpRequest)) {
+            var item, list = ["Microsoft.XMLHTTP", "Msxml2.XMLHTTP", "Msxml3.XMLHTTP"], i = list.length;
+            while (i--) {
+                try {
+                    item = list[i];
+                    var obj = new ActiveXObject(item);
+                    // we are still here!
+                    obj = list = null;
+                    break;
+                } 
+                catch (e) {
+                }
+            }
+            this.createXmlHttpRequest = function(){
+                return new ActiveXObject(item);
+            };
+        }
+        else {
+            this.createXmlHttpRequest = function(){
+                return new XMLHttpRequest();
+            };
+        }
+        return this.createXmlHttpRequest();
+    },
+    
+    /**
+     * Runs an asynchronous request using XMLHttpRequest
+     * @param {String} method POST, HEAD or GET
+     * @param {String} url The url to request
+     * @param {Object} data Any data that should be sent.
+     * @param {Function} success The callback function for successfull requests
+     * @param {Function} error The callback function for errors
+     */
+    ajax: function(method, url, data, success, error){
+        if (!error) {
+            error = function(){
+            };
+        }
+        var req = this.createXmlHttpRequest(), q = [];
+        req.open(method, url, true);
+        req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        req.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+        req.onreadystatechange = function(){
+            if (req.readyState == 4) {
+                if (req.status >= 200 && req.status < 300) {
+                    var contentType = req.getResponseHeader("Content-Type");
+                    if (contentType.substring(0, 16) === "application/json") {
+                        success(JSON.parse(req.responseText));
+                    }
+                    else {
+                        error("Invalid content type: " + contentType);
+                    }
+                }
+                else {
+                    error("An error occured. Status code: " + req.status);
+                }
+                req.onreadystatechange = null;
+                delete req.onreadystatechange;
+            }
+        };
+        if (data) {
+            for (var key in data) {
+                if (data.hasOwnProperty(key)) {
+                    q.push(key + "=" + encodeURIComponent(data[key]));
+                }
+            }
+        }
+        req.send(q.join("&"));
     },
     
     /**
