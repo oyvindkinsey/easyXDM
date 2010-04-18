@@ -29,10 +29,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
      * @param {String} method The name of the method
      */
     function _createMethod(definition, method){
-        // Add the scope so that calling the methods will work as expected
-        if (undef(definition.scope)) {
-            definition.scope = window;
-        }
+        var slice = Array.prototype.slice;
         if (definition.isVoid) {
             // #ifdef debug
             trace("creating void method " + method);
@@ -42,12 +39,11 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                 // #ifdef debug
                 trace("executing void method " + method);
                 // #endif
-                var params = Array.prototype.slice.call(arguments, 0);
                 // Send the method request
                 pub.down.outgoing(serializer.stringify({
                     id: null,
                     method: method,
-                    params: params
+                    params: slice.call(arguments, 0)
                 }));
             };
         }
@@ -60,7 +56,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                 // #ifdef debug
                 trace("executing method " + method);
                 // #endif
-                var l = arguments.length, callback, args, slice = Array.prototype.slice;
+                var l = arguments.length, callback, args;
                 if (l > 1 && typeof arguments[l - 2] === "function") {
                     callback = {
                         success: arguments[l - 2],
@@ -95,6 +91,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
      */
     function _executeMethod(method, id, fn, params){
         if (!fn) {
+            // no such method
             pub.down.outgoing(serializer.stringify({
                 jsonrpc: "2.0",
                 id: id,
@@ -108,7 +105,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
             // #ifdef debug
             trace("requested to execute async method " + method);
             // #endif
-            // The method is async, we need to add a callback
+            // The method is async, we need to add a success callback
             params.push(function(result){
                 // Send back the result
                 pub.down.outgoing(serializer.stringify({
@@ -117,6 +114,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                     result: result
                 }));
             });
+            // and an error callback
             params.push(function(message){
                 // Send back the result
                 pub.down.outgoing(serializer.stringify({

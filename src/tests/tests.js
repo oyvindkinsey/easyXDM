@@ -518,7 +518,7 @@ function runTests(){
                 });
             }
         }, {
-            name: "callig nonexisten method",
+            name: "calling nonexistent method",
             timeout: 5000,
             run: function(){
                 var scope = this;
