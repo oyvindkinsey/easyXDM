@@ -10,7 +10,7 @@
             easyXDM.DomHelper.requiresJSON("json2.js");
         </script>
         <script type="text/javascript">
-            if (!'XMLHttpRequest' in window) {
+            if (!window.XMLHttpRequest) {
                 window.XMLHttpRequest = (function(){
                     var item, list = ["Microsoft.XMLHTTP", "Msxml2.XMLHTTP", "Msxml3.XMLHTTP"], i = list.length;
                     while (i--) {
@@ -29,27 +29,27 @@
                 })();
             }
             
-            function ajax(url, data, fn){
-                var req = new XMLHttpRequest(), q;
+            function ajax(url, data, fn, eFn){
+                var req = new XMLHttpRequest(), q = [];
                 req.open("POST", url, true);
                 req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
                 req.setRequestHeader("X-Requested-With", "XMLHttpRequest");
                 req.onreadystatechange = function(){
                     if (req.readyState == 4) {
-                        req.onreadystatechange = null;
-                        delete req.onreadystatechange;
                         if (req.status >= 200 && req.status < 300) {
                             var contentType = req.getResponseHeader("Content-Type");
-                            if (contentType.startsWith("application/json")) {
+                            if (contentType.substring(0, 16) === "application/json") {
                                 fn(JSON.parse(req.responseText));
                             }
                             else {
-                                alert("Invalid content type: " + contentType);
+                                eFn("Invalid content type: " + contentType);
                             }
                         }
                         else {
-                            alert("An error occured. Status code: " + req.status);
+                            eFn("An error occured. Status code: " + req.status);
                         }
+                        req.onreadystatechange = null;
+                        delete req.onreadystatechange;
                     }
                 };
                 
