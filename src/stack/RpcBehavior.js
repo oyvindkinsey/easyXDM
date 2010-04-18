@@ -89,17 +89,17 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
      * @param {Function} method The exposed implementation
      * @param {Array} params The parameters supplied by the remote end
      */
-    function _executeMethod(method, id, fn, params){
+    function _executeMethod(method, id, fn, params, reply){
         if (!fn) {
             // no such method
-            pub.down.outgoing(serializer.stringify({
+            reply({
                 jsonrpc: "2.0",
                 id: id,
                 error: {
                     code: -32601
                 }
-            }));
-            return
+            });
+            return;
         }
         if (fn.isAsync) {
             // #ifdef debug
@@ -108,37 +108,37 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
             // The method is async, we need to add a success callback
             params.push(function(result){
                 // Send back the result
-                pub.down.outgoing(serializer.stringify({
+                reply({
                     jsonrpc: "2.0",
                     id: id,
                     result: result
-                }));
+                });
             });
             // and an error callback
             params.push(function(message){
                 // Send back the result
-                pub.down.outgoing(serializer.stringify({
+                reply({
                     jsonrpc: "2.0",
                     id: id,
                     error: {
                         code: 32099,
                         message: message
                     }
-                }));
+                });
             });
             // Call local method
             try {
                 fn.method.apply(fn.scope, params);
             } 
             catch (ex1) {
-                pub.down.outgoing(serializer.stringify({
+                reply({
                     jsonrpc: "2.0",
                     id: id,
                     error: {
                         code: 32099,
                         message: ex1.message
                     }
-                }));
+                });
             }
         }
         else {
@@ -172,7 +172,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                         }
                     };
                 }
-                pub.down.outgoing(serializer.stringify(response));
+                reply(response);
             }
         }
     }
@@ -185,7 +185,9 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                 trace("received request to execute method " + data.method + (data.id ? (" using callback id " + data.id) : ""));
                 // #endif
                 // A method call from the remote end
-                _executeMethod(data.method, data.id, config.local[data.method], data.params);
+                (config.backend && config.backend.handle || _executeMethod)(data.method, data.id, config.local[data.method], data.params, function(data){
+                    pub.down.outgoing(serializer.stringify(data));
+                });
             }
             else {
                 // #ifdef debug
