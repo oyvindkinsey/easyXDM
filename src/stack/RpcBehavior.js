@@ -185,9 +185,15 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                 trace("received request to execute method " + data.method + (data.id ? (" using callback id " + data.id) : ""));
                 // #endif
                 // A method call from the remote end
-                (config.backend && config.backend.handle || _executeMethod)(data.method, data.id, config.local[data.method], data.params, function(data){
+                var reply = function(data){
                     pub.down.outgoing(serializer.stringify(data));
-                });
+                };
+                if (config.handle) {
+                    config.handle(data, reply);
+                }
+                else {
+                    _executeMethod(data.method, data.id, config.local[data.method], data.params, reply);
+                }
             }
             else {
                 // #ifdef debug
