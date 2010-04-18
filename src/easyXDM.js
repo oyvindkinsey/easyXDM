@@ -261,7 +261,7 @@ easyXDM = {
      * @param {Array} stackElements An array of stack elements to be linked.
      * @return {easyXDM.stack.StackElement} The last element in the chain.
      */
-    createStack: function(stackElements){
+    chainStack: function(stackElements){
         var stackEl, defaults = {
             incoming: function(message, origin){
                 this.up.incoming(message, origin);

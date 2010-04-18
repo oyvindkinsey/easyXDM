@@ -24,7 +24,7 @@ easyXDM.Socket = function(config){
     trace("constructor");
     // #endif
     
-    var stack = easyXDM.createStack(easyXDM.prepareTransportStack(config).concat([{
+    var stack = easyXDM.chainStack(easyXDM.prepareTransportStack(config).concat([{
         incoming: function(message, origin){
             config.onMessage(message, origin);
         },

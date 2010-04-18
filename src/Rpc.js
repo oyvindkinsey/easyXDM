@@ -54,7 +54,7 @@ easyXDM.Rpc = function(config, jsonRpcConfig){
         jsonRpcConfig.serializer = impl;
     }
     
-    var stack = easyXDM.createStack(easyXDM.prepareTransportStack(config).concat([new easyXDM.stack.RpcBehavior(this, jsonRpcConfig), {
+    var stack = easyXDM.chainStack(easyXDM.prepareTransportStack(config).concat([new easyXDM.stack.RpcBehavior(this, jsonRpcConfig), {
         callback: function(success){
             if (config.onReady) {
                 config.onReady(success);
