@@ -19,7 +19,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
     // #ifdef debug
     var trace = easyXDM.Debug.getTracer("easyXDM.stack.RpcBehavior");
     // #endif
-    var pub, serializer = config.serializer || window.JSON;
+    var pub, serializer = config.serializer || easyXDM.JSON;
     var _callbackCounter = 0, _callbacks = {};
     
     /**

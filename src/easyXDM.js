@@ -102,7 +102,7 @@ easyXDM = {
                 if (req.status >= 200 && req.status < 300) {
                     var contentType = req.getResponseHeader("Content-Type");
                     if (contentType.substring(0, 16) === "application/json") {
-                        success(JSON.parse(req.responseText));
+                        success(easyXDM.JSON.parse(req.responseText));
                     }
                     else {
                         error("Invalid content type: " + contentType);
@@ -290,7 +290,46 @@ easyXDM = {
             }
         }
         return stackEl;
-    }
+    },
+    
+    /**
+     * A safe implementation of HTML5 JSON. Feature testing is used to make sure the implementation works.
+     * @type {JSON}
+     */
+    JSON: (function(){
+        var obj = {
+            a: [1, 2, 3]
+        }, json = "{\"a\":[1,2,3]}", impl;
+        
+        if (JSON && typeof JSON.stringify === "function" && JSON.stringify(obj).replace((/\s/g), "") === json) {
+            // this is a working JSON instance
+            return JSON;
+        }
+        else {
+            impl = {};
+            if (Object.toJSON) {
+                if (Object.toJSON(obj).replace((/\s/g), "") === json) {
+                    // this is a working stringify method
+                    impl.stringify = Object.toJSON;
+                }
+            }
+            
+            if (typeof String.prototype.evalJSON === "function") {
+                obj = json.evalJSON();
+                if (obj.a && obj.a.length === 3 && obj.a[2] === 3) {
+                    // this is a working parse method           
+                    impl.parse = function(str){
+                        return str.evalJSON();
+                    };
+                }
+            }
+            
+            if (!impl.stringify || !impl.parse) {
+                return null;
+            }
+            return impl;
+        }
+    }())
 };
 
 /**
@@ -359,3 +398,4 @@ easyXDM.stack = {
     }
     // #endif
 };
+
