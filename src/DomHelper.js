@@ -40,6 +40,7 @@ easyXDM.DomHelper = {
             // This needs to be hidden like this, simply setting display:none and the like will cause failures in some browsers.
             frame.style.position = "absolute";
             frame.style.left = "-2000px";
+            frame.style.top = "0px";
             document.body.appendChild(frame);
         }
         return frame;
