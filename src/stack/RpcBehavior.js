@@ -23,28 +23,39 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
     var _callbackCounter = 0, _callbacks = {};
     
     /**
+     * Serializes and sends the message
+     * @private
+     * @param {Object} data The JSON-RPC message to be sent. The jsonrpc property will be added.
+     */
+    function _send(data){
+        data.jsonrpc = "2.0";
+        pub.down.outgoing(serializer.stringify(data));
+    }
+    
+    /**
      * Creates a method that implements the given definition
      * @private
      * @param {easyXDM.configuration.Methods.Method} The method configuration
      * @param {String} method The name of the method
+     * @return {Function} A stub capable of proxying the requested method call
      */
     function _createMethod(definition, method){
         var slice = Array.prototype.slice;
+        
         if (definition.isVoid) {
             // #ifdef debug
             trace("creating void method " + method);
             // #endif
-            // No need to register a callback
+            // No need to register a callback, this is equal to a Notification
             return function(){
                 // #ifdef debug
                 trace("executing void method " + method);
                 // #endif
                 // Send the method request
-                pub.down.outgoing(serializer.stringify({
-                    id: null,
+                _send({
                     method: method,
                     params: slice.call(arguments, 0)
-                }));
+                });
             };
         }
         else {
@@ -64,19 +75,20 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                     };
                     args = slice.call(arguments, 0, l - 2);
                 }
-                else if (l > 0) {
-                    callback = {
-                        success: arguments[l - 1]
-                    };
-                    args = slice.call(arguments, 0, l - 1);
-                }
+                else 
+                    if (l > 0) {
+                        callback = {
+                            success: arguments[l - 1]
+                        };
+                        args = slice.call(arguments, 0, l - 1);
+                    }
                 _callbacks["" + (++_callbackCounter)] = callback;
                 // Send the method request
-                pub.down.outgoing(serializer.stringify({
+                _send({
                     method: method,
                     id: _callbackCounter,
                     params: args
-                }));
+                });
             };
         }
     }
@@ -89,11 +101,10 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
      * @param {Function} method The exposed implementation
      * @param {Array} params The parameters supplied by the remote end
      */
-    function _executeMethod(method, id, fn, params, reply){
+    function _executeMethod(method, id, fn, params){
         if (!fn) {
             // no such method
-            reply({
-                jsonrpc: "2.0",
+            _send({
                 id: id,
                 error: {
                     code: -32601
@@ -108,8 +119,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
             // The method is async, we need to add a success callback
             params.push(function(result){
                 // Send back the result
-                reply({
-                    jsonrpc: "2.0",
+                _send({
                     id: id,
                     result: result
                 });
@@ -117,8 +127,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
             // and an error callback
             params.push(function(message){
                 // Send back the result
-                reply({
-                    jsonrpc: "2.0",
+                _send({
                     id: id,
                     error: {
                         code: 32099,
@@ -131,8 +140,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                 fn.method.apply(fn.scope, params);
             } 
             catch (ex1) {
-                reply({
-                    jsonrpc: "2.0",
+                _send({
                     id: id,
                     error: {
                         code: 32099,
@@ -157,14 +165,12 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                 var response;
                 try {
                     response = {
-                        jsonrpc: "2.0",
                         id: id,
                         result: fn.method.apply(fn.scope, params)
                     };
                 } 
                 catch (ex2) {
                     response = {
-                        jsonrpc: "2.0",
                         id: id,
                         error: {
                             code: 32099,
@@ -172,7 +178,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                         }
                     };
                 }
-                reply(response);
+                _send(response);
             }
         }
     }
@@ -185,14 +191,11 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                 trace("received request to execute method " + data.method + (data.id ? (" using callback id " + data.id) : ""));
                 // #endif
                 // A method call from the remote end
-                var reply = function(data){
-                    pub.down.outgoing(serializer.stringify(data));
-                };
                 if (config.handle) {
-                    config.handle(data, reply);
+                    config.handle(data, _send);
                 }
                 else {
-                    _executeMethod(data.method, data.id, config.local[data.method], data.params, reply);
+                    _executeMethod(data.method, data.id, config.local[data.method], data.params);
                 }
             }
             else {
@@ -204,16 +207,17 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                 if (data.result && callback.success) {
                     callback.success(data.result);
                 }
-                else if (data.error) {
-                    if (callback.error) {
-                        callback.error(data.error);
-                    }
-                    // #ifdef debug
-                    else {
-                        trace("unhandled error returned.");
-                    }
+                else 
+                    if (data.error) {
+                        if (callback.error) {
+                            callback.error(data.error);
+                        }
+                        // #ifdef debug
+                        else {
+                            trace("unhandled error returned.");
+                        }
                     // #endif
-                }
+                    }
                 delete _callbacks[data.id];
             }
         },
