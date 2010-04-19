@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM: true, window, escape, unescape */
+/*global easyXDM: true, window, escape, unescape, ActiveXObject */
 
 // From http://peter.michaux.ca/articles/feature-detection-state-of-the-art-browser-scripting
 function isHostMethod(object, property){
@@ -51,6 +51,81 @@ easyXDM = {
     },
     
     /**
+     * Creates a cross-browser XMLHttpRequest object
+     * @return {XMLHttpRequest} A XMLHttpRequest object.
+     */
+    createXmlHttpRequest: function(){
+        if (undef(XMLHttpRequest)) {
+            var item, list = ["Microsoft.XMLHTTP", "Msxml2.XMLHTTP", "Msxml3.XMLHTTP"], i = list.length;
+            while (i--) {
+                try {
+                    item = list[i];
+                    var obj = new ActiveXObject(item);
+                    // we are still here!
+                    obj = list = null;
+                    break;
+                } 
+                catch (e) {
+                }
+            }
+            this.createXmlHttpRequest = function(){
+                return new ActiveXObject(item);
+            };
+        }
+        else {
+            this.createXmlHttpRequest = function(){
+                return new XMLHttpRequest();
+            };
+        }
+        return this.createXmlHttpRequest();
+    },
+    
+    /**
+     * Runs an asynchronous request using XMLHttpRequest
+     * @param {String} method POST, HEAD or GET
+     * @param {String} url The url to request
+     * @param {Object} data Any data that should be sent.
+     * @param {Function} success The callback function for successfull requests
+     * @param {Function} error The callback function for errors
+     */
+    ajax: function(method, url, data, success, error){
+        if (!error) {
+            error = function(){
+            };
+        }
+        var req = this.createXmlHttpRequest(), q = [];
+        req.open(method, url, true);
+        req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        req.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+        req.onreadystatechange = function(){
+            if (req.readyState == 4) {
+                if (req.status >= 200 && req.status < 300) {
+                    var contentType = req.getResponseHeader("Content-Type");
+                    if (contentType.substring(0, 16) === "application/json") {
+                        success(easyXDM.JSON.parse(req.responseText));
+                    }
+                    else {
+                        error("Invalid content type: " + contentType);
+                    }
+                }
+                else {
+                    error("An error occured. Status code: " + req.status);
+                }
+                req.onreadystatechange = null;
+                delete req.onreadystatechange;
+            }
+        };
+        if (data) {
+            for (var key in data) {
+                if (data.hasOwnProperty(key)) {
+                    q.push(key + "=" + encodeURIComponent(data[key]));
+                }
+            }
+        }
+        req.send(q.join("&"));
+    },
+    
+    /**
      * Prepares an array of stack-elements suitable for the current configuration
      * @param {Object} config The Transports configuration. See easyXDM.Socket for more.
      * @return {Array} An array of stack-elements with the TransportElement at index 0.
@@ -69,28 +144,30 @@ easyXDM = {
             config.remote = decodeURIComponent(query.xdm_e);
             protocol = query.xdm_p;
         }
-        else if (undef(protocol)) {
+        else {
             config.remote = u.resolveUrl(config.remote);
             config.channel = config.channel || "default";
-            if (isHostMethod(window, "postMessage")) {
-                protocol = "1";
-            }
-            else if (config.remoteHelper) {
-                config.remoteHelper = u.resolveUrl(config.remoteHelper);
-                protocol = "2";
-            }
-            else {
-                protocol = "0";
+            if (undef(protocol)) {
+                if (isHostMethod(window, "postMessage")) {
+                    protocol = "1";
+                }
+                else if (config.remoteHelper) {
+                    config.remoteHelper = u.resolveUrl(config.remoteHelper);
+                    protocol = "2";
+                }
+                else {
+                    protocol = "0";
+                }
+                // #ifdef debug
+                this._trace("selecting protocol: " + protocol);
+                // #endif
             }
             // #ifdef debug
-            this._trace("selecting protocol: " + protocol);
+            else {
+                this._trace("using protocol: " + protocol);
+            }
             // #endif
         }
-        // #ifdef debug
-        else {
-            this._trace("using protocol: " + protocol);
-        }
-        // #endif
         
         switch (protocol) {
             case "0":// 0 = HashTransport
@@ -184,7 +261,7 @@ easyXDM = {
      * @param {Array} stackElements An array of stack elements to be linked.
      * @return {easyXDM.stack.StackElement} The last element in the chain.
      */
-    createStack: function(stackElements){
+    chainStack: function(stackElements){
         var stackEl, defaults = {
             incoming: function(message, origin){
                 this.up.incoming(message, origin);
@@ -213,7 +290,46 @@ easyXDM = {
             }
         }
         return stackEl;
-    }
+    },
+    
+    /**
+     * A safe implementation of HTML5 JSON. Feature testing is used to make sure the implementation works.
+     * @type {JSON}
+     */
+    JSON: (function(){
+        var obj = {
+            a: [1, 2, 3]
+        }, json = "{\"a\":[1,2,3]}", impl;
+        
+        if (JSON && typeof JSON.stringify === "function" && JSON.stringify(obj).replace((/\s/g), "") === json) {
+            // this is a working JSON instance
+            return JSON;
+        }
+        else {
+            impl = {};
+            if (Object.toJSON) {
+                if (Object.toJSON(obj).replace((/\s/g), "") === json) {
+                    // this is a working stringify method
+                    impl.stringify = Object.toJSON;
+                }
+            }
+            
+            if (typeof String.prototype.evalJSON === "function") {
+                obj = json.evalJSON();
+                if (obj.a && obj.a.length === 3 && obj.a[2] === 3) {
+                    // this is a working parse method           
+                    impl.parse = function(str){
+                        return str.evalJSON();
+                    };
+                }
+            }
+            
+            if (!impl.stringify || !impl.parse) {
+                return null;
+            }
+            return impl;
+        }
+    }())
 };
 
 /**
@@ -282,3 +398,4 @@ easyXDM.stack = {
     }
     // #endif
 };
+

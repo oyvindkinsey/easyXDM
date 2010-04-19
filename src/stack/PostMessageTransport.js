@@ -89,6 +89,7 @@ easyXDM.stack.PostMessageTransport = function(config){
                         trace("firing onReady");
                         // #endif
                         // replace the eventlistener
+                        callerWindow = frame.contentWindow;
                         dh.un(window, "message", waitForReady);
                         dh.on(window, "message", _window_onMessage);
                         setTimeout(function(){
@@ -101,9 +102,7 @@ easyXDM.stack.PostMessageTransport = function(config){
                     xdm_e: location.protocol + "//" + location.host,
                     xdm_c: config.channel,
                     xdm_p: 1 // 1 = PostMessage
-                }), config.container, function(contentWindow){
-                    callerWindow = contentWindow;
-                });
+                }), config.container);
             }
             else {
                 // add the event handler for listening

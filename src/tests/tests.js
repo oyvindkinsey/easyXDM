@@ -468,7 +468,9 @@ function runTests(){
                             isVoid: true
                         },
                         asyncMethod: {},
-                        method: {}
+                        method: {},
+                        error: {},
+                        nonexistent: {}
                     },
                     local: {
                         voidCallback: {
@@ -502,6 +504,28 @@ function runTests(){
                 var scope = this;
                 this.remote.method(this.expectedMessage, function(message){
                     scope.notifyResult((scope.expectedMessage === message));
+                });
+            }
+        }, {
+            name: "with error",
+            timeout: 5000,
+            run: function(){
+                var scope = this;
+                this.remote.error(this.expectedMessage, function(){
+                    this.notifyResult(false, "success handler called");
+                }, function(message){
+                    scope.notifyResult(true);
+                });
+            }
+        }, {
+            name: "calling nonexistent method",
+            timeout: 5000,
+            run: function(){
+                var scope = this;
+                this.remote.nonexistent(this.expectedMessage, function(){
+                    this.notifyResult(false, "success handler called");
+                }, function(message){
+                    scope.notifyResult(true);
                 });
             }
         }]
