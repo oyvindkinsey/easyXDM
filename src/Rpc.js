@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, undef, JSON */
+/*global easyXDM, window, escape, unescape, undef,, chainStack, prepareTransportStack, debug */
 
 /** 
  * @class easyXDM.Rpc
@@ -14,11 +14,11 @@
  */
 easyXDM.Rpc = function(config, jsonRpcConfig){
     // #ifdef debug
-    var trace = easyXDM.Debug.getTracer("easyXDM.Rpc");
+    var trace = debug.getTracer("easyXDM.Rpc");
     trace("constructor");
     // #endif
     
-    var stack = easyXDM.chainStack(easyXDM.prepareTransportStack(config).concat([new easyXDM.stack.RpcBehavior(this, jsonRpcConfig), {
+    var stack = chainStack(prepareTransportStack(config).concat([new easyXDM.stack.RpcBehavior(this, jsonRpcConfig), {
         callback: function(success){
             if (config.onReady) {
                 config.onReady(success);

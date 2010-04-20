@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape */
+/*global easyXDM, window, escape, unescape, chainStack, prepareTransportStack, getLocation, debug */
 
 /**
  * @class easyXDM.Socket
@@ -20,11 +20,11 @@
  */
 easyXDM.Socket = function(config){
     // #ifdef debug
-    var trace = easyXDM.Debug.getTracer("easyXDM.Socket");
+    var trace = debug.getTracer("easyXDM.Socket");
     trace("constructor");
     // #endif
     
-    var stack = easyXDM.chainStack(easyXDM.prepareTransportStack(config).concat([{
+    var stack = chainStack(prepareTransportStack(config).concat([{
         incoming: function(message, origin){
             config.onMessage(message, origin);
         },
@@ -33,7 +33,7 @@ easyXDM.Socket = function(config){
                 config.onReady(success);
             }
         }
-    }])), recipient = easyXDM.Url.getLocation(config.remote);
+    }])), recipient = getLocation(config.remote);
     
     /**
      * Initiates the destruction of the stack.

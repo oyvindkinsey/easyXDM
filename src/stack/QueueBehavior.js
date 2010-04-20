@@ -15,7 +15,7 @@
  */
 easyXDM.stack.QueueBehavior = function(config){
     // #ifdef debug
-    var trace = easyXDM.Debug.getTracer("easyXDM.stack.QueueBehavior");
+    var trace = debug.getTracer("easyXDM.stack.QueueBehavior");
     trace("constructor");
     // #endif
     var pub, queue = [], waiting = false, incoming = "", destroying, maxLength = (config) ? config.maxLength : 0, encode = (config) ? (config.encode || false) : false;

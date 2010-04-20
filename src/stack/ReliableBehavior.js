@@ -13,7 +13,7 @@
  */
 easyXDM.stack.ReliableBehavior = function(config){
     // #ifdef debug
-    var trace = easyXDM.Debug.getTracer("easyXDM.stack.ReliableBehavior");
+    var trace = debug.getTracer("easyXDM.stack.ReliableBehavior");
     trace("constructor");
     // #endif
     var pub, // the public interface

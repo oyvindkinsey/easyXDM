@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, undef */
+/*global easyXDM, window, escape, unescape, undef, getJSONObject, debug */
 
 /**
  * @class easyXDM.stack.RpcBehavior
@@ -17,9 +17,9 @@
  */
 easyXDM.stack.RpcBehavior = function(proxy, config){
     // #ifdef debug
-    var trace = easyXDM.Debug.getTracer("easyXDM.stack.RpcBehavior");
+    var trace = debug.getTracer("easyXDM.stack.RpcBehavior");
     // #endif
-    var pub, serializer = config.serializer || easyXDM.JSON;
+    var pub, serializer = config.serializer || getJSONObject();
     var _callbackCounter = 0, _callbacks = {};
     
     /**
@@ -227,7 +227,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
             // #endif
             if (config.remote) {
                 // #ifdef debug
-                trace("creating concrete implementations");
+                trace("creating stubs");
                 // #endif
                 // Implement the remote sides exposed methods
                 for (var method in config.remote) {

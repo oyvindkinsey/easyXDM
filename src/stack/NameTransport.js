@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, undef */
+/*global easyXDM, window, escape, unescape, undef, getLocation, appendQueryParameters, resolveUrl, createFrame, debug, un */
 
 /**
  * @class easyXDM.stack.NameTransport
@@ -14,7 +14,7 @@
  */
 easyXDM.stack.NameTransport = function(config){
     // #ifdef debug
-    var trace = easyXDM.Debug.getTracer("easyXDM.stack.NameTransport");
+    var trace = debug.getTracer("easyXDM.stack.NameTransport");
     trace("constructor");
     if (config.isHost && undef(config.remoteHelper)) {
         trace("missing remoteHelper");
@@ -81,11 +81,10 @@ easyXDM.stack.NameTransport = function(config){
             // #ifdef debug
             trace("init");
             // #endif
-            var dh = easyXDM.DomHelper, u = easyXDM.Url;
             isHost = config.isHost;
             readyCount = 0;
-            remoteOrigin = u.getLocation(config.remote);
-            config.local = u.resolveUrl(config.local);
+            remoteOrigin = getLocation(config.remote);
+            config.local = resolveUrl(config.local);
             
             if (isHost) {
                 // Register the callback
@@ -101,22 +100,22 @@ easyXDM.stack.NameTransport = function(config){
                 });
                 
                 // Set up the frame that points to the remote instance
-                remoteUrl = u.appendQueryParameters(config.remote, {
+                remoteUrl = appendQueryParameters(config.remote, {
                     xdm_e: config.local,
                     xdm_c: config.channel,
                     xdm_p: 2
                 });
                 
-                remoteWindow = dh.createFrame(remoteUrl + '#' + config.channel, config.container, null, config.channel);
+                remoteWindow = createFrame(remoteUrl + '#' + config.channel, config.container, null, config.channel);
             }
             else {
                 config.remoteHelper = config.remote;
                 easyXDM.Fn.set(config.channel, _onMessage);
             }
             // Set up the iframe that will be used for the transport
-            callerWindow = dh.createFrame(config.local + "#_4" + config.channel, null, function(){
+            callerWindow = createFrame(config.local + "#_4" + config.channel, null, function(){
                 // Remove the handler
-                dh.un(callerWindow, "load", callerWindow.loadFn);
+                un(callerWindow, "load", callerWindow.loadFn);
                 easyXDM.Fn.set(config.channel + "_load", _onLoad);
                 _onReady();
             });

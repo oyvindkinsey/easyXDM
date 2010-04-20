@@ -33,11 +33,6 @@ function runTests(){
                 return false;
             }
         }, {
-            name: "check for the presence of easyXDM.Debug",
-            run: function(){
-                return this.Assert.isObject(easyXDM.Debug);
-            }
-        }, {
             name: "check for the presence of easyXDM.configuration",
             run: function(){
                 return this.Assert.isObject(easyXDM.configuration);
@@ -46,11 +41,6 @@ function runTests(){
             name: "check for the presence of easyXDM.DomHelper",
             run: function(){
                 return this.Assert.isObject(easyXDM.DomHelper);
-            }
-        }, {
-            name: "check for the presence of easyXDM.Url",
-            run: function(){
-                return this.Assert.isObject(easyXDM.Url);
             }
         }, {
             name: "check for the presence of easyXDM.Socket",

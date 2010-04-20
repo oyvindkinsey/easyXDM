@@ -13,7 +13,7 @@
  */
 easyXDM.stack.VerifyBehavior = function(config){
     // #ifdef debug
-    var trace = easyXDM.Debug.getTracer("easyXDM.stack.VerifyBehavior");
+    var trace = debug.getTracer("easyXDM.stack.VerifyBehavior");
     trace("constructor");
     if (undef(config.initiate)) {
         throw new Error("settings.initiate is not set");
