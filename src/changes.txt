@@ -1,3 +1,17 @@
+2.2.0 21.04.10
+Rpc
+	No more isVoid/isAsync
+		These are no longer needed as all of this is automatically handled by the RpcBehavior.
+	Optional callbacks when calling methods, success, success+error, or none if the remote method does not return data or you just don't care about it
+	A shorthand notation for defining local methods, nameOfMethod: function(... instead of nameOfMethod: { method: function(...
+	Smaller code base due to a simpler(!) RpcBehavior
+	
+Overall
+	Reduced the public API
+		This makes it more manageable for most
+	Proper documentation with code examples for Socket and Rpc
+	Restructured internal methods so that they are faster and more easy to minify
+
 2.1.0 18.04.10
 The Rpc behavior is now using the JSON-PRC 2.0 protocol, and will now also support an error callback.
 The Rpc class will also make sure that the serializer being used actually works, and so is not wrecked by the inclusion

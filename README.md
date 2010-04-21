@@ -32,7 +32,7 @@ The library also supplies a default xhr.html document that exposes a method 'pos
  
 Usage
 -----
-There are several examples and demos at the [wiki](http://easyxdm.net/wiki/) and in the [documentation](http://easyxdm.net/docs).
+There are several examples and demos at the [wiki](http://easyxdm.net/) and in the [documentation](http://easyxdm.net/docs/).
 
 Tests
 -----
