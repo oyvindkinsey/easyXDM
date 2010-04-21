@@ -16,21 +16,13 @@
              * When the window is finished loading start setting up the channel
              */
             window.onload = function(){
-            
                 /**
                  * When the channel is ready we create the interface
                  */
-                remote = new easyXDM.Rpc(/** The channel configuration*/{
+                remote = new easyXDM.Rpc({
                     local: "../name.html"
-                }, /** The configuration */ {
-                    /**
-                     *
-                     * @param {Object} rpc A JSON-RPC 2.0 request object
-                     * @param {Function} reply The callback method. Takes a single JSON-RPC 2.0 response object.
-                     */
-                    handle: function(rpc, reply){
-                        alert("requested to execute procedure '" + rpc.method + "'");
-                    }
+                }, {
+                    server: "rpcserver.aspx"
                 });
             };
         </script>

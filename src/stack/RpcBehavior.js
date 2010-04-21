@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, undef, getJSONObject, debug */
+/*global easyXDM, window, escape, unescape, undef, getJSONObject, debug, createXmlHttpRequest */
 
 /**
  * @class easyXDM.stack.RpcBehavior
@@ -152,39 +152,76 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
     
     return (pub = {
         incoming: function(message, origin){
-            var data = serializer.parse(message);
-            if (data.method) {
+            if (config.server) {
                 // #ifdef debug
-                trace("received request to execute method " + data.method + (data.id ? (" using callback id " + data.id) : ""));
+                trace("passing request to server");
                 // #endif
-                // A method call from the remote end
-                if (config.handle) {
-                    config.handle(data, _send);
-                }
-                else {
-                    _executeMethod(data.method, data.id, config.local[data.method], data.params);
-                }
+                var req = createXmlHttpRequest();
+                req.open("POST", config.server, true);
+                req.setRequestHeader("Content-Type", "application/json-rpc");
+                req.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+                req.onreadystatechange = function(){
+                    if (req.readyState == 4) {
+                        var contentType = req.getResponseHeader("Content-Type");
+                        if (req.status >= 200 && req.status < 300 && contentType.substring(0, 20) === "application/json-rpc") {
+                            var result = serializer.parse(req.responseText);
+                            if (result.id) {
+                                pub.down.outgoing(req.responseText);
+                            }
+                        }
+                        else {
+                            var id = serializer.parse(message).id;
+                            if (id) {
+                                _send({
+                                    id: id,
+                                    error: {
+                                        code: -32099,
+                                        message: "Application error. ContentType: " + contentType + ", status: " + req.status
+                                    }
+                                });
+                            }
+                        }
+                        req.onreadystatechange = null;
+                        delete req.onreadystatechange;
+                    }
+                };
+                req.send(message);
             }
             else {
-                // #ifdef debug
-                trace("received return value destined to callback with id " + data.id);
-                // #endif
-                // A method response from the other end
-                var callback = _callbacks[data.id];
-                if (data.result && callback.success) {
-                    callback.success(data.result);
-                }
-                else if (data.error) {
-                    if (callback.error) {
-                        callback.error(data.error);
-                    }
+                var data = serializer.parse(message);
+                if (data.method) {
                     // #ifdef debug
-                    else {
-                        trace("unhandled error returned.");
-                    }
+                    trace("received request to execute method " + data.method + (data.id ? (" using callback id " + data.id) : ""));
                     // #endif
+                    // A method call from the remote end
+                    if (config.handle) {
+                        config.handle(data, _send);
+                    }
+                    else {
+                        _executeMethod(data.method, data.id, config.local[data.method], data.params);
+                    }
                 }
-                delete _callbacks[data.id];
+                else {
+                    // #ifdef debug
+                    trace("received return value destined to callback with id " + data.id);
+                    // #endif
+                    // A method response from the other end
+                    var callback = _callbacks[data.id];
+                    if (data.result && callback.success) {
+                        callback.success(data.result);
+                    }
+                    else if (data.error) {
+                        if (callback.error) {
+                            callback.error(data.error);
+                        }
+                        // #ifdef debug
+                        else {
+                            trace("unhandled error returned.");
+                        }
+                        // #endif
+                    }
+                    delete _callbacks[data.id];
+                }
             }
         },
         init: function(){
