@@ -51,43 +51,40 @@ var debug = {
                 }
             };
         }
-        else 
-            if (!isHostObject(window, "console") || undef(console.info)) {
-                /**
+        else if (!isHostObject(window, "console") || undef(console.info)) {
+            /**
              * Create log window
              * @ignore
              */
-                var domain = location.host;
-                var windowname = domain.replace(/\./g, "") + "easyxdm_log";
-                var logWin = window.open("", windowname, "width=800,height=200,status=0,navigation=0,scrollbars=1");
-                if (logWin) {
-                    el = logWin.document.getElementById("log");
-                    this.clear = function(){
-                        try {
-                            el.innerHTML = "";
-                        } 
-                        catch (e) {
+            var domain = location.host;
+            var windowname = domain.replace(/\./g, "") + "easyxdm_log";
+            var logWin = window.open("", windowname, "width=800,height=200,status=0,navigation=0,scrollbars=1");
+            if (logWin) {
+                el = logWin.document.getElementById("log");
+                this.clear = function(){
+                    try {
+                        el.innerHTML = "";
+                    } 
+                    catch (e) {
                         //In case we are unloading
-                        }
-                    };
-                }
-                else {
-                    this.clear = function(){
-                    };
-                }
-            }
-            else 
-                if (console.clear) {
-                    this.clear = function(){
-                        console.clear();
-                    };
-                }
-                else 
-                    if (_FirebugCommandLine.clear) {
-                        this.clear = function(){
-                            _FirebugCommandLine.clear();
-                        };
                     }
+                };
+            }
+            else {
+                this.clear = function(){
+                };
+            }
+        }
+        else if (console.clear) {
+            this.clear = function(){
+                console.clear();
+            };
+        }
+        else if (_FirebugCommandLine.clear) {
+            this.clear = function(){
+                _FirebugCommandLine.clear();
+            };
+        }
         this.clear();
     },
     
@@ -115,49 +112,48 @@ var debug = {
                 }
             };
         }
-        else 
-            if (!isHostObject(window, "console") || undef(console.info)) {
-                /**
+        else if (!isHostObject(window, "console") || undef(console.info)) {
+            /**
              * Create log window
              * @ignore
              */
-                var domain = location.host, windowname = domain.replace(/\./g, "") + "easyxdm_log";
-                var logWin = window.open("", windowname, "width=800,height=200,status=0,navigation=0,scrollbars=1");
-                if (logWin) {
-                    var doc = logWin.document;
-                    if (doc.title !== "easyXDM log") {
-                        doc.write("<html><head><title>easyXDM log " + domain + "</title></head>");
-                        doc.write("<body><div id=\"log\"></div></body></html>");
-                        doc.close();
-                    }
-                    el = doc.getElementById("log");
-                    this.trace = function(msg){
-                        try {
-                            el.appendChild(doc.createElement("div")).appendChild(doc.createTextNode(location.host + "-" + new Date().valueOf() + ":" + msg));
-                            el.scrollTop = el.scrollHeight;
-                        } 
-                        catch (e) {
+            var domain = location.host, windowname = domain.replace(/\./g, "") + "easyxdm_log";
+            var logWin = window.open("", windowname, "width=800,height=200,status=0,navigation=0,scrollbars=1");
+            if (logWin) {
+                var doc = logWin.document;
+                if (doc.title !== "easyXDM log") {
+                    doc.write("<html><head><title>easyXDM log " + domain + "</title></head>");
+                    doc.write("<body><div id=\"log\"></div></body></html>");
+                    doc.close();
+                }
+                el = doc.getElementById("log");
+                this.trace = function(msg){
+                    try {
+                        el.appendChild(doc.createElement("div")).appendChild(doc.createTextNode(location.host + "-" + new Date().valueOf() + ":" + msg));
+                        el.scrollTop = el.scrollHeight;
+                    } 
+                    catch (e) {
                         //In case we are unloading
-                        }
-                    };
-                    this.trace("---- new logger at " + location.href);
-                }
-                else {
-                    // We are unable to use any logging
-                    this.trace = function(){
-                    };
-                }
+                    }
+                };
+                this.trace("---- new logger at " + location.href);
             }
             else {
-                /**
+                // We are unable to use any logging
+                this.trace = function(){
+                };
+            }
+        }
+        else {
+            /**
              * Sets trace to be a wrapper around console.info
              * @ignore
              * @param {String} msg
              */
-                this.trace = function(msg){
-                    console.info(location.host + "-" + new Date().valueOf() + ":" + msg);
-                };
-            }
+            this.trace = function(msg){
+                console.info(location.host + "-" + new Date().valueOf() + ":" + msg);
+            };
+        }
         this.trace(msg);
     },
     /**

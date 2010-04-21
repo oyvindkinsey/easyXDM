@@ -33,11 +33,6 @@ function runTests(){
                 return false;
             }
         }, {
-            name: "check for the presence of easyXDM.configuration",
-            run: function(){
-                return this.Assert.isObject(easyXDM.configuration);
-            }
-        }, {
             name: "check for the presence of easyXDM.DomHelper",
             run: function(){
                 return this.Assert.isObject(easyXDM.DomHelper);
@@ -454,9 +449,7 @@ function runTests(){
                     }
                 }, {
                     remote: {
-                        voidMethod: {
-                            isVoid: true
-                        },
+                        voidMethod: {},
                         asyncMethod: {},
                         method: {},
                         error: {},
@@ -466,8 +459,7 @@ function runTests(){
                         voidCallback: {
                             method: function(message){
                                 scope.notifyResult((scope.expectedMessage === message));
-                            },
-                            isVoid: true
+                            }
                         }
                     }
                 });

@@ -3,17 +3,15 @@
 
 /**
  * @class easyXDM.stack.RpcBehavior
- * This uses a protocol similar to JSON-RPC to expose local methods and to invoke remote methods and have responses returned over the the string based transport stack.<br/>
- * Local methods can be both asynchronous and synchronous.<br/>
- * Remote methods can be set up to return a response or not.
- * @extends easyXDM.stack.StackElement
+ * This uses JSON-RPC 2.0 to expose local methods and to invoke remote methods and have responses returned over the the string based transport stack.<br/>
+ * Exposed methods can return values synchronous, asyncronous, or bet set up to not return anything.
  * @namespace easyXDM.stack
  * @constructor
  * @param {Object} proxy The object to apply the methods to.
- * @param {easyXDM.configuration.RpcConfiguration} config The definition of the local and remote interface to implement.
- * @cfg {easyXDM.configuration.LocalConfiguration} local The local interface to expose.
- * @cfg {easyXDM.configuration.RemoteConfiguration} remote The remote methods to expose through the proxy.
- * @cfg {Object} serializer The serializer to use for serializing and deserializing the JSON. Should be compatible with the HTML5 JSON object. Optional, will default to window.JSON.
+ * @param {Object} config The definition of the local and remote interface to implement.
+ * @cfg {Object} local The local interface to expose.
+ * @cfg {Object} remote The remote methods to expose through the proxy.
+ * @cfg {Object} serializer The serializer to use for serializing and deserializing the JSON. Should be compatible with the HTML5 JSON object. Optional, will default to JSON.
  */
 easyXDM.stack.RpcBehavior = function(proxy, config){
     // #ifdef debug
@@ -31,6 +29,8 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
         data.jsonrpc = "2.0";
         pub.down.outgoing(serializer.stringify(data));
     }
+    function _emptyFn(){
+    }
     
     /**
      * Creates a method that implements the given definition
@@ -42,55 +42,44 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
     function _createMethod(definition, method){
         var slice = Array.prototype.slice;
         
-        if (definition.isVoid) {
+        // #ifdef debug
+        trace("creating method " + method);
+        // #endif
+        return function(){
             // #ifdef debug
-            trace("creating void method " + method);
+            trace("executing method " + method);
             // #endif
-            // No need to register a callback, this is equal to a Notification
-            return function(){
-                // #ifdef debug
-                trace("executing void method " + method);
-                // #endif
-                // Send the method request
-                _send({
-                    method: method,
-                    params: slice.call(arguments, 0)
-                });
+            var l = arguments.length, callback, message = {
+                method: method
             };
-        }
-        else {
-            // #ifdef debug
-            trace("creating method " + method);
-            // #endif
-            // We need to extract and register the callback
-            return function(){
-                // #ifdef debug
-                trace("executing method " + method);
-                // #endif
-                var l = arguments.length, callback, args;
+            
+            if (l > 0 && typeof arguments[l - 1] === "function") {
+                //with callback, procedure
                 if (l > 1 && typeof arguments[l - 2] === "function") {
+                    // two callbacks, success and error
                     callback = {
                         success: arguments[l - 2],
                         error: arguments[l - 1]
                     };
-                    args = slice.call(arguments, 0, l - 2);
+                    message.params = slice.call(arguments, 0, l - 2);
                 }
-                else 
-                    if (l > 0) {
-                        callback = {
-                            success: arguments[l - 1]
-                        };
-                        args = slice.call(arguments, 0, l - 1);
-                    }
+                else {
+                    // single callback, success
+                    callback = {
+                        success: arguments[l - 1]
+                    };
+                    message.params = slice.call(arguments, 0, l - 1);
+                }
                 _callbacks["" + (++_callbackCounter)] = callback;
-                // Send the method request
-                _send({
-                    method: method,
-                    id: _callbackCounter,
-                    params: args
-                });
-            };
-        }
+                message.id = _callbackCounter;
+            }
+            else {
+                // no callbacks, a notification
+                message.params = slice.call(arguments, 0);
+            }
+            // Send the method request
+            _send(message);
+        };
     }
     
     /**
@@ -103,83 +92,61 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
      */
     function _executeMethod(method, id, fn, params){
         if (!fn) {
-            // no such method
-            _send({
-                id: id,
-                error: {
-                    code: -32601
-                }
-            });
+            // #ifdef debug
+            trace("requested to execute non-existent procedure " + method);
+            // #endif
+            if (id) {
+                _send({
+                    id: id,
+                    error: {
+                        code: -32601
+                    }
+                });
+            }
             return;
         }
-        if (fn.isAsync) {
-            // #ifdef debug
-            trace("requested to execute async method " + method);
-            // #endif
-            // The method is async, we need to add a success callback
-            params.push(function(result){
-                // Send back the result
+        
+        // #ifdef debug
+        trace("requested to execute procedure " + method);
+        // #endif
+        var used = false, success, error;
+        if (id) {
+            success = function(result){
+                if (used) {
+                    return;
+                }
+                used = true;
                 _send({
                     id: id,
                     result: result
                 });
-            });
-            // and an error callback
-            params.push(function(message){
-                // Send back the result
+            };
+            error = function(message){
+                if (used) {
+                    return;
+                }
+                used = true;
                 _send({
                     id: id,
                     error: {
-                        code: 32099,
+                        code: -32099,
                         message: message
                     }
                 });
-            });
-            // Call local method
-            try {
-                fn.method.apply(fn.scope, params);
-            } 
-            catch (ex1) {
-                _send({
-                    id: id,
-                    error: {
-                        code: 32099,
-                        message: ex1.message
-                    }
-                });
-            }
+            };
         }
         else {
-            if (fn.isVoid) {
-                // #ifdef debug
-                trace("requested to execute void method " + method);
-                // #endif
-                // Call local method 
-                fn.method.apply(fn.scope, params);
+            success = error = _emptyFn;
+        }
+        // Call local method
+        try {
+            var result = fn.method.apply(fn.scope, params.concat([success, error]));
+            if (!undef(result)) {
+                success(result);
             }
-            else {
-                // #ifdef debug
-                trace("requested to execute method " + method);
-                // #endif
-                // Call local method and send back the response
-                var response;
-                try {
-                    response = {
-                        id: id,
-                        result: fn.method.apply(fn.scope, params)
-                    };
-                } 
-                catch (ex2) {
-                    response = {
-                        id: id,
-                        error: {
-                            code: 32099,
-                            message: ex2.message
-                        }
-                    };
-                }
-                _send(response);
-            }
+        } 
+        catch (ex1) {
+            error(ex1.message);
         }
     }
     
@@ -207,17 +174,16 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                 if (data.result && callback.success) {
                     callback.success(data.result);
                 }
-                else 
-                    if (data.error) {
-                        if (callback.error) {
-                            callback.error(data.error);
-                        }
-                        // #ifdef debug
-                        else {
-                            trace("unhandled error returned.");
-                        }
-                    // #endif
+                else if (data.error) {
+                    if (callback.error) {
+                        callback.error(data.error);
                     }
+                    // #ifdef debug
+                    else {
+                        trace("unhandled error returned.");
+                    }
+                    // #endif
+                }
                 delete _callbacks[data.id];
             }
         },

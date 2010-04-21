@@ -6,7 +6,6 @@
  * NameTransport uses the window.name property to relay data.
  * The <code>local</code> parameter needs to be set on both the consumer and provider,<br/>
  * and the <code>remoteHelper</code> parameter needs to be set on the consumer.
- * @extends easyXDM.stack.TransportStackElement
  * @constructor
  * @param {Object} config The transports configuration.
  * @cfg {String} remoteHelper The url to the remote instance of hash.html - this is only needed for the host.

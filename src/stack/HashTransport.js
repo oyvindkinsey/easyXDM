@@ -5,7 +5,6 @@
  * @class easyXDM.stack.HashTransport
  * HashTransport is a transport class that uses the IFrame URL Technique for communication.<br/>
  * <a href="http://msdn.microsoft.com/en-us/library/bb735305.aspx">http://msdn.microsoft.com/en-us/library/bb735305.aspx</a><br/>
- * @extends easyXDM.stack.TransportStackElement
  * @namespace easyXDM.stack
  * @constructor
  * @param {Object} config The transports configuration.
@@ -83,7 +82,7 @@ easyXDM.stack.HashTransport = function(config){
             // #ifdef debug
             trace("starting polling");
             // #endif
-            _timer = window.setInterval(_pollHash, pollInterval);
+            _timer = setInterval(_pollHash, pollInterval);
         }
         else {
             on(_listenerWindow, "resize", _onResize);
@@ -98,10 +97,9 @@ easyXDM.stack.HashTransport = function(config){
             if (usePolling) {
                 window.clearInterval(_timer);
             }
-            else 
-                if (_listenerWindow) {
-                    un(_listenerWindow, "resize", _pollHash);
-                }
+            else if (_listenerWindow) {
+                un(_listenerWindow, "resize", _pollHash);
+            }
             if (isHost || !useParent) {
                 _callerWindow.parentNode.removeChild(_callerWindow);
             }

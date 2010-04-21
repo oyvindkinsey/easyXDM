@@ -5,7 +5,6 @@
  * @class easyXDM.stack.VerifyBehavior
  * This behavior will verify that communication with the remote end is possible, and will also sign all outgoing,
  * and verify all incoming messages. This removes the risk of someone hijacking the iframe to send malicious messages.
- * @extends easyXDM.stack.StackElement
  * @namespace easyXDM.stack
  * @constructor
  * @param {Object} config The behaviors configuration.

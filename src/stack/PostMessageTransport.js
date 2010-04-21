@@ -6,7 +6,6 @@
  * PostMessageTransport is a transport class that uses HTML5 postMessage for communication.<br/>
  * <a href="http://msdn.microsoft.com/en-us/library/ms644944(VS.85).aspx">http://msdn.microsoft.com/en-us/library/ms644944(VS.85).aspx</a><br/>
  * <a href="https://developer.mozilla.org/en/DOM/window.postMessage">https://developer.mozilla.org/en/DOM/window.postMessage</a>
- * @extends easyXDM.stack.TransportStackElement
  * @namespace easyXDM.stack
  * @constructor
  * @param {Object} config The transports configuration.

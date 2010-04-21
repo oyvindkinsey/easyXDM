@@ -5,7 +5,9 @@
 var _trace;
 // #endif
 
-// From http://peter.michaux.ca/articles/feature-detection-state-of-the-art-browser-scripting
+/* Methods for feature testing
+ * From http://peter.michaux.ca/articles/feature-detection-state-of-the-art-browser-scripting
+ */
 function isHostMethod(object, property){
     var t = typeof object[property];
     return t == 'function' ||
@@ -17,10 +19,9 @@ function isHostObject(object, property){
     return !!(typeof(object[property]) == 'object' && object[property]);
 }
 
-//
-
-var reURI = /^(http.?:\/\/([^\/\s]+))/, reParent = /[\-\w]+\/\.\.\//, reDoubleSlash = /([^:])\/\//g;
-
+/*
+ * Create normalized methods for adding and removing events
+ */
 var on = (function(){
     if (isHostMethod(window, "addEventListener")) {
         /**
@@ -55,7 +56,6 @@ var on = (function(){
         };
     }
 }());
-
 
 var un = (function(){
     if (isHostMethod(window, "removeEventListener")) {
@@ -92,6 +92,12 @@ var un = (function(){
     }
 }());
 
+/*
+ * Methods for working with URLs
+ */
+var reURI = /^(http.?:\/\/([^\/\s]+))/, // returns groups for origin (1) and domain (2)
+ reParent = /[\-\w]+\/\.\.\//, // matches a foo/../ expression 
+ reDoubleSlash = /([^:])\/\//g; // matches // anywhere but in the protocol
 /**
  * Get the domain name from a url.
  * @private
@@ -184,6 +190,43 @@ function appendQueryParameters(url, parameters){
     return url + ((url.indexOf("?") === -1) ? "?" : "&") + q.join("&");
 }
 
+
+/**
+ * Parses the query string and returns a hashtable with the name/value pairs<br/>
+ * The hashtable is cached.
+ * @private
+ * @returns A hashtable populated with keys and values from the querystring.
+ * @type {Object}
+ */
+function getQuery(){
+    var cached = (function(){
+        // #ifdef debug
+        _trace("parsing location.search: '" + location.search);
+        // #endif
+        var query = {}, pair, search = location.search.substring(1).split("&"), i = search.length;
+        while (i--) {
+            pair = search[i].split("=");
+            query[pair[0]] = (pair.length === 2) ? pair[1] : "";
+        }
+        return query;
+    }());
+    
+    getQuery = function(){
+        return cached;
+    };
+    return cached;
+}
+
+
+/*
+ * Helper methods
+ */
+/**
+ * Helper for checking if a variable/property is undefined
+ * @private
+ * @param {Object} v The variable to test
+ * @return {Boolean} True if the passed variable is undefined
+ */
 function undef(v){
     return typeof v === "undefined";
 }
@@ -238,31 +281,66 @@ function getJSONObject(){
 }
 
 /**
- * Parses the query string and returns a hashtable with the name/value pairs<br/>
- * The hashtable is cached.
+ * Applies properties from the source object to the target object.<br/>
+ * This is a destructive method.
  * @private
- * @returns A hashtable populated with keys and values from the querystring.
- * @type {Object}
+ * @param {Object} target The target of the properties.
+ * @param {Object} source The source of the properties.
+ * @param {Boolean} onlyNew Set to True to only set non-existing properties.
  */
-function getQuery(){
-    var cached = (function(){
-        // #ifdef debug
-        _trace("parsing location.search: '" + location.search);
-        // #endif
-        var query = {}, pair, search = location.search.substring(1).split("&"), i = search.length;
-        while (i--) {
-            pair = search[i].split("=");
-            query[pair[0]] = (pair.length === 2) ? pair[1] : "";
+function apply(target, source, onlyNew){
+    if (!source) {
+        return;
+    }
+    for (var key in source) {
+        if (source.hasOwnProperty(key) && (!onlyNew || !target[key])) {
+            target[key] = source[key];
         }
-        return query;
-    }());
-    
-    getQuery = function(){
-        return cached;
-    };
-    return cached;
+    }
 }
 
+/**
+ * Creates a frame and appends it to the DOM.
+ * @private
+ * @param {String} url The url the frame should be set to
+ * @param {DOMElement} container Its parent element (Optional)
+ * @param {Function} onLoad A method that should be called with the frames contentWindow as argument when the frame is fully loaded. (Optional)
+ * @param {String} name The id/name the frame should get (Optional)
+ * @return The frames DOMElement
+ * @type DOMElement
+ */
+function createFrame(url, container, onLoad, name){
+    // #ifdef debug
+    _trace("creating frame: " + url);
+    // #endif
+    var frame = document.createElement("IFRAME");
+    frame.src = url;
+    if (name) {
+        //id needs to be set for the references to work reliably
+        frame.id = frame.name = name;
+    }
+    if (onLoad) {
+        frame.loadFn = function(){
+            onLoad(frame.contentWindow);
+        };
+        on(frame, "load", frame.loadFn);
+    }
+    if (container) {
+        container.appendChild(frame);
+    }
+    else {
+        // This needs to be hidden like this, simply setting display:none and the like will cause failures in some browsers.
+        frame.style.position = "absolute";
+        frame.style.left = "-2000px";
+        frame.style.top = "0px";
+        document.body.appendChild(frame);
+    }
+    return frame;
+}
+
+/*
+ * Methods related to AJAX
+ */
 /**
  * Creates a cross-browser XMLHttpRequest object
  * @private
@@ -271,10 +349,10 @@ function getQuery(){
 var createXmlHttpRequest = function(){
     if (undef(XMLHttpRequest)) {
         var item = (function(){
-            var list = ["Microsoft.XMLHTTP", "Msxml2.XMLHTTP", "Msxml3.XMLHTTP"], i = list.length;
+            var list = ["Microsoft", "Msxml2", "Msxml3"], i = list.length;
             while (i--) {
                 try {
-                    item = list[i];
+                    item = list[i] + ".XMLHTTP";
                     var obj = new ActiveXObject(item);
                     return item;
                 } 
@@ -338,25 +416,9 @@ function ajax(method, url, data, success, error){
     req.send(q.join("&"));
 }
 
-/**
- * Applies properties from the source object to the target object.<br/>
- * This is a destructive method.
- * @private
- * @param {Object} target The target of the properties.
- * @param {Object} source The source of the properties.
- * @param {Boolean} onlyNew Set to True to only set non-existing properties.
+/*
+ * Functions related to stacks
  */
-function apply(target, source, onlyNew){
-    if (!source) {
-        return;
-    }
-    for (var key in source) {
-        if (source.hasOwnProperty(key) && (!onlyNew || !target[key])) {
-            target[key] = source[key];
-        }
-    }
-}
-
 /**
  * Prepares an array of stack-elements suitable for the current configuration
  * @private
@@ -384,14 +446,13 @@ function prepareTransportStack(config){
             if (isHostMethod(window, "postMessage")) {
                 protocol = "1";
             }
-            else 
-                if (config.remoteHelper) {
-                    config.remoteHelper = resolveUrl(config.remoteHelper);
-                    protocol = "2";
-                }
-                else {
-                    protocol = "0";
-                }
+            else if (config.remoteHelper) {
+                config.remoteHelper = resolveUrl(config.remoteHelper);
+                protocol = "2";
+            }
+            else {
+                protocol = "0";
+            }
             // #ifdef debug
             _trace("selecting protocol: " + protocol);
             // #endif
@@ -527,50 +588,12 @@ function chainStack(stackElements){
     return stackEl;
 }
 
-/**
- * Creates a frame and appends it to the DOM.
- * @private
- * @param {String} url The url the frame should be set to
- * @param {DOMElement} container Its parent element (Optional)
- * @param {Function} onLoad A method that should be called with the frames contentWindow as argument when the frame is fully loaded. (Optional)
- * @param {String} name The id/name the frame should get (Optional)
- * @return The frames DOMElement
- * @type DOMElement
+/*
+ * Export the main object and any other methods applicable
  */
-function createFrame(url, container, onLoad, name){
-    // #ifdef debug
-    _trace("creating frame: " + url);
-    // #endif
-    var frame = document.createElement("IFRAME");
-    frame.src = url;
-    if (name) {
-        //id needs to be set for the references to work reliably
-        frame.id = frame.name = name;
-    }
-    if (onLoad) {
-        frame.loadFn = function(){
-            onLoad(frame.contentWindow);
-        };
-        on(frame, "load", frame.loadFn);
-    }
-    if (container) {
-        container.appendChild(frame);
-    }
-    else {
-        // This needs to be hidden like this, simply setting display:none and the like will cause failures in some browsers.
-        frame.style.position = "absolute";
-        frame.style.left = "-2000px";
-        frame.style.top = "0px";
-        document.body.appendChild(frame);
-    }
-    return frame;
-}
-
-
 /** 
  * @class easyXDM
- * A javascript library providing cross-browser, cross-domain messaging/RPC.<br/>
- * debug and the easyXDM.configuration namespace is only available in the debug version.
+ * A javascript library providing cross-browser, cross-domain messaging/RPC.
  * @version %%version%%
  * @singleton
  */

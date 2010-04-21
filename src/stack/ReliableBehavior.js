@@ -1,10 +1,9 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape */
+/*global easyXDM, window, escape, unescape, debug */
 
 /**
  * @class easyXDM.stack.ReliableBehavior
  * This is a behavior that tries to make the underlying transport reliable by using acknowledgements.
- * @extends easyXDM.stack.StackElement
  * @namespace easyXDM.stack
  * @constructor
  * @param {Object} config The behaviors configuration.

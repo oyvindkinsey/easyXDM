@@ -9,7 +9,6 @@
                 }
                 document.write(unescape("%3Cscript src='../easyXDM.js' type='text/javascript'%3E%3C/script%3E"));
                 document.write(unescape("%3Cscript src='../Debug.js' type='text/javascript'%3E%3C/script%3E"));
-                document.write(unescape("%3Cscript src='../configuration.js' type='text/javascript'%3E%3C/script%3E"));
                 document.write(unescape("%3Cscript src='../DomHelper.js' type='text/javascript'%3E%3C/script%3E"));
                 document.write(unescape("%3Cscript src='../Fn.js' type='text/javascript'%3E%3C/script%3E"));
                 document.write(unescape("%3Cscript src='../Socket.js' type='text/javascript'%3E%3C/script%3E"));
@@ -39,20 +38,16 @@
                     local: "../name.html"
                 }, {
                     remote: {
-                        voidCallback: {
-                            isVoid: true
-                        }
+                        voidCallback: {}
                     },
                     local: {
                         voidMethod: {
-                            isVoid: true,
                             method: function(msg){
                                 // Echo back the message
                                 remote.voidCallback(msg);
                             }
                         },
                         asyncMethod: {
-                            isAsync: true,
                             method: function(msg, fn){
                                 window.setTimeout(function(){
                                     // Echo back the msg
@@ -60,16 +55,14 @@
                                 }, 100);
                             }
                         },
-                        method: {
-                            method: function(msg){
-                                // Echo back the msg
-                                return msg;
-                            }
+                        // use the shorthand notation
+                        method: function(msg){
+                            // Echo back the msg
+                            return msg;
                         },
                         error: {
                             method: function(){
                                 var a, b = a.c;
-                                
                             }
                         }
                     }

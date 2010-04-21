@@ -6,6 +6,36 @@
  * This class creates a transport channel between two domains that is usable for sending and receiving string-based messages.<br/>
  * The channel is reliable, supports queueing, and ensures that the message originates from the expected domain.<br/>
  * Internally different stacks will be used depending on the browsers features and the available parameters.
+ * <h2>How to set up</h2>
+ * Setting up the provider:
+ * <pre><code>
+ * var socket = new easyXDM.Socket({
+ * &nbsp; local: "name.html",
+ * &nbsp; onReady: function(){
+ * &nbsp; &nbsp; &#47;&#47; you need to wait for the onReady callback before using the socket
+ * &nbsp; &nbsp; socket.postMessage("foo-message");
+ * &nbsp; },
+ * &nbsp; onMessage: function(message, origin) {
+ * &nbsp;&nbsp; alert("received " + message + " from " + origin);
+ * &nbsp; }
+ * });
+ * </code></pre>
+ * Setting up the consumer:
+ * <pre><code>
+ * var socket = new easyXDM.Socket({
+ * &nbsp; remote: "http:&#47;&#47;remotedomain/page.html",
+ * &nbsp; remoteHelper: "http:&#47;&#47;remotedomain/name.html",
+ * &nbsp; onReady: function(){
+ * &nbsp; &nbsp; &#47;&#47; you need to wait for the onReady callback before using the socket
+ * &nbsp; &nbsp; socket.postMessage("foo-message");
+ * &nbsp; },
+ * &nbsp; onMessage: function(message, origin) {
+ * &nbsp;&nbsp; alert("received " + message + " from " + origin);
+ * &nbsp; }
+ * });
+ * </code></pre>
+ * If you are unable to upload the <code>name.html</code> file to the consumers domain then remove <code>removeHelper</code> property
+ * and the transport will fall back to using FMI instead of the window.name to transport messages.
  * @namespace easyXDM
  * @constructor
  * @cfg {String/Window} local The url to the local name.html document, a local static file, or a reference to the local window.
