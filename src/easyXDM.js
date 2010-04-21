@@ -350,7 +350,7 @@ var createXmlHttpRequest = (function(){
     if (isHostMethod(window, "XMLHttpRequest")) {
         return function(){
             return new XMLHttpRequest();
-        }
+        };
     }
     else {
         var item = (function(){
