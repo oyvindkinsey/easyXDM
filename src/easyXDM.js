@@ -346,8 +346,13 @@ function createFrame(url, container, onLoad, name){
  * @private
  * @return {XMLHttpRequest} A XMLHttpRequest object.
  */
-var createXmlHttpRequest = function(){
-    if (undef(XMLHttpRequest)) {
+var createXmlHttpRequest = (function(){
+    if (isHostMethod(window, "XMLHttpRequest")) {
+        return function(){
+            return new XMLHttpRequest();
+        }
+    }
+    else {
         var item = (function(){
             var list = ["Microsoft", "Msxml2", "Msxml3"], i = list.length;
             while (i--) {
@@ -364,12 +369,7 @@ var createXmlHttpRequest = function(){
             return new ActiveXObject(item);
         };
     }
-    else {
-        return function(){
-            return new XMLHttpRequest();
-        };
-    }
-};
+}());
 
 /** Runs an asynchronous request using XMLHttpRequest
  * @private
@@ -384,7 +384,7 @@ function ajax(method, url, data, success, error){
         error = function(){
         };
     }
-    var req = this.createXmlHttpRequest(), q = [];
+    var req = createXmlHttpRequest(), q = [];
     req.open(method, url, true);
     req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     req.setRequestHeader("X-Requested-With", "XMLHttpRequest");
