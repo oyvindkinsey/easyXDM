@@ -29,13 +29,14 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
         data.jsonrpc = "2.0";
         pub.down.outgoing(serializer.stringify(data));
     }
+    
     function _emptyFn(){
     }
     
     /**
      * Creates a method that implements the given definition
      * @private
-     * @param {easyXDM.configuration.Methods.Method} The method configuration
+     * @param {Object} The method configuration
      * @param {String} method The name of the method
      * @return {Function} A stub capable of proxying the requested method call
      */
@@ -99,7 +100,8 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                 _send({
                     id: id,
                     error: {
-                        code: -32601
+                        code: -32601,
+                        message: "Procedure not found."
                     }
                 });
             }
@@ -130,7 +132,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                     id: id,
                     error: {
                         code: -32099,
-                        message: message
+                        message: "Application error: " + message
                     }
                 });
             };
