@@ -326,6 +326,8 @@ function createFrame(url, container, onLoad, name){
         on(frame, "load", frame.loadFn);
     }
     if (container) {
+        // Remove the frame
+        frame.border = frame.frameBorder = 0;
         container.appendChild(frame);
     }
     else {
