@@ -191,9 +191,6 @@ function appendQueryParameters(url, parameters){
 }
 
 var Query = (function(){
-    // #ifdef debug
-    _trace("parsing location.search: '" + location.search);
-    // #endif
     var query = {}, pair, search = location.search.substring(1).split("&"), i = search.length;
     while (i--) {
         pair = search[i].split("=");
