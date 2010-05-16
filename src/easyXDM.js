@@ -190,33 +190,17 @@ function appendQueryParameters(url, parameters){
     return url + ((url.indexOf("?") === -1) ? "?" : "&") + q.join("&");
 }
 
-
-/**
- * Parses the query string and returns a hashtable with the name/value pairs<br/>
- * The hashtable is cached.
- * @private
- * @returns A hashtable populated with keys and values from the querystring.
- * @type {Object}
- */
-function getQuery(){
-    var cached = (function(){
-        // #ifdef debug
-        _trace("parsing location.search: '" + location.search);
-        // #endif
-        var query = {}, pair, search = location.search.substring(1).split("&"), i = search.length;
-        while (i--) {
-            pair = search[i].split("=");
-            query[pair[0]] = (pair.length === 2) ? pair[1] : "";
-        }
-        return query;
-    }());
-    
-    getQuery = function(){
-        return cached;
-    };
-    return cached;
-}
-
+var Query = (function(){
+    // #ifdef debug
+    _trace("parsing location.search: '" + location.search);
+    // #endif
+    var query = {}, pair, search = location.search.substring(1).split("&"), i = search.length;
+    while (i--) {
+        pair = search[i].split("=");
+        query[pair[0]] = pair[1];
+    }
+    return query;
+})();
 
 /*
  * Helper methods
@@ -428,8 +412,8 @@ function ajax(method, url, data, success, error){
  * @return {Array} An array of stack-elements with the TransportElement at index 0.
  */
 function prepareTransportStack(config){
-    var query = getQuery(), protocol = config.protocol, stackEls;
-    config.isHost = config.isHost || undef(query.xdm_p);
+    var protocol = config.protocol, stackEls;
+    config.isHost = config.isHost || undef(Query.xdm_p);
     // #ifdef debug
     _trace("preparing transport stack");
     // #endif
@@ -437,9 +421,9 @@ function prepareTransportStack(config){
         // #ifdef debug
         _trace("using parameters from query");
         // #endif
-        config.channel = query.xdm_c;
-        config.remote = decodeURIComponent(query.xdm_e);
-        protocol = query.xdm_p;
+        config.channel = Query.xdm_c;
+        config.remote = decodeURIComponent(Query.xdm_e);
+        protocol = Query.xdm_p;
     }
     else {
         config.remote = resolveUrl(config.remote);
@@ -523,10 +507,10 @@ function prepareTransportStack(config){
             }
             else {
                 apply(config, {
-                    channel: query.xdm_c,
-                    remote: decodeURIComponent(query.xdm_e),
-                    useParent: !undef(query.xdm_pa),
-                    usePolling: !undef(query.xdm_po),
+                    channel: Query.xdm_c,
+                    remote: decodeURIComponent(Query.xdm_e),
+                    useParent: !undef(Query.xdm_pa),
+                    usePolling: !undef(Query.xdm_po),
                     useResize: config.useParent ? false : config.useResize
                 });
             }
