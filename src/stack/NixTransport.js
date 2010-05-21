@@ -1,11 +1,11 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, un, on*/
+/*global global, easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, un, on*/
 
 /**
  * @class easyXDM.stack.NixTransport
  * NixTransport is a transport class that uses the strange fact that in IE <8, the window.opener property can be written to and read from all windows.<br/>
  * This is used to pass methods that are able to relay messages back and forth. To avoid context-leakage a VBScript (COM) object is used to relay all the strings.<br/>
- * This transport is loosely based on the work done by <a href="https://issues.apache.org/jira/browse/SHINDIG-416">Shindig</a> 
+ * This transport is loosely based on the work done by <a href="https://issues.apache.org/jira/browse/SHINDIG-416">Shindig</a>
  * @namespace easyXDM.stack
  * @constructor
  * @param {Object} config The transports configuration.
@@ -28,7 +28,7 @@ easyXDM.stack.NixTransport = function(config){
             // #ifdef debug
             trace("destroy");
             // #endif
-			window.execScript('Set nixProxy_%%name%% = Nothing'.replace(/%%name%%/g, config.channel), 'vbscript');
+            window.execScript('Set nixProxy_%%name%% = Nothing'.replace(/%%name%%/g, config.channel), 'vbscript');
             proxy = null;
             if (frame) {
                 frame.parentNode.removeChild(frame);
@@ -113,7 +113,8 @@ easyXDM.stack.NixTransport = function(config){
             else {
                 window.opener.SetChild({
                     send: function(msg){
-                        setTimeout(function(){
+                        //global is needed here to avoid a strange scope error
+                        global.setTimeout(function(){
                             // #ifdef debug
                             trace("received message");
                             // #endif
