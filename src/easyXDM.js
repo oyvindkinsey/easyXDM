@@ -6,6 +6,7 @@ var global = this;
 var _trace;
 // #endif
 
+var _channelId = 0;
 /* Methods for feature testing
  * From http://peter.michaux.ca/articles/feature-detection-state-of-the-art-browser-scripting
  */
@@ -426,7 +427,7 @@ function prepareTransportStack(config){
     }
     else {
         config.remote = resolveUrl(config.remote);
-        config.channel = config.channel || "default";
+        config.channel = config.channel || "default" + _channelId++;
         config.secret = Math.random().toString(16).substring(2);
         if (undef(protocol)) {
             if (isHostMethod(window, "postMessage")) {

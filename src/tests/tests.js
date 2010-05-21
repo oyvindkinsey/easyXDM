@@ -19,7 +19,6 @@ var REMOTE = (function(){
     return remote.substring(0, remote.lastIndexOf("/"));
 }());
 
-var channelId = 0;
 function runTests(){
     easyTest.test([/**Tests for the presence of namespaces and classes*/{
         name: "Check that the library is complete",
@@ -112,7 +111,6 @@ function runTests(){
                 var messages = 0;
                 this.transport = new easyXDM.Socket({
                     protocol: "1",
-                    channel: "channel" + (channelId++),
                     local: "../name.html",
                     remote: REMOTE + "/test_transport.html",
                     onMessage: function(message, origin){
@@ -160,7 +158,6 @@ function runTests(){
                 var messages = 0;
                 this.transport = new easyXDM.Socket({
                     protocol: "3",
-                    channel: "channel" + (channelId++),
                     local: "../name.html",
                     remote: REMOTE + "/test_transport.html",
                     onMessage: function(message, origin){
@@ -209,7 +206,6 @@ function runTests(){
                 var messages = 0;
                 this.transport = new easyXDM.Socket({
                     protocol: "2", // This is just to override the automatic selection
-                    channel: "channel" + (channelId++),
                     local: "../name.html",
                     remote: REMOTE + "/test_transport.html",
                     remoteHelper: REMOTE + "/../name.html",
@@ -253,7 +249,6 @@ function runTests(){
                 var messages = 0;
                 this.transport = new easyXDM.Socket({
                     protocol: "0", // This is just to override the automatic selection
-                    channel: "channel" + (channelId++),
                     local: window,
                     remote: REMOTE + "/test_transport.html",
                     onMessage: function(message, origin){
@@ -301,7 +296,6 @@ function runTests(){
                 var messages = 0;
                 this.transport = new easyXDM.Socket({
                     protocol: "0", // This is just to override the automatic selection
-                    channel: "channel" + (channelId++),
                     remote: REMOTE + "/test_transport.html",
                     onMessage: function(message, origin){
                         if (++messages === 2) {
@@ -341,7 +335,6 @@ function runTests(){
                 var messages = 0;
                 this.transport = new easyXDM.Socket({
                     protocol: "0", // This is just to override the automatic selection
-                    channel: "channel" + (channelId++),
                     local: "s.gif",
                     remote: REMOTE + "/test_transport.html",
                     onMessage: function(message, origin){
@@ -386,7 +379,6 @@ function runTests(){
                 var scope = this;
                 this.transport = new easyXDM.Socket({
                     protocol: "0", // This is just to override the automatic selection
-                    channel: "channel" + (channelId++),
                     local: "../name.html",
                     remote: REMOTE + "/test_transport.html",
                     onMessage: function(message, origin){
@@ -422,7 +414,6 @@ function runTests(){
             run: function(){
                 var scope = this;
                 this.transport = new easyXDM.Socket({
-                    channel: "channel" + (channelId++),
                     local: "../name.html",
                     remote: REMOTE + "/test_transport.html",
                     onMessage: function(message, origin){
@@ -457,7 +448,6 @@ function runTests(){
             run: function(){
                 var scope = this;
                 this.transport = new easyXDM.Socket({
-                    channel: "channel" + (channelId++),
                     local: "../name.html",
                     remote: REMOTE + "/test_transport.html?a=b&c=d",
                     onMessage: function(message, origin){
@@ -492,7 +482,6 @@ function runTests(){
             run: function(){
                 var scope = this;
                 this.remote = new easyXDM.Rpc({
-                    channel: "channel" + (channelId++),
                     local: "../name.html",
                     remote: REMOTE + "/test_rpc.html",
                     remoteHelper: REMOTE + "/../name.html",
