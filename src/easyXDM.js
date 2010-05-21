@@ -419,15 +419,20 @@ function prepareTransportStack(config){
         _trace("using parameters from query");
         // #endif
         config.channel = Query.xdm_c;
+        config.secret = Query.xdm_s;
         config.remote = decodeURIComponent(Query.xdm_e);
         protocol = Query.xdm_p;
     }
     else {
         config.remote = resolveUrl(config.remote);
         config.channel = config.channel || "default";
+        config.secret = Math.random().toString(16).substring(2);
         if (undef(protocol)) {
             if (isHostMethod(window, "postMessage")) {
                 protocol = "1";
+            }
+            if (isHostMethod(window, "ActiveXObject")) {
+                protocol = "3";
             }
             else if (config.remoteHelper) {
                 config.remoteHelper = resolveUrl(config.remoteHelper);
@@ -527,6 +532,9 @@ function prepareTransportStack(config){
             stackEls = [new easyXDM.stack.NameTransport(config), new easyXDM.stack.QueueBehavior(), new easyXDM.stack.VerifyBehavior({
                 initiate: config.isHost
             })];
+            break;
+        case "3":
+            stackEls = [new easyXDM.stack.NixTransport(config)];
             break;
     }
     

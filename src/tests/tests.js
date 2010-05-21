@@ -58,6 +58,11 @@ function runTests(){
                 return this.Assert.isFunction(easyXDM.stack.PostMessageTransport);
             }
         }, {
+            name: "check for the presence of easyXDM.stack.NixTransport",
+            run: function(){
+                return this.Assert.isFunction(easyXDM.stack.NixTransport);
+            }
+        }, {
             name: "check for the presence of easyXDM.stack.NameTransport",
             run: function(){
                 return this.Assert.isFunction(easyXDM.stack.NameTransport);
@@ -107,6 +112,54 @@ function runTests(){
                 var messages = 0;
                 this.transport = new easyXDM.Socket({
                     protocol: "1",
+                    channel: "channel" + (channelId++),
+                    local: "../name.html",
+                    remote: REMOTE + "/test_transport.html",
+                    onMessage: function(message, origin){
+                        if (scope.expectedMessage === message) {
+                            if (++messages === 2) {
+                                scope.notifyResult(true);
+                            }
+                        }
+                    },
+                    onReady: function(){
+                        scope.notifyResult(true);
+                    }
+                });
+            }
+        }, {
+            name: "message is echoed back",
+            timeout: 5000,
+            run: function(){
+                this.transport.postMessage(this.expectedMessage);
+                this.transport.postMessage(this.expectedMessage);
+            }
+        }, {
+            name: "destroy",
+            run: function(){
+                this.transport.destroy();
+                return ((document.getElementsByTagName("iframe").length === 0));
+            }
+        }]
+    }, {
+        name: "test easyXDM.Socket{NixMessageTransport}",
+        runIf: function(){
+            if (typeof window.ActiveXObject !== "function") {
+                return "This test requires IE";
+            }
+        },
+        
+        setUp: function(){
+            this.expectedMessage = "3abcd1234";
+        },
+        steps: [{
+            name: "onReady is fired",
+            timeout: 5000,
+            run: function(){
+                var scope = this;
+                var messages = 0;
+                this.transport = new easyXDM.Socket({
+                    protocol: "3",
                     channel: "channel" + (channelId++),
                     local: "../name.html",
                     remote: REMOTE + "/test_transport.html",
