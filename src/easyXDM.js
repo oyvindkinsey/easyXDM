@@ -432,7 +432,7 @@ function prepareTransportStack(config){
             if (isHostMethod(window, "postMessage")) {
                 protocol = "1";
             }
-            else if (isHostMethod(window, "ActiveXObject")) {
+            else if (isHostMethod(window, "ActiveXObject") && isHostMethod(window, "execScript")) {
                 protocol = "3";
             }
             else if (config.remoteHelper) {
