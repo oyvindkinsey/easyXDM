@@ -57,7 +57,7 @@ var debug = {
              * @ignore
              */
             var domain = location.host;
-            var windowname = domain.replace(/\./g, "") + "easyxdm_log";
+            var windowname = domain.replace(/\.|:/g, "") + "easyxdm_log";
             var logWin = window.open("", windowname, "width=800,height=200,status=0,navigation=0,scrollbars=1");
             if (logWin) {
                 el = logWin.document.getElementById("log");
@@ -117,7 +117,7 @@ var debug = {
              * Create log window
              * @ignore
              */
-            var domain = location.host, windowname = domain.replace(/\./g, "") + "easyxdm_log";
+            var domain = location.host, windowname = domain.replace(/\.|:/g, "") + "easyxdm_log";
             var logWin = window.open("", windowname, "width=800,height=200,status=0,navigation=0,scrollbars=1");
             if (logWin) {
                 var doc = logWin.document;
