@@ -197,7 +197,7 @@ var Query = (function(){
         query[pair[0]] = pair[1];
     }
     return query;
-})();
+}());
 
 /*
  * Helper methods
