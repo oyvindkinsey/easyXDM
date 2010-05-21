@@ -28,9 +28,9 @@ easyXDM.stack.NixTransport = function(config){
             // #ifdef debug
             trace("destroy");
             // #endif
-            window.execScript('Set nixProxy_%%name%% = Nothing'.replace(/%%name%%/g, config.channel), 'vbscript');
-            proxy = null;
             if (frame) {
+                window.execScript('Set nixProxy_%%name%% = Nothing'.replace(/%%name%%/g, config.channel), 'vbscript');
+                proxy = null;
                 frame.parentNode.removeChild(frame);
                 frame = null;
             }
