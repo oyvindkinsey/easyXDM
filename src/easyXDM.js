@@ -7,6 +7,10 @@ var _trace;
 // #endif
 
 var _channelId = 0;
+
+var reURI = /^(http.?:\/\/([^\/\s]+))/, // returns groups for origin (1) and domain (2)
+ reParent = /[\-\w]+\/\.\.\//, // matches a foo/../ expression 
+ reDoubleSlash = /([^:])\/\//g; // matches // anywhere but in the protocol
 /* Methods for feature testing
  * From http://peter.michaux.ca/articles/feature-detection-state-of-the-art-browser-scripting
  */
@@ -97,9 +101,6 @@ var un = (function(){
 /*
  * Methods for working with URLs
  */
-var reURI = /^(http.?:\/\/([^\/\s]+))/, // returns groups for origin (1) and domain (2)
- reParent = /[\-\w]+\/\.\.\//, // matches a foo/../ expression 
- reDoubleSlash = /([^:])\/\//g; // matches // anywhere but in the protocol
 /**
  * Get the domain name from a url.
  * @private
@@ -220,47 +221,40 @@ function undef(v){
  * @return {JSON} A valid JSON conforming object, or null if not found.
  */
 function getJSONObject(){
-    var cached = (function(){
-        var obj = {
-            a: [1, 2, 3]
-        }, json = "{\"a\":[1,2,3]}";
-        
-        if (JSON && typeof JSON.stringify === "function" && JSON.stringify(obj).replace((/\s/g), "") === json) {
-            // this is a working JSON instance
-            return JSON;
-        }
-        
-        var impl = {};
-        if (Object.toJSON) {
-            if (Object.toJSON(obj).replace((/\s/g), "") === json) {
-                // this is a working stringify method
-                impl.stringify = Object.toJSON;
-            }
-        }
-        
-        if (typeof String.prototype.evalJSON === "function") {
-            obj = json.evalJSON();
-            if (obj.a && obj.a.length === 3 && obj.a[2] === 3) {
-                // this is a working parse method           
-                impl.parse = function(str){
-                    return str.evalJSON();
-                };
-            }
-        }
-        
-        if (!impl.stringify || !impl.parse) {
-            return null;
-        }
-        return impl;
-    }());
+    var cached = {};
+    var obj = {
+        a: [1, 2, 3]
+    }, json = "{\"a\":[1,2,3]}";
     
-    if (cached) {
+    if (JSON && typeof JSON.stringify === "function" && JSON.stringify(obj).replace((/\s/g), "") === json) {
+        // this is a working JSON instance
+        return JSON;
+    }
+    if (Object.toJSON) {
+        if (Object.toJSON(obj).replace((/\s/g), "") === json) {
+            // this is a working stringify method
+            cached.stringify = Object.toJSON;
+        }
+    }
+    
+    if (typeof String.prototype.evalJSON === "function") {
+        obj = json.evalJSON();
+        if (obj.a && obj.a.length === 3 && obj.a[2] === 3) {
+            // this is a working parse method           
+            cached.parse = function(str){
+                return str.evalJSON();
+            };
+        }
+    }
+    
+    if (cached.stringify && cached.parse) {
         // Only memoize the result if we have valid instance
         getJSONObject = function(){
             return cached;
         };
+        return cached;
     }
-    return cached;
+    return null;
 }
 
 /**
