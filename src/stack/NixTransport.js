@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global global, easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, un, on*/
+/*global GetNixProxy, easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, un, on, isHostMethod*/
 
 /**
  * @class easyXDM.stack.NixTransport
@@ -29,7 +29,6 @@ easyXDM.stack.NixTransport = function(config){
             trace("destroy");
             // #endif
             if (frame) {
-                window.execScript('Set nixProxy_%%name%% = Nothing'.replace(/%%name%%/g, config.channel), 'vbscript');
                 proxy = null;
                 frame.parentNode.removeChild(frame);
                 frame = null;
@@ -39,60 +38,51 @@ easyXDM.stack.NixTransport = function(config){
             // #ifdef debug
             trace("init");
             // #endif
-            
             targetOrigin = getLocation(config.remote);
             if (config.isHost) {
-                // set up the iframe
-                frame = createFrame(appendQueryParameters(config.remote, {
-                    xdm_e: location.protocol + "//" + location.host,
-                    xdm_c: config.channel,
-                    xdm_s: config.secret,
-                    xdm_p: 3 // 3 = NixTransport
-                }), config.container);
-                
                 try {
-                    var vbScript = 'Class NixProxy%%name%%\n' +
-                    '    Private m_parent, m_child, m_Auth\n' +
-                    '\n' +
-                    '    Public Sub SetParent(obj, auth)\n' +
-                    '        If isEmpty(m_Auth) Then m_Auth = auth\n' +
-                    '        SET m_parent = obj\n' +
-                    '    End Sub\n' +
-                    '    Public Sub SetChild(obj)\n' +
-                    '        SET m_child = obj\n' +
-                    '        m_parent.ready()\n' +
-                    '    End Sub\n' +
-                    '\n' +
-                    // The auth string, which is a pre-shared key between the parent and the child, 
-                    // and that can only be set once by the parent, secures the communication, and also serves to provide
-                    // 'proof' of the origin of the messages.
-                    '    Public Sub SendToParent(data, auth)\n' +
-                    // Make sure its a string we pass on so that we don't risk any object's toString method being called
-                    '        If m_Auth = auth Then m_parent.send(CStr(data))\n' +
-                    '    End Sub\n' +
-                    '    Public Sub SendToChild(data, auth)\n' +
-                    '        If m_Auth = auth Then m_child.send(CStr(data))\n' +
-                    '    End Sub\n' +
-                    'End Class\n' +
-                    'Set nixProxy_%%name%% = New NixProxy%%name%%\n';
-                    window.execScript(vbScript.replace(/%%name%%/g, config.channel), 'vbscript');
-                    proxy = (new Function("return nixProxy_" + config.channel))();
+                    if (!isHostMethod(window, "GetNixProxy")) {
+                        window.execScript('Class NixProxy\n' +
+                        '    Private m_parent, m_child, m_Auth\n' +
+                        '\n' +
+                        '    Public Sub SetParent(obj, auth)\n' +
+                        '        If isEmpty(m_Auth) Then m_Auth = auth\n' +
+                        '        SET m_parent = obj\n' +
+                        '    End Sub\n' +
+                        '    Public Sub SetChild(obj)\n' +
+                        '        SET m_child = obj\n' +
+                        '        m_parent.ready()\n' +
+                        '    End Sub\n' +
+                        '\n' +
+                        // The auth string, which is a pre-shared key between the parent and the child, 
+                        // and that can only be set once by the parent, secures the communication, and also serves to provide
+                        // 'proof' of the origin of the messages.
+                        // Before passing the message on to the recipent we convert the message into a primitive, 
+                        // this mitigates modifying .toString as an attack vector.
+                        '    Public Sub SendToParent(data, auth)\n' +
+                        '        If m_Auth = auth Then m_parent.send(CStr(data))\n' +
+                        '    End Sub\n' +
+                        '    Public Sub SendToChild(data, auth)\n' +
+                        '        If m_Auth = auth Then m_child.send(CStr(data))\n' +
+                        '    End Sub\n' +
+                        'End Class\n' +
+                        'Function GetNixProxy()\n' +
+                        '    Set GetNixProxy = New NixProxy\n' +
+                        'End Function\n', 'vbscript');
+                    }
+                    proxy = GetNixProxy();
                     proxy.SetParent({
                         send: function(msg){
-                            setTimeout(function(){
-                                // #ifdef debug
-                                trace("received message");
-                                // #endif
-                                pub.up.incoming(msg, targetOrigin);
-                            }, 0);
+                            // #ifdef debug
+                            trace("received message");
+                            // #endif
+                            pub.up.incoming(msg, targetOrigin);
                         },
                         ready: function(){
-                            setTimeout(function(){
-                                // #ifdef debug
-                                trace("firing onReady");
-                                // #endif
-                                pub.up.callback(true);
-                            }, 0);
+                            // #ifdef debug
+                            trace("firing onReady");
+                            // #endif
+                            pub.up.callback(true);
                         }
                     }, config.secret);
                     send = function(msg){
@@ -103,20 +93,24 @@ easyXDM.stack.NixTransport = function(config){
                     };
                 } 
                 catch (e) {
-                    throw new Error("Could not set up VBScript Host:" + e.message);
+                    throw new Error("Could not set up VBScript NixProxy:" + e.message);
                 }
+                // set up the iframe
+                frame = createFrame(appendQueryParameters(config.remote, {
+                    xdm_e: location.protocol + "//" + location.host,
+                    xdm_c: config.channel,
+                    xdm_s: config.secret,
+                    xdm_p: 3 // 3 = NixTransport
+                }), config.container);
                 frame.contentWindow.opener = proxy;
             }
             else {
                 window.opener.SetChild({
                     send: function(msg){
-                        //global is needed here to avoid a strange scope error
-                        global.setTimeout(function(){
-                            // #ifdef debug
-                            trace("received message");
-                            // #endif
-                            pub.up.incoming(msg, targetOrigin);
-                        }, 0);
+                        // #ifdef debug
+                        trace("received message");
+                        // #endif
+                        pub.up.incoming(msg, targetOrigin);
                     }
                 });
                 
@@ -126,13 +120,10 @@ easyXDM.stack.NixTransport = function(config){
                     // #endif
                     window.opener.SendToParent(msg, config.secret);
                 };
-                
-                setTimeout(function(){
-                    // #ifdef debug
-                    trace("firing onReady");
-                    // #endif
-                    pub.up.callback(true);
-                }, 0);
+                // #ifdef debug
+                trace("firing onReady");
+                // #endif
+                pub.up.callback(true);
             }
         }
     });

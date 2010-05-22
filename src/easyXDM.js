@@ -1,7 +1,6 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
 /*global easyXDM: true, window, escape, unescape, ActiveXObject */
 
-var global = this;
 // #ifdef debug
 var _trace;
 // #endif
