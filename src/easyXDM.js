@@ -4,9 +4,7 @@
 // #ifdef debug
 var _trace;
 // #endif
-
 var _channelId = 0;
-
 var reURI = /^(http.?:\/\/([^\/\s]+))/, // returns groups for origin (1) and domain (2)
  reParent = /[\-\w]+\/\.\.\//, // matches a foo/../ expression 
  reDoubleSlash = /([^:])\/\//g; // matches // anywhere but in the protocol
@@ -369,13 +367,7 @@ function ajax(method, url, data, success, error){
     req.onreadystatechange = function(){
         if (req.readyState == 4) {
             if (req.status >= 200 && req.status < 300) {
-                var contentType = req.getResponseHeader("Content-Type");
-                if (contentType.substring(0, 16) === "application/json") {
-                    success(getJSONObject().parse(req.responseText));
-                }
-                else {
-                    error("Invalid content type: " + contentType);
-                }
+                success(getJSONObject().parse(req.responseText));
             }
             else {
                 error("An error occured. Status code: " + req.status);
