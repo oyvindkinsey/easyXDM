@@ -52,15 +52,10 @@ easyXDM.stack.NixTransport = function(config){
                 
                 try {
                     var vbScript = 'Class NixProxy%%name%%\n' +
-                    '    Private m_parent\n' +
-                    '    Private m_child\n' +
-                    '    Private m_Auth\n' +
+                    '    Private m_parent, m_child, m_Auth\n' +
                     '\n' +
-                    '    Public Sub SetAuth(auth)\n' +
+                    '    Public Sub SetParent(obj, auth)\n' +
                     '        If isEmpty(m_Auth) Then m_Auth = auth\n' +
-                    '    End Sub\n' +
-                    '\n' +
-                    '    Public Sub SetParent(obj)\n' +
                     '        SET m_parent = obj\n' +
                     '    End Sub\n' +
                     '    Public Sub SetChild(obj)\n' +
@@ -68,18 +63,20 @@ easyXDM.stack.NixTransport = function(config){
                     '        m_parent.ready()\n' +
                     '    End Sub\n' +
                     '\n' +
+                    // The auth string, which is a pre-shared key between the parent and the child, 
+                    // and that can only be set once by the parent, secures the communication, and also serves to provide
+                    // 'proof' of the origin of the messages.
                     '    Public Sub SendToParent(data, auth)\n' +
-                    '        If m_Auth = auth Then m_parent.send(data) Else MsgBox("wrong auth")\n' +
+                    // Make sure its a string we pass on so that we don't risk any object's toString method being called
+                    '        If m_Auth = auth Then m_parent.send(CStr(data))\n' +
                     '    End Sub\n' +
-                    '\n' +
                     '    Public Sub SendToChild(data, auth)\n' +
-                    '        If m_Auth = auth Then m_child.send(data) Else MsgBox("wrong auth")\n' +
+                    '        If m_Auth = auth Then m_child.send(CStr(data))\n' +
                     '    End Sub\n' +
                     'End Class\n' +
                     'Set nixProxy_%%name%% = New NixProxy%%name%%\n';
                     window.execScript(vbScript.replace(/%%name%%/g, config.channel), 'vbscript');
                     proxy = (new Function("return nixProxy_" + config.channel))();
-                    proxy.SetAuth(config.secret);
                     proxy.SetParent({
                         send: function(msg){
                             setTimeout(function(){
@@ -97,7 +94,7 @@ easyXDM.stack.NixTransport = function(config){
                                 pub.up.callback(true);
                             }, 0);
                         }
-                    });
+                    }, config.secret);
                     send = function(msg){
                         // #ifdef debug
                         trace("sending message");
