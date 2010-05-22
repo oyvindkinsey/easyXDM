@@ -1,3 +1,8 @@
+2.3.0 22.05.10
+Fixed some minor bugs (debug related)
+The biggest change is a new first-class transport for IE6 and IE7, a transport that is actually faster than postMessage for IE8!
+This means that you can now support IE6+ and Opera 9+ Firefox 3+ and Chrome using javascript only (no more name.html!)
+
 2.2.0 21.04.10
 Rpc
 	No more isVoid/isAsync
