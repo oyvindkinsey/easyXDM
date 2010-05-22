@@ -55,9 +55,6 @@ easyXDM.WidgetManager = function(config){
      * @param {String} topic The topic to subscribe to
      */
     function _subscribe(url, topic){
-        // #ifdef debug
-        debug.trace(url + " subscribing to " + topic);
-        // #endif
         if (!(topic in _subscribers)) {
             _subscribers[topic] = [];
         }
@@ -73,14 +70,8 @@ easyXDM.WidgetManager = function(config){
      * @param {Object} widgetConfig The widgets configuration
      */
     function _initializeWidget(widget, url, widgetConfig){
-        // #ifdef debug
-        debug.trace("initializing widget " + url);
-        // #endif
         widget.initialize(_widgetSettings, function(response){
             if (response.isInitialized) {
-                // #ifdef debug
-                debug.trace("widget " + url + " is initialized");
-                // #endif
                 _widgets[url] = widget;
                 var i = response.subscriptions.length;
                 while (i--) {
@@ -91,9 +82,6 @@ easyXDM.WidgetManager = function(config){
                 });
             }
             else {
-                // #ifdef debug
-                debug.trace("widget " + url + " was not initialized");
-                // #endif
                 widget.destroy();
                 _raiseEvent(Events.WidgetFailed, {
                     url: url
@@ -129,9 +117,6 @@ easyXDM.WidgetManager = function(config){
      * @param {Object} widgetConfig The widgets configuration
      */
     function _setUpWidget(url, widgetConfig){
-        // #ifdef debug
-        debug.trace("setting up widget");
-        // #endif
         var widget = new easyXDM.Rpc({
             channel: "widget" + _channelNr++,
             local: _hashUrl,
@@ -170,9 +155,6 @@ easyXDM.WidgetManager = function(config){
      * @param {Object} widgetConfig The widgets url
      */
     this.addWidget = function(url, widgetConfig){
-        // #ifdef debug
-        debug.trace("adding widget " + url);
-        // #endif
         if (url in _widgets) {
             throw new Error("A widget with this url has already been initialized");
         }
@@ -185,9 +167,6 @@ easyXDM.WidgetManager = function(config){
      */
     this.removeWidget = function(url){
         if (url in _widgets) {
-            // #ifdef debug
-            debug.trace("removing widget " + url);
-            // #endif
             for (var topic in _subscribers) {
                 if (_subscribers.hasOwnProperty(topic)) {
                     var subscribers = _subscribers[topic], i = subscribers.length;
@@ -202,11 +181,6 @@ easyXDM.WidgetManager = function(config){
             _widgets[url].destroy();
             delete _widgets[url];
         }
-        // #ifdef debug
-        else {
-            debug.trace("widget " + url + " is not loaded");
-        }
-        // #endif
     };
     
     /**
@@ -215,9 +189,6 @@ easyXDM.WidgetManager = function(config){
      * @param {Object} data The data to publish
      */
     this.publish = function(topic, data){
-        // #ifdef debug
-        debug.trace("publishing message to topic " + topic);
-        // #endif
         _publish("", topic, data);
     };
     
@@ -226,9 +197,6 @@ easyXDM.WidgetManager = function(config){
      * @param {Object} data The data to broadcast
      */
     this.broadcast = function(data){
-        // #ifdef debug
-        debug.trace("broadcasting data");
-        // #endif
         for (var url in _widgets) {
             if (_widgets.hasOwnPropert(url)) {
                 _widgets[url].send({
