@@ -105,7 +105,9 @@ easyXDM.stack.NixTransport = function(config){
                 frame.contentWindow.opener = proxy;
             }
             else {
-                window.opener.SetChild({
+                // by storing this in a variable we negate replacement attacks	
+                proxy = window.opener;
+                proxy.SetChild({
                     send: function(msg){
                         // #ifdef debug
                         trace("received message");
@@ -118,7 +120,7 @@ easyXDM.stack.NixTransport = function(config){
                     // #ifdef debug
                     trace("sending");
                     // #endif
-                    window.opener.SendToParent(msg, config.secret);
+                    proxy.SendToParent(msg, config.secret);
                 };
                 setTimeout(function(){
                     // #ifdef debug
