@@ -79,10 +79,12 @@ easyXDM.stack.NixTransport = function(config){
                             pub.up.incoming(msg, targetOrigin);
                         },
                         ready: function(){
-                            // #ifdef debug
-                            trace("firing onReady");
-                            // #endif
-                            pub.up.callback(true);
+                            setTimeout(function(){
+                                // #ifdef debug
+                                trace("firing onReady");
+                                // #endif
+                                pub.up.callback(true);
+                            }, 0);
                         }
                     }, config.secret);
                     send = function(msg){
