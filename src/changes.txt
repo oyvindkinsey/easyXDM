@@ -1,3 +1,6 @@
+2.3.1 24.05.10
+Fixed a bug in the NixTransport that would cause the provider to fire onReady before the constructor has returned.
+
 2.3.0 22.05.10
 Fixed some minor bugs (debug related)
 The biggest change is a new first-class transport for IE6 and IE7, a transport that is actually faster than postMessage for IE8!

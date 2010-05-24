@@ -120,10 +120,12 @@ easyXDM.stack.NixTransport = function(config){
                     // #endif
                     window.opener.SendToParent(msg, config.secret);
                 };
-                // #ifdef debug
-                trace("firing onReady");
-                // #endif
-                pub.up.callback(true);
+                setTimeout(function(){
+                    // #ifdef debug
+                    trace("firing onReady");
+                    // #endif
+                    pub.up.callback(true);
+                }, 0);
             }
         }
     });
