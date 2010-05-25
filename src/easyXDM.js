@@ -4,6 +4,7 @@
 // #ifdef debug
 var _trace;
 // #endif
+var global = this;
 var _channelId = 0;
 var reURI = /^(http.?:\/\/([^\/\s]+))/, // returns groups for origin (1) and domain (2)
  reParent = /[\-\w]+\/\.\.\//, // matches a foo/../ expression 
@@ -416,16 +417,32 @@ function prepareTransportStack(config){
         config.secret = Math.random().toString(16).substring(2);
         if (undef(protocol)) {
             if (isHostMethod(window, "postMessage")) {
+                /*
+                 * This is supported in IE8+, Firefox 3+, Opera 9+, Chrome 2+ and Safari 4+
+                 */
                 protocol = "1";
             }
             else if (isHostMethod(window, "ActiveXObject") && isHostMethod(window, "execScript")) {
+                /*
+                 * This is supported in IE6 and IE7
+                 */
                 protocol = "3";
             }
             else if (config.remoteHelper) {
+                /*
+                 * This is supported in all browsers that retains the value of window.name when
+                 * navigating from one domain to another, and where parent.frames[foo] can be used
+                 * get access to a frame from the same domain
+                 */
                 config.remoteHelper = resolveUrl(config.remoteHelper);
                 protocol = "2";
             }
             else {
+                /*
+                 * This is supported in all browsers where [window].location is writable for all
+                 * The resize event will be used if resize is supported and the iframe is not put
+                 * into a container, else polling will be used.
+                 */
                 protocol = "0";
             }
             // #ifdef debug
