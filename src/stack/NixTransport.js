@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global GetNixProxy, easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, un, on, isHostMethod*/
+/*global global, GetNixProxy, easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, un, on, isHostMethod*/
 
 /**
  * @class easyXDM.stack.NixTransport
@@ -111,10 +111,13 @@ easyXDM.stack.NixTransport = function(config){
                 proxy = window.opener;
                 proxy.SetChild({
                     send: function(msg){
-                        // #ifdef debug
-                        trace("received message");
-                        // #endif
-                        pub.up.incoming(msg, targetOrigin);
+                        // the timeout is necessary to have execution continue in the correct context
+                        global.setTimeout(function(){
+                            // #ifdef debug
+                            trace("received message");
+                            // #endif
+                            pub.up.incoming(msg, targetOrigin);
+                        }, 0);
                     }
                 });
                 
