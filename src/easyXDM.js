@@ -256,23 +256,25 @@ function getJSON(){
     return null;
 }
 
-function apply(destination, source){
-    for (var prop in source) {
-        if (source.hasOwnProperty(prop)) {
-            destination[prop] = source[prop];
-        }
-    }
-    return destination;
-}
-
-function applyIf(destination, source){
+/**
+ * Applies properties from the source object to the target object.<br/>
+ * This is a destructive method.
+ * @private
+ * @param {Object} target The target of the properties.
+ * @param {Object} source The source of the properties.
+ * @param {Boolean} noOverwrite Set to True to only set non-existing properties.
+ */
+function apply(destination, source, noOverwrite){
     var member;
     for (var prop in source) {
         if (source.hasOwnProperty(prop)) {
             if (prop in destination) {
                 member = source[prop];
                 if (typeof member === "object") {
-                    applyIf(destination[prop], member);
+                    apply(destination[prop], member, noOverwrite);
+                }
+                else if (!noOverwrite) {
+                    destination[prop] = source[prop];
                 }
             }
             else {
@@ -366,7 +368,7 @@ var getXhr = (function(){
  * @cfg{Function} error The callback function for errors
  */
 function ajax(config){
-    applyIf(config, {
+    apply(config, {
         method: "POST",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded",
@@ -376,7 +378,7 @@ function ajax(config){
         error: emptyFn,
         data: {},
         type: "plain"
-    });
+    }, true);
     
     var req = getXhr(), q = [];
     req.open(config.method, config.url, true);
@@ -596,7 +598,7 @@ function chainStack(stackElements){
     };
     for (var i = 0, len = stackElements.length; i < len; i++) {
         stackEl = stackElements[i];
-        applyIf(stackEl, defaults);
+        apply(stackEl, defaults, true);
         if (i !== 0) {
             stackEl.down = stackElements[i - 1];
         }
