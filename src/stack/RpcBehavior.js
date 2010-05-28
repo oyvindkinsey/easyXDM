@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, undef, getJSONObject, debug */
+/*global easyXDM, window, escape, unescape, undef, getJSON, debug */
 
 /**
  * @class easyXDM.stack.RpcBehavior
@@ -17,7 +17,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
     // #ifdef debug
     var trace = debug.getTracer("easyXDM.stack.RpcBehavior");
     // #endif
-    var pub, serializer = config.serializer || getJSONObject();
+    var pub, serializer = config.serializer || getJSON();
     var _callbackCounter = 0, _callbacks = {};
     
     /**

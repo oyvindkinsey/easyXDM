@@ -18,7 +18,12 @@
                         post: {
                             isAsync: true,
                             method: function(url, data, success, error){
-                                easyXDM.ajax("POST", url, data, success, error);
+                                easyXDM.ajax({
+                                    url: url,
+                                    data: data,
+                                    success: success,
+                                    success: error
+                                });
                             }
                         }
                     }

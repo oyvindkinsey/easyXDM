@@ -6,6 +6,7 @@ var _trace;
 // #endif
 var global = this;
 var _channelId = 0;
+var emptyFn = Function.prototype;
 var reURI = /^(http.?:\/\/([^\/\s]+))/, // returns groups for origin (1) and domain (2)
  reParent = /[\-\w]+\/\.\.\//, // matches a foo/../ expression 
  reDoubleSlash = /([^:])\/\//g; // matches // anywhere but in the protocol
@@ -218,7 +219,7 @@ function undef(v){
  * @private
  * @return {JSON} A valid JSON conforming object, or null if not found.
  */
-function getJSONObject(){
+function getJSON(){
     var cached = {};
     var obj = {
         a: [1, 2, 3]
@@ -247,7 +248,7 @@ function getJSONObject(){
     
     if (cached.stringify && cached.parse) {
         // Only memoize the result if we have valid instance
-        getJSONObject = function(){
+        getJSON = function(){
             return cached;
         };
         return cached;
@@ -255,23 +256,31 @@ function getJSONObject(){
     return null;
 }
 
-/**
- * Applies properties from the source object to the target object.<br/>
- * This is a destructive method.
- * @private
- * @param {Object} target The target of the properties.
- * @param {Object} source The source of the properties.
- * @param {Boolean} onlyNew Set to True to only set non-existing properties.
- */
-function apply(target, source, onlyNew){
-    if (!source) {
-        return;
-    }
-    for (var key in source) {
-        if (source.hasOwnProperty(key) && (!onlyNew || !target[key])) {
-            target[key] = source[key];
+function apply(destination, source){
+    for (var prop in source) {
+        if (source.hasOwnProperty(prop)) {
+            destination[prop] = source[prop];
         }
     }
+    return destination;
+}
+
+function applyIf(destination, source){
+    var member;
+    for (var prop in source) {
+        if (source.hasOwnProperty(prop)) {
+            if (prop in destination) {
+                member = source[prop];
+                if (typeof member === "object") {
+                    applyIf(destination[prop], member);
+                }
+            }
+            else {
+                destination[prop] = source[prop];
+            }
+        }
+    }
+    return destination;
 }
 
 /**
@@ -323,7 +332,7 @@ function createFrame(url, container, onLoad, name){
  * @private
  * @return {XMLHttpRequest} A XMLHttpRequest object.
  */
-var createXmlHttpRequest = (function(){
+var getXhr = (function(){
     if (isHostMethod(window, "XMLHttpRequest")) {
         return function(){
             return new XMLHttpRequest();
@@ -350,38 +359,53 @@ var createXmlHttpRequest = (function(){
 
 /** Runs an asynchronous request using XMLHttpRequest
  * @private
- * @param {String} method POST, HEAD or GET
- * @param {String} url The url to request
- * @param {Object} data Any data that should be sent.
- * @param {Function} success The callback function for successfull requests
- * @param {Function} error The callback function for errors
+ * @cfg {String} method POST, HEAD or GET
+ * @cfg {String} url The url to request
+ * @cfg {Object} data Any data that should be sent.
+ * @cfg {Function} success The callback function for successfull requests
+ * @cfg{Function} error The callback function for errors
  */
-function ajax(method, url, data, success, error){
-    if (!error) {
-        error = function(){
-        };
+function ajax(config){
+    applyIf(config, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-Requested-With": "XMLHttpRequest"
+        },
+        success: emptyFn,
+        error: emptyFn,
+        data: {},
+        type: "plain"
+    });
+    
+    var req = getXhr(), q = [];
+    req.open(config.method, config.url, true);
+    for (var prop in config.headers) {
+        if (config.headers.hasOwnProperty(prop)) {
+            req.setRequestHeader(prop, config.headers[prop]);
+        }
     }
-    var req = createXmlHttpRequest(), q = [];
-    req.open(method, url, true);
-    req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    req.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+    
     req.onreadystatechange = function(){
         if (req.readyState == 4) {
             if (req.status >= 200 && req.status < 300) {
-                success(getJSONObject().parse(req.responseText));
+                var response = req.responseText;
+                if (config.type === "json") {
+                    response = getJSON().parse(response);
+                }
+                config.success(response);
             }
             else {
-                error("An error occured. Status code: " + req.status);
+                config.error("An error occured. Status code: " + req.status);
             }
             req.onreadystatechange = null;
             delete req.onreadystatechange;
         }
     };
-    if (data) {
-        for (var key in data) {
-            if (data.hasOwnProperty(key)) {
-                q.push(key + "=" + encodeURIComponent(data[key]));
-            }
+    
+    for (var key in config.data) {
+        if (config.data.hasOwnProperty(key)) {
+            q.push(encodeURIComponent(key) + "=" + encodeURIComponent(config.data[key]));
         }
     }
     req.send(q.join("&"));
@@ -572,7 +596,7 @@ function chainStack(stackElements){
     };
     for (var i = 0, len = stackElements.length; i < len; i++) {
         stackEl = stackElements[i];
-        apply(stackEl, defaults, true);
+        applyIf(stackEl, defaults);
         if (i !== 0) {
             stackEl.down = stackElements[i - 1];
         }
@@ -600,6 +624,6 @@ global.easyXDM = {
     version: "%%version%%",
     apply: apply,
     ajax: ajax,
-    getJSONObject: getJSONObject,
+    getJSONObject: getJSON,
     stack: {}
 };
