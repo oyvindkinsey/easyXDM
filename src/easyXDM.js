@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM: true, window, escape, unescape, ActiveXObject */
+/*global easyXDM, JSON, XMLHttpRequest, window, escape, unescape, ActiveXObject */
 
 // #ifdef debug
 var _trace;
@@ -592,7 +592,7 @@ function chainStack(stackElements){
  * @version %%version%%
  * @singleton
  */
-easyXDM = {
+global.easyXDM = {
     /**
      * The version of the library
      * @type {String}
