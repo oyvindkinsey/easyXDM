@@ -98,12 +98,17 @@ easyXDM.stack.NixTransport = function(config){
                     throw new Error("Could not set up VBScript NixProxy:" + e.message);
                 }
                 // set up the iframe
-                frame = createFrame(appendQueryParameters(config.remote, {
-                    xdm_e: location.protocol + "//" + location.host,
-                    xdm_c: config.channel,
-                    xdm_s: config.secret,
-                    xdm_p: 3 // 3 = NixTransport
-                }), config.container);
+                frame = createFrame({
+                    prop: {
+                        src: appendQueryParameters(config.remote, {
+                            xdm_e: location.protocol + "//" + location.host,
+                            xdm_c: config.channel,
+                            xdm_s: config.secret,
+                            xdm_p: 3 // 3 = NixTransport
+                        })
+                    },
+                    container: config.container
+                });
                 frame.contentWindow.opener = proxy;
             }
             else {

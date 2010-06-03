@@ -122,12 +122,18 @@ easyXDM.stack.HashTransport = function(config){
                 pub.up.callback(true);
             }
             else {
-                _callerWindow = createFrame((isHost ? config.remote : config.remote + "#" + config.channel), config.container, (isHost && useParent || !isHost) ? function(){
-                    _listenerWindow = window;
-                    _attachListeners();
-                    pub.up.callback(true);
-                }
- : null, (isHost ? "local_" : "remote_") + config.channel);
+                _callerWindow = createFrame({
+                    container: config.container,
+                    prop: {
+                        src: (isHost ? config.remote : config.remote + "#" + config.channel),
+                        name: (isHost ? "local_" : "remote_") + config.channel
+                    },
+                    onLoad: (isHost && useParent || !isHost) ? (function(){
+                        _listenerWindow = window;
+                        _attachListeners();
+                        pub.up.callback(true);
+                    }) : null
+                });
                 
                 if (isHost && !useParent) {
                     var tries = 0, max = config.delay / 50;

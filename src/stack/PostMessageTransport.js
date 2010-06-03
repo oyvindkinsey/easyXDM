@@ -96,11 +96,16 @@ easyXDM.stack.PostMessageTransport = function(config){
                     }
                 });
                 // set up the iframe
-                frame = createFrame(appendQueryParameters(config.remote, {
-                    xdm_e: location.protocol + "//" + location.host,
-                    xdm_c: config.channel,
-                    xdm_p: 1 // 1 = PostMessage
-                }), config.container);
+                frame = createFrame({
+                    prop: {
+                        src: appendQueryParameters(config.remote, {
+                            xdm_e: location.protocol + "//" + location.host,
+                            xdm_c: config.channel,
+                            xdm_p: 1 // 1 = PostMessage
+                        })
+                    },
+                    container: config.container
+                });
             }
             else {
                 // add the event handler for listening

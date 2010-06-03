@@ -288,33 +288,44 @@ function apply(destination, source, noOverwrite){
 /**
  * Creates a frame and appends it to the DOM.
  * @private
- * @param {String} url The url the frame should be set to
- * @param {DOMElement} container Its parent element (Optional)
- * @param {Function} onLoad A method that should be called with the frames contentWindow as argument when the frame is fully loaded. (Optional)
- * @param {String} name The id/name the frame should get (Optional)
+ * @cfg {Object} prop The properties that should be set on the frame. This should include the 'src' property
+ * @cfg {Object} attr The attributes that should be set on the frame.
+ * @cfg {DOMElement} container Its parent element (Optional)
+ * @cfg {Function} onLoad A method that should be called with the frames contentWindow as argument when the frame is fully loaded. (Optional)
  * @return The frames DOMElement
  * @type DOMElement
  */
-function createFrame(url, container, onLoad, name){
+function createFrame(config){
     // #ifdef debug
-    _trace("creating frame: " + url);
+    _trace("creating frame: " + config.prop.url);
     // #endif
+    
     var frame = document.createElement("IFRAME");
-    frame.src = url;
-    if (name) {
-        //id needs to be set for the references to work reliably
-        frame.id = frame.name = name;
+    
+    // transfer properties to the frame
+    apply(frame, config.prop);
+    //id needs to be set for the references to work reliably
+    frame.id = frame.name = config.prop.name;
+    
+    if (config.attr) {
+        // set attributes on the frame
+        for (var key in config.attr) {
+            if (config.attr.hasOwnProperty(key)) {
+                frame.setAttribute(key, config.attr[key]);
+            }
+        }
     }
-    if (onLoad) {
+    
+    if (config.onLoad) {
         frame.loadFn = function(){
-            onLoad(frame.contentWindow);
+            config.onLoad(frame.contentWindow);
         };
         on(frame, "load", frame.loadFn);
     }
-    if (container) {
+    if (config.container) {
         // Remove the frame
         frame.border = frame.frameBorder = 0;
-        container.appendChild(frame);
+        config.container.appendChild(frame);
     }
     else {
         // This needs to be hidden like this, simply setting display:none and the like will cause failures in some browsers.

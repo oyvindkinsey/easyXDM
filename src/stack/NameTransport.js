@@ -69,6 +69,9 @@ easyXDM.stack.NameTransport = function(config){
             _sendMessage(message);
         },
         destroy: function(){
+            // #ifdef debug
+            trace("destroy");
+            // #endif
             callerWindow.parentNode.removeChild(callerWindow);
             callerWindow = null;
             if (isHost) {
@@ -104,19 +107,29 @@ easyXDM.stack.NameTransport = function(config){
                     xdm_c: config.channel,
                     xdm_p: 2
                 });
-                
-                remoteWindow = createFrame(remoteUrl + '#' + config.channel, config.container, null, config.channel);
+                remoteWindow = createFrame({
+                    prop: {
+                        src: remoteUrl + '#' + config.channel,
+                        name: config.channel
+                    },
+                    container: config.container
+                });
             }
             else {
                 config.remoteHelper = config.remote;
                 easyXDM.Fn.set(config.channel, _onMessage);
             }
             // Set up the iframe that will be used for the transport
-            callerWindow = createFrame(config.local + "#_4" + config.channel, null, function(){
-                // Remove the handler
-                un(callerWindow, "load", callerWindow.loadFn);
-                easyXDM.Fn.set(config.channel + "_load", _onLoad);
-                _onReady();
+            callerWindow = createFrame({
+                prop: {
+                    src: config.local + "#_4" + config.channel
+                },
+                onLoad: function(){
+                    // Remove the handler
+                    un(callerWindow, "load", callerWindow.loadFn);
+                    easyXDM.Fn.set(config.channel + "_load", _onLoad);
+                    _onReady();
+                }
             });
         }
     });
