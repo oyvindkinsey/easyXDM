@@ -458,7 +458,7 @@ function prepareTransportStack(config){
                 /*
                  * This is supported in all browsers that retains the value of window.name when
                  * navigating from one domain to another, and where parent.frames[foo] can be used
-                 * get access to a frame from the same domain
+                 * to get access to a frame from the same domain
                  */
                 config.remoteHelper = resolveUrl(config.remoteHelper);
                 protocol = "2";
