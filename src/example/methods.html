@@ -51,6 +51,12 @@
                      * Register the DOMElement that the generated IFrame should be inserted into
                      */
                     container: document.getElementById("embedded"),
+                    props: {
+                        style: {
+                            border: "2px dotted red",
+                            height: "200px"
+                        }
+                    },
                     onReady: function(){
                         /**
                          * Call a method on the other side
@@ -89,9 +95,6 @@
             }
         </script>
         <style type="text/css">
-            #embedded {
-                height: 200px;
-            }
             
             #embedded iframe {
                 width: 100%;
