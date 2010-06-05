@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, undef, getLocation, appendQueryParameters, resolveUrl, createFrame, debug, un */
+/*global easyXDM, window, escape, unescape, undef, getLocation, appendQueryParameters, resolveUrl, createFrame, debug, un, apply */
 
 /**
  * @class easyXDM.stack.NameTransport
@@ -107,13 +107,11 @@ easyXDM.stack.NameTransport = function(config){
                     xdm_c: config.channel,
                     xdm_p: 2
                 });
-                remoteWindow = createFrame({
-                    prop: {
-                        src: remoteUrl + '#' + config.channel,
-                        name: config.channel
-                    },
-                    container: config.container
+                apply(config.props, {
+                    src: remoteUrl + '#' + config.channel,
+                    name: config.channel
                 });
+                remoteWindow = createFrame(config);
             }
             else {
                 config.remoteHelper = config.remote;
@@ -121,7 +119,7 @@ easyXDM.stack.NameTransport = function(config){
             }
             // Set up the iframe that will be used for the transport
             callerWindow = createFrame({
-                prop: {
+                props: {
                     src: config.local + "#_4" + config.channel
                 },
                 onLoad: function(){

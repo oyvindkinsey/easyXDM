@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, getLocation, createFrame, debug, un, on*/
+/*global easyXDM, window, escape, unescape, getLocation, createFrame, debug, un, on, apply*/
 
 /**
  * @class easyXDM.stack.HashTransport
@@ -122,9 +122,8 @@ easyXDM.stack.HashTransport = function(config){
                 pub.up.callback(true);
             }
             else {
-                _callerWindow = createFrame({
-                    container: config.container,
-                    prop: {
+                apply(config, {
+                    props: {
                         src: (isHost ? config.remote : config.remote + "#" + config.channel),
                         name: (isHost ? "local_" : "remote_") + config.channel
                     },
@@ -134,6 +133,7 @@ easyXDM.stack.HashTransport = function(config){
                         pub.up.callback(true);
                     }) : null
                 });
+                _callerWindow = createFrame(config);
                 
                 if (isHost && !useParent) {
                     var tries = 0, max = config.delay / 50;

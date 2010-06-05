@@ -297,24 +297,15 @@ function apply(destination, source, noOverwrite){
  */
 function createFrame(config){
     // #ifdef debug
-    _trace("creating frame: " + config.prop.url);
+    _trace("creating frame: " + config.props.url);
     // #endif
     
     var frame = document.createElement("IFRAME");
     
     // transfer properties to the frame
-    apply(frame, config.prop);
+    apply(frame, config.props);
     //id needs to be set for the references to work reliably
-    frame.id = frame.name = config.prop.name;
-    
-    if (config.attr) {
-        // set attributes on the frame
-        for (var key in config.attr) {
-            if (config.attr.hasOwnProperty(key)) {
-                frame.setAttribute(key, config.attr[key]);
-            }
-        }
-    }
+    frame.id = frame.name;
     
     if (config.onLoad) {
         frame.loadFn = function(){
@@ -439,6 +430,10 @@ function prepareTransportStack(config){
     // #ifdef debug
     _trace("preparing transport stack");
     // #endif
+    
+    if (!config.props) {
+        config.props = {};
+    }
     if (!config.isHost) {
         // #ifdef debug
         _trace("using parameters from query");

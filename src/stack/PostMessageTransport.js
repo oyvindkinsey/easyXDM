@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, un, on*/
+/*global easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, un, on, apply*/
 
 /**
  * @class easyXDM.stack.PostMessageTransport
@@ -96,16 +96,14 @@ easyXDM.stack.PostMessageTransport = function(config){
                     }
                 });
                 // set up the iframe
-                frame = createFrame({
-                    prop: {
-                        src: appendQueryParameters(config.remote, {
-                            xdm_e: location.protocol + "//" + location.host,
-                            xdm_c: config.channel,
-                            xdm_p: 1 // 1 = PostMessage
-                        })
-                    },
-                    container: config.container
+                apply(config.props, {
+                    src: appendQueryParameters(config.remote, {
+                        xdm_e: location.protocol + "//" + location.host,
+                        xdm_c: config.channel,
+                        xdm_p: 1 // 1 = PostMessage
+                    })
                 });
+                frame = createFrame(config);
             }
             else {
                 // add the event handler for listening

@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global global, GetNixProxy, easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, un, on, isHostMethod*/
+/*global global, GetNixProxy, easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, un, on, isHostMethod, apply*/
 
 /**
  * @class easyXDM.stack.NixTransport
@@ -98,17 +98,15 @@ easyXDM.stack.NixTransport = function(config){
                     throw new Error("Could not set up VBScript NixProxy:" + e.message);
                 }
                 // set up the iframe
-                frame = createFrame({
-                    prop: {
-                        src: appendQueryParameters(config.remote, {
-                            xdm_e: location.protocol + "//" + location.host,
-                            xdm_c: config.channel,
-                            xdm_s: config.secret,
-                            xdm_p: 3 // 3 = NixTransport
-                        })
-                    },
-                    container: config.container
+                apply(config.props, {
+                    src: appendQueryParameters(config.remote, {
+                        xdm_e: location.protocol + "//" + location.host,
+                        xdm_c: config.channel,
+                        xdm_s: config.secret,
+                        xdm_p: 3 // 3 = NixTransport
+                    })
                 });
+                frame = createFrame(config);
                 frame.contentWindow.opener = proxy;
             }
             else {
