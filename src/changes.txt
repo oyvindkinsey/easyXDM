@@ -1,3 +1,9 @@
+2.3.2 05.06.10
+Improved the ajax feature - this is now propely implemented and which should make the xhr.html file more suiting.
+Minor security fixes to the NixTransport.
+The transport configuration now takes a 'props' property that can be used to apply arbitrary properties onto the created iframe.
+This can be used to style the iframe using e.g 'props: {style: {border: "1px solid red"}}'
+
 2.3.1 24.05.10
 Fixed a bug in the NixTransport that would cause the provider to fire onReady before the constructor has returned.
 
