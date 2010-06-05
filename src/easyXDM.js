@@ -367,7 +367,7 @@ var getXhr = (function(){
  * @cfg {String} url The url to request
  * @cfg {Object} data Any data that should be sent.
  * @cfg {Function} success The callback function for successfull requests
- * @cfg{Function} error The callback function for errors
+ * @cfg {Function} error The callback function for errors
  */
 function ajax(config){
     apply(config, {
@@ -377,7 +377,9 @@ function ajax(config){
             "X-Requested-With": "XMLHttpRequest"
         },
         success: emptyFn,
-        error: emptyFn,
+        error: function(msg){
+            throw new Error(msg);
+        },
         data: {},
         type: "plain"
     }, true);
