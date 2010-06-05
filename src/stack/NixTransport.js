@@ -28,8 +28,8 @@ easyXDM.stack.NixTransport = function(config){
             // #ifdef debug
             trace("destroy");
             // #endif
+            proxy = null;
             if (frame) {
-                proxy = null;
                 frame.parentNode.removeChild(frame);
                 frame = null;
             }
@@ -110,8 +110,13 @@ easyXDM.stack.NixTransport = function(config){
                 frame.contentWindow.opener = proxy;
             }
             else {
-                // by storing this in a variable we negate replacement attacks	
-                proxy = window.opener;
+                // by storing this in a variable we negate replacement attacks
+                try {
+                    proxy = window.opener;
+                } 
+                catch (e) {
+                    throw new Error("Cannot access window.opener");
+                }
                 proxy.SetChild({
                     send: function(msg){
                         // the timeout is necessary to have execution continue in the correct context
