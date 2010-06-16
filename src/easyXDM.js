@@ -146,7 +146,7 @@ function resolveUrl(url){
     // strip the #hash
     var indexOf = url.indexOf("#");
     if (indexOf !== -1) {
-        url = url.substring(0, url.indexOf("#"));
+        url = url.substring(0, indexOf);
     }
     
     // replace all // except the one in proto with /
