@@ -144,7 +144,10 @@ function resolveUrl(url){
     }
     // #endif
     // strip the #hash
-    url = url.substring(0, url.indexOf("#"));
+    var indexOf = url.indexOf("#");
+    if (indexOf !== -1) {
+        url = url.substring(0, url.indexOf("#"));
+    }
     
     // replace all // except the one in proto with /
     url = url.replace(reDoubleSlash, "$1/");
