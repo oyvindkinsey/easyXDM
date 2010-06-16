@@ -143,8 +143,6 @@ function resolveUrl(url){
         throw new Error("url is undefined or empty");
     }
     // #endif
-    // strip the #hash
-    url = url.substring(0, url.indexOf("#"));
     
     // replace all // except the one in proto with /
     url = url.replace(reDoubleSlash, "$1/");
