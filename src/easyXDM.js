@@ -300,9 +300,9 @@ function createFrame(config){
     _trace("creating frame: " + config.props.url);
     // #endif
     var frame;
-	// This is to work around the problems in IE6/7 with setting the name property. 
-	// Internally this is set as 'submitName' instead when using 'iframe.name = ...'
-	// This is not required by easyXDM itself, but is to facilitate other use cases 
+    // This is to work around the problems in IE6/7 with setting the name property. 
+    // Internally this is set as 'submitName' instead when using 'iframe.name = ...'
+    // This is not required by easyXDM itself, but is to facilitate other use cases 
     /*@cc_on
      if (config.props.name){
      frame = document.createElement("<iframe name=\"" + config.props.name + "\"/>");
