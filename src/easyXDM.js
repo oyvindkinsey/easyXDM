@@ -183,13 +183,19 @@ function appendQueryParameters(url, parameters){
         throw new Error("parameters is undefined or null");
     }
     // #endif
+    
+    var hash = "", indexOf = url.indexOf("#");
+    if (indexOf !== -1) {
+        hash = url.substring(indexOf);
+        url = url.substring(0, indexOf);
+    }
     var q = [];
     for (var key in parameters) {
         if (parameters.hasOwnProperty(key)) {
             q.push(key + "=" + parameters[key]);
         }
     }
-    return url + ((url.indexOf("?") === -1) ? "?" : "&") + q.join("&");
+    return url + ((url.indexOf("?") === -1) ? "?" : "&") + q.join("&") + hash;
 }
 
 var Query = (function(){
