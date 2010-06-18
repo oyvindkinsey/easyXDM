@@ -173,10 +173,10 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                 // #endif
                 // A method response from the other end
                 var callback = _callbacks[data.id];
-                if (data.result && callback.success) {
+                if (!undef(data.result) && callback.success) {
                     callback.success(data.result);
                 }
-                else if (data.error) {
+                else if (!undef(data.error)) {
                     if (callback.error) {
                         callback.error(data.error);
                     }
