@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, debug*/
+/*global easyXDM, window, escape, unescape, debug, undef*/
 
 /**
  * @class easyXDM.stack.QueueBehavior
@@ -17,7 +17,7 @@ easyXDM.stack.QueueBehavior = function(config){
     var trace = debug.getTracer("easyXDM.stack.QueueBehavior");
     trace("constructor");
     // #endif
-    var pub, queue = [], waiting = false, incoming = "", destroying, maxLength = (config) ? config.maxLength : 0, encode = (config) ? (config.encode || false) : false;
+    var pub, queue = [], waiting = true, incoming = "", destroying, maxLength = 0;
     
     function dispatch(){
         if (waiting || queue.length === 0 || destroying) {
@@ -40,6 +40,18 @@ easyXDM.stack.QueueBehavior = function(config){
         });
     }
     return (pub = {
+        init: function(){
+            if (undef(config)) {
+                config = {};
+            }
+            maxLength = config.maxLength ? config.maxLength : 0;
+            pub.down.init();
+        },
+        callback: function(success){
+            waiting = false;
+            dispatch();
+            pub.up.callback(success);
+        },
         incoming: function(message, origin){
             var indexOf = message.indexOf("_"), seq = parseInt(message.substring(0, indexOf), 10);
             incoming += message.substring(indexOf + 1);
@@ -47,7 +59,7 @@ easyXDM.stack.QueueBehavior = function(config){
                 // #ifdef debug
                 trace("received the last fragment");
                 // #endif
-                if (encode) {
+                if (config.encode) {
                     incoming = decodeURIComponent(incoming);
                 }
                 pub.up.incoming(incoming, origin);
@@ -60,7 +72,7 @@ easyXDM.stack.QueueBehavior = function(config){
             // #endif
         },
         outgoing: function(message, origin, fn){
-            if (encode) {
+            if (config.encode) {
                 message = encodeURIComponent(message);
             }
             var fragments = [], fragment;

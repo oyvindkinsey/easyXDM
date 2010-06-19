@@ -579,7 +579,7 @@ function prepareTransportStack(config){
             })];
             break;
         case "1":
-            stackEls = [new easyXDM.stack.PostMessageTransport(config)];
+            stackEls = [new easyXDM.stack.PostMessageTransport(config), new easyXDM.stack.QueueBehavior()];
             break;
         case "2":
             stackEls = [new easyXDM.stack.NameTransport(config), new easyXDM.stack.QueueBehavior(), new easyXDM.stack.VerifyBehavior({
@@ -587,7 +587,7 @@ function prepareTransportStack(config){
             })];
             break;
         case "3":
-            stackEls = [new easyXDM.stack.NixTransport(config)];
+            stackEls = [new easyXDM.stack.NixTransport(config), new easyXDM.stack.QueueBehavior()];
             break;
     }
     

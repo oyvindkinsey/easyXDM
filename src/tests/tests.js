@@ -432,6 +432,35 @@ function runTests(){
             }
         }]
     }, {
+        name: "test easyXDM.Socket{} with buffering",
+        setUp: function(){
+            this.expectedMessage = "4abcd1234";
+        },
+        tearDown: function(){
+            this.transport.destroy();
+            if (document.getElementsByTagName("iframe").length !== 0) {
+                throw new Error("iframe still present");
+            }
+        },
+        steps: [{
+            name: "onReady is fired, and buffered message sent",
+            timeout: 5000,
+            run: function(){
+                var scope = this;
+                this.transport = new easyXDM.Socket({
+                    local: "../name.html",
+                    remote: REMOTE + "/test_transport.html",
+                    onMessage: function(message, origin){
+                        scope.notifyResult((scope.expectedMessage === message));
+                    },
+                    onReady: function(){
+                        scope.notifyResult(true);
+                    }
+                });
+                this.transport.postMessage(this.expectedMessage);
+            }
+        }]
+    }, {
         name: "test easyXDM.Socket{} with query parameters",
         setUp: function(){
             this.expectedMessage = "5abcd1234";

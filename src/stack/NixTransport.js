@@ -21,8 +21,9 @@ easyXDM.stack.NixTransport = function(config){
  frame, send, targetOrigin, proxy;
     
     return (pub = {
-        outgoing: function(message, domain){
+        outgoing: function(message, domain, fn){
             send(message);
+            fn();
         },
         destroy: function(){
             // #ifdef debug
