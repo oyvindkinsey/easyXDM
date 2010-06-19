@@ -173,10 +173,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                 // #endif
                 // A method response from the other end
                 var callback = _callbacks[data.id];
-                if (!undef(data.result) && callback.success) {
-                    callback.success(data.result);
-                }
-                else if (!undef(data.error)) {
+                if (data.error) {
                     if (callback.error) {
                         callback.error(data.error);
                     }
@@ -185,6 +182,9 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                         trace("unhandled error returned.");
                     }
                     // #endif
+                }
+                else if (callback.success) {
+                    callback.success(data.result);
                 }
                 delete _callbacks[data.id];
             }
