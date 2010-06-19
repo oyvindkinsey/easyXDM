@@ -198,7 +198,7 @@ function appendQueryParameters(url, parameters){
     return url + ((url.indexOf("?") === -1) ? "?" : "&") + q.join("&") + hash;
 }
 
-var Query = (function(){
+var _query = (function(){
     var query = {}, pair, search = location.search.substring(1).split("&"), i = search.length;
     while (i--) {
         pair = search[i].split("=");
@@ -443,7 +443,7 @@ function ajax(config){
  */
 function prepareTransportStack(config){
     var protocol = config.protocol, stackEls;
-    config.isHost = config.isHost || undef(Query.xdm_p);
+    config.isHost = config.isHost || undef(_query.xdm_p);
     // #ifdef debug
     _trace("preparing transport stack");
     // #endif
@@ -455,10 +455,10 @@ function prepareTransportStack(config){
         // #ifdef debug
         _trace("using parameters from query");
         // #endif
-        config.channel = Query.xdm_c;
-        config.secret = Query.xdm_s;
-        config.remote = decodeURIComponent(Query.xdm_e);
-        protocol = Query.xdm_p;
+        config.channel = _query.xdm_c;
+        config.secret = _query.xdm_s;
+        config.remote = decodeURIComponent(_query.xdm_e);
+        protocol = _query.xdm_p;
     }
     else {
         config.remote = resolveUrl(config.remote);
@@ -562,10 +562,10 @@ function prepareTransportStack(config){
             }
             else {
                 apply(config, {
-                    channel: Query.xdm_c,
-                    remote: decodeURIComponent(Query.xdm_e),
-                    useParent: !undef(Query.xdm_pa),
-                    usePolling: !undef(Query.xdm_po),
+                    channel: _query.xdm_c,
+                    remote: decodeURIComponent(_query.xdm_e),
+                    useParent: !undef(_query.xdm_pa),
+                    usePolling: !undef(_query.xdm_po),
                     useResize: config.useParent ? false : config.useResize
                 });
             }
@@ -648,6 +648,7 @@ global.easyXDM = {
      */
     version: "%%version%%",
     apply: apply,
+    query: _query,
     ajax: ajax,
     getJSONObject: getJSON,
     stack: {}
