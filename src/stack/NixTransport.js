@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global global, GetNixProxy, easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, un, on, isHostMethod, apply*/
+/*global global, getNixProxy, easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, un, on, isHostMethod, apply*/
 
 /**
  * @class easyXDM.stack.NixTransport
@@ -42,7 +42,7 @@ easyXDM.stack.NixTransport = function(config){
             targetOrigin = getLocation(config.remote);
             if (config.isHost) {
                 try {
-                    if (!isHostMethod(window, "GetNixProxy")) {
+                    if (!isHostMethod(window, "getNixProxy")) {
                         window.execScript('Class NixProxy\n' +
                         '    Private m_parent, m_child, m_Auth\n' +
                         '\n' +
@@ -67,11 +67,11 @@ easyXDM.stack.NixTransport = function(config){
                         '        If m_Auth = auth Then m_child.send(CStr(data))\n' +
                         '    End Sub\n' +
                         'End Class\n' +
-                        'Function GetNixProxy()\n' +
+                        'Function getNixProxy()\n' +
                         '    Set GetNixProxy = New NixProxy\n' +
                         'End Function\n', 'vbscript');
                     }
-                    proxy = GetNixProxy();
+                    proxy = getNixProxy();
                     proxy.SetParent({
                         send: function(msg){
                             // #ifdef debug
@@ -95,8 +95,8 @@ easyXDM.stack.NixTransport = function(config){
                         proxy.SendToChild(msg, config.secret);
                     };
                 } 
-                catch (e) {
-                    throw new Error("Could not set up VBScript NixProxy:" + e.message);
+                catch (e1) {
+                    throw new Error("Could not set up VBScript NixProxy:" + e1.message);
                 }
                 // set up the iframe
                 apply(config.props, {
@@ -115,7 +115,7 @@ easyXDM.stack.NixTransport = function(config){
                 try {
                     proxy = window.opener;
                 } 
-                catch (e) {
+                catch (e2) {
                     throw new Error("Cannot access window.opener");
                 }
                 proxy.SetChild({

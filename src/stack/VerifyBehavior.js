@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, undef */
+/*global easyXDM, window, escape, unescape, undef, debug */
 
 /**
  * @class easyXDM.stack.VerifyBehavior

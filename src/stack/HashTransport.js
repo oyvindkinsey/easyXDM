@@ -114,7 +114,6 @@ easyXDM.stack.HashTransport = function(config){
             useParent = config.useParent;
             useResize = config.useResize;
             _remoteOrigin = getLocation(config.remote);
-            
             if (!isHost && useParent) {
                 _listenerWindow = window;
                 _callerWindow = parent;
@@ -127,11 +126,12 @@ easyXDM.stack.HashTransport = function(config){
                         src: (isHost ? config.remote : config.remote + "#" + config.channel),
                         name: (isHost ? "local_" : "remote_") + config.channel
                     },
-                    onLoad: (isHost && useParent || !isHost) ? (function(){
+                    onLoad: (isHost && useParent || !isHost) ? function(){
                         _listenerWindow = window;
                         _attachListeners();
                         pub.up.callback(true);
-                    }) : null
+                    }
+ : null
                 });
                 _callerWindow = createFrame(config);
                 
