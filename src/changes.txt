@@ -1,3 +1,9 @@
+2.4.0 20.06.10
+Implemented http://github.com/oyvindkinsey/easyXDM/issues/19
+You can now interact with the Socket/Rpc prior to the onReady event being fired.
+These actions will be buffered and executed once the transport is ready.
+Fixed an issue that lead to the minified file *not* being properly minified.
+
 2.3.3 18.06.10
 Fixed http://github.com/oyvindkinsey/easyXDM/issues/issue/15
 Fixed http://github.com/oyvindkinsey/easyXDM/issues/issue/17
