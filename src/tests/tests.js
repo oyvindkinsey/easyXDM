@@ -478,7 +478,7 @@ function runTests(){
                 var scope = this;
                 this.transport = new easyXDM.Socket({
                     local: "../name.html",
-                    remote: REMOTE + "/test_transport.html?a=b&c=d",
+                    remote: REMOTE + "/test_transport.html?a=b&c=d#foo,faa",
                     onMessage: function(message, origin){
                         scope.notifyResult((scope.expectedMessage === message));
                     },
