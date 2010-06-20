@@ -10,6 +10,8 @@ var emptyFn = Function.prototype;
 var reURI = /^(http.?:\/\/([^\/\s]+))/, // returns groups for origin (1) and domain (2)
  reParent = /[\-\w]+\/\.\.\//, // matches a foo/../ expression 
  reDoubleSlash = /([^:])\/\//g; // matches // anywhere but in the protocol
+//Sniffing is bad, but in this case unavoidable
+var CREATE_FRAME_USING_HTML = /msie [67]/.test(navigator.userAgent.toLowerCase());
 /* Methods for feature testing
  * From http://peter.michaux.ca/articles/feature-detection-state-of-the-art-browser-scripting
  */
@@ -309,12 +311,10 @@ function createFrame(config){
     // This is to work around the problems in IE6/7 with setting the name property. 
     // Internally this is set as 'submitName' instead when using 'iframe.name = ...'
     // This is not required by easyXDM itself, but is to facilitate other use cases 
-    /*@cc_on
-     if (config.props.name){
-     frame = document.createElement("<iframe name=\"" + config.props.name + "\"/>");
-     }
-     @*/
-    if (!frame) {
+    if (config.props.name && CREATE_FRAME_USING_HTML) {
+        frame = document.createElement("<iframe name=\"" + config.props.name + "\"/>");
+    }
+    else {
         frame = document.createElement("IFRAME");
     }
     // transfer properties to the frame
