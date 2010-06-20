@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, undef, getJSON, debug */
+/*global easyXDM, window, escape, unescape, undef, getJSON, debug, emptyFn */
 
 /**
  * @class easyXDM.stack.RpcBehavior
@@ -28,9 +28,6 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
     function _send(data){
         data.jsonrpc = "2.0";
         pub.down.outgoing(serializer.stringify(data));
-    }
-    
-    function _emptyFn(){
     }
     
     /**
@@ -138,7 +135,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
             };
         }
         else {
-            success = error = _emptyFn;
+            success = error = emptyFn;
         }
         // Call local method
         try {
