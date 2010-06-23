@@ -305,7 +305,7 @@ function apply(destination, source, noOverwrite){
  */
 function createFrame(config){
     // #ifdef debug
-    _trace("creating frame: " + config.props.url);
+    _trace("creating frame: " + config.props.src);
     // #endif
     var frame;
     // This is to work around the problems in IE6/7 with setting the name property. 
