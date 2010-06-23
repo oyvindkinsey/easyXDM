@@ -385,6 +385,8 @@ var getXhr = (function(){
  * @cfg {Function} error The callback function for errors
  */
 function ajax(config){
+    var req = getXhr(), arr = [], data;
+    
     apply(config, {
         method: "POST",
         headers: {
@@ -399,8 +401,14 @@ function ajax(config){
         type: "plain"
     }, true);
     
-    var req = getXhr(), q = [];
-    req.open(config.method, config.url, true);
+    for (var key in config.data) {
+        if (config.data.hasOwnProperty(key)) {
+            arr.push(encodeURIComponent(key) + "=" + encodeURIComponent(config.data[key]));
+        }
+    }
+    data = arr.join("&");
+    
+    req.open(config.method, config.url + (config.method == "POST" ? "" : "?" + data), true);
     for (var prop in config.headers) {
         if (config.headers.hasOwnProperty(prop)) {
             req.setRequestHeader(prop, config.headers[prop]);
@@ -424,12 +432,8 @@ function ajax(config){
         }
     };
     
-    for (var key in config.data) {
-        if (config.data.hasOwnProperty(key)) {
-            q.push(encodeURIComponent(key) + "=" + encodeURIComponent(config.data[key]));
-        }
-    }
-    req.send(q.join("&"));
+    
+    req.send(config.method == "POST" ? data : "");
 }
 
 /*
