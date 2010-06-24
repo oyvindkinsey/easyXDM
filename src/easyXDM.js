@@ -317,10 +317,6 @@ function createFrame(config){
     else {
         frame = document.createElement("IFRAME");
     }
-    // transfer properties to the frame
-    apply(frame, config.props);
-    //id needs to be set for the references to work reliably
-    frame.id = frame.name;
     
     if (config.onLoad) {
         frame.loadFn = function(){
@@ -340,6 +336,11 @@ function createFrame(config){
         frame.style.top = "0px";
         document.body.appendChild(frame);
     }
+    
+    // transfer properties to the frame
+    apply(frame, config.props);
+    //id needs to be set for the references to work reliably
+    frame.id = frame.name;
     return frame;
 }
 
