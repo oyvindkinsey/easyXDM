@@ -20,6 +20,8 @@ var REMOTE = (function(){
 }());
 
 function runTests(){
+
+    var i = 0;
     easyTest.test([/**Tests for the presence of namespaces and classes*/{
         name: "Check that the library is complete",
         steps: [{
@@ -101,7 +103,7 @@ function runTests(){
         },
         
         setUp: function(){
-            this.expectedMessage = "3abcd1234";
+            this.expectedMessage = ++i + "_abcd1234%@¤/";
         },
         steps: [{
             name: "onReady is fired",
@@ -148,7 +150,7 @@ function runTests(){
         },
         
         setUp: function(){
-            this.expectedMessage = "3abcd1234";
+            this.expectedMessage = ++i + "_abcd1234%@¤/";
         },
         steps: [{
             name: "onReady is fired",
@@ -190,7 +192,7 @@ function runTests(){
         name: "test easyXDM.Socket{NameTransport}",
         failedMessage: "This might fail in modern browsers due to restrictions in referencing existing windows",
         setUp: function(){
-            this.expectedMessage = "1abcd1234";
+            this.expectedMessage = ++i + "_abcd1234%@¤/";
         },
         tearDown: function(){
             this.transport.destroy();
@@ -233,7 +235,7 @@ function runTests(){
     }, {
         name: "test easyXDM.Socket{HashTransport} using window",
         setUp: function(){
-            this.expectedMessage = "1abcd1234";
+            this.expectedMessage = ++i + "_abcd1234%@¤/";
         },
         tearDown: function(){
             this.transport.destroy();
@@ -276,7 +278,7 @@ function runTests(){
         name: "test easyXDM.Socket{HashTransport} with no blank local, available image and resize",
         failedMessage: "This might fail in modern browsers due to restrictions in referencing existing windows",
         setUp: function(){
-            this.expectedMessage = "2abcd1234";
+            this.expectedMessage = ++i + "_abcd1234%@¤/";
             this.img = document.createElement("img");
             this.img.src = "s.gif";
             document.body.appendChild(this.img);
@@ -319,7 +321,7 @@ function runTests(){
         name: "test easyXDM.Socket{HashTransport} with s.gif and polling",
         failedMessage: "This might fail in modern browsers due to restrictions in referencing existing windows",
         setUp: function(){
-            this.expectedMessage = "2abcd1234";
+            this.expectedMessage = ++i + "_abcd1234%@¤/";
         },
         tearDown: function(){
             this.transport.destroy();
@@ -400,7 +402,7 @@ function runTests(){
     }, {
         name: "test easyXDM.Socket{}",
         setUp: function(){
-            this.expectedMessage = "4abcd1234";
+            this.expectedMessage = ++i + "_abcd1234%@¤/";
         },
         tearDown: function(){
             this.transport.destroy();
@@ -434,7 +436,7 @@ function runTests(){
     }, {
         name: "test easyXDM.Socket{} with buffering",
         setUp: function(){
-            this.expectedMessage = "4abcd1234";
+            this.expectedMessage = ++i + "_abcd1234%@¤/";
         },
         tearDown: function(){
             this.transport.destroy();
@@ -443,7 +445,7 @@ function runTests(){
             }
         },
         steps: [{
-            name: "onReady is fired, and buffered message sent",
+            name: "Buffered messages are sent",
             timeout: 5000,
             run: function(){
                 var scope = this;
@@ -452,9 +454,6 @@ function runTests(){
                     remote: REMOTE + "/test_transport.html",
                     onMessage: function(message, origin){
                         scope.notifyResult((scope.expectedMessage === message));
-                    },
-                    onReady: function(){
-                        scope.notifyResult(true);
                     }
                 });
                 this.transport.postMessage(this.expectedMessage);
@@ -463,7 +462,7 @@ function runTests(){
     }, {
         name: "test easyXDM.Socket{} with query parameters",
         setUp: function(){
-            this.expectedMessage = "5abcd1234";
+            this.expectedMessage = ++i + "_abcd1234%@¤/";
         },
         tearDown: function(){
             this.transport.destroy();
@@ -497,7 +496,7 @@ function runTests(){
     }, {
         name: "test easyXDM.Rpc",
         setUp: function(){
-            this.expectedMessage = "6abcd1234";
+            this.expectedMessage = ++i + "_abcd1234%@¤/";
         },
         tearDown: function(){
             this.remote.destroy();
