@@ -430,8 +430,6 @@ function ajax(config){
             else {
                 config.error("An error occured. Status code: " + req.status);
             }
-            req.onreadystatechange = null;
-            delete req.onreadystatechange;
         }
     };
     
