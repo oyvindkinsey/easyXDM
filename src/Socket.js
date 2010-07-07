@@ -39,15 +39,18 @@
  * @namespace easyXDM
  * @constructor
  * @cfg {String/Window} local The url to the local name.html document, a local static file, or a reference to the local window.
- * @cfg {String} remote The url to the providers document.
- * @cfg {String} remoteHelper The url to the remote name.html file. This is to support NameTransport as a fallback. Optional.
+ * @cfg {String} remote (Consumer only) The url to the providers document.
+ * @cfg {String} remoteHelper (Consumer only) The url to the remote name.html file. This is to support NameTransport as a fallback. Optional.
  * @cfg {Number} delay The number of milliseconds easyXDM should try to get a reference to the local window.  Optional, defaults to 2000.
  * @cfg {Number} interval The interval used when polling for messages. Optional, defaults to 300.
- * @cfg {String} channel The name of the channel to use. Must be unique. Optional if only a single channel is expected in the document.
+ * @cfg {String} channel (Consumer only) The name of the channel to use. Can be used to set consistent iframe names. Must be unique. Optional.
  * @cfg {Function} onMessage The method that should handle incoming messages.<br/> This method should accept two arguments, the message as a string, and the origin as a string. Optional.
  * @cfg {Function} onReady A method that should be called when the transport is ready. Optional.
- * @cfg {DOMElement} container The element that the primary iframe should be inserted into. If not set then the iframe will be positioned off-screen. Optional.
- * @cfg {Object} props Additional properties that should be applied to the iframe. This can also contain nested objects e.g: <code>{style:{width:"100px", height:"100px"}}</code>. 
+ * @cfg {DOMElement} container (Consumer only) The element that the primary iframe should be inserted into. If not set then the iframe will be positioned off-screen. Optional.
+ * @cfg {Array/String} acl (Provider only) Here you can specify which '[protocol]://[domain]' patterns that should be allowed to act as the consumer towards this provider.<br/>
+ * This can contain the wildcards ? and *.  Examples are 'http://example.com', '*.foo.com' and '*dom?.com'. If you want to use reqular expressions then you pattern needs to start with ^ and end with $.
+ * If none of the patterns match an Error will be thrown.  
+ * @cfg {Object} props (Consumer only) Additional properties that should be applied to the iframe. This can also contain nested objects e.g: <code>{style:{width:"100px", height:"100px"}}</code>. 
  * Properties such as 'name' and 'src' will be overrided. Optional.
  */
 easyXDM.Socket = function(config){

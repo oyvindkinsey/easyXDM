@@ -447,7 +447,7 @@ function ajax(config){
  * @return {Array} An array of stack-elements with the TransportElement at index 0.
  */
 function prepareTransportStack(config){
-    var protocol = config.protocol, stackEls;
+    var protocol = config.protocol, stackEls, i;
     config.isHost = config.isHost || undef(_query.xdm_p);
     // #ifdef debug
     _trace("preparing transport stack");
@@ -464,6 +464,25 @@ function prepareTransportStack(config){
         config.secret = _query.xdm_s;
         config.remote = decodeURIComponent(_query.xdm_e);
         protocol = _query.xdm_p;
+        if (config.acl) {
+            // normalize into an array
+            if (typeof config.acl == "string") {
+                config.acl = [config.acl];
+            }
+            var allowed = false, re;
+            i = config.acl.length;
+            while (i--) {
+                re = config.acl(i);
+                re = new RegExp(re.substr(0, 1) == "^" ? re : ("^" + re.replace(/(\*)/g, ".$1").replace(/\?/g, ".") + "$"));
+                if (re.test(config.remote)) {
+                    allowed = true;
+                    break;
+                }
+            }
+            if (!allowed) {
+                throw new Error("Access denied for " + config.remote);
+            }
+        }
     }
     else {
         config.remote = resolveUrl(config.remote);
@@ -525,7 +544,8 @@ function prepareTransportStack(config){
                     _trace("looking for image to use as local");
                     // #endif
                     // If no local is set then we need to find an image hosted on the current domain
-                    var domain = location.protocol + "//" + location.host, images = document.body.getElementsByTagName("img"), i = images.length, image;
+                    var domain = location.protocol + "//" + location.host, images = document.body.getElementsByTagName("img"), image;
+                    i = images.length;
                     while (i--) {
                         image = images[i];
                         if (image.src.substring(0, domain.length) === domain) {
