@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyTest, easyXDM, window*/
+/*global easyTest, easyXDM, window, checkAcl, getDomainName, getLocation, appendQueryParameters*/
 var REMOTE = (function(){
     var remote = location.href;
     switch (location.host) {
@@ -92,6 +92,68 @@ function runTests(){
             name: "check for the presence of easyXDM.stack.RpcBehavior",
             run: function(){
                 return this.Assert.isFunction(easyXDM.stack.RpcBehavior);
+            }
+        }]
+    }, {
+        name: "Check helper functions",
+        setUp: function(){
+            this.url1 = "http://foo.bar/a/b/c?d=e#f";
+            this.url2 = "http://foo.bar:80/a/b/c?d=e#f";
+            
+        },
+        steps: [{
+            name: "getDomainName",
+            run: function(){
+                return getDomainName(this.url1) === "foo.bar";
+            }
+        }, {
+            name: "getLocation",
+            run: function(){
+                return getLocation(this.url1) === "http://foo.bar";
+            }
+        }, {
+            name: "getLocation with :port",
+            run: function(){
+                return getLocation(this.url2) === "http://foo.bar:80";
+            }
+        }, {
+            name: "appendQueryParameters",
+            run: function(){
+                return appendQueryParameters(this.url2, {
+                    g: "h"
+                }) ===
+                "http://foo.bar:80/a/b/c?d=e&g=h#f";
+            }
+        }]
+    }, {
+        name: "Check the ACL feature",
+        setUp: function(){
+            this.acl = ["http://www.domain.invalid", "*.domaina.com", "http://dom?inb.com", "^http://domc{3}ain\\.com$"];
+        },
+        steps: [{
+            name: "Match complete string",
+            run: function(){
+                return checkAcl(this.acl, "http://www.domain.invalid");
+            }
+        }, {
+            name: "Match *",
+            run: function(){
+                return checkAcl(this.acl, "http://www.domaina.com");
+            }
+        }, {
+            name: "Match ?",
+            run: function(){
+                return checkAcl(this.acl, "http://domainb.com");
+            }
+        }, {
+            name: "Match RegExp",
+            run: function(){
+                return checkAcl(this.acl, "http://domcccain.com");
+            }
+        }, {
+            name: "No match",
+            run: function(){
+                return !checkAcl(this.acl, "http://foo.com");
             }
         }]
     }, {
