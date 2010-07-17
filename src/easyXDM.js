@@ -437,6 +437,30 @@ function ajax(config){
     req.send(isPOST ? data : "");
 }
 
+/**
+ * Check whether a domain is allowed using an Access Control List.
+ * The ACL can contain * and ? as wildcards, or can be regular expressions.
+ * If regular expressions they need to begin with ^ and end with $.
+ * @param {Array/String} acl The list of allowed domains
+ * @param {String} domain The domain to test.
+ * @return {Boolean} True if the domain is allowed, false if not.
+ */
+function checkAcl(acl, domain){
+    // normalize into an array
+    if (typeof acl == "string") {
+        acl = [acl];
+    }
+    var re, i = acl.length;
+    while (i--) {
+        re = acl[i];
+        re = new RegExp(re.substr(0, 1) == "^" ? re : ("^" + re.replace(/(\*)/g, ".$1").replace(/\?/g, ".") + "$"));
+        if (re.test(domain)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 /*
  * Functions related to stacks
  */
@@ -447,7 +471,7 @@ function ajax(config){
  * @return {Array} An array of stack-elements with the TransportElement at index 0.
  */
 function prepareTransportStack(config){
-    var protocol = config.protocol, stackEls, i;
+    var protocol = config.protocol, stackEls;
     config.isHost = config.isHost || undef(_query.xdm_p);
     // #ifdef debug
     _trace("preparing transport stack");
@@ -464,24 +488,8 @@ function prepareTransportStack(config){
         config.secret = _query.xdm_s;
         config.remote = decodeURIComponent(_query.xdm_e);
         protocol = _query.xdm_p;
-        if (config.acl) {
-            // normalize into an array
-            if (typeof config.acl == "string") {
-                config.acl = [config.acl];
-            }
-            var allowed = false, re;
-            i = config.acl.length;
-            while (i--) {
-                re = config.acl(i);
-                re = new RegExp(re.substr(0, 1) == "^" ? re : ("^" + re.replace(/(\*)/g, ".$1").replace(/\?/g, ".") + "$"));
-                if (re.test(config.remote)) {
-                    allowed = true;
-                    break;
-                }
-            }
-            if (!allowed) {
-                throw new Error("Access denied for " + config.remote);
-            }
+        if (config.acl && !checkAcl(config.acl, config.remote)) {
+            throw new Error("Access denied for " + config.remote);
         }
     }
     else {
@@ -545,7 +553,7 @@ function prepareTransportStack(config){
                     // #endif
                     // If no local is set then we need to find an image hosted on the current domain
                     var domain = location.protocol + "//" + location.host, images = document.body.getElementsByTagName("img"), image;
-                    i = images.length;
+                    var i = images.length;
                     while (i--) {
                         image = images[i];
                         if (image.src.substring(0, domain.length) === domain) {
