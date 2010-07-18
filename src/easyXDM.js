@@ -421,11 +421,17 @@ function ajax(config){
     req.onreadystatechange = function(){
         if (req.readyState == 4) {
             if (req.status >= 200 && req.status < 300) {
-                var response = req.responseText;
-                if (config.type === "json") {
-                    response = getJSON().parse(response);
+                if (config.type == "json") {
+                    try {
+                        config.success(getJSON().parse(req.responseText));
+                    } 
+                    catch (e) {
+                        config.error("An error occured. Error parsing JSON: " + e.message);
+                    }
                 }
-                config.success(response);
+                else {
+                    config.success(req.responseText);
+                }
             }
             else {
                 config.error("An error occured. Status code: " + req.status);
