@@ -15,18 +15,15 @@
                     local: "name.html"
                 }, {
                     local: {
-                        post: {
-                            isAsync: true,
-                            method: function(url, data, success, error){
-                                easyXDM.ajax({
-                                    url: url,
-                                    method: "POST",
-                                    data: data,
-                                    type: "json",
-                                    success: success,
-                                    error: error
-                                });
-                            }
+                        post: function(url, data, success, error){
+                            easyXDM.ajax({
+                                url: url,
+                                method: "POST",
+                                data: data,
+                                type: "json",
+                                success: success,
+                                error: error
+                            });
                         }
                     }
                 });
