@@ -441,6 +441,7 @@ function ajax(config){
  * Check whether a domain is allowed using an Access Control List.
  * The ACL can contain * and ? as wildcards, or can be regular expressions.
  * If regular expressions they need to begin with ^ and end with $.
+ * @private
  * @param {Array/String} acl The list of allowed domains
  * @param {String} domain The domain to test.
  * @return {Boolean} True if the domain is allowed, false if not.
