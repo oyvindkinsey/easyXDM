@@ -1,3 +1,9 @@
+2.4.2 25.07.10
+Major improvements on the support for older browsers.
+The use of resize in the HashTransport to notify about incoming messages has now been removed as it was not reliant across browsers.
+
+The library has now been tested on IE6/7/8, Opera 10, Firefox 2, 3.6, Safari 3.2, 5 and Chrome 5, and there are now no tests that are failing. 
+
 2.4.1 25.07.10
 Fixed http://github.com/oyvindkinsey/easyXDM/issues/issue/22
 Implemented http://github.com/oyvindkinsey/easyXDM/issues/issue/20
