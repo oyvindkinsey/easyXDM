@@ -21,7 +21,13 @@
                     case "2":
                         // NameTransport local
                         window.parent.parent.easyXDM.Fn.get(location.hash.substring(3))(window.name);
-                        window.history.back();
+                        if (document.referrer) {
+                            location.href = document.referrer + "#_4" + location.hash.substring(3);
+                        }
+                        else {
+                            // This does not work in Safari 3
+                            history.back();
+                        }
                         break;
                     case "3":
                         // NameTransport remote
@@ -32,7 +38,12 @@
                             throw new Error("unable to reference window");
                         }
                         guest.easyXDM.Fn.get(channel)(window.name);
-                        window.history.back();
+                        if (document.referrer) {
+                            location.href = document.referrer + "#_4" + channel;
+                        }
+                        else {
+                            history.back();
+                        }
                         break;
                     case "4":
                         // NameTransport idle

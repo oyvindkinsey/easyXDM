@@ -317,7 +317,11 @@ function createFrame(config){
     else {
         frame = document.createElement("IFRAME");
     }
-    
+    if (config.props.name) {
+        // We need to add these properties before adding the element to te DOM
+        frame.id = frame.name = config.props.name;
+        delete config.props.name;
+    }
     if (config.onLoad) {
         frame.loadFn = function(){
             config.onLoad(frame.contentWindow);
