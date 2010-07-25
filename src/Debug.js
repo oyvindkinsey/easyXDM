@@ -30,64 +30,6 @@ var debug = {
         }
         this.log(msg);
     },
-    
-    /**
-     * Clears the current output element.
-     */
-    clear: function(){
-        var el = document.getElementById("log");
-        if (el) {
-            /**
-             * Sets trace to be a function that outputs the messages to the DOMElement with id "log"
-             * @ignore
-             * @param {String} msg
-             */
-            this.clear = function(){
-                try {
-                    el.innerHTML = "";
-                } 
-                catch (e) {
-                    //In case we are unloading
-                }
-            };
-        }
-        else if (!isHostObject(window, "console") || undef(console.info)) {
-            /**
-             * Create log window
-             * @ignore
-             */
-            var domain = location.host;
-            var windowname = domain.replace(/\.|:/g, "") + "easyxdm_log";
-            var logWin = window.open("", windowname, "width=800,height=200,status=0,navigation=0,scrollbars=1");
-            if (logWin) {
-                el = logWin.document.getElementById("log");
-                this.clear = function(){
-                    try {
-                        el.innerHTML = "";
-                    } 
-                    catch (e) {
-                        //In case we are unloading
-                    }
-                };
-            }
-            else {
-                this.clear = function(){
-                };
-            }
-        }
-        else if (console.clear) {
-            this.clear = function(){
-                console.clear();
-            };
-        }
-        else if (_FirebugCommandLine.clear) {
-            this.clear = function(){
-                _FirebugCommandLine.clear();
-            };
-        }
-        this.clear();
-    },
-    
     /**
      * Will try to trace the given message either to a DOMElement with the id "log",
      * or by using console.info.
@@ -121,12 +63,13 @@ var debug = {
             var logWin = window.open("", windowname, "width=800,height=200,status=0,navigation=0,scrollbars=1");
             if (logWin) {
                 var doc = logWin.document;
-                if (doc.title !== "easyXDM log") {
+                el = doc.getElementById("log");
+                if (!el) {
                     doc.write("<html><head><title>easyXDM log " + domain + "</title></head>");
                     doc.write("<body><div id=\"log\"></div></body></html>");
                     doc.close();
+                    el = doc.getElementById("log");
                 }
-                el = doc.getElementById("log");
                 this.trace = function(msg){
                     try {
                         el.appendChild(doc.createElement("div")).appendChild(doc.createTextNode(location.host + "-" + new Date().valueOf() + ":" + msg));
