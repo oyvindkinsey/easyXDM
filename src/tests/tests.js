@@ -96,6 +96,11 @@ function runTests(){
         }]
     }, {
         name: "Check helper functions",
+        runIf: function(){
+            if (location.href.indexOf("/src/") != -1) {
+                return "This can only be run in development.";
+            }
+        },
         setUp: function(){
             this.url1 = "http://foo.bar/a/b/c?d=e#f";
             this.url2 = "http://foo.bar:80/a/b/c?d=e#f";
@@ -127,6 +132,11 @@ function runTests(){
         }]
     }, {
         name: "Check the ACL feature",
+        runIf: function(){
+            if (location.href.indexOf("/src/") != -1) {
+                return "This can only be run in development.";
+            }
+        },
         setUp: function(){
             this.acl = ["http://www.domain.invalid", "*.domaina.com", "http://dom?inb.com", "^http://domc{3}ain\\.com$"];
         },
