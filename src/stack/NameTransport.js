@@ -133,7 +133,7 @@ easyXDM.stack.NameTransport = function(config){
                         else {
                             setTimeout(test, 50);
                         }
-                    })();
+                    }());
                 }
             });
         }
