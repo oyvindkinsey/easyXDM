@@ -32,16 +32,7 @@ easyXDM.stack.HashTransport = function(config){
             return;
         }
         var url = config.remote + "#" + (_msgNr++) + "_" + message;
-        
-        if (isHost || !useParent) {
-            // We are referencing an iframe
-            _callerWindow.contentWindow.location = url;
-            // #ifdef debug
-        }
-        else {
-            // We are referencing the parent window
-            _callerWindow.location = url;
-        }
+        ((isHost || !useParent) ? _callerWindow.contentWindow : _callerWindow).location = url;
     }
     
     function _handleHash(hash){
