@@ -61,7 +61,11 @@ easyXDM.stack.HashTransport = function(config){
         // #ifdef debug
         trace("onresize: new message");
         // #endif
-        _handleHash(_listenerWindow.location.hash);
+        var href = _listenerWindow.location.href, hash = "", indexOf = href.indexOf("#");
+        if (indexOf != -1) {
+            hash = href.substring(indexOf);
+        }
+        _handleHash(hash);
     }
     
     /**
@@ -69,11 +73,15 @@ easyXDM.stack.HashTransport = function(config){
      * @private
      */
     function _pollHash(){
-        if (_listenerWindow.location.hash && _listenerWindow.location.hash != _lastMsg) {
+        var href = _listenerWindow.location.href, hash = "", indexOf = href.indexOf("#");
+        if (indexOf != -1) {
+            hash = href.substring(indexOf);
+        }
+        if (hash && hash != _lastMsg) {
             // #ifdef debug
             trace("poll: new message");
             // #endif
-            _handleHash(_listenerWindow.location.hash);
+            _handleHash(hash);
         }
     }
     
