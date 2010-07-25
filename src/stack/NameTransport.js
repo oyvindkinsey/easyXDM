@@ -126,7 +126,14 @@ easyXDM.stack.NameTransport = function(config){
                     // Remove the handler
                     un(callerWindow, "load", callerWindow.loadFn);
                     easyXDM.Fn.set(config.channel + "_load", _onLoad);
-                    _onReady();
+                    (function test(){
+                        if (typeof callerWindow.contentWindow.sendMessage == "function") {
+                            _onReady();
+                        }
+                        else {
+                            setTimeout(test, 50);
+                        }
+                    })();
                 }
             });
         }

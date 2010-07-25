@@ -8,12 +8,12 @@
     <body>
         <script type="text/javascript">
         
-        window.sendMessage = function(message, url){
+        function sendMessage(message, url){
             window.setTimeout(function(){
                 window.name = message;
                 location.href = url + "," + encodeURIComponent(location.protocol + "//" + location.host + location.pathname);
             }, 0);
-        };
+        }
         
         if (location.hash) {
             if (location.hash.substring(1, 2) === "_") {
