@@ -200,7 +200,7 @@ function appendQueryParameters(url, parameters){
     return url + ((url.indexOf("?") === -1) ? "?" : "&") + q.join("&") + hash;
 }
 
-var _query = (function(){
+var query = (function(){
     var query = {}, pair, search = location.search.substring(1).split("&"), i = search.length;
     while (i--) {
         pair = search[i].split("=");
@@ -479,7 +479,7 @@ function checkAcl(acl, domain){
  */
 function prepareTransportStack(config){
     var protocol = config.protocol, stackEls;
-    config.isHost = config.isHost || undef(_query.xdm_p);
+    config.isHost = config.isHost || undef(query.xdm_p);
     // #ifdef debug
     _trace("preparing transport stack");
     // #endif
@@ -491,10 +491,10 @@ function prepareTransportStack(config){
         // #ifdef debug
         _trace("using parameters from query");
         // #endif
-        config.channel = _query.xdm_c;
-        config.secret = _query.xdm_s;
-        config.remote = decodeURIComponent(_query.xdm_e);
-        protocol = _query.xdm_p;
+        config.channel = query.xdm_c;
+        config.secret = query.xdm_s;
+        config.remote = decodeURIComponent(query.xdm_e);
+        protocol = query.xdm_p;
         if (config.acl && !checkAcl(config.acl, config.remote)) {
             throw new Error("Access denied for " + config.remote);
         }
@@ -602,10 +602,10 @@ function prepareTransportStack(config){
             }
             else {
                 apply(config, {
-                    channel: _query.xdm_c,
-                    remote: decodeURIComponent(_query.xdm_e),
-                    useParent: !undef(_query.xdm_pa),
-                    usePolling: !undef(_query.xdm_po),
+                    channel: query.xdm_c,
+                    remote: decodeURIComponent(query.xdm_e),
+                    useParent: !undef(query.xdm_pa),
+                    usePolling: !undef(query.xdm_po),
                     useResize: config.useParent ? false : config.useResize
                 });
             }
@@ -688,7 +688,7 @@ global.easyXDM = {
      */
     version: "%%version%%",
     apply: apply,
-    query: _query,
+    query: query,
     ajax: ajax,
     getJSONObject: getJSON,
     stack: {}
