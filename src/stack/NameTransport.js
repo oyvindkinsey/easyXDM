@@ -25,7 +25,7 @@ easyXDM.stack.NameTransport = function(config){
     var isHost, callerWindow, remoteWindow, readyCount, callback, remoteOrigin, remoteUrl;
     
     function _sendMessage(message){
-        var url = config.remoteHelper + (isHost ? ("#_3" + encodeURIComponent(remoteUrl + "#" + config.channel)) : ("#_2" + config.channel));
+        var url = config.remoteHelper + (isHost ? "#_3" : "#_2") + config.channel;
         // #ifdef debug
         trace("sending message " + message);
         trace("navigating to  '" + url + "'");
