@@ -551,7 +551,7 @@ function prepareTransportStack(config){
     switch (protocol) {
         case "0":// 0 = HashTransport
             apply(config, {
-                interval: 300,
+                interval: 100,
                 delay: 2000,
                 useResize: true,
                 useParent: false,
@@ -614,7 +614,7 @@ function prepareTransportStack(config){
                 });
             }
             stackEls = [new easyXDM.stack.HashTransport(config), new easyXDM.stack.ReliableBehavior({
-                timeout: ((config.useResize ? 50 : config.interval * 1.5) + (config.usePolling ? config.interval * 1.5 : 50))
+                timeout: config.interval * 1.5
             }), new easyXDM.stack.QueueBehavior({
                 encode: true,
                 maxLength: 4000 - config.remote.length

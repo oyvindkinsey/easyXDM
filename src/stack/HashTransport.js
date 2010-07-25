@@ -19,7 +19,7 @@ easyXDM.stack.HashTransport = function(config){
     // #endif    
     var pub;
     var me = this, isHost, _timer, pollInterval, _lastMsg, _msgNr, _listenerWindow, _callerWindow;
-    var usePolling, useParent, useResize, _remoteOrigin;
+    var useParent, _remoteOrigin;
     
     function _sendMessage(message){
         // #ifdef debug
@@ -36,12 +36,7 @@ easyXDM.stack.HashTransport = function(config){
         if (isHost || !useParent) {
             // We are referencing an iframe
             _callerWindow.contentWindow.location = url;
-            if (useResize) {
-                // #ifdef debug
-                trace("resizing to new size " + (_callerWindow.width > 75 ? 50 : 100));
-                // #endif
-                _callerWindow.width = _callerWindow.width > 75 ? 50 : 100;
-            }
+            // #ifdef debug
         }
         else {
             // We are referencing the parent window
@@ -57,22 +52,14 @@ easyXDM.stack.HashTransport = function(config){
         pub.up.incoming(_lastMsg.substring(_lastMsg.indexOf("_") + 1), _remoteOrigin);
     }
     
-    function _onResize(){
-        // #ifdef debug
-        trace("onresize: new message");
-        // #endif
-        var href = _listenerWindow.location.href, hash = "", indexOf = href.indexOf("#");
-        if (indexOf != -1) {
-            hash = href.substring(indexOf);
-        }
-        _handleHash(hash);
-    }
-    
     /**
      * Checks location.hash for a new message and relays this to the receiver.
      * @private
      */
     function _pollHash(){
+        if (!_listenerWindow) {
+            return;
+        }
         var href = _listenerWindow.location.href, hash = "", indexOf = href.indexOf("#");
         if (indexOf != -1) {
             hash = href.substring(indexOf);
@@ -86,15 +73,10 @@ easyXDM.stack.HashTransport = function(config){
     }
     
     function _attachListeners(){
-        if (usePolling) {
-            // #ifdef debug
-            trace("starting polling");
-            // #endif
-            _timer = setInterval(_pollHash, pollInterval);
-        }
-        else {
-            on(_listenerWindow, "resize", _onResize);
-        }
+        // #ifdef debug
+        trace("starting polling");
+        // #endif
+        _timer = setInterval(_pollHash, pollInterval);
     }
     
     return (pub = {
@@ -102,12 +84,7 @@ easyXDM.stack.HashTransport = function(config){
             _sendMessage(message);
         },
         destroy: function(){
-            if (usePolling) {
-                window.clearInterval(_timer);
-            }
-            else if (_listenerWindow) {
-                un(_listenerWindow, "resize", _pollHash);
-            }
+            window.clearInterval(_timer);
             if (isHost || !useParent) {
                 _callerWindow.parentNode.removeChild(_callerWindow);
             }
@@ -118,32 +95,21 @@ easyXDM.stack.HashTransport = function(config){
             pollInterval = config.interval;
             _lastMsg = "#" + config.channel;
             _msgNr = 0;
-            usePolling = config.usePolling;
             useParent = config.useParent;
-            useResize = config.useResize;
             _remoteOrigin = getLocation(config.remote);
-            if (!isHost && useParent) {
-                _listenerWindow = window;
-                _callerWindow = parent;
-                _attachListeners();
-                pub.up.callback(true);
-            }
-            else {
-                apply(config, {
-                    props: {
-                        src: (isHost ? config.remote : config.remote + "#" + config.channel),
-                        name: (isHost ? "local_" : "remote_") + config.channel
-                    },
-                    onLoad: (isHost && useParent || !isHost) ? function(){
+            if (isHost) {
+                config.props = {
+                    src: config.remote,
+                    name: "local_" + config.channel
+                };
+                if (useParent) {
+                    config.onLoad = function(){
                         _listenerWindow = window;
                         _attachListeners();
                         pub.up.callback(true);
-                    }
- : null
-                });
-                _callerWindow = createFrame(config);
-                
-                if (isHost && !useParent) {
+                    };
+                }
+                else {
                     var tries = 0, max = config.delay / 50;
                     (function getRef(){
                         if (++tries > max) {
@@ -152,24 +118,43 @@ easyXDM.stack.HashTransport = function(config){
                             // #endif
                             throw new Error("Unable to reference listenerwindow");
                         }
-                        if (_listenerWindow) {
-                            return;
-                        }
                         try {
-                            // This works in IE6
                             _listenerWindow = _callerWindow.contentWindow.frames["remote_" + config.channel];
-                            window.clearTimeout(_timer);
+                        } 
+                        catch (ex) {
+                        }
+                        if (_listenerWindow) {
                             _attachListeners();
                             // #ifdef debug
                             trace("got a reference to _listenerWindow");
                             // #endif
                             pub.up.callback(true);
-                            return;
-                        } 
-                        catch (ex) {
+                        }
+                        else {
                             setTimeout(getRef, 50);
                         }
                     }());
+                }
+                _callerWindow = createFrame(config);
+            }
+            else {
+                _listenerWindow = window;
+                _attachListeners();
+                if (useParent) {
+                    _callerWindow = parent;
+                    pub.up.callback(true);
+                }
+                else {
+                    apply(config, {
+                        props: {
+                            src: config.remote + "#" + config.channel + new Date(),
+                            name: "remote_" + config.channel
+                        },
+                        onLoad: function(){
+                            pub.up.callback(true);
+                        }
+                    });
+                    _callerWindow = createFrame(config);
                 }
             }
         }
