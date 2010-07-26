@@ -508,7 +508,7 @@ function prepareTransportStack(config){
         config.channel = config.channel || "default" + _channelId++;
         config.secret = Math.random().toString(16).substring(2);
         if (undef(protocol)) {
-            if (isHostMethod(window, "postMessage")) {
+            if (isHostMethod(window, "postMessage") || isHostMethod(document, "postMessage")) {
                 /*
                  * This is supported in IE8+, Firefox 3+, Opera 9+, Chrome 2+ and Safari 4+
                  */

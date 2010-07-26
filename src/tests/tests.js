@@ -168,7 +168,7 @@ function runTests(){
     }, {
         name: "test easyXDM.Socket{PostMessageTransport}",
         runIf: function(){
-            if (typeof window.postMessage === "undefined") {
+            if (!("postMessage" in window || "postMessage" in document)) {
                 return "This test requires the HTML5 postMessage interface.";
             }
         },

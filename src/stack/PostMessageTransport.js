@@ -88,7 +88,7 @@ easyXDM.stack.PostMessageTransport = function(config){
                         trace("firing onReady");
                         // #endif
                         // replace the eventlistener
-                        callerWindow = frame.contentWindow;
+                        callerWindow = ("postMessage" in frame.contentWindow) ? frame.contentWindow : frame.contentWindow.document;
                         un(window, "message", waitForReady);
                         on(window, "message", _window_onMessage);
                         setTimeout(function(){
@@ -96,6 +96,7 @@ easyXDM.stack.PostMessageTransport = function(config){
                         }, 0);
                     }
                 });
+                
                 // set up the iframe
                 apply(config.props, {
                     src: appendQueryParameters(config.remote, {
@@ -109,8 +110,9 @@ easyXDM.stack.PostMessageTransport = function(config){
             else {
                 // add the event handler for listening
                 on(window, "message", _window_onMessage);
-                callerWindow = window.parent;
+                callerWindow = ("postMessage" in window.parent) ? window.parent : window.parent.document;
                 callerWindow.postMessage(config.channel + "-ready", targetOrigin);
+                
                 setTimeout(function(){
                     pub.up.callback(true);
                 }, 0);
