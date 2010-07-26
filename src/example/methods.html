@@ -11,7 +11,6 @@
             easyXDM.DomHelper.requiresJSON("../json2.js");
         </script>
         <script type="text/javascript">
-            var remote;
             var REMOTE = (function(){
                 var remote = location.href;
                 switch (location.host) {
@@ -30,57 +29,47 @@
                 }
                 return remote.substring(0, remote.lastIndexOf("/"));
             }());
-            window.onload = function(){
+            var remote = new easyXDM.Rpc(/** The channel configuration */{
                 /**
-                 * When the window is finished loading start setting up the interface
+                 * Register the url to hash.html, this must be an absolute path
+                 * or a path relative to the root.
+                 * @field
                  */
-                remote = new easyXDM.Rpc(/** The channel configuration */{
-                    /**
-                     * Register the url to hash.html, this must be an absolute path
-                     * or a path relative to the root.
-                     * @field
-                     */
-                    local: "../name.html",
-                    /**
-                     * Register the url to the remote interface
-                     * @field
-                     */
-                    remote: REMOTE + "/remotemethods.html",
-                    remoteHelper: REMOTE + "/../name.html",
-                    /**
-                     * Register the DOMElement that the generated IFrame should be inserted into
-                     */
-                    container: document.getElementById("embedded"),
-                    props: {
-                        style: {
-                            border: "2px dotted red",
-                            height: "200px"
-                        }
-                    },
-                    onReady: function(){
-                        /**
-                         * Call a method on the other side
-                         */
-                        remote.noOp();
+                local: "../name.html",
+                /**
+                 * Register the url to the remote interface
+                 * @field
+                 */
+                remote: REMOTE + "/remotemethods.html",
+                remoteHelper: REMOTE + "/../name.html",
+                /**
+                 * Register the DOMElement that the generated IFrame should be inserted into
+                 */
+                container: document.getElementById("embedded"),
+                props: {
+                    style: {
+                        border: "2px dotted red",
+                        height: "200px"
                     }
-                }, /** The interface configuration */ {
-                    remote: {
-                        addNumbers: {},
-                        multiplyNumbers: {},
-                        noOp: {
-                            isVoid: true
-                        }
-                    },
-                    local: {
-                        alertMessage: {
-                            method: function(msg){
-                                alert(msg);
-                            },
-                            isVoid: true
-                        }
+                },
+                onReady: function(){
+                    /**
+                     * Call a method on the other side
+                     */
+                    remote.noOp();
+                }
+            }, /** The interface configuration */ {
+                remote: {
+                    addNumbers: {},
+                    multiplyNumbers: {},
+                    noOp: {}
+                },
+                local: {
+                    alertMessage: function(msg){
+                        alert(msg);
                     }
-                });
-            };
+                }
+            });
             
             function add(a, b){
                 remote.addNumbers(a, b, function(result){

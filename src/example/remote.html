@@ -16,49 +16,38 @@
              * windows visible to the user that are able to communicate
              * It can also run XHR-queries the local domain that can be returned to the other side of the proxy.
              */
-            var proxy;
-            var remoteapp;
-            
+            var remoteapp = window.open('remoteapp.html', 'mainapp', 'width=300,height=300');
             /**
-             * When the window is finished loading start setting up the channel
+             * Check that the window wasn't blocked as a popup
              */
-            window.onload = function(){
+            if (remoteapp) {
                 /**
-                 * Try to open up a new window.
+                 * We start by creating a channel
                  */
-                remoteapp = window.open('remoteapp.html', 'mainapp', 'width=300,height=300');
-                /**
-                 * Check that the window wasn't blocked as a popup
-                 */
-                if (remoteapp) {
+                var proxy = new easyXDM.Socket(/** The configuration */{
+                    local: "../name.html",
                     /**
-                     * We start by creating a channel
+                     * Register the method that should handle incoming data
+                     * @param {Object} data
+                     * @param {String} origin
                      */
-                    proxy = new easyXDM.Socket(/** The configuration */{
-                        local: "../name.html",
-                        /**
-                         * Register the method that should handle incoming data
-                         * @param {Object} data
-                         * @param {String} origin
-                         */
-                        onMessage: function(data, origin){
-                            data = JSON.parse(data);
-                            remoteapp.focus();
-                            var div = remoteapp.document.createElement("div");
-                            div.innerHTML = "data from '" + origin + "'";
+                    onMessage: function(data, origin){
+                        data = JSON.parse(data);
+                        remoteapp.focus();
+                        var div = remoteapp.document.createElement("div");
+                        div.innerHTML = "data from '" + origin + "'";
+                        remoteapp.document.body.appendChild(div);
+                        for (var key in data) {
+                            div = remoteapp.document.createElement("div");
+                            div.innerHTML = key + "=" + data[key];
                             remoteapp.document.body.appendChild(div);
-                            for (var key in data) {
-                                div = remoteapp.document.createElement("div");
-                                div.innerHTML = key + "=" + data[key];
-                                remoteapp.document.body.appendChild(div);
-                            }
                         }
-                    });
-                }
-                else {
-                    alert("you need to allow opening popups for this to work");
-                }
-            };
+                    }
+                });
+            }
+            else {
+                alert("you need to allow opening popups for this to work");
+            }
             
             function sendData(data){
                 proxy.postMessage(JSON.stringify(data));

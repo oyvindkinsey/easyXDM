@@ -5,26 +5,17 @@
         <script type="text/javascript" src="../easyXDM.debug.js">
         </script>
         <script type="text/javascript">
-            var transport;
-            /**
-             * When the window is finished loading start setting up the channel
-             */
-            window.onload = function(){
+            var transport = new easyXDM.Socket(/** The configuration */{
+                local: "../name.html",
                 /**
-                 * We start by creating a transport
+                 * Register the method that should handle incoming messages
+                 * @param {String} data
+                 * @param {String} origin
                  */
-                transport = new easyXDM.Socket(/** The configuration */{
-                    local: "../name.html",
-                    /**
-                     * Register the method that should handle incoming messages
-                     * @param {String} data
-                     * @param {String} origin
-                     */
-                    onMessage: function(message, origin){
-                        alert("Received '" + message + "' from '" + origin + "'");
-                    }
-                });
-            };
+                onMessage: function(message, origin){
+                    alert("Received '" + message + "' from '" + origin + "'");
+                }
+            });
         </script>
     </head>
     <body>

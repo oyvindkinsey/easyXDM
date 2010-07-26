@@ -10,7 +10,7 @@
         <script type="text/javascript" src="../easyXDM.Widgets.debug.js">
         </script>
         <script type="text/javascript">
-            window.onload = function(){
+            easyXDM.whenReady(function(){
                 var widget = new easyXDM.Widget({
                     subscriptions: ["testtopic"],
                     initialize: function(widget, widgetManager){
@@ -40,7 +40,7 @@
                         });
                     }
                 });
-            };
+            });
         </script>
     </head>
     <body>

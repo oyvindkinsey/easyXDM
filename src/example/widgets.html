@@ -11,14 +11,14 @@
         </script>
         <script type="text/javascript">
             var _widgetManager;
-            window.onload = function(){
+            easyXDM.whenReady(function(){
                 _widgetManager = new easyXDM.WidgetManager({
                     local: "../name.html",
-					container: document.getElementById("widgets")
+                    container: document.getElementById("widgets")
                 });
                 document.getElementById("widget1url").value = location.href.replace("consumer", "provider").replace("widgets.html", "widget.html");
                 document.getElementById("widget2url").value = location.href.replace("consumer.", "").replace("widgets.html", "widget.html");
-            };
+            });
         </script>
         <style type="text/css">
             

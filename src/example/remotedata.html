@@ -41,30 +41,21 @@
                 }
             };
             
-            var channel;
-            /**
-             * When the window is finished loading start setting up the channel
-             */
-            window.onload = function(){
+            var socket = new easyXDM.Socket(/** The configuration */{
+                local: "../name.html",
                 /**
-                 * We start by creating a channel
+                 * Register the method that should handle incoming data
+                 * @param {Object} data
+                 * @param {String} origin
                  */
-                channel = new easyXDM.Socket(/** The configuration */{
-                    local: "../name.html",
-                    /**
-                     * Register the method that should handle incoming data
-                     * @param {Object} data
-                     * @param {String} origin
-                     */
-                    onMessage: function(data, origin){
-                        data = serializer.parse(data);
-                        alert("Received data from '" + origin + "':");
-                        for (var key in data) {
-                            alert("Property '" + key + "'=" + data[key]);
-                        }
+                onMessage: function(data, origin){
+                    data = serializer.parse(data);
+                    alert("Received data from '" + origin + "':");
+                    for (var key in data) {
+                        alert("Property '" + key + "'=" + data[key]);
                     }
-                });
-            };
+                }
+            });
         </script>
     </head>
     <body>

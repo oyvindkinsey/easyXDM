@@ -18,7 +18,6 @@
              * of the opened window, the remote interface is able to interface freely with the
              * remote web application and can serve as a bridge between the two applications.
              */
-            var proxy;
             var REMOTE = (function(){
                 var remote = location.href;
                 switch (location.host) {
@@ -37,41 +36,36 @@
                 }
                 return remote.substring(0, remote.lastIndexOf("/"));
             }());
-            window.onload = function(){
+            var proxy = new easyXDM.Socket(/** The configuration */{
                 /**
-                 * When the window is finished loading start setting up the channel
+                 * Register the method that should handle incoming data
+                 * @param {Object} data
+                 * @param {String} origin
                  */
-                proxy = new easyXDM.Socket(/** The configuration */{
-                    /**
-                     * Register the method that should handle incoming data
-                     * @param {Object} data
-                     * @param {String} origin
-                     */
-                    onMessage: function(data, origin){
-                        data = JSON.parse(data);
-                        var div = document.createElement("div");
-                        div.innerHTML = "data from '" + origin + "'";
+                onMessage: function(data, origin){
+                    data = JSON.parse(data);
+                    var div = document.createElement("div");
+                    div.innerHTML = "data from '" + origin + "'";
+                    document.body.appendChild(div);
+                    for (var key in data) {
+                        div = document.createElement("div");
+                        div.innerHTML = key + "=" + data[key];
                         document.body.appendChild(div);
-                        for (var key in data) {
-                            div = document.createElement("div");
-                            div.innerHTML = key + "=" + data[key];
-                            document.body.appendChild(div);
-                        }
-                    },
-                    /**
-                     * Register the url to hash.html, this must be an absolute path
-                     * or a path relative to the root.
-                     * @field
-                     */
-                    local: "../name.html",
-                    /**
-                     * Register the url to the remote interface
-                     * @field
-                     */
-                    remote: REMOTE + "/remote.html",
-                    remoteHelper: REMOTE + "/../name.html"
-                });
-            };
+                    }
+                },
+                /**
+                 * Register the url to name.html, this must be an absolute path
+                 * or a path relative to the root.
+                 * @field
+                 */
+                local: "../name.html",
+                /**
+                 * Register the url to the remote interface
+                 * @field
+                 */
+                remote: REMOTE + "/remote.html",
+                remoteHelper: REMOTE + "/../name.html"
+            });
         </script>
     </head>
     <body>
