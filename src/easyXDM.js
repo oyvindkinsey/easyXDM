@@ -526,7 +526,7 @@ function prepareTransportStack(config){
                  */
                 protocol = "3";
             }
-            else if (navigator.product === "Gecko" && "frameElement" in window) {
+            else if (navigator.product === "Gecko" && "frameElement" in window && navigator.userAgent.indexOf('WebKit') == -1) {
                 /*
                  * This is supported in Gecko (Firefox 1+)
                  */
