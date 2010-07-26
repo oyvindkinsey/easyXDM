@@ -400,8 +400,6 @@ function createFrame(config){
     
     // transfer properties to the frame
     apply(frame, config.props);
-    //id needs to be set for the references to work reliably
-    frame.id = frame.name;
     return frame;
 }
 
