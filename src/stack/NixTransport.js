@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global global, getNixProxy, easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, un, on, isHostMethod, apply*/
+/*global global, getNixProxy, easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, un, on, isHostMethod, apply, query*/
 
 /**
  * @class easyXDM.stack.NixTransport
@@ -101,7 +101,7 @@ easyXDM.stack.NixTransport = function(config){
                 // set up the iframe
                 apply(config.props, {
                     src: appendQueryParameters(config.remote, {
-                        xdm_e: location.protocol + "//" + location.host,
+                        xdm_e: location.protocol + "//" + location.host + location.pathname,
                         xdm_c: config.channel,
                         xdm_s: config.secret,
                         xdm_p: 3 // 3 = NixTransport
@@ -111,37 +111,42 @@ easyXDM.stack.NixTransport = function(config){
                 frame.contentWindow.opener = proxy;
             }
             else {
-                // by storing this in a variable we negate replacement attacks
-                try {
-                    proxy = window.opener;
-                } 
-                catch (e2) {
-                    throw new Error("Cannot access window.opener");
+                if (!document.referrer || document.referrer != query.xdm_e) {
+                    window.parent.location = query.xdm_e;
                 }
-                proxy.SetChild({
-                    send: function(msg){
-                        // the timeout is necessary to have execution continue in the correct context
-                        global.setTimeout(function(){
-                            // #ifdef debug
-                            trace("received message");
-                            // #endif
-                            pub.up.incoming(msg, targetOrigin);
-                        }, 0);
+                else {
+                    try {
+                        // by storing this in a variable we negate replacement attacks
+                        proxy = window.opener;
+                    } 
+                    catch (e2) {
+                        throw new Error("Cannot access window.opener");
                     }
-                });
-                
-                send = function(msg){
-                    // #ifdef debug
-                    trace("sending");
-                    // #endif
-                    proxy.SendToParent(msg, config.secret);
-                };
-                setTimeout(function(){
-                    // #ifdef debug
-                    trace("firing onReady");
-                    // #endif
-                    pub.up.callback(true);
-                }, 0);
+                    proxy.SetChild({
+                        send: function(msg){
+                            // the timeout is necessary to have execution continue in the correct context
+                            global.setTimeout(function(){
+                                // #ifdef debug
+                                trace("received message");
+                                // #endif
+                                pub.up.incoming(msg, targetOrigin);
+                            }, 0);
+                        }
+                    });
+                    
+                    send = function(msg){
+                        // #ifdef debug
+                        trace("sending");
+                        // #endif
+                        proxy.SendToParent(msg, config.secret);
+                    };
+                    setTimeout(function(){
+                        // #ifdef debug
+                        trace("firing onReady");
+                        // #endif
+                        pub.up.callback(true);
+                    }, 0);
+                }
             }
         }
     });
