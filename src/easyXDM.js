@@ -509,6 +509,9 @@ function prepareTransportStack(config){
         config.secret = Math.random().toString(16).substring(2);
         if (undef(protocol)) {
             if (getLocation(location.href) == getLocation(config.remote)) {
+                /*
+                 * Both documents has the same origin, lets use direct access.
+                 */
                 protocol = "4";
             }
             else if (isHostMethod(window, "postMessage") || isHostMethod(document, "postMessage")) {
@@ -524,6 +527,9 @@ function prepareTransportStack(config){
                 protocol = "3";
             }
             else if (navigator.product === "Gecko" && isHostObject(window, "frameElement")) {
+                /*
+                 * This is supported in Gecko (Firefox 1+)
+                 */
                 protocol = "5";
             }
             else if (config.remoteHelper) {
