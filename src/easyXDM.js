@@ -100,7 +100,19 @@ var un = (function(){
 /*
  * Cross Browser implementation of DOMContentLoaded.
  */
-var isReady = (document.readyState == "complete"), domReadyQueue = [];
+var isReady = false, domReadyQueue = [];
+if ("readyState" in document) {
+    isReady = document.readyState == "complete";
+}
+else {
+    // If readyState is not supported in the browser, then in order to be able to fire whenReady functions apropriately
+    // when added dynamically _after_ DOM load, we have to deduce wether the DOM is ready or not.
+    if (document.body) {
+        // document.body is not available prior to the body being built
+        // This does mean that we might fire it prematurely, but we only need the body element to be available for appending.
+        isReady = true;
+    }
+}
 function dom_onLoaded(){
     if (isReady) {
         return;
@@ -388,15 +400,15 @@ function createFrame(config){
     if (config.container) {
         // Remove the frame
         frame.border = frame.frameBorder = 0;
-        config.container.appendChild(frame);
     }
     else {
         // This needs to be hidden like this, simply setting display:none and the like will cause failures in some browsers.
         frame.style.position = "absolute";
         frame.style.left = "-2000px";
         frame.style.top = "0px";
-        document.body.appendChild(frame);
+        config.container = document.body;
     }
+    config.container.insertBefore(frame, config.container.firstChild);
     
     // transfer properties to the frame
     apply(frame, config.props);
