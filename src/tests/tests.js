@@ -262,8 +262,8 @@ function runTests(){
     }, {
         name: "test easyXDM.Socket{FrameElementTransport}",
         runIf: function(){
-            if (!(navigator.product === "Gecko" && "frameElement" in window)) {
-                return "This test requires the a Gecko browser and the presence of the frameElement object";
+            if (!(navigator.product === "Gecko" && "frameElement" in window && !("postMessage" in window))) {
+                return "This test requires an older Gecko browser and the presence of the frameElement object";
             }
         },
         setUp: function(){
