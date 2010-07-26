@@ -20,7 +20,6 @@ var REMOTE = (function(){
 }());
 
 function runTests(){
-
     var i = 0;
     easyTest.test([/**Tests for the presence of namespaces and classes*/{
         name: "Check that the library is complete",
@@ -97,7 +96,7 @@ function runTests(){
     }, {
         name: "Check helper functions",
         runIf: function(){
-            if (location.href.indexOf("/src/") != -1) {
+            if (location.href.indexOf("/src/") == -1) {
                 return "This can only be run in development.";
             }
         },
@@ -133,7 +132,7 @@ function runTests(){
     }, {
         name: "Check the ACL feature",
         runIf: function(){
-            if (location.href.indexOf("/src/") != -1) {
+            if (location.href.indexOf("/src/") == -1) {
                 return "This can only be run in development.";
             }
         },
