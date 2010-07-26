@@ -1,3 +1,7 @@
+2.4.3 26.07.10
+Added two more transports, the SameOriginTransport and the FrameElementTransport.
+Made some improvements in the NixTransport
+
 2.4.2 25.07.10
 Major improvements on the support for older browsers.
 The use of resize in the HashTransport to notify about incoming messages has now been removed as it was not reliant across browsers.
