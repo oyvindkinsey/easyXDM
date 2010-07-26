@@ -1,9 +1,6 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
 /*global easyXDM, JSON, XMLHttpRequest, window, escape, unescape, ActiveXObject */
 
-// #ifdef debug
-var _trace;
-// #endif
 var global = this;
 var _channelId = 0;
 var emptyFn = Function.prototype;
@@ -12,6 +9,11 @@ var reURI = /^(http.?:\/\/([^\/\s]+))/, // returns groups for origin (1) and dom
  reDoubleSlash = /([^:])\/\//g; // matches // anywhere but in the protocol
 //Sniffing is bad, but in this case unavoidable
 var CREATE_FRAME_USING_HTML = /msie [67]/.test(navigator.userAgent.toLowerCase());
+// #ifdef debug
+var _trace = emptyFn;
+// #endif
+
+
 /* Methods for feature testing
  * From http://peter.michaux.ca/articles/feature-detection-state-of-the-art-browser-scripting
  */
@@ -98,6 +100,71 @@ var un = (function(){
         };
     }
 }());
+
+/*
+ * Cross Browser implementation of DOMContentLoaded.
+ */
+var isReady = (document.readyState == "complete"), domReadyQueue = [];
+function dom_onLoaded(){
+    if (isReady) {
+        return;
+    }
+    // #ifdef debug
+    _trace("firing dom_onLoaded");
+    // #endif
+    isReady = true;
+    for (var i = 0; i < domReadyQueue.length; i++) {
+        domReadyQueue[i]();
+    }
+    un(window, "DOMContentLoaded", dom_onLoaded);
+    un(document, "DOMContentLoaded", dom_onLoaded);
+    if (isHostMethod(window, "ActiveXObject")) {
+        un(document, "readystatechange", dom_onLoaded);
+        un(window, "load", dom_onLoaded);
+    }
+}
+
+if (!isReady) {
+    on(window, "DOMContentLoaded", dom_onLoaded);
+    on(document, "DOMContentLoaded", dom_onLoaded);
+    
+    if (isHostMethod(window, "ActiveXObject")) {
+        on(document, "readystatechange", dom_onLoaded);
+        on(window, "load", dom_onLoaded);
+        
+        if (window === top) {
+            (function doScrollCheck(){
+                if (isReady) {
+                    return;
+                }
+                // http://javascript.nwbox.com/IEContentLoaded/
+                try {
+                    document.documentElement.doScroll("left");
+                } 
+                catch (e) {
+                    setTimeout(doScrollCheck, 1);
+                    return;
+                }
+                dom_onLoaded();
+            }());
+        }
+    }
+}
+/**
+ * This will add a function to the queue of functions to be run once the DOM reaches a ready state.
+ * If functions are added after this event then they will be executed immediately.
+ * @param {function} fn The function to add
+ * @param {Object} scope An optional scope for the function to be called with.
+ */
+function whenReady(fn, scope){
+    if (isReady) {
+        fn.call(scope);
+        return;
+    }
+    domReadyQueue.push(function(){
+        fn.call(scope);
+    });
+}
 
 /*
  * Methods for working with URLs
