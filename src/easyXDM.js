@@ -36,7 +36,6 @@ var on = (function(){
         /**
          * Set on to use the DOM level 2 addEventListener
          * https://developer.mozilla.org/en/DOM/element.on
-         * @ignore
          * @param {Object} target
          * @param {String} type
          * @param {Function} listener
@@ -52,7 +51,6 @@ var on = (function(){
         /**
          * Set on to a wrapper around the IE spesific attachEvent
          * http://msdn.microsoft.com/en-us/library/ms536343%28VS.85%29.aspx
-         * @ignore
          * @param {Object} object
          * @param {String} sEvent
          * @param {Function} fpNotify
@@ -71,7 +69,6 @@ var un = (function(){
         /**
          * Set un to use the DOM level 2 removeEventListener
          * https://developer.mozilla.org/en/DOM/element.un
-         * @ignore
          * @param {Object} target
          * @param {String} type
          * @param {Function} listener
@@ -87,7 +84,6 @@ var un = (function(){
         /**
          * Set un to a wrapper around the IE spesific detachEvent
          * http://msdn.microsoft.com/en-us/library/ms536411%28VS.85%29.aspx
-         * @ignore
          * @param {Object} object
          * @param {String} sEvent
          * @param {Function} fpNotify
@@ -171,7 +167,6 @@ function whenReady(fn, scope){
  */
 /**
  * Get the domain name from a url.
- * @private
  * @param {String} url The url to extract the domain from.
  * @returns The domain part of the url.
  * @type {String}
@@ -187,7 +182,6 @@ function getDomainName(url){
 
 /**
  * Returns  a string containing the schema, domain and if present the port
- * @private
  * @param {String} url The url to extract the location from
  * @return {String} The location part of the url
  */
@@ -202,7 +196,6 @@ function getLocation(url){
 
 /**
  * Resolves a relative url into an absolute one.
- * @private
  * @param {String} url The path to resolve.
  * @return {String} The resolved url.
  */
@@ -241,7 +234,6 @@ function resolveUrl(url){
 /**
  * Appends the parameters to the given url.<br/>
  * The base url can contain existing query parameters.
- * @private
  * @param {String} url The base url.
  * @param {Object} parameters The parameters to add.
  * @return {String} A new valid url with the parameters appended.
@@ -281,7 +273,6 @@ var query = (function(){
  */
 /**
  * Helper for checking if a variable/property is undefined
- * @private
  * @param {Object} v The variable to test
  * @return {Boolean} True if the passed variable is undefined
  */
@@ -291,7 +282,6 @@ function undef(v){
 
 /**
  * A safe implementation of HTML5 JSON. Feature testing is used to make sure the implementation works.
- * @private
  * @return {JSON} A valid JSON conforming object, or null if not found.
  */
 function getJSON(){
@@ -333,8 +323,6 @@ function getJSON(){
 
 /**
  * Applies properties from the source object to the target object.<br/>
- * This is a destructive method.
- * @private
  * @param {Object} target The target of the properties.
  * @param {Object} source The source of the properties.
  * @param {Boolean} noOverwrite Set to True to only set non-existing properties.
@@ -362,11 +350,13 @@ function apply(destination, source, noOverwrite){
 
 /**
  * Creates a frame and appends it to the DOM.
- * @private
- * @cfg {Object} prop The properties that should be set on the frame. This should include the 'src' property
- * @cfg {Object} attr The attributes that should be set on the frame.
- * @cfg {DOMElement} container Its parent element (Optional)
- * @cfg {Function} onLoad A method that should be called with the frames contentWindow as argument when the frame is fully loaded. (Optional)
+ * @param config {object} This object can have the following properties
+ * <ul>
+ * <li> {object} prop The properties that should be set on the frame. This should include the 'src' property.</li>
+ * <li> {object} attr The attributes that should be set on the frame.</li>
+ * <li> {DOMElement} container Its parent element (Optional).</li>
+ * <li> {function} onLoad A method that should be called with the frames contentWindow as argument when the frame is fully loaded. (Optional)</li>
+ * </ul>
  * @return The frames DOMElement
  * @type DOMElement
  */
@@ -420,7 +410,6 @@ function createFrame(config){
  */
 /**
  * Creates a cross-browser XMLHttpRequest object
- * @private
  * @return {XMLHttpRequest} A XMLHttpRequest object.
  */
 var getXhr = (function(){
@@ -448,13 +437,9 @@ var getXhr = (function(){
     }
 }());
 
-/** Runs an asynchronous request using XMLHttpRequest
- * @private
- * @cfg {String} method POST, HEAD or GET
- * @cfg {String} url The url to request
- * @cfg {Object} data Any data that should be sent.
- * @cfg {Function} success The callback function for successfull requests
- * @cfg {Function} error The callback function for errors
+/** 
+ * Runs an asynchronous request using XMLHttpRequest
+ * @param {object} config The configuration
  */
 function ajax(config){
     var req = getXhr(), pairs = [], data, isPOST;
@@ -518,7 +503,6 @@ function ajax(config){
  * Check whether a domain is allowed using an Access Control List.
  * The ACL can contain * and ? as wildcards, or can be regular expressions.
  * If regular expressions they need to begin with ^ and end with $.
- * @private
  * @param {Array/String} acl The list of allowed domains
  * @param {String} domain The domain to test.
  * @return {Boolean} True if the domain is allowed, false if not.
@@ -544,7 +528,6 @@ function checkAcl(acl, domain){
  */
 /**
  * Prepares an array of stack-elements suitable for the current configuration
- * @private
  * @param {Object} config The Transports configuration. See easyXDM.Socket for more.
  * @return {Array} An array of stack-elements with the TransportElement at index 0.
  */
@@ -726,7 +709,6 @@ function prepareTransportStack(config){
 /**
  * Chains all the separate stack elements into a single usable stack.<br/>
  * If an element is missing a necessary method then it will have a pass-through method applied.
- * @private
  * @param {Array} stackElements An array of stack elements to be linked.
  * @return {easyXDM.stack.StackElement} The last element in the chain.
  */
@@ -773,12 +755,49 @@ function chainStack(stackElements){
 global.easyXDM = {
     /**
      * The version of the library
-     * @type {String}
+     * @type {string}
      */
     version: "%%version%%",
-    apply: apply,
+    /**
+     * This is a map containing all the query parameters passed to the document.
+     * All the values has been decoded using decodeURIComponent.
+     * @type {object}
+     */
     query: query,
+    /**
+     * @private
+     */
+    stack: {},
+    /**
+     * Applies properties from the source object to the target object.<br/>
+     * @param {object} target The target of the properties.
+     * @param {object} source The source of the properties.
+     * @param {boolean} noOverwrite Set to True to only set non-existing properties.
+     */
+    apply: apply,
+    /** 
+     * Runs an asynchronous request using XMLHttpRequest
+     * @param {object} config This object can have the following properties
+     * <ul>
+     * <li> url: string<br/>The url to request.</li>
+     * <li> method: string<br/>POST, HEAD or GET.</li>
+     * <li> data: object<br/>Any data that should be sent.</li>
+     * <li> type: string<br/>The type of data to retrieve. If set to 'json' then the result will be parsed.</li>
+     * <li> success: function<br/>The callback function for successfull requests.</li>
+     * <li> error: function<br/>The callback function for errors.</li>
+     * </ul>
+     */
     ajax: ajax,
+    /**
+     * A safe implementation of HTML5 JSON. Feature testing is used to make sure the implementation works.
+     * @return {JSON} A valid JSON conforming object, or null if not found.
+     */
     getJSONObject: getJSON,
-    stack: {}
+    /**
+     * This will add a function to the queue of functions to be run once the DOM reaches a ready state.
+     * If functions are added after this event then they will be executed immediately.
+     * @param {function} fn The function to add
+     * @param {object} scope An optional scope for the function to be called with.
+     */
+    whenReady: whenReady
 };
