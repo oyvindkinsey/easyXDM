@@ -50,10 +50,12 @@ easyXDM.stack.FrameElementTransport = function(config){
                 });
                 frame = createFrame(config);
                 frame.fn = function(sendFn){
-                    send = sendFn;
-                    pub.up.callback(true);
-                    // remove the function so that it cannot be used to overwrite the send function later on
                     delete frame.fn;
+                    send = sendFn;
+                    setTimeout(function(){
+                        pub.up.callback(true);
+                    }, 0);
+                    // remove the function so that it cannot be used to overwrite the send function later on
                     return function(msg){
                         pub.up.incoming(msg, targetOrigin);
                     };

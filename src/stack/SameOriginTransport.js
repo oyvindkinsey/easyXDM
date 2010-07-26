@@ -51,7 +51,9 @@ easyXDM.stack.SameOriginTransport = function(config){
                 frame = createFrame(config);
                 easyXDM.Fn.set(config.channel, function(sendFn){
                     send = sendFn;
-                    pub.up.callback(true);
+                    setTimeout(function(){
+                        pub.up.callback(true);
+                    }, 0);
                     return function(msg){
                         pub.up.incoming(msg, targetOrigin);
                     };
