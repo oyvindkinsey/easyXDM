@@ -194,7 +194,7 @@ function appendQueryParameters(url, parameters){
     var q = [];
     for (var key in parameters) {
         if (parameters.hasOwnProperty(key)) {
-            q.push(key + "=" + parameters[key]);
+            q.push(key + "=" + encodeURIComponent(parameters[key]));
         }
     }
     return url + ((url.indexOf("?") === -1) ? "?" : "&") + q.join("&") + hash;
@@ -204,7 +204,7 @@ var query = (function(){
     var query = {}, pair, search = location.search.substring(1).split("&"), i = search.length;
     while (i--) {
         pair = search[i].split("=");
-        query[pair[0]] = pair[1];
+        query[pair[0]] = decodeURIComponent(pair[1]);
     }
     return query;
 }());
@@ -497,7 +497,7 @@ function prepareTransportStack(config){
         // #endif
         config.channel = query.xdm_c;
         config.secret = query.xdm_s;
-        config.remote = decodeURIComponent(query.xdm_e);
+        config.remote = query.xdm_e;
         protocol = query.xdm_p;
         if (config.acl && !checkAcl(config.acl, config.remote)) {
             throw new Error("Access denied for " + config.remote);
@@ -591,7 +591,7 @@ function prepareTransportStack(config){
                     config.usePolling = true;
                     config.useParent = true;
                     config.local = location.protocol + "//" + location.host + location.pathname + location.search;
-                    parameters.xdm_e = encodeURIComponent(config.local);
+                    parameters.xdm_e = config.local;
                     parameters.xdm_pa = 1; // use parent
                 }
                 else {
@@ -607,7 +607,7 @@ function prepareTransportStack(config){
             else {
                 apply(config, {
                     channel: query.xdm_c,
-                    remote: decodeURIComponent(query.xdm_e),
+                    remote: query.xdm_e,
                     useParent: !undef(query.xdm_pa),
                     usePolling: !undef(query.xdm_po),
                     useResize: config.useParent ? false : config.useResize
