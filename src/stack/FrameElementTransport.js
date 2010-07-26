@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, apply, query*/
+/*global easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, apply, query, whenReady*/
 
 /**
  * @class easyXDM.stack.FrameElementTransport
@@ -33,7 +33,7 @@ easyXDM.stack.FrameElementTransport = function(config){
                 frame = null;
             }
         },
-        init: function(){
+        onDOMReady: function(){
             // #ifdef debug
             trace("init");
             // #endif
@@ -76,6 +76,9 @@ easyXDM.stack.FrameElementTransport = function(config){
                     pub.up.callback(true);
                 }
             }
+        },
+        init: function(){
+            whenReady(pub.onDOMReady, pub);
         }
     });
 };

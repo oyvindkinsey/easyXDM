@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, undef, getLocation, appendQueryParameters, resolveUrl, createFrame, debug, un, apply */
+/*global easyXDM, window, escape, unescape, undef, getLocation, appendQueryParameters, resolveUrl, createFrame, debug, un, apply, whenReady*/
 
 /**
  * @class easyXDM.stack.NameTransport
@@ -79,7 +79,7 @@ easyXDM.stack.NameTransport = function(config){
                 remoteWindow = null;
             }
         },
-        init: function(){
+        onDOMReady: function(){
             // #ifdef debug
             trace("init");
             // #endif
@@ -136,6 +136,9 @@ easyXDM.stack.NameTransport = function(config){
                     }());
                 }
             });
+        },
+        init: function(){
+            whenReady(pub.onDOMReady, pub);
         }
     });
 };

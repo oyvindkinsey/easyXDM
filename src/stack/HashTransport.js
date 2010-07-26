@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, getLocation, createFrame, debug, un, on, apply*/
+/*global easyXDM, window, escape, unescape, getLocation, createFrame, debug, un, on, apply, whenReady*/
 
 /**
  * @class easyXDM.stack.HashTransport
@@ -81,7 +81,7 @@ easyXDM.stack.HashTransport = function(config){
             }
             _callerWindow = null;
         },
-        init: function(){
+        onDOMReady: function(){
             isHost = config.isHost;
             pollInterval = config.interval;
             _lastMsg = "#" + config.channel;
@@ -148,6 +148,9 @@ easyXDM.stack.HashTransport = function(config){
                     _callerWindow = createFrame(config);
                 }
             }
+        },
+        init: function(){
+            whenReady(pub.onDOMReady, pub);
         }
     });
 };
