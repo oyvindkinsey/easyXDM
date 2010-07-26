@@ -213,6 +213,51 @@ function runTests(){
             }
         }]
     }, {
+        name: "test easyXDM.Socket{FrameElementTransport}",
+        runIf: function(){
+            if (!(navigator.product === "Gecko" && "frameElement" in window)) {
+                return "This test requires the a Gecko browser and the presence of the frameElement object";
+            }
+        },
+        setUp: function(){
+            this.expectedMessage = ++i + "_abcd1234%@¤/";
+        },
+        steps: [{
+            name: "onReady is fired",
+            timeout: 5000,
+            run: function(){
+                var scope = this;
+                var messages = 0;
+                this.transport = new easyXDM.Socket({
+                    protocol: "5",
+                    remote: REMOTE + "/test_transport.html",
+                    onMessage: function(message, origin){
+                        if (scope.expectedMessage === message) {
+                            if (++messages === 2) {
+                                scope.notifyResult(true);
+                            }
+                        }
+                    },
+                    onReady: function(){
+                        scope.notifyResult(true);
+                    }
+                });
+            }
+        }, {
+            name: "message is echoed back",
+            timeout: 5000,
+            run: function(){
+                this.transport.postMessage(this.expectedMessage);
+                this.transport.postMessage(this.expectedMessage);
+            }
+        }, {
+            name: "destroy",
+            run: function(){
+                this.transport.destroy();
+                return ((document.getElementsByTagName("iframe").length === 0));
+            }
+        }]
+    }, {
         name: "test easyXDM.Socket{NixMessageTransport}",
         runIf: function(){
             if (!("ActiveXObject" in window && (/msie [67]/i).test(navigator.userAgent))) {

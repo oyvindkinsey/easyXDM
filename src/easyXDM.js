@@ -520,6 +520,9 @@ function prepareTransportStack(config){
                  */
                 protocol = "3";
             }
+            else if (navigator.product === "Gecko" && isHostObject(window, "frameElement")) {
+                protocol = "5";
+            }
             else if (config.remoteHelper) {
                 /*
                  * This is supported in all browsers that retains the value of window.name when
@@ -632,6 +635,9 @@ function prepareTransportStack(config){
             break;
         case "3":
             stackEls = [new easyXDM.stack.NixTransport(config), new easyXDM.stack.QueueBehavior()];
+            break;
+        case "5":
+            stackEls = [new easyXDM.stack.FrameElementTransport(config)];
             break;
     }
     
