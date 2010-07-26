@@ -111,10 +111,14 @@ easyXDM.stack.NixTransport = function(config){
                 frame.contentWindow.opener = proxy;
             }
             else {
-                if (!document.referrer || document.referrer != query.xdm_e) {
+                if (document.referrer && document.referrer != query.xdm_e) {
                     window.parent.location = query.xdm_e;
                 }
                 else {
+                    if (document.referrer != query.xdm_e) {
+                        // This is to mitigate origin-spoofing
+                        window.parent.location = query.xdm_e;
+                    }
                     try {
                         // by storing this in a variable we negate replacement attacks
                         proxy = window.opener;

@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, un, on, apply*/
+/*global easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, apply, query*/
 
 /**
  * @class easyXDM.stack.FrameElementTransport
@@ -52,16 +52,27 @@ easyXDM.stack.FrameElementTransport = function(config){
                 frame.fn = function(sendFn){
                     send = sendFn;
                     pub.up.callback(true);
+                    // remove the function so that it cannot be used to overwrite the send function later on
+                    delete frame.fn;
                     return function(msg){
                         pub.up.incoming(msg, targetOrigin);
                     };
                 };
             }
             else {
-                send = window.frameElement.fn(function(msg){
-                    pub.up.incoming(msg, targetOrigin);
-                });
-                pub.up.callback(true);
+                if (document.referrer && document.referrer != query.xdm_e) {
+                    window.parent.location = query.xdm_e;
+                }
+                else {
+                    if (document.referrer != query.xdm_e) {
+                        // This is to mitigate origin-spoofing
+                        window.parent.location = query.xdm_e;
+                    }
+                    send = window.frameElement.fn(function(msg){
+                        pub.up.incoming(msg, targetOrigin);
+                    });
+                    pub.up.callback(true);
+                }
             }
         }
     });
