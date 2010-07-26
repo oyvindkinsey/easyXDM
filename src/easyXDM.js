@@ -508,7 +508,10 @@ function prepareTransportStack(config){
         config.channel = config.channel || "default" + _channelId++;
         config.secret = Math.random().toString(16).substring(2);
         if (undef(protocol)) {
-            if (isHostMethod(window, "postMessage") || isHostMethod(document, "postMessage")) {
+            if (getLocation(location.href) == getLocation(config.remote)) {
+                protocol = "4";
+            }
+            else if (isHostMethod(window, "postMessage") || isHostMethod(document, "postMessage")) {
                 /*
                  * This is supported in IE8+, Firefox 3+, Opera 9+, Chrome 2+ and Safari 4+
                  */
@@ -632,6 +635,9 @@ function prepareTransportStack(config){
             break;
         case "3":
             stackEls = [new easyXDM.stack.NixTransport(config), new easyXDM.stack.QueueBehavior()];
+            break;
+        case "4":
+            stackEls = [new easyXDM.stack.SameOriginTransport(config)];
             break;
     }
     

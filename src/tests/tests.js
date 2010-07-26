@@ -19,6 +19,8 @@ var REMOTE = (function(){
     return remote.substring(0, remote.lastIndexOf("/"));
 }());
 
+var LOCAL = location.protocol + "//" + location.host + location.pathname.substring(0, location.pathname.lastIndexOf("/"));
+
 function runTests(){
     var i = 0;
     easyTest.test([/**Tests for the presence of namespaces and classes*/{
@@ -51,6 +53,11 @@ function runTests(){
             name: "check for the presence of easyXDM.stack",
             run: function(){
                 return this.Assert.isObject(easyXDM.stack);
+            }
+        }, {
+            name: "check for the presence of easyXDM.stack.SameOriginTransport",
+            run: function(){
+                return this.Assert.isFunction(easyXDM.stack.SameOriginTransport);
             }
         }, {
             name: "check for the presence of easyXDM.stack.PostMessageTransport",
@@ -163,6 +170,46 @@ function runTests(){
             name: "No match",
             run: function(){
                 return !checkAcl(this.acl, "http://foo.com");
+            }
+        }]
+    }, {
+        name: "test easyXDM.Socket{SameOriginTransport}",
+        setUp: function(){
+            this.expectedMessage = ++i + "_abcd1234%@¤/";
+        },
+        steps: [{
+            name: "onReady is fired",
+            timeout: 5000,
+            run: function(){
+                var scope = this;
+                var messages = 0;
+                this.transport = new easyXDM.Socket({
+                    protocol: "4",
+                    remote: LOCAL + "/test_transport.html",
+                    onMessage: function(message, origin){
+                        if (scope.expectedMessage === message) {
+                            if (++messages === 2) {
+                                scope.notifyResult(true);
+                            }
+                        }
+                    },
+                    onReady: function(){
+                        scope.notifyResult(true);
+                    }
+                });
+            }
+        }, {
+            name: "message is echoed back",
+            timeout: 5000,
+            run: function(){
+                this.transport.postMessage(this.expectedMessage);
+                this.transport.postMessage(this.expectedMessage);
+            }
+        }, {
+            name: "destroy",
+            run: function(){
+                this.transport.destroy();
+                return ((document.getElementsByTagName("iframe").length === 0));
             }
         }]
     }, {
