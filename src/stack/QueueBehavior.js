@@ -17,7 +17,7 @@ easyXDM.stack.QueueBehavior = function(config){
     var trace = debug.getTracer("easyXDM.stack.QueueBehavior");
     trace("constructor");
     // #endif
-    var pub, queue = [], waiting = true, incoming = "", destroying, maxLength = 0;
+    var pub, queue = [], waiting = true, incoming = "", destroying, maxLength = 0, lazy = false;
     
     function dispatch(){
         if (waiting || queue.length === 0 || destroying) {
@@ -45,7 +45,12 @@ easyXDM.stack.QueueBehavior = function(config){
                 config = {};
             }
             maxLength = config.maxLength ? config.maxLength : 0;
-            pub.down.init();
+            if (config.lazy) {
+                lazy = true;
+            }
+            else {
+                pub.down.init();
+            }
         },
         callback: function(success){
             waiting = false;
@@ -96,7 +101,12 @@ easyXDM.stack.QueueBehavior = function(config){
                     callback: fragments.length === 0 ? fn : null
                 });
             }
-            dispatch();
+            if (lazy) {
+                pub.down.init();
+            }
+            else {
+                dispatch();
+            }
         },
         destroy: function(){
             // #ifdef debug

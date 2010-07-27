@@ -692,18 +692,18 @@ function prepareTransportStack(config){
                 maxLength: 4000 - config.remote.length
             }), new easyXDM.stack.VerifyBehavior({
                 initiate: config.isHost
-            }), new easyXDM.stack.QueueBehavior()];
+            })];
             break;
         case "1":
-            stackEls = [new easyXDM.stack.PostMessageTransport(config), new easyXDM.stack.QueueBehavior()];
+            stackEls = [new easyXDM.stack.PostMessageTransport(config)];
             break;
         case "2":
             stackEls = [new easyXDM.stack.NameTransport(config), new easyXDM.stack.QueueBehavior(), new easyXDM.stack.VerifyBehavior({
                 initiate: config.isHost
-            }), new easyXDM.stack.QueueBehavior()];
+            })];
             break;
         case "3":
-            stackEls = [new easyXDM.stack.NixTransport(config), new easyXDM.stack.QueueBehavior()];
+            stackEls = [new easyXDM.stack.NixTransport(config)];
             break;
         case "4":
             stackEls = [new easyXDM.stack.SameOriginTransport(config)];
@@ -712,7 +712,10 @@ function prepareTransportStack(config){
             stackEls = [new easyXDM.stack.FrameElementTransport(config)];
             break;
     }
-    
+    // this behavior is responsible for buffering outgoing messages, and for performing lazy initialization
+    stackEls.push(new easyXDM.stack.QueueBehavior({
+        lazy: config.lazy
+    }));
     return stackEls;
 }
 
