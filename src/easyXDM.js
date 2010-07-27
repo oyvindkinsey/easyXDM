@@ -113,6 +113,7 @@ else {
         isReady = true;
     }
 }
+
 function dom_onLoaded(){
     if (isReady) {
         return;
@@ -124,11 +125,18 @@ function dom_onLoaded(){
     for (var i = 0; i < domReadyQueue.length; i++) {
         domReadyQueue[i]();
     }
+    domReadyQueue.length = 0;
     un(window, "DOMContentLoaded", dom_onLoaded);
     un(document, "DOMContentLoaded", dom_onLoaded);
     if (isHostMethod(window, "ActiveXObject")) {
-        un(document, "readystatechange", dom_onLoaded);
         un(window, "load", dom_onLoaded);
+    }
+}
+
+function document_onReadyStateChange(){
+    if (document.readyState == "complete") {
+        dom_onLoaded();
+        un(document, "readystatechange", document_onReadyStateChange);
     }
 }
 
@@ -137,7 +145,7 @@ if (!isReady) {
     on(document, "DOMContentLoaded", dom_onLoaded);
     
     if (isHostMethod(window, "ActiveXObject")) {
-        on(document, "readystatechange", dom_onLoaded);
+        on(document, "readystatechange", document_onReadyStateChange);
         on(window, "load", dom_onLoaded);
         
         if (window === top) {
