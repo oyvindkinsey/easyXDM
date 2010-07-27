@@ -39,6 +39,7 @@
  * @namespace easyXDM
  * @constructor
  * @cfg {String/Window} local The url to the local name.html document, a local static file, or a reference to the local window.
+ * @cfg {Boolean} lazy (Consumer only) Set this to true if you want easyXDM to defer creating the transport until really needed. 
  * @cfg {String} remote (Consumer only) The url to the providers document.
  * @cfg {String} remoteHelper (Consumer only) The url to the remote name.html file. This is to support NameTransport as a fallback. Optional.
  * @cfg {Number} delay The number of milliseconds easyXDM should try to get a reference to the local window.  Optional, defaults to 2000.
@@ -46,7 +47,7 @@
  * @cfg {String} channel (Consumer only) The name of the channel to use. Can be used to set consistent iframe names. Must be unique. Optional.
  * @cfg {Function} onMessage The method that should handle incoming messages.<br/> This method should accept two arguments, the message as a string, and the origin as a string. Optional.
  * @cfg {Function} onReady A method that should be called when the transport is ready. Optional.
- * @cfg {DOMElement} container (Consumer only) The element that the primary iframe should be inserted into. If not set then the iframe will be positioned off-screen. Optional.
+ * @cfg {DOMElement|String} container (Consumer only) The element, or the id of the element that the primary iframe should be inserted into. If not set then the iframe will be positioned off-screen. Optional.
  * @cfg {Array/String} acl (Provider only) Here you can specify which '[protocol]://[domain]' patterns that should be allowed to act as the consumer towards this provider.<br/>
  * This can contain the wildcards ? and *.  Examples are 'http://example.com', '*.foo.com' and '*dom?.com'. If you want to use reqular expressions then you pattern needs to start with ^ and end with $.
  * If none of the patterns match an Error will be thrown.  

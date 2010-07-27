@@ -394,28 +394,33 @@ function createFrame(config){
     else {
         frame = document.createElement("IFRAME");
     }
+    
     if (config.props.name) {
         // We need to add these properties before adding the element to te DOM
         frame.id = frame.name = config.props.name;
         delete config.props.name;
     }
+    
     if (config.onLoad) {
         frame.loadFn = function(){
             config.onLoad(frame.contentWindow);
         };
         on(frame, "load", frame.loadFn);
     }
-    if (config.container) {
-        // Remove the frame
-        frame.border = frame.frameBorder = 0;
+    
+    if (typeof config.container == "string") {
+        config.container = document.getElementById(config.container);
     }
-    else {
+    
+    if (!config.container) {
         // This needs to be hidden like this, simply setting display:none and the like will cause failures in some browsers.
         frame.style.position = "absolute";
         frame.style.left = "-2000px";
         frame.style.top = "0px";
         config.container = document.body;
     }
+    
+    frame.border = frame.frameBorder = 0;
     config.container.insertBefore(frame, config.container.firstChild);
     
     // transfer properties to the frame
