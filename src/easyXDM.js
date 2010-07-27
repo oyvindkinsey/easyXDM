@@ -29,73 +29,40 @@ function isHostObject(object, property){
 }
 
 /*
- * Create normalized methods for adding and removing events
+ * Cross Browser implementation for adding and removing event listeners.
  */
-var on = (function(){
-    if (isHostMethod(window, "addEventListener")) {
-        /**
-         * Set on to use the DOM level 2 addEventListener
-         * https://developer.mozilla.org/en/DOM/element.on
-         * @param {Object} target
-         * @param {String} type
-         * @param {Function} listener
-         */
-        return function(target, type, listener){
-            // #ifdef debug
-            _trace("adding listener " + type);
-            // #endif
-            target.addEventListener(type, listener, false);
-        };
-    }
-    else {
-        /**
-         * Set on to a wrapper around the IE spesific attachEvent
-         * http://msdn.microsoft.com/en-us/library/ms536343%28VS.85%29.aspx
-         * @param {Object} object
-         * @param {String} sEvent
-         * @param {Function} fpNotify
-         */
-        return function(object, sEvent, fpNotify){
-            // #ifdef debug
-            _trace("adding listener " + sEvent);
-            // #endif
-            object.attachEvent("on" + sEvent, fpNotify);
-        };
-    }
-}());
-
-var un = (function(){
-    if (isHostMethod(window, "removeEventListener")) {
-        /**
-         * Set un to use the DOM level 2 removeEventListener
-         * https://developer.mozilla.org/en/DOM/element.un
-         * @param {Object} target
-         * @param {String} type
-         * @param {Function} listener
-         */
-        return function(target, type, listener, useCapture){
-            // #ifdef debug
-            _trace("removing listener " + type);
-            // #endif
-            target.removeEventListener(type, listener, useCapture);
-        };
-    }
-    else {
-        /**
-         * Set un to a wrapper around the IE spesific detachEvent
-         * http://msdn.microsoft.com/en-us/library/ms536411%28VS.85%29.aspx
-         * @param {Object} object
-         * @param {String} sEvent
-         * @param {Function} fpNotify
-         */
-        return function(object, sEvent, fpNotify){
-            // #ifdef debug
-            _trace("removing listener " + sEvent);
-            // #endif
-            object.detachEvent("on" + sEvent, fpNotify);
-        };
-    }
-}());
+var on, un;
+if (isHostMethod(window, "addEventListener")) {
+    on = function(target, type, listener){
+        // #ifdef debug
+        _trace("adding listener " + type);
+        // #endif
+        target.addEventListener(type, listener, false);
+    };
+    un = function(target, type, listener, useCapture){
+        // #ifdef debug
+        _trace("removing listener " + type);
+        // #endif
+        target.removeEventListener(type, listener, useCapture);
+    };
+}
+else if (isHostMethod(window, "attachEvent")) {
+    on = function(object, sEvent, fpNotify){
+        // #ifdef debug
+        _trace("adding listener " + sEvent);
+        // #endif
+        object.attachEvent("on" + sEvent, fpNotify);
+    };
+    un = function(object, sEvent, fpNotify){
+        // #ifdef debug
+        _trace("removing listener " + sEvent);
+        // #endif
+        object.detachEvent("on" + sEvent, fpNotify);
+    };
+}
+else {
+    throw new Error("Browser not supported");
+}
 
 /*
  * Cross Browser implementation of DOMContentLoaded.
