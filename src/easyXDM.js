@@ -2,7 +2,7 @@
 /*global easyXDM, JSON, XMLHttpRequest, window, escape, unescape, ActiveXObject */
 
 var global = this;
-var _channelId = 0;
+var channelId = 0;
 var emptyFn = Function.prototype;
 var reURI = /^(http.?:\/\/([^\/\s]+))/, // returns groups for origin (1) and domain (2)
  reParent = /[\-\w]+\/\.\.\//, // matches a foo/../ expression 
@@ -545,7 +545,7 @@ function prepareTransportStack(config){
     }
     else {
         config.remote = resolveUrl(config.remote);
-        config.channel = config.channel || "default" + _channelId++;
+        config.channel = config.channel || "default" + channelId++;
         config.secret = Math.random().toString(16).substring(2);
         if (undef(protocol)) {
             if (getLocation(location.href) == getLocation(config.remote)) {
