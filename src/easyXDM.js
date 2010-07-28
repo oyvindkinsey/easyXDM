@@ -694,7 +694,8 @@ function prepareTransportStack(config){
     }
     // this behavior is responsible for buffering outgoing messages, and for performing lazy initialization
     stackEls.push(new easyXDM.stack.QueueBehavior({
-        lazy: config.lazy
+        lazy: config.lazy,
+        remove: true
     }));
     return stackEls;
 }
@@ -734,6 +735,16 @@ function chainStack(stackElements){
         }
     }
     return stackEl;
+}
+
+/**
+ * This will remove a stackelement from its stack while leaving the stack functional.
+ * @param {Object} element The elment to remove from the stack.
+ */
+function removeFromStack(element){
+    element.up.down = element.down;
+    element.down.up = element.up;
+    element.up = element.down = null;
 }
 
 /*

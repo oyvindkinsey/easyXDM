@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, debug, undef*/
+/*global easyXDM, window, escape, unescape, debug, undef, removeFromStack*/
 
 /**
  * @class easyXDM.stack.QueueBehavior
@@ -20,6 +20,11 @@ easyXDM.stack.QueueBehavior = function(config){
     var pub, queue = [], waiting = true, incoming = "", destroying, maxLength = 0, lazy = false, doFragment = false;
     
     function dispatch(){
+        if (config.remove && queue.length === 0) {
+            trace("removing myself from the stack");
+            removeFromStack(pub);
+            return;
+        }
         if (waiting || queue.length === 0 || destroying) {
             return;
         }
@@ -57,8 +62,9 @@ easyXDM.stack.QueueBehavior = function(config){
         },
         callback: function(success){
             waiting = false;
+            var up = pub.up; // in case dispatch calls removeFromStack
             dispatch();
-            pub.up.callback(success);
+            up.callback(success);
         },
         incoming: function(message, origin){
             if (doFragment) {
