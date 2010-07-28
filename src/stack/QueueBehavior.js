@@ -17,7 +17,7 @@ easyXDM.stack.QueueBehavior = function(config){
     var trace = debug.getTracer("easyXDM.stack.QueueBehavior");
     trace("constructor");
     // #endif
-    var pub, queue = [], waiting = true, incoming = "", destroying, maxLength = 0, lazy = false;
+    var pub, queue = [], waiting = true, incoming = "", destroying, maxLength = 0, lazy = false, doFragment = false;
     
     function dispatch(){
         if (waiting || queue.length === 0 || destroying) {
@@ -44,7 +44,10 @@ easyXDM.stack.QueueBehavior = function(config){
             if (undef(config)) {
                 config = {};
             }
-            maxLength = config.maxLength ? config.maxLength : 0;
+            if (config.maxLength) {
+                maxLength = config.maxLength;
+                doFragment = true;
+            }
             if (config.lazy) {
                 lazy = true;
             }
@@ -58,47 +61,58 @@ easyXDM.stack.QueueBehavior = function(config){
             pub.up.callback(success);
         },
         incoming: function(message, origin){
-            var indexOf = message.indexOf("_"), seq = parseInt(message.substring(0, indexOf), 10);
-            incoming += message.substring(indexOf + 1);
-            if (seq === 0) {
-                // #ifdef debug
-                trace("received the last fragment");
-                // #endif
-                if (config.encode) {
-                    incoming = decodeURIComponent(incoming);
+            if (doFragment) {
+                var indexOf = message.indexOf("_"), seq = parseInt(message.substring(0, indexOf), 10);
+                incoming += message.substring(indexOf + 1);
+                if (seq === 0) {
+                    // #ifdef debug
+                    trace("received the last fragment");
+                    // #endif
+                    if (config.encode) {
+                        incoming = decodeURIComponent(incoming);
+                    }
+                    pub.up.incoming(incoming, origin);
+                    incoming = "";
                 }
-                pub.up.incoming(incoming, origin);
-                incoming = "";
+                // #ifdef debug
+                else {
+                    trace("waiting for more fragments, seq=" + message);
+                }
+                // #endif
             }
-            // #ifdef debug
             else {
-                trace("waiting for more fragments, seq=" + message);
+                pub.up.incoming(message, origin);
             }
-            // #endif
         },
         outgoing: function(message, origin, fn){
             if (config.encode) {
                 message = encodeURIComponent(message);
             }
             var fragments = [], fragment;
-            if (maxLength) {
+            if (doFragment) {
+                // fragment into chunks
                 while (message.length !== 0) {
                     fragment = message.substring(0, maxLength);
                     message = message.substring(fragment.length);
                     fragments.push(fragment);
                 }
+                // enqueue the chunks
+                while ((fragment = fragments.shift())) {
+                    // #ifdef debug
+                    trace("enqueuing");
+                    // #endif
+                    queue.push({
+                        data: fragments.length + "_" + fragment,
+                        origin: origin,
+                        callback: fragments.length === 0 ? fn : null
+                    });
+                }
             }
             else {
-                fragments.push(message);
-            }
-            while ((fragment = fragments.shift())) {
-                // #ifdef debug
-                trace("enqueuing");
-                // #endif
                 queue.push({
-                    data: fragments.length + "_" + fragment,
+                    data: message,
                     origin: origin,
-                    callback: fragments.length === 0 ? fn : null
+                    callback: fn
                 });
             }
             if (lazy) {
