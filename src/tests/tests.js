@@ -305,7 +305,7 @@ function runTests(){
             }
         }]
     }, {
-        name: "test easyXDM.Socket{NixMessageTransport}",
+        name: "test easyXDM.Socket{NixTransport}",
         runIf: function(){
             if (!("ActiveXObject" in window && (/msie [67]/i).test(navigator.userAgent))) {
                 return "This test requires IE6/7";
