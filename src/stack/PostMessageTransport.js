@@ -62,7 +62,9 @@ easyXDM.stack.PostMessageTransport = function(config){
     return (pub = {
         outgoing: function(message, domain, fn){
             callerWindow.postMessage(config.channel + " " + message, domain || targetOrigin);
-            fn();
+            if (fn) {
+                fn();
+            }
         },
         destroy: function(){
             // #ifdef debug
