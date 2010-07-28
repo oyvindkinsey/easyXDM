@@ -21,7 +21,9 @@ easyXDM.stack.QueueBehavior = function(config){
     
     function dispatch(){
         if (config.remove && queue.length === 0) {
+            // #ifdef debug
             trace("removing myself from the stack");
+            // #endif
             removeFromStack(pub);
             return;
         }
