@@ -103,7 +103,7 @@ easyXDM.stack.NixTransport = function(config){
                 // set up the iframe
                 apply(config.props, {
                     src: appendQueryParameters(config.remote, {
-                        xdm_e: location.protocol + "//" + location.host + location.pathname,
+                        xdm_e: location.protocol + "//" + location.host + location.pathname + location.search,
                         xdm_c: config.channel,
                         xdm_s: config.secret,
                         xdm_p: 3 // 3 = NixTransport
