@@ -125,13 +125,17 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                     return;
                 }
                 used = true;
-                _send({
+                var msg = {
                     id: id,
                     error: {
                         code: -32099,
                         message: "Application error: " + message
                     }
-                });
+                };
+                if (typeof message == "object" && "data" in message) {
+                    msg.data = message.data;
+                }
+                _send(msg);
             };
         }
         else {
