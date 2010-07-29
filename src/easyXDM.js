@@ -466,23 +466,40 @@ function ajax(config){
     
     req.onreadystatechange = function(){
         if (req.readyState == 4) {
-            if (req.status >= 200 && req.status < 300) {
-                if (config.type == "json") {
-                    try {
-                        config.success(getJSON().parse(req.responseText));
-                    } 
-                    catch (e) {
-                        config.error("An error occured. Error parsing JSON: " + e.message);
-                    }
-                }
-                else {
-                    config.success(req.responseText);
+            var response, errorMsg;
+            if (config.type == "json") {
+                try {
+                    response = req.responseText;
+                    response = getJSON().parse(response);
+                } 
+                catch (e) {
+                    errorMsg = "An error occured while parsing the JSON: " + e.message;
                 }
             }
             else {
-                config.error("An error occured. Status code: " + req.status);
+                response = req.responseText;
             }
+            
+            if (req.status < 200 || req.status >= 300) {
+                errorMsg = "The server did not return a valid status code.";
+            }
+            
+            if (errorMsg) {
+                config.error({
+                    message: errorMsg,
+                    status: req.status,
+                    data: response,
+                    toString: function(){
+                        return this.message + " Status: " + this.status;
+                    }
+                });
+            }
+            else {
+                config.success(response);
+            }
+            
             req.onreadystatechange = emptyFn;
+            req = null;
         }
     };
     
