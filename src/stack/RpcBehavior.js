@@ -133,7 +133,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                     }
                 };
                 if (typeof message == "object" && "data" in message) {
-                    msg.data = message.data;
+                    msg.error.data = message.data;
                 }
                 _send(msg);
             };
