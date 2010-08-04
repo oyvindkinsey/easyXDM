@@ -39,11 +39,11 @@ if (isHostMethod(window, "addEventListener")) {
         // #endif
         target.addEventListener(type, listener, false);
     };
-    un = function(target, type, listener, useCapture){
+    un = function(target, type, listener){
         // #ifdef debug
         _trace("removing listener " + type);
         // #endif
-        target.removeEventListener(type, listener, useCapture);
+        target.removeEventListener(type, listener, false);
     };
 }
 else if (isHostMethod(window, "attachEvent")) {
