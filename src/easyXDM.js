@@ -69,7 +69,7 @@ else {
  */
 var isReady = false, domReadyQueue = [];
 if ("readyState" in document) {
-    isReady = document.readyState == "complete";
+    isReady = (document.readyState == "complete" || document.readyState == "loaded");
 }
 else {
     // If readyState is not supported in the browser, then in order to be able to fire whenReady functions apropriately
