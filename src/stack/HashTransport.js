@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, getLocation, createFrame, debug, un, on, apply, whenReady*/
+/*global easyXDM, window, escape, unescape, getLocation, createFrame, debug, un, on, apply, whenReady, IFRAME_PREFIX*/
 
 /**
  * @class easyXDM.stack.HashTransport
@@ -91,7 +91,7 @@ easyXDM.stack.HashTransport = function(config){
             if (isHost) {
                 config.props = {
                     src: config.remote,
-                    name: "local_" + config.channel
+                    name: IFRAME_PREFIX + config.channel + "_provider"
                 };
                 if (useParent) {
                     config.onLoad = function(){
@@ -110,7 +110,7 @@ easyXDM.stack.HashTransport = function(config){
                             throw new Error("Unable to reference listenerwindow");
                         }
                         try {
-                            _listenerWindow = _callerWindow.contentWindow.frames["remote_" + config.channel];
+                            _listenerWindow = _callerWindow.contentWindow.frames[IFRAME_PREFIX + config.channel + "_consumer"];
                         } 
                         catch (ex) {
                         }
@@ -139,7 +139,7 @@ easyXDM.stack.HashTransport = function(config){
                     apply(config, {
                         props: {
                             src: config.remote + "#" + config.channel + new Date(),
-                            name: "remote_" + config.channel
+                            name: IFRAME_PREFIX + config.channel + "_consumer"
                         },
                         onLoad: function(){
                             pub.up.callback(true);

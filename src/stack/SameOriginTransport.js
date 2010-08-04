@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, un, on, apply, whenReady*/
+/*global easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, un, on, apply, whenReady, IFRAME_PREFIX*/
 
 /**
  * @class easyXDM.stack.SameOriginTransport
@@ -46,7 +46,8 @@ easyXDM.stack.SameOriginTransport = function(config){
                         xdm_e: location.protocol + "//" + location.host + location.pathname,
                         xdm_c: config.channel,
                         xdm_p: 4 // 4 = SameOriginTransport
-                    })
+                    }),
+                    name: IFRAME_PREFIX + config.channel + "_provider"
                 });
                 frame = createFrame(config);
                 easyXDM.Fn.set(config.channel, function(sendFn){

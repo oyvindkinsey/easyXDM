@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, undef, getLocation, appendQueryParameters, resolveUrl, createFrame, debug, un, apply, whenReady*/
+/*global easyXDM, window, escape, unescape, undef, getLocation, appendQueryParameters, resolveUrl, createFrame, debug, un, apply, whenReady, IFRAME_PREFIX*/
 
 /**
  * @class easyXDM.stack.NameTransport
@@ -109,7 +109,7 @@ easyXDM.stack.NameTransport = function(config){
                 });
                 apply(config.props, {
                     src: remoteUrl + '#' + config.channel,
-                    name: config.channel
+                    name: IFRAME_PREFIX + config.channel + "_provider"
                 });
                 remoteWindow = createFrame(config);
             }
