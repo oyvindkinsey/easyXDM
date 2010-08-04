@@ -31,20 +31,18 @@ easyXDM.stack.ReliableBehavior = function(config){
                 // #endif
                 currentMessage = "";
                 if (callback) {
-                    setTimeout(function(){
-                        callback(true);
-                    }, 0);
+                    callback(true);
                 }
             }
-            idIn = ack[1];
             if (message.length > 0) {
                 // #ifdef debug
                 trace("sending ack, and passing on " + message);
                 // #endif
-                pub.down.outgoing(idIn + "," + idOut + "_" + currentMessage, origin);
-                setTimeout(function(){
+                pub.down.outgoing(ack[1] + "," + idOut + "_" + currentMessage, origin);
+                if (idIn != ack[1]) {
+                    idIn = ack[1];
                     pub.up.incoming(message, origin);
-                }, 0);
+                }
             }
             
         },
