@@ -9,7 +9,7 @@ var reURI = /^(http.?:\/\/([^\/\s]+))/, // returns groups for origin (1) and dom
  reDoubleSlash = /([^:])\/\//g; // matches // anywhere but in the protocol
 var IFRAME_PREFIX = "easyXDM_";
 //Sniffing is bad, but in this case unavoidable
-var CREATE_FRAME_USING_HTML = /msie [67]/.test(navigator.userAgent.toLowerCase());
+var CREATE_FRAME_USING_HTML = /msie /.test(navigator.userAgent.toLowerCase());
 // #ifdef debug
 var _trace = emptyFn;
 // #endif
