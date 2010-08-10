@@ -16,41 +16,43 @@
              * windows visible to the user that are able to communicate
              * It can also run XHR-queries the local domain that can be returned to the other side of the proxy.
              */
-            var remoteapp = window.open('remoteapp.html', 'mainapp', 'width=300,height=300');
+            var remoteapp;
             /**
-             * Check that the window wasn't blocked as a popup
+             * We start by creating a channel
              */
-            if (remoteapp) {
+            var proxy = new easyXDM.Socket(/** The configuration */{
+                local: "../name.html",
                 /**
-                 * We start by creating a channel
+                 * Register the method that should handle incoming data
+                 * @param {Object} data
+                 * @param {String} origin
                  */
-                var proxy = new easyXDM.Socket(/** The configuration */{
-                    local: "../name.html",
-                    /**
-                     * Register the method that should handle incoming data
-                     * @param {Object} data
-                     * @param {String} origin
-                     */
-                    onMessage: function(data, origin){
-                        data = JSON.parse(data);
-                        remoteapp.focus();
-                        var div = remoteapp.document.createElement("div");
-                        div.innerHTML = "data from '" + origin + "'";
+                onMessage: function(data, origin){
+                    data = JSON.parse(data);
+                    var div = remoteapp.document.createElement("div");
+                    div.innerHTML = "data from '" + origin + "'";
+                    if (remoteapp) {
                         remoteapp.document.body.appendChild(div);
                         for (var key in data) {
                             div = remoteapp.document.createElement("div");
                             div.innerHTML = key + "=" + data[key];
                             remoteapp.document.body.appendChild(div);
                         }
+                        remoteapp.focus();
                     }
-                });
-            }
-            else {
-                alert("you need to allow opening popups for this to work");
+                }
+            });
+            
+            
+            function setApp(app){
+                remoteapp = app;
             }
             
             function sendData(data){
-                proxy.postMessage(JSON.stringify(data));
+                var copy = {};
+                // copy the object in order to avoid the JSON serialization bug
+                easyXDM.apply(copy, data);
+                proxy.postMessage(JSON.stringify(copy));
             }
         </script>
     </head>
