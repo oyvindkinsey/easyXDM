@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global global, getNixProxy, easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, un, on, isHostMethod, apply, query, whenReady*/
+/*global global, getNixProxy, easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, un, on, isHostMethod, apply, query, whenReady, IFRAME_PREFIX*/
 
 /**
  * @class easyXDM.stack.NixTransport
@@ -107,7 +107,8 @@ easyXDM.stack.NixTransport = function(config){
                         xdm_c: config.channel,
                         xdm_s: config.secret,
                         xdm_p: 3 // 3 = NixTransport
-                    })
+                    }),
+                    name: IFRAME_PREFIX + config.channel + "_provider"
                 });
                 frame = createFrame(config);
                 frame.contentWindow.opener = proxy;

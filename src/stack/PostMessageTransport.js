@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, un, on, apply, whenReady*/
+/*global easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, un, on, apply, whenReady, IFRAME_PREFIX*/
 
 /**
  * @class easyXDM.stack.PostMessageTransport
@@ -105,7 +105,8 @@ easyXDM.stack.PostMessageTransport = function(config){
                         xdm_e: location.protocol + "//" + location.host,
                         xdm_c: config.channel,
                         xdm_p: 1 // 1 = PostMessage
-                    })
+                    }),
+                    name: IFRAME_PREFIX + config.channel + "_provider"
                 });
                 frame = createFrame(config);
             }

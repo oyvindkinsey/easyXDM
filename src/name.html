@@ -33,7 +33,7 @@
                         break;
                     case "3":
                         // NameTransport remote
-                        var guest = window.parent.frames[channel];
+                        var guest = window.parent.frames["easyXDM_" + channel + "_provider"];
                         if (!guest) {
                             throw new Error("unable to reference window");
                         }
