@@ -43,7 +43,7 @@ easyXDM.stack.FrameElementTransport = function(config){
                 // set up the iframe
                 apply(config.props, {
                     src: appendQueryParameters(config.remote, {
-                        xdm_e: location.protocol + "//" + location.host + location.pathname,
+                        xdm_e: location.protocol + "//" + location.host + location.pathname + location.search,
                         xdm_c: config.channel,
                         xdm_p: 5 // 5 = FrameElementTransport
                     }),
