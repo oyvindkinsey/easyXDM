@@ -433,7 +433,7 @@ var getXhr = (function(){
  * @param {object} config The configuration
  */
 function ajax(config){
-    var req = getXhr(), pairs = [], data, isPOST;
+    var req = getXhr(), pairs = [], data, isPOST, timeout;
     
     apply(config, {
         method: "POST",
@@ -446,7 +446,8 @@ function ajax(config){
             throw new Error(msg);
         },
         data: {},
-        type: "plain"
+        type: "plain",
+        timeout: 30
     }, true);
     isPOST = config.method == "POST";
     
@@ -467,6 +468,7 @@ function ajax(config){
     
     req.onreadystatechange = function(){
         if (req.readyState == 4) {
+            clearTimeout(timeout);
             var response, errorMsg;
             if (config.type == "json") {
                 try {
@@ -496,14 +498,24 @@ function ajax(config){
                 });
             }
             else {
-                config.success(response);
+                config.success(response, req);
             }
             
             req.onreadystatechange = emptyFn;
             req = null;
         }
     };
-    
+    timeout = setTimeout(function(){
+        req.abort();
+        config.error({
+            message: "timeout after " + config.timeout + " second",
+            status: 0,
+            data: null,
+            toString: function(){
+                return this.message + " Status: " + this.status;
+            }
+        });
+    }, config.timeout);
     req.send(isPOST ? data : "");
 }
 
