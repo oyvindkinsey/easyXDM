@@ -495,7 +495,7 @@ function ajax(config){
                     toString: function(){
                         return this.message + " Status: " + this.status;
                     }
-                });
+                }, req);
             }
             else {
                 config.success(response, req);
@@ -514,7 +514,7 @@ function ajax(config){
             toString: function(){
                 return this.message + " Status: " + this.status;
             }
-        });
+        }, null);
     }, config.timeout);
     req.send(isPOST ? data : "");
 }
