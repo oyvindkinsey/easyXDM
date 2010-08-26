@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, apply, query, whenReady*/
+/*global easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, apply, query, whenReady, IFRAME_PREFIX*/
 
 /**
  * @class easyXDM.stack.FrameElementTransport
@@ -43,10 +43,11 @@ easyXDM.stack.FrameElementTransport = function(config){
                 // set up the iframe
                 apply(config.props, {
                     src: appendQueryParameters(config.remote, {
-                        xdm_e: location.protocol + "//" + location.host + location.pathname,
+                        xdm_e: location.protocol + "//" + location.host + location.pathname + location.search,
                         xdm_c: config.channel,
                         xdm_p: 5 // 5 = FrameElementTransport
-                    })
+                    }),
+                    name: IFRAME_PREFIX + config.channel + "_provider"
                 });
                 frame = createFrame(config);
                 frame.fn = function(sendFn){

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="easyXDM" default="build" basedir=".">
 	<property file="build.properties"/>
+	<property file="build.secret.properties"/>
 	<property name="project.build.artifactdir" value="./artifacts/"/>
 	<property name="project.build.publishdir" value="./artifacts/"/>
-	<property name="project.build.version" value="2.4.6"/>
+	<property name="project.build.version" value="2.4.7"/>
 	
 	<!-- Setup classpath for js-build-tools ant tasks -->
 	<path id="js-build-tasks.classpath">
@@ -17,6 +18,14 @@
 	<taskdef name="yuicompress" classname="com.moxiecode.ant.tasks.YuiCompressTask" classpathref="js-build-tasks.classpath" loaderref="js-build-tasks.classpath.loader" />
 	<taskdef name="jslint" classname="com.googlecode.jslint4java.ant.JSLintTask" classpath="tools/jslint4java-1.3.3/jslint4java-1.3.3.jar" />
 	
+	<path id="githubhuploadtask.classpath">
+		<pathelement location="."/>
+		<fileset dir="tools/GitHubUploadTask">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+	<taskdef name="upload" classname="no.kinsey.ant.GitHubUploadTask" classpathref="githubhuploadtask.classpath" loaderref="githubhuploadtask.classpath.loader" />
+
 	<target name="clean" depends="" description="Cleans up the project from temporary files">
 		<delete dir="work" quiet="true"/>
 		<delete dir="${project.build.artifactdir}v${project.build.version}" quiet="true"/>
@@ -36,7 +45,7 @@
 		
 		<concat destfile="work/easyXDM.combined.js">	
 			<fileset dir="." includes="${project.src.dir}/begin_scope.txt" />
-			<fileset dir="." includes="${project.src.dir}/easyXDM.js" />
+			<fileset dir="." includes="${project.src.dir}/Core.js" />
 			<fileset dir="." includes="${project.src.dir}/Debug.js" />
 			<fileset dir="." includes="${project.src.dir}/DomHelper.js" />
 			<fileset dir="." includes="${project.src.dir}/Fn.js" />
@@ -122,12 +131,11 @@
 		<replace file="${project.build.artifactdir}v${project.build.version}-docs/index.html" token="%%version%%" value="${project.build.version}.${build.number}"/>
 	</target>
 	
-	<target name="package" depends="document">
+	<target name="package" depends="build">
 		<zip destfile="${project.build.artifactdir}${ant.project.name}-${project.build.version}.${build.number}.zip" basedir="${project.build.artifactdir}v${project.build.version}"/>
-		<zip destfile="${project.build.artifactdir}${ant.project.name}-${project.build.version}.${build.number}-docs.zip" basedir="${project.build.artifactdir}v${project.build.version}-docs"/>
 	</target>
 	
-	<target name="publish" depends="package">
+	<target name="publish" depends="document, package">
 		<delete dir="${project.build.publishdir}/" quiet="true" />
 		<copy todir="${project.build.publishdir}/">
 			<fileset dir="${project.build.artifactdir}v${project.build.version}"/>
@@ -135,11 +143,10 @@
 		<copy todir="${project.build.publishdir}/docs/">
 			<fileset dir="${project.build.artifactdir}v${project.build.version}-docs"/>
 		</copy>
-		<copy file="${project.build.artifactdir}${ant.project.name}-${project.build.version}.${build.number}.zip" tofile="${project.build.publishdir}/dev/source.zip" />
-		<copy file="${project.build.artifactdir}${ant.project.name}-${project.build.version}.${build.number}-docs.zip" tofile="${project.build.publishdir}/dev/docs.zip" />
+		<copy file="${project.build.artifactdir}${ant.project.name}-${project.build.version}.${build.number}.zip" tofile="${project.build.publishdir}/source.zip" />
 	</target>
 	
-	<target name="publishtoweb" depends="package">
+	<target name="publishtoweb" depends="package, document">
 		<delete dir="${project.build.publishdir}v${project.build.version}" quiet="true" />
 		<copy todir="${project.build.publishdir}v${project.build.version}">
 			<fileset dir="${project.build.artifactdir}v${project.build.version}"/>
@@ -147,8 +154,8 @@
 		<copy todir="${project.build.publishdir}v${project.build.version}/docs/">
 			<fileset dir="${project.build.artifactdir}v${project.build.version}-docs"/>
 		</copy>
-		<copy file="${project.build.artifactdir}${ant.project.name}-${project.build.version}.${build.number}.zip" tofile="${project.build.publishdir}v${project.build.version}/source.zip" />
-		<copy file="${project.build.artifactdir}${ant.project.name}-${project.build.version}.${build.number}-docs.zip" tofile="${project.build.publishdir}v${project.build.version}/docs.zip" />
+		<copy file="${project.build.artifactdir}${ant.project.name}-${project.build.version}.${build.number}.zip" tofile="${project.build.publishdir}v${project.build.version}/download.zip" />
+		<upload user="${github.user}" repo="${github.repo}" username="${github.username}" token="${github.token}" description="just a test" path="${project.build.artifactdir}${ant.project.name}-${project.build.version}.${build.number}.zip" />
 	</target>
 	
 </project>

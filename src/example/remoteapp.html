@@ -2,9 +2,13 @@
 <html>
     <head>
         <title>easyXDM</title>
+        <script type="text/javascript">
+            var target = location.hash.substring(1);
+            var host = window.opener.frames[target];
+            host.setApp(window);
+        </script>
     </head>
     <body>
-    	<!-- Send some data to the other side using the proxy -->
-        <input type="button" onclick="window.opener.sendData({a:'b',c:'d',e:'f'});" value="send data to local"/>
+        <!-- Send some data to the other side using the proxy --><input type="button" onclick="host.sendData({a:'b',c:'d',e:'f'});" value="send data to local"/>
     </body>
 </html>

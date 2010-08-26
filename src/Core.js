@@ -7,8 +7,9 @@ var emptyFn = Function.prototype;
 var reURI = /^(http.?:\/\/([^\/\s]+))/, // returns groups for origin (1) and domain (2)
  reParent = /[\-\w]+\/\.\.\//, // matches a foo/../ expression 
  reDoubleSlash = /([^:])\/\//g; // matches // anywhere but in the protocol
+var IFRAME_PREFIX = "easyXDM_";
 //Sniffing is bad, but in this case unavoidable
-var CREATE_FRAME_USING_HTML = /msie [67]/.test(navigator.userAgent.toLowerCase());
+var CREATE_FRAME_USING_HTML = /msie /.test(navigator.userAgent.toLowerCase());
 // #ifdef debug
 var _trace = emptyFn;
 // #endif
@@ -682,9 +683,7 @@ function prepareTransportStack(config){
                     useResize: config.useParent ? false : config.useResize
                 });
             }
-            stackEls = [new easyXDM.stack.HashTransport(config), new easyXDM.stack.ReliableBehavior({
-                timeout: config.interval * 1.5
-            }), new easyXDM.stack.QueueBehavior({
+            stackEls = [new easyXDM.stack.HashTransport(config), new easyXDM.stack.ReliableBehavior({}), new easyXDM.stack.QueueBehavior({
                 encode: true,
                 maxLength: 4000 - config.remote.length
             }), new easyXDM.stack.VerifyBehavior({

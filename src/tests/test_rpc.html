@@ -2,33 +2,18 @@
 <html>
     <head>
         <title>easyXDM</title>
+        <script type="text/javascript" src="../easyXDM.debug.js">
+        </script>
         <script type="text/javascript">
             if (location.href.indexOf("src") !== -1) {
                 if (typeof JSON === "undefined") {
                     document.write(unescape("%3Cscript src='../../tools/json2.js' type='text/javascript'%3E%3C/script%3E"));
                 }
-                document.write(unescape("%3Cscript src='../easyXDM.js' type='text/javascript'%3E%3C/script%3E"));
-                document.write(unescape("%3Cscript src='../Debug.js' type='text/javascript'%3E%3C/script%3E"));
-                document.write(unescape("%3Cscript src='../DomHelper.js' type='text/javascript'%3E%3C/script%3E"));
-                document.write(unescape("%3Cscript src='../Fn.js' type='text/javascript'%3E%3C/script%3E"));
-                document.write(unescape("%3Cscript src='../Socket.js' type='text/javascript'%3E%3C/script%3E"));
-                document.write(unescape("%3Cscript src='../Rpc.js' type='text/javascript'%3E%3C/script%3E"));
-                document.write(unescape("%3Cscript src='../stack/SameOriginTransport.js' type='text/javascript'%3E%3C/script%3E"));
-                document.write(unescape("%3Cscript src='../stack/PostMessageTransport.js' type='text/javascript'%3E%3C/script%3E"));
-                document.write(unescape("%3Cscript src='../stack/FrameElementTransport.js' type='text/javascript'%3E%3C/script%3E"));
-                document.write(unescape("%3Cscript src='../stack/NixTransport.js' type='text/javascript'%3E%3C/script%3E"));
-                document.write(unescape("%3Cscript src='../stack/NameTransport.js' type='text/javascript'%3E%3C/script%3E"));
-                document.write(unescape("%3Cscript src='../stack/HashTransport.js' type='text/javascript'%3E%3C/script%3E"));
-                document.write(unescape("%3Cscript src='../stack/ReliableBehavior.js' type='text/javascript'%3E%3C/script%3E"));
-                document.write(unescape("%3Cscript src='../stack/QueueBehavior.js' type='text/javascript'%3E%3C/script%3E"));
-                document.write(unescape("%3Cscript src='../stack/VerifyBehavior.js' type='text/javascript'%3E%3C/script%3E"));
-                document.write(unescape("%3Cscript src='../stack/RpcBehavior.js' type='text/javascript'%3E%3C/script%3E"));
             }
             else {
                 if (typeof JSON === "undefined") {
                     document.write(unescape("%3Cscript src='../json2.js' type='text/javascript'%3E%3C/script%3E"));
                 }
-                document.write(unescape("%3Cscript src='../easyXDM.debug.js' type='text/javascript'%3E%3C/script%3E"));
             }
         </script>
         <script type="text/javascript">

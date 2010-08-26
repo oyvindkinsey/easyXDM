@@ -6,3 +6,4 @@ build.number
 .tmp_*
 src/.*
 *.prefs
+build.secret.properties
