@@ -66,7 +66,7 @@ easyXDM.stack.SameOriginTransport = function(config){
                 });
                 setTimeout(function(){
                     pub.up.callback(true);
-                }, 0)
+                }, 0);
             }
         },
         init: function(){
