@@ -412,117 +412,6 @@ function createFrame(config){
     return frame;
 }
 
-/*
- * Methods related to AJAX
- */
-/**
- * Creates a cross-browser XMLHttpRequest object
- * @return {XMLHttpRequest} A XMLHttpRequest object.
- */
-var getXhr = (function(){
-    if (isHostMethod(window, "XMLHttpRequest")) {
-        return function(){
-            return new XMLHttpRequest();
-        };
-    }
-    else {
-        var item = (function(){
-            var list = ["Microsoft", "Msxml2", "Msxml3"], i = list.length;
-            while (i--) {
-                try {
-                    item = list[i] + ".XMLHTTP";
-                    var obj = new ActiveXObject(item);
-                    return item;
-                } 
-                catch (e) {
-                }
-            }
-        }());
-        return function(){
-            return new ActiveXObject(item);
-        };
-    }
-}());
-
-/** 
- * Runs an asynchronous request using XMLHttpRequest
- * @param {object} config The configuration
- */
-function ajax(config){
-    var req = getXhr(), pairs = [], data, isPOST;
-    
-    apply(config, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-            "X-Requested-With": "XMLHttpRequest"
-        },
-        success: emptyFn,
-        error: function(msg){
-            throw new Error(msg);
-        },
-        data: {},
-        type: "plain"
-    }, true);
-    isPOST = config.method == "POST";
-    
-    for (var key in config.data) {
-        if (config.data.hasOwnProperty(key)) {
-            pairs.push(encodeURIComponent(key) + "=" + encodeURIComponent(config.data[key]));
-        }
-    }
-    data = pairs.join("&");
-    
-    req.open(config.method, config.url + (isPOST ? "" : "?" + data), true);
-    
-    for (var prop in config.headers) {
-        if (config.headers.hasOwnProperty(prop)) {
-            req.setRequestHeader(prop, config.headers[prop]);
-        }
-    }
-    
-    req.onreadystatechange = function(){
-        if (req.readyState == 4) {
-            var response, errorMsg;
-            if (config.type == "json") {
-                try {
-                    response = req.responseText;
-                    response = getJSON().parse(response);
-                } 
-                catch (e) {
-                    errorMsg = "An error occured while parsing the JSON: " + e.message;
-                }
-            }
-            else {
-                response = req.responseText;
-            }
-            
-            if (req.status < 200 || req.status >= 300) {
-                errorMsg = "The server did not return a valid status code.";
-            }
-            
-            if (errorMsg) {
-                config.error({
-                    message: errorMsg,
-                    status: req.status,
-                    data: response,
-                    toString: function(){
-                        return this.message + " Status: " + this.status;
-                    }
-                });
-            }
-            else {
-                config.success(response);
-            }
-            
-            req.onreadystatechange = emptyFn;
-            req = null;
-        }
-    };
-    
-    req.send(isPOST ? data : "");
-}
-
 /**
  * Check whether a domain is allowed using an Access Control List.
  * The ACL can contain * and ? as wildcards, or can be regular expressions.
@@ -811,19 +700,7 @@ global.easyXDM = {
      * @param {boolean} noOverwrite Set to True to only set non-existing properties.
      */
     apply: apply,
-    /** 
-     * Runs an asynchronous request using XMLHttpRequest
-     * @param {object} config This object can have the following properties
-     * <ul>
-     * <li> url: string<br/>The url to request.</li>
-     * <li> method: string<br/>POST, HEAD or GET.</li>
-     * <li> data: object<br/>Any data that should be sent.</li>
-     * <li> type: string<br/>The type of data to retrieve. If set to 'json' then the result will be parsed.</li>
-     * <li> success: function<br/>The callback function for successfull requests.</li>
-     * <li> error: function<br/>The callback function for errors.</li>
-     * </ul>
-     */
-    ajax: ajax,
+    
     /**
      * A safe implementation of HTML5 JSON. Feature testing is used to make sure the implementation works.
      * @return {JSON} A valid JSON conforming object, or null if not found.
