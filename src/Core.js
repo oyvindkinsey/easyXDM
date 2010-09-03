@@ -14,9 +14,7 @@ var _trace = emptyFn;
 // #endif
 
 
-/* Methods for feature testing
- * From http://peter.michaux.ca/articles/feature-detection-state-of-the-art-browser-scripting
- */
+// http://peter.michaux.ca/articles/feature-detection-state-of-the-art-browser-scripting
 function isHostMethod(object, property){
     var t = typeof object[property];
     return t == 'function' ||
@@ -27,6 +25,15 @@ function isHostMethod(object, property){
 function isHostObject(object, property){
     return !!(typeof(object[property]) == 'object' && object[property]);
 }
+
+// end
+
+// http://perfectionkills.com/instanceof-considered-harmful-or-how-to-write-a-robust-isarray/
+function isArray(o){
+    return Object.prototype.toString.call(o) === '[object Array]';
+}
+
+// end
 
 /*
  * Cross Browser implementation for adding and removing event listeners.
