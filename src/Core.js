@@ -389,10 +389,7 @@ function createFrame(config){
     delete config.props.name;
     
     if (config.onLoad) {
-        frame.loadFn = function(){
-            config.onLoad(frame.contentWindow);
-        };
-        on(frame, "load", frame.loadFn);
+        on(frame, "load", config.onLoad);
     }
     
     if (typeof config.container == "string") {
