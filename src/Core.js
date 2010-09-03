@@ -4,12 +4,11 @@
 var global = this;
 var channelId = 0;
 var emptyFn = Function.prototype;
-var reURI = /^(http.?:\/\/([^\/\s]+))/, // returns groups for origin (1) and domain (2)
- reParent = /[\-\w]+\/\.\.\//, // matches a foo/../ expression 
- reDoubleSlash = /([^:])\/\//g; // matches // anywhere but in the protocol
+var reURI = /^(http.?:\/\/([^\/\s]+))/; // returns groups for origin (1) and domain (2)
+var reParent = /[\-\w]+\/\.\.\//; // matches a foo/../ expression 
+var reDoubleSlash = /([^:])\/\//g; // matches // anywhere but in the protocol
 var IFRAME_PREFIX = "easyXDM_";
-//Sniffing is bad, but in this case unavoidable
-var CREATE_FRAME_USING_HTML = /msie /.test(navigator.userAgent.toLowerCase());
+var HAS_NAME_PROPERTY_BUG;
 // #ifdef debug
 var _trace = emptyFn;
 // #endif
@@ -337,6 +336,25 @@ function apply(destination, source, noOverwrite){
 }
 
 /**
+ * This tests for the bug in IE where setting the [name] property using javascript causes the value to be redirected into [submitName].
+ */
+function testForNamePropertyBug(){
+    var el = document.createElement("iframe");
+    el.name = "easyXDM_TEST";
+    apply(el.style, {
+        position: "absolute",
+        left: "-2000px",
+        top: "0px"
+    });
+    document.body.appendChild(el);
+    HAS_NAME_PROPERTY_BUG = !(el.contentWindow === window.frames[el.name]);
+    document.body.removeChild(el);
+    // #ifdef debug
+    _trace("HAS_NAME_PROPERTY_BUG: " + HAS_NAME_PROPERTY_BUG);
+    // #endif
+}
+
+/**
  * Creates a frame and appends it to the DOM.
  * @param config {object} This object can have the following properties
  * <ul>
@@ -352,22 +370,23 @@ function createFrame(config){
     // #ifdef debug
     _trace("creating frame: " + config.props.src);
     // #endif
+    if (undef(HAS_NAME_PROPERTY_BUG)) {
+        testForNamePropertyBug();
+    }
     var frame;
     // This is to work around the problems in IE6/7 with setting the name property. 
     // Internally this is set as 'submitName' instead when using 'iframe.name = ...'
     // This is not required by easyXDM itself, but is to facilitate other use cases 
-    if (config.props.name && CREATE_FRAME_USING_HTML) {
+    if (HAS_NAME_PROPERTY_BUG) {
         frame = document.createElement("<iframe name=\"" + config.props.name + "\"/>");
     }
     else {
         frame = document.createElement("IFRAME");
+        frame.name = config.props.name;
     }
     
-    if (config.props.name) {
-        // We need to add these properties before adding the element to te DOM
-        frame.id = frame.name = config.props.name;
-        delete config.props.name;
-    }
+    frame.id = frame.name = config.props.name;
+    delete config.props.name;
     
     if (config.onLoad) {
         frame.loadFn = function(){
