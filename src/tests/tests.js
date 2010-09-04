@@ -686,7 +686,10 @@ function runTests(){
                         asyncMethod: {},
                         method: {},
                         error: {},
-                        nonexistent: {}
+                        nonexistent: {},
+                        namedParamsMethod: {
+                            namedParams: true
+                        }
                     },
                     local: {
                         voidCallback: {
@@ -741,6 +744,17 @@ function runTests(){
                     this.notifyResult(false, "success handler called");
                 }, function(message){
                     scope.notifyResult(true);
+                });
+            }
+        }, {
+            name: "using named parameters",
+            timeout: 5000,
+            run: function(){
+                var scope = this;
+                this.remote.namedParamsMethod({
+                    msg: this.expectedMessage
+                }, function(message){
+                    scope.notifyResult((scope.expectedMessage === message));
                 });
             }
         }]
