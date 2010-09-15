@@ -2,12 +2,10 @@
 /*global easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, un, on, apply, whenReady, IFRAME_PREFIX*/
 
 /**
- * @class easyXDM.stack.PostMessageTransport
  * PostMessageTransport is a transport class that uses HTML5 postMessage for communication.<br/>
  * <a href="http://msdn.microsoft.com/en-us/library/ms644944(VS.85).aspx">http://msdn.microsoft.com/en-us/library/ms644944(VS.85).aspx</a><br/>
  * <a href="https://developer.mozilla.org/en/DOM/window.postMessage">https://developer.mozilla.org/en/DOM/window.postMessage</a>
- * @namespace easyXDM.stack
- * @constructor
+ * @class easyXDM.stack.PostMessageTransport
  * @param {Object} config The transports configuration.
  * @cfg {String} remote The remote domain to communicate with.
  */

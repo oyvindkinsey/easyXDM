@@ -2,11 +2,9 @@
 /*global easyXDM, window, escape, unescape, undef, getJSON, debug, emptyFn, isArray */
 
 /**
- * @class easyXDM.stack.RpcBehavior
  * This uses JSON-RPC 2.0 to expose local methods and to invoke remote methods and have responses returned over the the string based transport stack.<br/>
  * Exposed methods can return values synchronous, asyncronous, or bet set up to not return anything.
- * @namespace easyXDM.stack
- * @constructor
+ * @class easyXDM.stack.RpcBehavior
  * @param {Object} proxy The object to apply the methods to.
  * @param {Object} config The definition of the local and remote interface to implement.
  * @cfg {Object} local The local interface to expose.

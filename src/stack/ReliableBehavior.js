@@ -2,10 +2,8 @@
 /*global easyXDM, window, escape, unescape, debug */
 
 /**
- * @class easyXDM.stack.ReliableBehavior
  * This is a behavior that tries to make the underlying transport reliable by using acknowledgements.
- * @namespace easyXDM.stack
- * @constructor
+ * @class easyXDM.stack.ReliableBehavior
  * @param {Object} config The behaviors configuration.
  */
 easyXDM.stack.ReliableBehavior = function(config){

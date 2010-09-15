@@ -2,9 +2,9 @@
 /*global easyXDM, window, escape, unescape, isHostObject, isHostMethod, un, on, createFrame, debug */
 
 /** 
- * @class easyXDM.DomHelper
  * Contains methods for dealing with the DOM
- * @singleton
+ * @class easyXDM.DomHelper
+ * @static
  */
 easyXDM.DomHelper = {
     /**

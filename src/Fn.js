@@ -7,10 +7,9 @@
     var _map = {};
     
     /**
-     * @class easyXDM.Fn
      * This contains methods related to function handling, such as storing callbacks.
-     * @singleton
-     * @namespace easyXDM
+     * @class easyXDM.Fn
+     * @static
      */
     easyXDM.Fn = {
         /**

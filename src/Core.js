@@ -679,14 +679,15 @@ function removeFromStack(element){
  * Export the main object and any other methods applicable
  */
 /** 
- * @class easyXDM
  * A javascript library providing cross-browser, cross-domain messaging/RPC.
+ * @class easyXDM
  * @version %%version%%
- * @singleton
+ * @static
  */
 global.easyXDM = {
     /**
      * The version of the library
+     * @property version
      * @type {string}
      */
     version: "%%version%%",
@@ -697,11 +698,11 @@ global.easyXDM = {
      */
     query: query,
     /**
-     * @private
      */
     stack: {},
     /**
      * Applies properties from the source object to the target object.<br/>
+     * @method apply
      * @param {object} target The target of the properties.
      * @param {object} source The source of the properties.
      * @param {boolean} noOverwrite Set to True to only set non-existing properties.
@@ -710,12 +711,14 @@ global.easyXDM = {
     
     /**
      * A safe implementation of HTML5 JSON. Feature testing is used to make sure the implementation works.
+     * @method getJSONObject
      * @return {JSON} A valid JSON conforming object, or null if not found.
      */
     getJSONObject: getJSON,
     /**
      * This will add a function to the queue of functions to be run once the DOM reaches a ready state.
      * If functions are added after this event then they will be executed immediately.
+     * @method whenReady
      * @param {function} fn The function to add
      * @param {object} scope An optional scope for the function to be called with.
      */

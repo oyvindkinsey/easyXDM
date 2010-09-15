@@ -2,11 +2,9 @@
 /*global easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, apply, query, whenReady, IFRAME_PREFIX*/
 
 /**
- * @class easyXDM.stack.FrameElementTransport
  * FrameElementTransport is a transport class that can be used with Gecko-browser as these allow passing variables using the frameElement property.<br/>
  * Security is maintained as Gecho uses Lexical Authorization to determine under which scope a function is running.
- * @namespace easyXDM.stack
- * @constructor
+ * @class easyXDM.stack.FrameElementTransport
  * @param {Object} config The transports configuration.
  * @cfg {String} remote The remote document to communicate with.
  */

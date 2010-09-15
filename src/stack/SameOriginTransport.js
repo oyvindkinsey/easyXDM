@@ -2,11 +2,9 @@
 /*global easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, un, on, apply, whenReady, IFRAME_PREFIX*/
 
 /**
- * @class easyXDM.stack.SameOriginTransport
  * SameOriginTransport is a transport class that can be used when both domains have the same origin.<br/>
  * This can be useful for testing and for when the main application supports both internal and external sources.
- * @namespace easyXDM.stack
- * @constructor
+ * @class easyXDM.stack.SameOriginTransport
  * @param {Object} config The transports configuration.
  * @cfg {String} remote The remote document to communicate with.
  */

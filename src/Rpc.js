@@ -2,7 +2,6 @@
 /*global easyXDM, window, escape, unescape, undef,, chainStack, prepareTransportStack, debug */
 
 /** 
- * @class easyXDM.Rpc
  * Creates a proxy object that can be used to call methods implemented on the remote end of the channel, and also to provide the implementation
  * of methods to be called from the remote end.<br/>
  * The instantiated object will have methods matching those specified in <code>config.remote</code>.<br/>
@@ -99,8 +98,7 @@
  * });
  * </code></pre>
  * If <code>serializer</code> is set then the class will not attempt to use the native implementation.
- * @namespace easyXDM
- * @constructor
+ * @class easyXDM.Rpc
  * @param {Object} config The underlying transports configuration. See easyXDM.Socket for available parameters.
  * @param {Object} jsonRpcConfig The description of the interface to implement.
  */

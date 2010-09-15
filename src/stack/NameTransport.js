@@ -2,14 +2,12 @@
 /*global easyXDM, window, escape, unescape, undef, getLocation, appendQueryParameters, resolveUrl, createFrame, debug, un, apply, whenReady, IFRAME_PREFIX*/
 
 /**
- * @class easyXDM.stack.NameTransport
  * NameTransport uses the window.name property to relay data.
  * The <code>local</code> parameter needs to be set on both the consumer and provider,<br/>
  * and the <code>remoteHelper</code> parameter needs to be set on the consumer.
+ * @class easyXDM.stack.NameTransport
  * @constructor
  * @param {Object} config The transports configuration.
- * @cfg {String} remoteHelper The url to the remote instance of hash.html - this is only needed for the host.
- * @namespace easyXDM.stack
  */
 easyXDM.stack.NameTransport = function(config){
     // #ifdef debug

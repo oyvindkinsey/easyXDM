@@ -2,13 +2,11 @@
 /*global easyXDM, window, escape, unescape, debug, undef, removeFromStack*/
 
 /**
- * @class easyXDM.stack.QueueBehavior
  * This is a behavior that enables queueing of messages. <br/>
  * It will buffer incoming messages and dispach these as fast as the underlying transport allows.
  * This will also fragment/defragment messages so that the outgoing message is never bigger than the
  * set length.
- * @namespace easyXDM.stack
- * @constructor
+ * @class easyXDM.stack.QueueBehavior
  * @param {Object} config The behaviors configuration. Optional.
  * @cfg {Number} maxLength The maximum length of each outgoing message. Set this to enable fragmentation.
  */

@@ -2,11 +2,9 @@
 /*global easyXDM, window, escape, unescape, getLocation, createFrame, debug, un, on, apply, whenReady, IFRAME_PREFIX*/
 
 /**
- * @class easyXDM.stack.HashTransport
  * HashTransport is a transport class that uses the IFrame URL Technique for communication.<br/>
  * <a href="http://msdn.microsoft.com/en-us/library/bb735305.aspx">http://msdn.microsoft.com/en-us/library/bb735305.aspx</a><br/>
- * @namespace easyXDM.stack
- * @constructor
+ * @class easyXDM.stack.HashTransport
  * @param {Object} config The transports configuration.
  * @cfg {String/Window} local The url to the local file used for proxying messages, or the local window.
  * @cfg {Number} delay The number of milliseconds easyXDM should try to get a reference to the local window.

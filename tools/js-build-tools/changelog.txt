@@ -1,2 +1,2 @@
-Version 1.0 (200x-xx-xx)
+Version 1.0 (2009-08-19)
 	First release.

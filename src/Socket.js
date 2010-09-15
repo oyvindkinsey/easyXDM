@@ -2,11 +2,10 @@
 /*global easyXDM, window, escape, unescape, chainStack, prepareTransportStack, getLocation, debug */
 
 /**
- * @class easyXDM.Socket
  * This class creates a transport channel between two domains that is usable for sending and receiving string-based messages.<br/>
  * The channel is reliable, supports queueing, and ensures that the message originates from the expected domain.<br/>
  * Internally different stacks will be used depending on the browsers features and the available parameters.
- * <h2>How to set up</h2>
+ * &lt;h2&gt;How to set up</h2>
  * Setting up the provider:
  * <pre><code>
  * var socket = new easyXDM.Socket({
@@ -36,8 +35,7 @@
  * </code></pre>
  * If you are unable to upload the <code>name.html</code> file to the consumers domain then remove <code>removeHelper</code> property
  * and the transport will fall back to using FMI instead of the window.name to transport messages.
- * @namespace easyXDM
- * @constructor
+ * @class easyXDM.Socket
  * @cfg {String/Window} local The url to the local name.html document, a local static file, or a reference to the local window.
  * @cfg {Boolean} lazy (Consumer only) Set this to true if you want easyXDM to defer creating the transport until really needed. 
  * @cfg {String} remote (Consumer only) The url to the providers document.
