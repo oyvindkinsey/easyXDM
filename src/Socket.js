@@ -34,8 +34,8 @@
  * &nbsp; }
  * });
  * </code></pre>
- * If you are unable to upload the <code>name.html</code> file to the consumers domain then remove <code>removeHelper</code> property
- * and the transport will fall back to using FMI instead of the window.name to transport messages.
+ * If you are unable to upload the <code>name.html</code> file to the consumers domain then remove the <code>remoteHelper</code> property
+ * and easyXDM will fall back to using the HashTransport instead of the NameTransport when not able to use any of the primary transports.
  * @namespace easyXDM
  * @constructor
  * @cfg {String/Window} local The url to the local name.html document, a local static file, or a reference to the local window.
