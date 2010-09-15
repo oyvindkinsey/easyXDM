@@ -118,7 +118,8 @@ if (!isReady) {
     on(window, "DOMContentLoaded", dom_onLoaded);
     on(document, "DOMContentLoaded", dom_onLoaded);
     
-    if (isHostMethod(window, "ActiveXObject")) {
+    if (isHostMethod(window, "attachEvent")) {
+        // non-DOM-3 compliant IE
         on(document, "readystatechange", document_onReadyStateChange);
         on(window, "load", dom_onLoaded);
         
