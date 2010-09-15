@@ -342,9 +342,7 @@ function apply(destination, source, noOverwrite){
     return destination;
 }
 
-/**
- * This tests for the bug in IE where setting the [name] property using javascript causes the value to be redirected into [submitName].
- */
+// This tests for the bug in IE where setting the [name] property using javascript causes the value to be redirected into [submitName].
 function testForNamePropertyBug(){
     var el = document.createElement("iframe");
     el.name = "easyXDM_TEST";
