@@ -4,20 +4,17 @@
 var global = this;
 var channelId = 0;
 var emptyFn = Function.prototype;
-var reURI = /^(http.?:\/\/([^\/\s]+))/, // returns groups for origin (1) and domain (2)
- reParent = /[\-\w]+\/\.\.\//, // matches a foo/../ expression 
- reDoubleSlash = /([^:])\/\//g; // matches // anywhere but in the protocol
+var reURI = /^(http.?:\/\/([^\/\s]+))/; // returns groups for origin (1) and domain (2)
+var reParent = /[\-\w]+\/\.\.\//; // matches a foo/../ expression 
+var reDoubleSlash = /([^:])\/\//g; // matches // anywhere but in the protocol
 var IFRAME_PREFIX = "easyXDM_";
-//Sniffing is bad, but in this case unavoidable
-var CREATE_FRAME_USING_HTML = /msie /.test(navigator.userAgent.toLowerCase());
+var HAS_NAME_PROPERTY_BUG;
 // #ifdef debug
 var _trace = emptyFn;
 // #endif
 
 
-/* Methods for feature testing
- * From http://peter.michaux.ca/articles/feature-detection-state-of-the-art-browser-scripting
- */
+// http://peter.michaux.ca/articles/feature-detection-state-of-the-art-browser-scripting
 function isHostMethod(object, property){
     var t = typeof object[property];
     return t == 'function' ||
@@ -28,6 +25,15 @@ function isHostMethod(object, property){
 function isHostObject(object, property){
     return !!(typeof(object[property]) == 'object' && object[property]);
 }
+
+// end
+
+// http://perfectionkills.com/instanceof-considered-harmful-or-how-to-write-a-robust-isarray/
+function isArray(o){
+    return Object.prototype.toString.call(o) === '[object Array]';
+}
+
+// end
 
 /*
  * Cross Browser implementation for adding and removing event listeners.
@@ -336,6 +342,23 @@ function apply(destination, source, noOverwrite){
     return destination;
 }
 
+// This tests for the bug in IE where setting the [name] property using javascript causes the value to be redirected into [submitName].
+function testForNamePropertyBug(){
+    var el = document.createElement("iframe");
+    el.name = "easyXDM_TEST";
+    apply(el.style, {
+        position: "absolute",
+        left: "-2000px",
+        top: "0px"
+    });
+    document.body.appendChild(el);
+    HAS_NAME_PROPERTY_BUG = !(el.contentWindow === window.frames[el.name]);
+    document.body.removeChild(el);
+    // #ifdef debug
+    _trace("HAS_NAME_PROPERTY_BUG: " + HAS_NAME_PROPERTY_BUG);
+    // #endif
+}
+
 /**
  * Creates a frame and appends it to the DOM.
  * @param config {object} This object can have the following properties
@@ -352,28 +375,26 @@ function createFrame(config){
     // #ifdef debug
     _trace("creating frame: " + config.props.src);
     // #endif
+    if (undef(HAS_NAME_PROPERTY_BUG)) {
+        testForNamePropertyBug();
+    }
     var frame;
     // This is to work around the problems in IE6/7 with setting the name property. 
     // Internally this is set as 'submitName' instead when using 'iframe.name = ...'
     // This is not required by easyXDM itself, but is to facilitate other use cases 
-    if (config.props.name && CREATE_FRAME_USING_HTML) {
+    if (HAS_NAME_PROPERTY_BUG) {
         frame = document.createElement("<iframe name=\"" + config.props.name + "\"/>");
     }
     else {
         frame = document.createElement("IFRAME");
+        frame.name = config.props.name;
     }
     
-    if (config.props.name) {
-        // We need to add these properties before adding the element to te DOM
-        frame.id = frame.name = config.props.name;
-        delete config.props.name;
-    }
+    frame.id = frame.name = config.props.name;
+    delete config.props.name;
     
     if (config.onLoad) {
-        frame.loadFn = function(){
-            config.onLoad(frame.contentWindow);
-        };
-        on(frame, "load", frame.loadFn);
+        on(frame, "load", config.onLoad);
     }
     
     if (typeof config.container == "string") {
@@ -394,117 +415,6 @@ function createFrame(config){
     // transfer properties to the frame
     apply(frame, config.props);
     return frame;
-}
-
-/*
- * Methods related to AJAX
- */
-/**
- * Creates a cross-browser XMLHttpRequest object
- * @return {XMLHttpRequest} A XMLHttpRequest object.
- */
-var getXhr = (function(){
-    if (isHostMethod(window, "XMLHttpRequest")) {
-        return function(){
-            return new XMLHttpRequest();
-        };
-    }
-    else {
-        var item = (function(){
-            var list = ["Microsoft", "Msxml2", "Msxml3"], i = list.length;
-            while (i--) {
-                try {
-                    item = list[i] + ".XMLHTTP";
-                    var obj = new ActiveXObject(item);
-                    return item;
-                } 
-                catch (e) {
-                }
-            }
-        }());
-        return function(){
-            return new ActiveXObject(item);
-        };
-    }
-}());
-
-/** 
- * Runs an asynchronous request using XMLHttpRequest
- * @param {object} config The configuration
- */
-function ajax(config){
-    var req = getXhr(), pairs = [], data, isPOST;
-    
-    apply(config, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-            "X-Requested-With": "XMLHttpRequest"
-        },
-        success: emptyFn,
-        error: function(msg){
-            throw new Error(msg);
-        },
-        data: {},
-        type: "plain"
-    }, true);
-    isPOST = config.method == "POST";
-    
-    for (var key in config.data) {
-        if (config.data.hasOwnProperty(key)) {
-            pairs.push(encodeURIComponent(key) + "=" + encodeURIComponent(config.data[key]));
-        }
-    }
-    data = pairs.join("&");
-    
-    req.open(config.method, config.url + (isPOST ? "" : "?" + data), true);
-    
-    for (var prop in config.headers) {
-        if (config.headers.hasOwnProperty(prop)) {
-            req.setRequestHeader(prop, config.headers[prop]);
-        }
-    }
-    
-    req.onreadystatechange = function(){
-        if (req.readyState == 4) {
-            var response, errorMsg;
-            if (config.type == "json") {
-                try {
-                    response = req.responseText;
-                    response = getJSON().parse(response);
-                } 
-                catch (e) {
-                    errorMsg = "An error occured while parsing the JSON: " + e.message;
-                }
-            }
-            else {
-                response = req.responseText;
-            }
-            
-            if (req.status < 200 || req.status >= 300) {
-                errorMsg = "The server did not return a valid status code.";
-            }
-            
-            if (errorMsg) {
-                config.error({
-                    message: errorMsg,
-                    status: req.status,
-                    data: response,
-                    toString: function(){
-                        return this.message + " Status: " + this.status;
-                    }
-                });
-            }
-            else {
-                config.success(response);
-            }
-            
-            req.onreadystatechange = emptyFn;
-            req = null;
-        }
-    };
-    
-    req.send(isPOST ? data : "");
 }
 
 /**
@@ -795,19 +705,7 @@ global.easyXDM = {
      * @param {boolean} noOverwrite Set to True to only set non-existing properties.
      */
     apply: apply,
-    /** 
-     * Runs an asynchronous request using XMLHttpRequest
-     * @param {object} config This object can have the following properties
-     * <ul>
-     * <li> url: string<br/>The url to request.</li>
-     * <li> method: string<br/>POST, HEAD or GET.</li>
-     * <li> data: object<br/>Any data that should be sent.</li>
-     * <li> type: string<br/>The type of data to retrieve. If set to 'json' then the result will be parsed.</li>
-     * <li> success: function<br/>The callback function for successfull requests.</li>
-     * <li> error: function<br/>The callback function for errors.</li>
-     * </ul>
-     */
-    ajax: ajax,
+    
     /**
      * A safe implementation of HTML5 JSON. Feature testing is used to make sure the implementation works.
      * @return {JSON} A valid JSON conforming object, or null if not found.

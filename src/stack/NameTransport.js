@@ -118,13 +118,14 @@ easyXDM.stack.NameTransport = function(config){
                 easyXDM.Fn.set(config.channel, _onMessage);
             }
             // Set up the iframe that will be used for the transport
+            
             callerWindow = createFrame({
                 props: {
                     src: config.local + "#_4" + config.channel
                 },
-                onLoad: function(){
+                onLoad: function onLoad(){
                     // Remove the handler
-                    un(callerWindow, "load", callerWindow.loadFn);
+                    un(callerWindow, "load", onLoad);
                     easyXDM.Fn.set(config.channel + "_load", _onLoad);
                     (function test(){
                         if (typeof callerWindow.contentWindow.sendMessage == "function") {

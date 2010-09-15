@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, undef, getJSON, debug, emptyFn */
+/*global easyXDM, window, escape, unescape, undef, getJSON, debug, emptyFn, isArray */
 
 /**
  * @class easyXDM.stack.RpcBehavior
@@ -75,6 +75,9 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                 // no callbacks, a notification
                 message.params = slice.call(arguments, 0);
             }
+            if (definition.namedParams && message.params.length === 1) {
+                message.params = message.params[0];
+            }
             // Send the method request
             _send(message);
         };
@@ -142,6 +145,9 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
             success = error = emptyFn;
         }
         // Call local method
+        if (!isArray(params)) {
+            params = [params];
+        }
         try {
             var result = fn.method.apply(fn.scope, params.concat([success, error]));
             if (!undef(result)) {

@@ -20,42 +20,38 @@
             easyXDM.DomHelper.requiresJSON("../json2.js");
         </script>
         <script type="text/javascript">
-            var remote;
-            window.onload = function(){
-                remote = new easyXDM.Rpc({
-                    local: "../name.html"
-                }, {
-                    remote: {
-                        voidCallback: {}
+            var remote = new easyXDM.Rpc({
+                local: "../name.html"
+            }, {
+                remote: {
+                    voidCallback: {}
+                },
+                local: {
+                    voidMethod: function(msg){
+                        // Echo back the message
+                        remote.voidCallback(msg);
                     },
-                    local: {
-                        voidMethod: {
-                            method: function(msg){
-                                // Echo back the message
-                                remote.voidCallback(msg);
-                            }
-                        },
-                        asyncMethod: {
-                            method: function(msg, fn){
-                                window.setTimeout(function(){
-                                    // Echo back the msg
-                                    fn(msg);
-                                }, 100);
-                            }
-                        },
-                        // use the shorthand notation
-                        method: function(msg){
+                    asyncMethod: function(msg, fn){
+                        window.setTimeout(function(){
                             // Echo back the msg
-                            return msg;
-                        },
-                        error: {
-                            method: function(){
-                                var a, b = a.c;
-                            }
+                            fn(msg);
+                        }, 100);
+                    },
+                    // use the shorthand notation
+                    method: function(msg){
+                        // Echo back the msg
+                        return msg;
+                    },
+                    error: function(){
+                        var a, b = a.c;
+                    },
+                    namedParamsMethod: {
+                        method: function(params){
+                            return params.msg;
                         }
                     }
-                });
-            };
+                }
+            });
             window.onunload = function(){
                 if (remote) {
                     remote.destroy();
