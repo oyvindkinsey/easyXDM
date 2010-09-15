@@ -6,6 +6,26 @@
     <body>
         <ul>
             <li>
+                2.4.8 15.09.10
+                <br/>
+                Fixed a bug in the SameOriginTransport that could cause onReady to fire prior to the constructor of the Socket/Rpc returning.
+                <br/>
+                Removed the browser sniffing related to the element.name bug (IE). This also makes easyXMD work correctly in IE9 (beta)! 
+                <br/>
+                <strong>Removed the ajax feature from the core in order to streamline the library.</strong>
+                If you rely on this, then please use the 
+                <code>
+                    tinylib
+                </code>
+                library present in 
+                <code>
+                    xhr.html
+                </code>
+                (the only place easyXDM itself used the ajax feature).
+                <br/>
+                Added support to the Rpc object for using named parameters. 
+            </li>
+            <li>
                 2.4.7 23.08.10
                 <br/>
                 Fixed <a href="http://github.com/oyvindkinsey/easyXDM/issues/issue/28">http://github.com/oyvindkinsey/easyXDM/issues/issue/28</a>
