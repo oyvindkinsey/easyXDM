@@ -1,10 +1,14 @@
 ﻿<%
     Response.ContentType = "application/json"
     Response.AddHeader("x-foo", "bar")
-    Response.AddHeader("Access-Control-Allow-Origin", "http://xdm4")
+    Response.AddHeader("Access-Control-Allow-Origin", "http://xdm2")
     Response.AddHeader("Access-Control-Allow-Methods", "POST")
 
-%>
+    Select Case Request.HttpMethod.ToUpper()
+        Case "OPTIONS"
+            
+        Case "POST"
+ %>
 {
     "glossary": {
         "title": "example glossary",
@@ -27,3 +31,10 @@
         }
     }
 }
+<%
+        Case "GET"
+            
+            
+    End Select
+    
+    %>   
