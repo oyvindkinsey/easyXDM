@@ -70,7 +70,6 @@
 		<preprocess infile="work/easyXDM.combined.js" outfile="work/easyXDM.js"/>
 		<preprocess infile="work/easyXDM.combined.js" outfile="work/easyXDM.debug.js" defines="debug"/>
 		<preprocess infile="${project.src.dir}/name.html" outfile="work/name.html"/>
-		<preprocess infile="${project.src.dir}/xhr.html" outfile="work/xhr.html"/>
 		<preprocess infile="${project.src.dir}/widgets/Widgets.js" outfile="work/easyXDM.Widgets.js"/>
 		<preprocess infile="${project.src.dir}/widgets/Widgets.js" outfile="work/easyXDM.Widgets.debug.js" defines="debug"/>
 		
