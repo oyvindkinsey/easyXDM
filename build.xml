@@ -117,6 +117,9 @@
 		<copy todir="${project.build.artifactdir}v${project.build.version}/example">
 			<fileset dir="${project.src.dir}/example"/>
 		</copy>
+		<copy todir="${project.build.artifactdir}v${project.build.version}/cors">
+			<fileset dir="${project.src.dir}/cors"/>
+		</copy>
 		<copy todir="${project.build.artifactdir}v${project.build.version}/tests">
 			<fileset dir="${project.src.dir}/tests"/>
 		</copy>	
