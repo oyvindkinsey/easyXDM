@@ -24,6 +24,7 @@ Using JavaScript only (no Flash, Silverlight, extra html files etc) easyXDM prov
 * IE8+ - using the PostMessageTransport
 * Opera 9+ - using the PostMessageTransport (support for both Operas old standard and the HTML5 standard)
 * Firefox 1-2 - using the FrameElementTransport
+* Firefox 3+ - using the PostMessageTransport
 * Safari 4+ - using the PostMessageTransport
 * Chrome 2+ - using the PostMessageTransport
 
