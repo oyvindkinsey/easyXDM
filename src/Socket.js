@@ -60,6 +60,7 @@ easyXDM.Socket = function(config){
     trace("constructor");
     // #endif
     
+    // create the stack
     var stack = chainStack(prepareTransportStack(config).concat([{
         incoming: function(message, origin){
             config.onMessage(message, origin);
@@ -71,6 +72,9 @@ easyXDM.Socket = function(config){
         }
     }])), recipient = getLocation(config.remote);
     
+    // set the origin
+    this.origin = getLocation(config.remote);
+	
     /**
      * Initiates the destruction of the stack.
      */

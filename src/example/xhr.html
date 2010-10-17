@@ -11,6 +11,7 @@
             easyXDM.DomHelper.requiresJSON("../json2.js");
         </script>
         <script type="text/javascript">
+            // this is only bootstrapping code
             var REMOTE = (function(){
                 var remote = location.href;
                 switch (location.host) {
@@ -30,22 +31,33 @@
                 return remote.substring(0, remote.lastIndexOf("/"));
             }());
             
+            // this is really what you are after
             var xhr = new easyXDM.Rpc({
                 local: "../name.html",
-                remote: REMOTE + "/../xhr.html",
+                remote: REMOTE + "/../cors/",
                 remoteHelper: REMOTE + "/../name.html"
             }, {
                 remote: {
-                    post: {}
+                    request: {}
                 }
             });
             
             function getGlossary(){
-                xhr.post("example/glossary.php", {
-                    param1: "a",
-                    param2: "b"
-                }, function(json){
-                    alert(json.glossary.title);
+                xhr.request({
+                    url: "../example/glossary.aspx",
+                    method: "POST",
+                    headers: {
+                        "x-auth-token": "abcde"
+                    },
+                    data: {
+                        param1: "a",
+                        param2: "b"
+                    }
+                }, function(rpcdata){
+                    var json = easyXDM.getJSONObject().parse(rpcdata.data);
+                    
+                    document.getElementById("response").innerHTML = json.glossary.title;
+                    document.getElementById("header").innerHTML = rpcdata.headers["x-foo"];
                 });
                 
             }
@@ -71,11 +83,13 @@
         <div id="embedded">
         </div>
         <div>
-            This example shows how to use easyXDM to call regular ajax services (no JSONP) from remote domains.
-            <br/>
-            This is done by exposing a method post with the familiar signature 'String url, Object data, Function callback'.
+            This example shows how to use easyXDM to call regular ajax/cors services (no JSONP) from remote domains.
             <br/>
             <input type="button" onclick="getGlossary()" value="Call getGlossary using the exposed method"/>
+            <br/>
+            Data from response:<span id="response"></span>
+            <br/>
+            Data from header:<span id="header"></span>
         </div>
         <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");

@@ -111,32 +111,26 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
         // #ifdef debug
         trace("requested to execute procedure " + method);
         // #endif
-        var used = false, success, error;
+        var success, error;
         if (id) {
             success = function(result){
-                if (used) {
-                    return;
-                }
-                used = true;
+                success = emptyFn;
                 _send({
                     id: id,
                     result: result
                 });
             };
-            error = function(message){
-                if (used) {
-                    return;
-                }
-                used = true;
+            error = function(message, data){
+                error = emptyFn;
                 var msg = {
                     id: id,
                     error: {
                         code: -32099,
-                        message: "Application error: " + message
+                        message: message
                     }
                 };
-                if (typeof message == "object" && "data" in message) {
-                    msg.error.data = message.data;
+                if (data) {
+                    msg.error.data = data;
                 }
                 _send(msg);
             };

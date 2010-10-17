@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, undef,, chainStack, prepareTransportStack, debug */
+/*global easyXDM, window, escape, unescape, undef,, chainStack, prepareTransportStack, debug, getLocation */
 
 /** 
  * @class easyXDM.Rpc
@@ -123,6 +123,8 @@ easyXDM.Rpc = function(config, jsonRpcConfig){
             }
         }
     }
+	
+    // create the stack
     var stack = chainStack(prepareTransportStack(config).concat([new easyXDM.stack.RpcBehavior(this, jsonRpcConfig), {
         callback: function(success){
             if (config.onReady) {
@@ -130,6 +132,10 @@ easyXDM.Rpc = function(config, jsonRpcConfig){
             }
         }
     }]));
+	
+    // set the origin 
+    this.origin = getLocation(config.remote);
+	
     
     /**
      * Initiates the destruction of the stack.
