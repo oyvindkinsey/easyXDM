@@ -12,7 +12,7 @@ easyXDM is a Javascript library that enables you as a developer to easily work a
 * have good documentation
 * be the best xdm-library in existence
 
-How easXDM works 
+How easyXDM works 
 ---------------
 At the core easyXDM provides a transport stack capable of passing string based messages between two windows, a **consumer** (the main document) and a **provider** (a document included using an iframe).
 It does this by using one of several available techniques, always selecting the most efficient one for the current browser.    
