@@ -115,12 +115,10 @@ function document_onReadyStateChange(){
 }
 
 if (!isReady) {
-    on(window, "DOMContentLoaded", dom_onLoaded);
     on(document, "DOMContentLoaded", dom_onLoaded);
     
     if (isHostMethod(window, "ActiveXObject")) {
         on(document, "readystatechange", document_onReadyStateChange);
-        on(window, "load", dom_onLoaded);
         
         if (window === top) {
             (function doScrollCheck(){
@@ -139,6 +137,9 @@ if (!isReady) {
             }());
         }
     }
+
+    // A fallback to window.onload, that will always work
+    on(window, "load", dom_onLoaded);
 }
 /**
  * This will add a function to the queue of functions to be run once the DOM reaches a ready state.
