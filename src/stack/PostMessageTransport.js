@@ -125,7 +125,7 @@ easyXDM.stack.PostMessageTransport = function(config){
                 // set up the iframe
                 apply(config.props, {
                     src: appendQueryParameters(config.remote, {
-                        xdm_e: location.protocol + "//" + location.host,
+                        xdm_e: getLocation(location.href),
                         xdm_c: config.channel,
                         xdm_p: 1 // 1 = PostMessage
                     }),

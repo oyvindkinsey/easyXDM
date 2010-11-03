@@ -124,9 +124,13 @@ easyXDM.stack.NixTransport = function(config){
                     throw new Error("Could not set up VBScript NixProxy:" + e1.message);
                 }
                 // set up the iframe
+                var remote = location.href, i = remote.indexOf("#");
+                if (i != -1) {
+                    remote = remote.substring(0, i);
+                }
                 apply(config.props, {
                     src: appendQueryParameters(config.remote, {
-                        xdm_e: location.protocol + "//" + location.host + location.pathname + location.search,
+                        xdm_e: remote,
                         xdm_c: config.channel,
                         xdm_s: config.secret,
                         xdm_p: 3 // 3 = NixTransport

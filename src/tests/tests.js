@@ -2,7 +2,7 @@
 /*global easyTest, easyXDM, window, checkAcl, getDomainName, getLocation, appendQueryParameters*/
 var REMOTE = (function(){
     var remote = location.href;
-    switch (location.host) {
+    switch (location.hostname) {
         case "provider.easyxdm.net":
             location.href = remote.replace("provider", "consumer");
             break;
