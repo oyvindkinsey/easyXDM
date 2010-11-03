@@ -99,7 +99,7 @@ else {
  */
 var isReady = false, domReadyQueue = [];
 if ("readyState" in document) {
-    isReady = (document.readyState == "complete" || document.readyState == "loaded");
+    isReady = document.readyState == "complete";
 }
 else {
     // If readyState is not supported in the browser, then in order to be able to fire whenReady functions apropriately
@@ -111,39 +111,30 @@ else {
     }
 }
 
-function dom_onLoaded(){
-    if (isReady) {
-        return;
-    }
+function dom_onReady(){
+    dom_onReady = emptyFn;
     // #ifdef debug
-    _trace("firing dom_onLoaded");
+    _trace("firing dom_onReady");
     // #endif
     isReady = true;
     for (var i = 0; i < domReadyQueue.length; i++) {
         domReadyQueue[i]();
     }
     domReadyQueue.length = 0;
-    un(window, "DOMContentLoaded", dom_onLoaded);
-    un(document, "DOMContentLoaded", dom_onLoaded);
-    if (isHostMethod(window, "ActiveXObject")) {
-        un(window, "load", dom_onLoaded);
-    }
 }
 
-function document_onReadyStateChange(){
-    if (document.readyState == "complete") {
-        dom_onLoaded();
-        un(document, "readystatechange", document_onReadyStateChange);
-    }
-}
 
 if (!isReady) {
-    on(document, "DOMContentLoaded", dom_onLoaded);
-    
-    if (isHostMethod(window, "ActiveXObject")) {
-        on(document, "readystatechange", document_onReadyStateChange);
-        
-        if (window === top) {
+    if (isHostMethod(window, "addEventListener")) {
+        on(document, "DOMContentLoaded", dom_onReady);
+    }
+    else {
+        on(document, "readystatechange", function(){
+            if (document.readyState == "complete") {
+                dom_onReady();
+            }
+        });
+        if (document.documentElement.doScroll && window === top) {
             (function doScrollCheck(){
                 if (isReady) {
                     return;
@@ -156,13 +147,13 @@ if (!isReady) {
                     setTimeout(doScrollCheck, 1);
                     return;
                 }
-                dom_onLoaded();
+                dom_onReady();
             }());
         }
     }
     
     // A fallback to window.onload, that will always work
-    on(window, "load", dom_onLoaded);
+    on(window, "load", dom_onReady);
 }
 /**
  * This will add a function to the queue of functions to be run once the DOM reaches a ready state.
