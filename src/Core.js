@@ -1,5 +1,28 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
 /*global easyXDM, JSON, XMLHttpRequest, window, escape, unescape, ActiveXObject */
+//
+// easyXDM
+// http://easyxdm.net/
+// Copyright(c) 2009, Øyvind Sean Kinsey, oyvind@kinsey.no.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
 
 var global = this;
 var channelId = 0;
@@ -46,11 +69,11 @@ if (isHostMethod(window, "addEventListener")) {
         // #endif
         target.addEventListener(type, listener, false);
     };
-    un = function(target, type, listener, useCapture){
+    un = function(target, type, listener){
         // #ifdef debug
         _trace("removing listener " + type);
         // #endif
-        target.removeEventListener(type, listener, useCapture);
+        target.removeEventListener(type, listener, false);
     };
 }
 else if (isHostMethod(window, "attachEvent")) {
@@ -76,7 +99,7 @@ else {
  */
 var isReady = false, domReadyQueue = [];
 if ("readyState" in document) {
-    isReady = (document.readyState == "complete" || document.readyState == "loaded");
+    isReady = document.readyState == "complete";
 }
 else {
     // If readyState is not supported in the browser, then in order to be able to fire whenReady functions apropriately
@@ -88,41 +111,30 @@ else {
     }
 }
 
-function dom_onLoaded(){
-    if (isReady) {
-        return;
-    }
+function dom_onReady(){
+    dom_onReady = emptyFn;
     // #ifdef debug
-    _trace("firing dom_onLoaded");
+    _trace("firing dom_onReady");
     // #endif
     isReady = true;
     for (var i = 0; i < domReadyQueue.length; i++) {
         domReadyQueue[i]();
     }
     domReadyQueue.length = 0;
-    un(window, "DOMContentLoaded", dom_onLoaded);
-    un(document, "DOMContentLoaded", dom_onLoaded);
-    if (isHostMethod(window, "ActiveXObject")) {
-        un(window, "load", dom_onLoaded);
-    }
 }
 
-function document_onReadyStateChange(){
-    if (document.readyState == "complete") {
-        dom_onLoaded();
-        un(document, "readystatechange", document_onReadyStateChange);
-    }
-}
 
 if (!isReady) {
-    on(window, "DOMContentLoaded", dom_onLoaded);
-    on(document, "DOMContentLoaded", dom_onLoaded);
-    
-    if (isHostMethod(window, "ActiveXObject")) {
-        on(document, "readystatechange", document_onReadyStateChange);
-        on(window, "load", dom_onLoaded);
-        
-        if (window === top) {
+    if (isHostMethod(window, "addEventListener")) {
+        on(document, "DOMContentLoaded", dom_onReady);
+    }
+    else {
+        on(document, "readystatechange", function(){
+            if (document.readyState == "complete") {
+                dom_onReady();
+            }
+        });
+        if (document.documentElement.doScroll && window === top) {
             (function doScrollCheck(){
                 if (isReady) {
                     return;
@@ -135,10 +147,13 @@ if (!isReady) {
                     setTimeout(doScrollCheck, 1);
                     return;
                 }
-                dom_onLoaded();
+                dom_onReady();
             }());
         }
     }
+    
+    // A fallback to window.onload, that will always work
+    on(window, "load", dom_onReady);
 }
 /**
  * This will add a function to the queue of functions to be run once the DOM reaches a ready state.

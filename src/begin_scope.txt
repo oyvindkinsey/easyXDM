@@ -1,1 +1,5 @@
 (function (window, document, location, setTimeout, decodeURIComponent, encodeURIComponent) {
+	// double inclusion safeguard
+	if ("easyXDM" in window) {
+		return;
+	}

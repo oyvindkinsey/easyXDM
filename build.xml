@@ -4,7 +4,7 @@
 	<property file="build.secret.properties"/>
 	<property name="project.build.artifactdir" value="./artifacts/"/>
 	<property name="project.build.publishdir" value="./artifacts/"/>
-	<property name="project.build.version" value="2.4.8"/>
+	<property name="project.build.version" value="2.4.9"/>
 	
 	<!-- Setup classpath for js-build-tools ant tasks -->
 	<path id="js-build-tasks.classpath">
@@ -70,7 +70,6 @@
 		<preprocess infile="work/easyXDM.combined.js" outfile="work/easyXDM.js"/>
 		<preprocess infile="work/easyXDM.combined.js" outfile="work/easyXDM.debug.js" defines="debug"/>
 		<preprocess infile="${project.src.dir}/name.html" outfile="work/name.html"/>
-		<preprocess infile="${project.src.dir}/xhr.html" outfile="work/xhr.html"/>
 		<preprocess infile="${project.src.dir}/widgets/Widgets.js" outfile="work/easyXDM.Widgets.js"/>
 		<preprocess infile="${project.src.dir}/widgets/Widgets.js" outfile="work/easyXDM.Widgets.debug.js" defines="debug"/>
 		
@@ -117,6 +116,9 @@
 		
 		<copy todir="${project.build.artifactdir}v${project.build.version}/example">
 			<fileset dir="${project.src.dir}/example"/>
+		</copy>
+		<copy todir="${project.build.artifactdir}v${project.build.version}/cors">
+			<fileset dir="${project.src.dir}/cors"/>
 		</copy>
 		<copy todir="${project.build.artifactdir}v${project.build.version}/tests">
 			<fileset dir="${project.src.dir}/tests"/>

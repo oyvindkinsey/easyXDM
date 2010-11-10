@@ -6,6 +6,19 @@
     <body>
         <ul>
             <li>
+                2.4.9 10.11.10
+                <br/>
+                Improved the 
+                <code>
+                    whenReady
+                </code>
+                feature - easyXDM will now work correctly in IE9 too.
+                <br/>
+                Replaced the xhr.html endpoint with a stricter /cors/ endpoint. This adhers to the CORS standard and enables a similar autorization scheme.
+                <br/>
+                Improved the error message sent by the RpcBehavior. This now includes extra error data passed from the origin of the error. 
+            </li>
+            <li>
                 2.4.8 15.09.10
                 <br/>
                 Fixed a bug in the SameOriginTransport that could cause onReady to fire prior to the constructor of the Socket/Rpc returning.
