@@ -1,4 +1,4 @@
-easyXDM - easy Cross-Domain Messaging
+﻿easyXDM - easy Cross-Domain Messaging
 =====================================
 easyXDM is a Javascript library that enables you as a developer to easily work around the limitation set in place by the Same Origin Policy, in turn making it easy to communicate and expose javascript API's across domain boundaries.
 
@@ -139,10 +139,6 @@ Call the methods like this
     
 The Rpc configurations `local` and `remote` properties can be left out if empty. Both properties can have multiple methods defined.
 
-Since either end is free to use AJAX etc the Rpc object can be used to easily expose AJAX in a cross-domain fashion. For this the library comes with a default `xhr.html` document that exposes a method `post(String url, [Object data], function fn)`.
-
-** The xhr.html document should be extended to filter the incoming requests to only allowed resources.**
-
 When calling the stubs you can provide up to two callback functions after the expected arguments, the first one being the method that will receive the callback in case of a success, and the next the method that will receive the callback in case of an error.
 
 If an error occurs in the execution of the stubbed method then this will be caught and passed back to the error handler. This means that you in the body of the exposed method can use ` throw "custom error";` to return a message, or you can pass a message, and an optional object containing error data to the error callback.
@@ -165,6 +161,27 @@ If you want to conditionally include Douglas Crockfords JSON2 library (or any ot
 
 This will only include it if not natively supported.
 
+The shipped /cors/ interface
+-----
+Since either end is free to use AJAX etc the Rpc object can be used to easily expose enable cross-domain AJAX. For this the library comes with a default `/cors/index.html` (`/cors/`) document that exposes a method `request(object config, function successFn, function errorFn)`, where config can have the following properties:
+
+* `method` {string} - GET or POST. Default POST
+* `headers` {object} - A map of headers to apply - the defaults are `"Content-Type": "application/x-www-form-urlencoded"` and `"X-Requested-With": "XMLHttpRequest"`. Set headers are added to the default, null values removed.
+* `timeout` {number} - the number of milliseconds before a timeout occurs. Default 10000 (10 seconds)
+* `data´ {object} - a map of the data to pass
+
+If the request succeeds the success handler will be passed an object with the following properties
+
+* `data` {string} - the responseText
+* `status` {number} - The status of the request
+* `headers` {object} - a map of the returned headers
+
+If the request fail the error handler will be passed an object with the following properties
+
+* `data` {string} - the responseText if available, or null
+* `status` {number} - The status of the request
+* `message` {string} - A friendly message explaining the error
+
 For more information
 -----
 
@@ -184,4 +201,4 @@ easyXDM is distributed under the MIT license. Please keep the exisisting headers
 
 Author
 ======
-�yvind Sean Kinsey <oyvind@kinsey.no> (http://kinsey.no) is the developer behind easyXDM.
+Øyvind Sean Kinsey - <oyvind@kinsey.no>, @okinsey, http://kinsey.no
