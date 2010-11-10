@@ -98,7 +98,7 @@
                     
                     // apply the request headers
                     for (var prop in config.headers) {
-                        if (config.headers.hasOwnProperty(prop)) {
+                        if (config.headers.hasOwnProperty(prop) && config.headers[prop]) {
                             req.setRequestHeader(prop, config.headers[prop]);
                         }
                     }
