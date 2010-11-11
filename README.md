@@ -183,6 +183,23 @@ If the request fail the error handler will be passed an object with the followin
 * `status` {number} - The status of the request
 * `message` {string} - A friendly message explaining the error
 
+This is how you can use it:
+
+    var rpc = new easyXDM.Rpc({
+		remote: "http://foo.bar/cors/"
+	},
+    {
+        request: {}
+    });
+
+	rpc.request({
+		url: "/resource/x/y/z/",
+		method: "POST",
+		data: {foo: "bar", bar: "foo"}
+	}, function(response){
+		alert(response.data);
+	});
+	
 For more information
 -----
 
