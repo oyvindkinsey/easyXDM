@@ -165,6 +165,7 @@ The shipped /cors/ interface
 -----
 Since either end is free to use AJAX etc the Rpc object can be used to easily expose enable cross-domain AJAX. For this the library comes with a default `/cors/index.html` (`/cors/`) document that exposes a method `request(object config, function successFn, function errorFn)`, where config can have the following properties:
 
+* `url` {string} - The url to request
 * `method` {string} - GET or POST. Default POST
 * `headers` {object} - A map of headers to apply - the defaults are `"Content-Type": "application/x-www-form-urlencoded"` and `"X-Requested-With": "XMLHttpRequest"`. Set headers are added to the default, null values removed.
 * `timeout` {number} - the number of milliseconds before a timeout occurs. Default 10000 (10 seconds)
