@@ -217,6 +217,14 @@ License
 =======
 easyXDM is distributed under the MIT license. Please keep the exisisting headers.
 
-Author
+Attribution
 ======
+Main developer
 Øyvind Sean Kinsey - <oyvind@kinsey.no>, @okinsey, http://kinsey.no
+
+The following has attributed to the project
+
+* Eli Grey (http://eligrey.com/) - The /cors/ interface is adapted from his project pmxdr (http://github.com/eligrey/pmxdr/)
+* Peter Michaux (http://peter.michaux.ca/articles/feature-detection-state-of-the-art-browser-scripting) Feature detection is based on his article
+* Juriy Zaytsev - kangax (http://perfectionkills.com/instanceof-considered-harmful-or-how-to-write-a-robust-isarray/) Implementation of isArray 
+* ++ many people through feedback
