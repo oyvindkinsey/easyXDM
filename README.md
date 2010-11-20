@@ -189,7 +189,9 @@ This is how you can use it:
 		remote: "http://foo.bar/cors/"
 	},
     {
-        request: {}
+        remote: {
+			request: {}
+		}
     });
 
 	rpc.request({
