@@ -135,9 +135,9 @@
                             clearTimeout(timeout);
                             
                             // parse the response headers
-                            var rawHeaders = req.getAllResponseHeaders(), headers = {}, reHeader = /([\w-_]+):\s+(.*)$/gm, m;
+                            var rawHeaders = req.getAllResponseHeaders(), headers = {}, headers_lowercase = {}, reHeader = /([\w-_]+):\s+(.*)$/gm, m;
                             while ((m = reHeader.exec(rawHeaders))) {
-                                headers[m[1]] = m[2];
+                                headers_lowercase[m[1].toLowerCase()] = headers[m[1]] = m[2];
                             }
                             
                             if (req.status < 200 || req.status >= 300) {
@@ -156,8 +156,8 @@
                                 var errorMessage;
                                 if (useAccessControl) {
                                     // normalize the valuse access controls
-                                    var aclAllowedOrigin = (headers["Access-Control-Allow-Origin"] || "").replace(/\s/g, "");
-                                    var aclAllowedMethods = (headers["Access-Control-Allow-Methods"] || "").replace(/\s/g, "");
+                                    var aclAllowedOrigin = (headers_lowercase["access-control-allow-origin"] || "").replace(/\s/g, "");
+                                    var aclAllowedMethods = (headers_lowercase["access-control-allow-methods"] || "").replace(/\s/g, "");
                                     
                                     // determine if origin is trusted
                                     if (alwaysTrusted || aclAllowedOrigin == "*" || aclAllowedOrigin.indexOf(remote.origin) != -1) {
