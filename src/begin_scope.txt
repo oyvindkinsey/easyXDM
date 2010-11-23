@@ -1,5 +1,7 @@
 (function (window, document, location, setTimeout, decodeURIComponent, encodeURIComponent) {
-	// double inclusion safeguard
-	if ("easyXDM" in window) {
+	// Double inclusion safeguard
+	// If you want to have easyXDM scoped to a closure (for instance to avoid version collisions etc, 
+	// just define a variable 'easyXDM' as undefined prior to easyXDM's initialization closure.
+	if (typeof easyXDM != "undefined") {
 		return;
 	}

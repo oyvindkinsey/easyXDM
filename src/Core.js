@@ -25,7 +25,7 @@
 //
 
 var global = this;
-var channelId = 0;
+var channelId = Math.floor(Math.random() * 100) * 100; // randomize the initial id in case of multiple closures loaded 
 var emptyFn = Function.prototype;
 var reURI = /^(http.?:\/\/([^\/\s]+))/; // returns groups for origin (1) and domain (2)
 var reParent = /[\-\w]+\/\.\.\//; // matches a foo/../ expression 
@@ -697,7 +697,7 @@ function removeFromStack(element){
  * @version %%version%%
  * @singleton
  */
-global.easyXDM = {
+easyXDM = {
     /**
      * The version of the library
      * @type {string}
