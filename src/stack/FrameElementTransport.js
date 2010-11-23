@@ -86,19 +86,12 @@ easyXDM.stack.FrameElementTransport = function(config){
                 };
             }
             else {
-                if (document.referrer && document.referrer != query.xdm_e) {
-                    window.parent.location = query.xdm_e;
-                }
-                else {
-                    if (document.referrer != query.xdm_e) {
-                        // This is to mitigate origin-spoofing
-                        window.parent.location = query.xdm_e;
-                    }
-                    send = window.frameElement.fn(function(msg){
-                        pub.up.incoming(msg, targetOrigin);
-                    });
-                    pub.up.callback(true);
-                }
+                // This is to mitigate origin-spoofing
+                window.parent.location = query.xdm_e + "#";
+                send = window.frameElement.fn(function(msg){
+                    pub.up.incoming(msg, targetOrigin);
+                });
+                pub.up.callback(true);
             }
         },
         init: function(){
