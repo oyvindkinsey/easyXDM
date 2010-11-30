@@ -19,7 +19,7 @@
         Nullam massa ipsum, pulvinar ut facilisis a, commodo ut orci. Mauris ac ipsum diam, sit amet laoreet tortor. In pretium, nulla vel ornare euismod, nibh augue pharetra magna, at semper felis diam in ipsum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus blandit ornare dignissim. Fusce et nulla urna. Morbi nec ante erat. Nullam ut urna libero. Nulla non ipsum purus, et cursus lectus. Etiam vehicula, mauris in faucibus vehicula, dolor quam sodales neque, sed laoreet est augue at lacus. Nunc tincidunt lacinia elit eu dignissim. Mauris at enim mauris. Donec congue auctor dui, eget posuere ante accumsan in. Nulla non quam enim, eget tempor arcu. Suspendisse nec nibh diam, ut congue est. Fusce at urna eget velit posuere ornare nec eget mauris. Sed accumsan magna et enim mollis dignissim.
         <script type="text/javascript">
             window.onload = function(){
-                parent.socket.postMessage(document.body.scrollHeight);
+                parent.socket.postMessage(document.body.clientHeight || document.body.offsetHeight || document.body.scrollHeight);
             };
         </script>
     </body>
