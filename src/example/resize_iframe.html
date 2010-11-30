@@ -25,22 +25,8 @@
             }());
             
             var transport = new easyXDM.Socket(/** The configuration */{
-                /**
-                 * Register the url to name.html, this must be an absolute path
-                 * or a path relative to the root.
-                 * @field
-                 */
-                local: "../name.html",
-                /**
-                 * Register the url to the remote interface
-                 * @field
-                 */
-                remote: REMOTE + "/resized_iframe.html",
-                remoteHelper: REMOTE + "/../name.html",
-                /**
-                 * Register the DOMElement that the generated IFrame should be inserted into
-                 */
-                container: document.getElementById("embedded"),
+                remote: REMOTE + "/resize_intermediate.html?url=resized_iframe_1.html",
+                container: "embedded",
                 onMessage: function(message, origin){
                     this.container.getElementsByTagName("iframe")[0].style.height = message + "px";
                 }
@@ -48,15 +34,16 @@
         </script>
     </head>
     <body>
-        <div style="border:1px solid black;padding:3px">
-            <div style="float:right">
-                <a href="http://www.addthis.com/bookmark.php?v=250&amp;pub=xa-4a6cb9890fd71978" onmouseover="return addthis_open(this, '', '[URL]', '[TITLE]');" onmouseout="addthis_close();" onclick="return addthis_sendto();"><img src="http://s7.addthis.com/static/btn/lg-share-en.gif" width="125" height="16" alt="Bookmark and Share" style="border:0"/></a>
-                <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js?pub=xa-4a6cb9890fd71978">
-                </script>
-            </div>
-            <a href="http://easyxdm.net/docs/">See easyxdm.net/docs for full documentation and more examples</a>
+        <div style="border:1px solid black;padding:3px;margin:10px;">
+            <a href="index.html">Index of examples</a>
+            | <a href="http://github.com/oyvindkinsey/easyXDM/#readme">Readme at github</a>
+            | 
+            | <a href="http://easyxmd.net/">easyXDM.net</a>
+            | <a href="http://groups.google.com/group/easyxdm">easyXDM at Google Groups</a>
             <br/>
             The examples are executing slower than the production build due to the extensive tracing.
+            <br/>
+            If you are alerted about a popup, then this is only the trace log feature. You can ignore this.
         </div>
         <!-- easyXDM.Debug.trace(msg) will output its messages to any element with the id "log" -->
         <div id="log" style="height:100px;border:1px dotted black;overflow:auto">

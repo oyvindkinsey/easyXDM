@@ -11,9 +11,13 @@
             easyXDM.DomHelper.requiresJSON("../json2.js");
         </script>
         <script type="text/javascript">
-            
-            // this is just some bootstrapping code in order to provide
-            // the correct host name depending on where it is being run.
+            /* Here we demo how to have two visible web applications communicate together.
+             * This is done by having the remote interface open a visible window and loading
+             * the application in this.
+             * Since the remote interface has access to the entire DOM (including javascript)
+             * of the opened window, the remote interface is able to interface freely with the
+             * remote web application and can serve as a bridge between the two applications.
+             */
             var REMOTE = (function(){
                 var remote = location.href;
                 switch (location.host) {
@@ -32,32 +36,45 @@
                 }
                 return remote.substring(0, remote.lastIndexOf("/"));
             }());
-            
-            
-            
-            var btn;
-            var remote = new easyXDM.Rpc({
-                remote: REMOTE + "/upload_rpc.html",
-                onReady: function(){
-                    //display the upload form
-                    var frm = document.getElementById("frmUpload");
-                    frm.action = REMOTE + "/upload_handler.aspx";
-                    frm.style.display = "block";
-                    btn = document.getElementById("btnSubmit");
-                    
-                    frm.onsubmit = function(){
-                        btn.disabled = "disabled";
-                    };
+            var proxy, win;
+            function openPopup(){
+                if (win) {
+                    return;
                 }
-            }, {
-                local: {
-                    returnUploadResponse: function(response){
-                        // here you should call back into your regular workflow
-                        btn.disabled = null;
-                        alert(response.msg);
-                    }
-                }
-            });
+                win = window.open(REMOTE + '/remoteapp.html' + '#easyXDM_xyz_provider', 'mainapp', "width=400, height=400");
+                document.getElementById("btn").disabled = "";
+                proxy = new easyXDM.Socket(/** The configuration */{
+                    /**
+                     * Register the method that should handle incoming data
+                     * @param {Object} data
+                     * @param {String} origin
+                     */
+                    onMessage: function(data, origin){
+                        data = JSON.parse(data);
+                        var div = document.createElement("div");
+                        div.innerHTML = "data from '" + origin + "'";
+                        document.body.appendChild(div);
+                        for (var key in data) {
+                            div = document.createElement("div");
+                            div.innerHTML = key + "=" + data[key];
+                            document.body.appendChild(div);
+                        }
+                    },
+                    channel: "xyz",
+                    /**
+                     * Register the url to name.html, this must be an absolute path
+                     * or a path relative to the root.
+                     * @field
+                     */
+                    local: "../name.html",
+                    /**
+                     * Register the url to the remote interface
+                     * @field
+                     */
+                    remote: REMOTE + "/remote.html",
+                    remoteHelper: REMOTE + "/../name.html"
+                });
+            }
         </script>
     </head>
     <body>
@@ -75,11 +92,7 @@
         <!-- easyXDM.Debug.trace(msg) will output its messages to any element with the id "log" -->
         <div id="log" style="height:100px;border:1px dotted black;overflow:auto">
         </div>
-        <form id="frmUpload" style="display:none" method="POST" target="upload_target" enctype="multipart/form-data">
-            <input type="file" name="upload_file"/><input type="submit" id="btnSubmit" value="Upload file"/>
-        </form><!--
-        tracking code
-        -->
+        <input type="button" onclick="openPopup();" value="Open popup"/><!-- Send som data to the other side --><input id="btn" disabled="disabled" type="button" onclick="proxy.postMessage(JSON.stringify({a:'b',c:'d',e:'f'}));" value="send data to remote"/>
         <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
