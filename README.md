@@ -77,6 +77,9 @@ These properties can be set only on the provider
 
 * `acl` {String || String[]} Use this to only allow specific domains to consume this provider. The patterns can contain the wildcards ? and * as in the examples 'http://example.com', '*.foo.com' and '*dom?.com', or they can be regular expressions starting with ^ and ending with $. If none of the patterns match an Error will be thrown.
 
+A socket can be teared down (iframe removed etc) using 
+
+    socket.destroy();
 
 The easyXDM.Rpc
 ---------------
@@ -160,6 +163,10 @@ If you want to conditionally include Douglas Crockfords JSON2 library (or any ot
     </script>
 
 This will only include it if not natively supported.
+
+An rpc object can be teared down (iframe removed etc) using 
+
+    rpc.destroy();
 
 The shipped /cors/ interface
 -----
