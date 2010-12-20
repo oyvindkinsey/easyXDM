@@ -84,7 +84,7 @@ easyXDM.stack.SameOriginTransport = function(config){
                 });
             }
             else {
-                send = parent.easyXDM.Fn.get(config.channel, true)(function(msg){
+                send = getParentObject().Fn.get(config.channel, true)(function(msg){
                     pub.up.incoming(msg, targetOrigin);
                 });
                 setTimeout(function(){

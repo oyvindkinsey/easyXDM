@@ -32,6 +32,7 @@ var reParent = /[\-\w]+\/\.\.\//; // matches a foo/../ expression
 var reDoubleSlash = /([^:])\/\//g; // matches // anywhere but in the protocol
 var IFRAME_PREFIX = "easyXDM_";
 var HAS_NAME_PROPERTY_BUG;
+var namespace = ""; // stores namespace under which easyXDM object is stored on the page (empty if the object is global)
 // #ifdef debug
 var _trace = emptyFn;
 // #endif
@@ -47,6 +48,16 @@ function isHostMethod(object, property){
 
 function isHostObject(object, property){
     return !!(typeof(object[property]) == 'object' && object[property]);
+}
+
+function getParentObject() {
+    var obj = parent;
+    if (namespace !== "") {
+        for (var i = 0, ii = namespace.split('.'); i < ii.length; i++) {
+            obj = obj[ii[i]];
+        }
+    }
+    return obj.easyXDM;
 }
 
 // end
@@ -170,6 +181,16 @@ function whenReady(fn, scope){
         fn.call(scope);
     });
 }
+
+/**
+ * This will store provided namespace for SameOriginTransport to successfuly
+ * recover easyXDM instance from a parent frame (see getParentObject function).
+ * @param {String} scope A scope (namespace) under which easyXDM object is stored on the page.
+ */
+function addToNamespace(scope) {
+    namespace = scope;
+}
+
 
 /*
  * Methods for working with URLs
@@ -732,5 +753,11 @@ easyXDM = {
      * @param {function} fn The function to add
      * @param {object} scope An optional scope for the function to be called with.
      */
-    whenReady: whenReady
+    whenReady: whenReady,
+    /**
+     * This will store provided namespace for SameOriginTransport to successfuly
+     * recover easyXDM instance from a parent frame (see getParentObject function).
+     * @param {String} scope A scope (namespace) under which easyXDM object is stored on the page.
+     */
+    addToNamespace: addToNamespace
 };
