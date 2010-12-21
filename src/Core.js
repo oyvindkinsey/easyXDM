@@ -30,8 +30,13 @@ var emptyFn = Function.prototype;
 var reURI = /^(http.?:\/\/([^\/\s]+))/; // returns groups for origin (1) and domain (2)
 var reParent = /[\-\w]+\/\.\.\//; // matches a foo/../ expression 
 var reDoubleSlash = /([^:])\/\//g; // matches // anywhere but in the protocol
+var namespace = ""; // stores namespace under which easyXDM object is stored on the page (empty if object is global)
+var easyXDM = {};
+var _easyXDM = window.easyXDM; // map over global easyXDM in case of overwrite
+
 var IFRAME_PREFIX = "easyXDM_";
 var HAS_NAME_PROPERTY_BUG;
+
 // #ifdef debug
 var _trace = emptyFn;
 // #endif
@@ -169,6 +174,39 @@ function whenReady(fn, scope){
     domReadyQueue.push(function(){
         fn.call(scope);
     });
+}
+
+/**
+ * Returns an instance of easyXDM from the parent window with
+ * respect to the namespace.
+ *
+ * @returns An instance of easyXDM (in the parent window)
+ */
+function getParentObject() {
+    var obj = parent;
+    if (namespace !== "") {
+        for (var i = 0, ii = namespace.split("."); i < ii.length; i++) {
+            obj = obj[ii[i]];
+        }
+    }
+    return obj.easyXDM;
+}
+
+/**
+ * Removes easyXDM variable from the global scope. It also returns control
+ * of the easyXDM variable to whatever code used it before.
+ *
+ * @param {String} scope A string representation of an object that will hold
+ *                       an instance of easyXDM.
+ * @returns An instance of easyXDM
+ */
+function noConflict(scope) {
+    window.easyXDM = _easyXDM;
+    namespace = scope;
+    if (namespace) {
+        IFRAME_PREFIX = "easyXDM_" + namespace.replace(".", "_") + "_";
+    }
+    return easyXDM;
 }
 
 /*
@@ -360,7 +398,7 @@ function apply(destination, source, noOverwrite){
 // This tests for the bug in IE where setting the [name] property using javascript causes the value to be redirected into [submitName].
 function testForNamePropertyBug(){
     var el = document.createElement("iframe");
-    el.name = "easyXDM_TEST";
+    el.name = IFRAME_PREFIX + "TEST";
     apply(el.style, {
         position: "absolute",
         left: "-2000px",
@@ -732,5 +770,22 @@ easyXDM = {
      * @param {function} fn The function to add
      * @param {object} scope An optional scope for the function to be called with.
      */
-    whenReady: whenReady
+    whenReady: whenReady,
+    /**
+     * Removes easyXDM variable from the global scope. It also returns control
+     * of the easyXDM variable to whatever code used it before.
+     *
+     * @param {String} scope A string representation of an object that will hold
+     *                       an instance of easyXDM.
+     * @returns An instance of easyXDM
+     */
+    noConflict: noConflict
 };
+
+// #ifdef debug
+// Expose helper functions so we can test them
+easyXDM.checkAcl = checkAcl;
+easyXDM.getDomainName = getDomainName;
+easyXDM.getLocation = getLocation;
+easyXDM.appendQueryParameters = appendQueryParameters;
+// #endif
