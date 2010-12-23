@@ -208,6 +208,22 @@ This is how you can use it:
 	}, function(response){
 		alert(response.data);
 	});
+
+easyXDM.noConflict
+-----
+
+If you want two or more instances of easyXDM to run on the same page, you can put your instance into a namespace using easyXDM.noConflict method. This method returns control of easyXDM global object to the other library and returns an instance of itself.
+
+This is useful if you embed your code on the page and cannot guarantee that it does not already define window.easyXDM.
+
+It also takes a single argument, a string representation of the namespace. We need it to get access to the instance in the parent window (when using SameOriginTransport).
+
+Example:
+
+	// Let's assume we already have an instance of easyXDM on the page, but
+	// we need to load another one and put it under PROJECT.easyXDM. Here is
+	// how you do it.
+	var PROJECT = { easyXDM: easyXDM.noConflict("PROJECT") };
 	
 For more information
 -----
@@ -232,7 +248,7 @@ Main developer
 Øyvind Sean Kinsey - <oyvind@kinsey.no>, @okinsey, http://kinsey.no
 
 The following has attributed to the project
-
+* [Anton Kovalyov](http://self.kovalyov.net/) - Added the `noConflict` feature.
 * [Eli Grey](http://eligrey.com/) - The /cors/ interface is adapted from his project [pmxdr](http://github.com/eligrey/pmxdr/)
 * [Peter Michaux](http://peter.michaux.ca/articles/feature-detection-state-of-the-art-browser-scripting) - Feature detection is based on his article
 * [Juriy Zaytsev - kangax](http://perfectionkills.com/instanceof-considered-harmful-or-how-to-write-a-robust-isarray/) - Implementation of isArray 
