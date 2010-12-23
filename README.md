@@ -247,7 +247,7 @@ Attribution
 Main developer
 Øyvind Sean Kinsey - <oyvind@kinsey.no>, @okinsey, http://kinsey.no
 
-The following has attributed to the project
+The following has contributed to the project
 
 * [Anton Kovalyov](http://self.kovalyov.net/) - Added the `noConflict` feature.
 * [Eli Grey](http://eligrey.com/) - The /cors/ interface is adapted from his project [pmxdr](http://github.com/eligrey/pmxdr/)
