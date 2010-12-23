@@ -33,7 +33,6 @@ var reDoubleSlash = /([^:])\/\//g; // matches // anywhere but in the protocol
 var namespace = ""; // stores namespace under which easyXDM object is stored on the page (empty if object is global)
 var easyXDM = {};
 var _easyXDM = window.easyXDM; // map over global easyXDM in case of overwrite
-
 var IFRAME_PREFIX = "easyXDM_";
 var HAS_NAME_PROPERTY_BUG;
 
@@ -182,7 +181,7 @@ function whenReady(fn, scope){
  *
  * @returns An instance of easyXDM (in the parent window)
  */
-function getParentObject() {
+function getParentObject(){
     var obj = parent;
     if (namespace !== "") {
         for (var i = 0, ii = namespace.split("."); i < ii.length; i++) {
@@ -210,13 +209,13 @@ function getParentObject() {
  *                    an instance of easyXDM.
  * @returns An instance of easyXDM
  */
-function noConflict(ns) {
+function noConflict(ns){
     // #ifdef debug
-    if (typeof ns != "string" || /^\s*$/.test(ns)) {
-        throw new Error('namespace must be a non-empty string')
+    if (typeof ns != "string" || !ns) {
+        throw new Error('namespace must be a non-empty string');
     }
     // #endif
-
+    
     window.easyXDM = _easyXDM;
     namespace = ns;
     if (namespace) {

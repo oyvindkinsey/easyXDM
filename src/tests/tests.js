@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyTest, easyXDM, window*/
+/*global easyTest, easyXDM, window, modules*/
 var REMOTE = (function(){
     var remote = location.href;
     switch (location.host) {
@@ -571,8 +571,7 @@ function runTests(){
             name: "window.easyXDM is released {namespace}",
             timeout: 5000,
             run: function(){
-                this.notifyResult(window.easyXDM._test_global &&
-                    typeof modules.easyXDM._test_global == "undefined");
+                this.notifyResult(window.easyXDM._test_global && !modules.easyXDM._test_global);
             }
         }, {
             name: "onReady is fired {namespace}",
