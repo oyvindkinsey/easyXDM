@@ -129,7 +129,7 @@
 		</copy>	
 	</target>
 	
-	<target name="document" depends="build">
+	<target name="document">
 		<delete dir="${project.build.artifactdir}v${project.build.version}-docs" quiet="true"/>
 		<java jar="tools/ext-doc/ext-doc.jar" fork="true" failonerror="true" maxmemory="128m" >
 			<arg line="-p docs.xml -o ${project.build.artifactdir}v${project.build.version}-docs -t tools/ext-doc/template/ext/template.xml"/>
