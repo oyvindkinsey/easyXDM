@@ -186,9 +186,19 @@ function getParentObject() {
     var obj = parent;
     if (namespace !== "") {
         for (var i = 0, ii = namespace.split("."); i < ii.length; i++) {
+            // #ifdef debug
+            if (!obj) {
+                throw new Error(ii.slice(0, i + 1).join('.') + ' is not an object');
+            }
+            // #endif
             obj = obj[ii[i]];
         }
     }
+    // #ifdef debug
+    if (!obj || !obj.easyXDM) {
+        throw new Error('Could not find easyXDM in parent.' + namespace);
+    }
+    // #endif
     return obj.easyXDM;
 }
 
@@ -196,13 +206,19 @@ function getParentObject() {
  * Removes easyXDM variable from the global scope. It also returns control
  * of the easyXDM variable to whatever code used it before.
  *
- * @param {String} scope A string representation of an object that will hold
- *                       an instance of easyXDM.
+ * @param {String} ns A string representation of an object that will hold
+ *                    an instance of easyXDM.
  * @returns An instance of easyXDM
  */
-function noConflict(scope) {
+function noConflict(ns) {
+    // #ifdef debug
+    if (typeof ns != "string" || /^\s*$/.test(ns)) {
+        throw new Error('namespace must be a non-empty string')
+    }
+    // #endif
+
     window.easyXDM = _easyXDM;
-    namespace = scope;
+    namespace = ns;
     if (namespace) {
         IFRAME_PREFIX = "easyXDM_" + namespace.replace(".", "_") + "_";
     }
@@ -735,7 +751,7 @@ function removeFromStack(element){
  * @version %%version%%
  * @singleton
  */
-easyXDM = {
+apply(easyXDM, {
     /**
      * The version of the library
      * @type {string}
@@ -775,17 +791,19 @@ easyXDM = {
      * Removes easyXDM variable from the global scope. It also returns control
      * of the easyXDM variable to whatever code used it before.
      *
-     * @param {String} scope A string representation of an object that will hold
-     *                       an instance of easyXDM.
+     * @param {String} ns A string representation of an object that will hold
+     *                    an instance of easyXDM.
      * @returns An instance of easyXDM
      */
     noConflict: noConflict
-};
+});
 
 // #ifdef debug
 // Expose helper functions so we can test them
-easyXDM.checkAcl = checkAcl;
-easyXDM.getDomainName = getDomainName;
-easyXDM.getLocation = getLocation;
-easyXDM.appendQueryParameters = appendQueryParameters;
+apply(easyXDM, {
+    checkAcl: checkAcl,
+    getDomainName: getDomainName,
+    getLocation: getLocation,
+    appendQueryParameters: appendQueryParameters
+});
 // #endif
