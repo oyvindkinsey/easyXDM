@@ -179,7 +179,7 @@ function whenReady(fn, scope){
  * Returns an instance of easyXDM from the parent window with
  * respect to the namespace.
  *
- * @returns An instance of easyXDM (in the parent window)
+ * @return An instance of easyXDM (in the parent window)
  */
 function getParentObject(){
     var obj = parent;
@@ -207,7 +207,7 @@ function getParentObject(){
  *
  * @param {String} ns A string representation of an object that will hold
  *                    an instance of easyXDM.
- * @returns An instance of easyXDM
+ * @return An instance of easyXDM
  */
 function noConflict(ns){
     // #ifdef debug
@@ -230,7 +230,7 @@ function noConflict(ns){
 /**
  * Get the domain name from a url.
  * @param {String} url The url to extract the domain from.
- * @returns The domain part of the url.
+ * @return The domain part of the url.
  * @type {String}
  */
 function getDomainName(url){
@@ -792,7 +792,7 @@ apply(easyXDM, {
      *
      * @param {String} ns A string representation of an object that will hold
      *                    an instance of easyXDM.
-     * @returns An instance of easyXDM
+     * @return An instance of easyXDM
      */
     noConflict: noConflict
 });
