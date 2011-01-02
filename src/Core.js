@@ -215,6 +215,7 @@ function noConflict(ns){
     if (typeof ns != "string" || !ns) {
         throw new Error('namespace must be a non-empty string');
     }
+    _trace("Settings namespace to '" + ns + "'");
     // #endif
     
     window.easyXDM = _easyXDM;

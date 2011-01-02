@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global console, _FirebugCommandLine,  easyXDM, window, escape, unescape, isHostObject, undef, _trace, domIsReady, emptyFn */
+/*global console, _FirebugCommandLine,  easyXDM, window, escape, unescape, isHostObject, undef, _trace, domIsReady, emptyFn, namespace */
 //
 // easyXDM
 // http://easyxdm.net/
@@ -69,7 +69,7 @@ var debug = {
              * @param {String} msg
              */
             this.log = function(msg){
-                console.log(location.host + " - " + this.getTime() + ": " + msg);
+                console.log(location.host + (namespace ? ":" + namespace : "") + " - " + this.getTime() + ": " + msg);
             };
         }
         this.log(msg);
@@ -99,7 +99,7 @@ var debug = {
                  */
                 this.trace = function(msg){
                     try {
-                        el.appendChild(document.createElement("div")).appendChild(document.createTextNode(location.host + " - " + this.getTime() + ":" + msg));
+                        el.appendChild(document.createElement("div")).appendChild(document.createTextNode(location.host + (namespace ? ":" + namespace : "") + " - " + this.getTime() + ":" + msg));
                         el.scrollTop = el.scrollHeight;
                     } 
                     catch (e) {
@@ -114,7 +114,7 @@ var debug = {
                  * @param {String} msg
                  */
                 this.trace = function(msg){
-                    console.info(location.host + " - " + this.getTime() + ":" + msg);
+                    console.info(location.host + (namespace ? ":" + namespace : "") + " - " + this.getTime() + ":" + msg);
                 };
             }
             else {
@@ -139,7 +139,7 @@ var debug = {
                     }
                     this.trace = function(msg){
                         try {
-                            el.appendChild(doc.createElement("div")).appendChild(doc.createTextNode(location.host + " - " + this.getTime() + ":" + msg));
+                            el.appendChild(doc.createElement("div")).appendChild(doc.createTextNode(location.host + (namespace ? ":" + namespace : "") + " - " + this.getTime() + ":" + msg));
                             el.scrollTop = el.scrollHeight;
                         } 
                         catch (e) {
