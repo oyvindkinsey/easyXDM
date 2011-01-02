@@ -105,10 +105,9 @@ var isReady = false, domReadyQueue = [], state;
 if ("readyState" in document) {
     // If browser is WebKit-powered, check for both 'loaded' (legacy browsers) and
     // 'interactive' (HTML5 specs, recent WebKit builds) states.
+    // https://bugs.webkit.org/show_bug.cgi?id=45119
     state = document.readyState;
-    isReady = state == "complete" ||
-        (~navigator.userAgent.indexOf('AppleWebKit/') &&
-            (state == "loaded" || state == "interactive"));
+    isReady = state == "complete" || (~ navigator.userAgent.indexOf('AppleWebKit/') && (state == "loaded" || state == "interactive"));
 }
 else {
     // If readyState is not supported in the browser, then in order to be able to fire whenReady functions apropriately
