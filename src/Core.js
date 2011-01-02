@@ -101,9 +101,14 @@ else {
 /*
  * Cross Browser implementation of DOMContentLoaded.
  */
-var isReady = false, domReadyQueue = [];
+var isReady = false, domReadyQueue = [], state;
 if ("readyState" in document) {
-    isReady = document.readyState == "complete";
+    // If browser is WebKit-powered, check for both 'loaded' (legacy browsers) and
+    // 'interactive' (HTML5 specs, recent WebKit builds) states.
+    state = document.readyState;
+    isReady = state == "complete" ||
+        (~navigator.userAgent.indexOf('AppleWebKit/') &&
+            (state == "loaded" || state == "interactive"));
 }
 else {
     // If readyState is not supported in the browser, then in order to be able to fire whenReady functions apropriately
