@@ -101,19 +101,19 @@ else {
 /*
  * Cross Browser implementation of DOMContentLoaded.
  */
-var isReady = false, domReadyQueue = [], state;
+var domIsReady = false, domReadyQueue = [], readyState;
 if ("readyState" in document) {
     // If browser is WebKit-powered, check for both 'loaded' (legacy browsers) and
     // 'interactive' (HTML5 specs, recent WebKit builds) states.
     // https://bugs.webkit.org/show_bug.cgi?id=45119
-    state = document.readyState;
-    isReady = state == "complete" || (~ navigator.userAgent.indexOf('AppleWebKit/') && (state == "loaded" || state == "interactive"));
+    readyState = document.readyState;
+    domIsReady = readyState == "complete" || (~ navigator.userAgent.indexOf('AppleWebKit/') && (readyState == "loaded" || readyState == "interactive"));
 }
 else {
     // If readyState is not supported in the browser, then in order to be able to fire whenReady functions apropriately
     // when added dynamically _after_ DOM load, we have to deduce wether the DOM is ready or not.
     // We only need a body to add elements to, so the existence of document.body is enough for us.
-    isReady = !!document.body;
+    domIsReady = !!document.body;
 }
 
 function dom_onReady(){
@@ -121,7 +121,7 @@ function dom_onReady(){
     // #ifdef debug
     _trace("firing dom_onReady");
     // #endif
-    isReady = true;
+    domIsReady = true;
     for (var i = 0; i < domReadyQueue.length; i++) {
         domReadyQueue[i]();
     }
@@ -129,7 +129,7 @@ function dom_onReady(){
 }
 
 
-if (!isReady) {
+if (!domIsReady) {
     if (isHostMethod(window, "addEventListener")) {
         on(document, "DOMContentLoaded", dom_onReady);
     }
@@ -141,7 +141,7 @@ if (!isReady) {
         });
         if (document.documentElement.doScroll && window === top) {
             (function doScrollCheck(){
-                if (isReady) {
+                if (domIsReady) {
                     return;
                 }
                 // http://javascript.nwbox.com/IEContentLoaded/
@@ -167,7 +167,7 @@ if (!isReady) {
  * @param {Object} scope An optional scope for the function to be called with.
  */
 function whenReady(fn, scope){
-    if (isReady) {
+    if (domIsReady) {
         fn.call(scope);
         return;
     }

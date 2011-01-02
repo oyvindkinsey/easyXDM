@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global console, _FirebugCommandLine,  easyXDM, window, escape, unescape, isHostObject, undef, _trace, isReady, emptyFn */
+/*global console, _FirebugCommandLine,  easyXDM, window, escape, unescape, isHostObject, undef, _trace, domIsReady, emptyFn */
 //
 // easyXDM
 // http://easyxdm.net/
@@ -67,7 +67,7 @@ var debug = {
      */
     trace: function(msg){
         // Uses memoizing to cache the implementation
-        if (!isReady) {
+        if (!domIsReady) {
             if (this._deferred.length === 0) {
                 easyXDM.whenReady(debug.flush, debug);
             }
