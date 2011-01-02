@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global console, _FirebugCommandLine,  easyXDM, window, escape, unescape, isHostObject, undef, _trace, isReady, emptyFn */
+/*global console, _FirebugCommandLine,  easyXDM, window, escape, unescape, isHostObject, undef, _trace, domIsReady, emptyFn, namespace */
 //
 // easyXDM
 // http://easyxdm.net/
@@ -35,6 +35,20 @@ var debug = {
         this._deferred.length = 0;
         this.trace("... end of deferred messages ...");
     },
+    getTime: function(){
+        var d = new Date(), h = d.getHours() + "", m = d.getMinutes() + "", s = d.getSeconds() + "", ms = d.getMilliseconds() + "", zeros = "000";
+        if (h.length == 1) {
+            h = "0" + h;
+        }
+        if (m.length == 1) {
+            m = "0" + m;
+        }
+        if (s.length == 1) {
+            s = "0" + s;
+        }
+        ms = zeros.substring(ms.length) + ms;
+        return h + ":" + m + ":" + s + "." + ms;
+    },
     /**
      * Logs the message to console.log if available
      * @param {String} msg The message to log
@@ -55,7 +69,7 @@ var debug = {
              * @param {String} msg
              */
             this.log = function(msg){
-                console.log(location.host + "-" + new Date().valueOf() + ":" + msg);
+                console.log(location.host + (namespace ? ":" + namespace : "") + " - " + this.getTime() + ": " + msg);
             };
         }
         this.log(msg);
@@ -67,7 +81,7 @@ var debug = {
      */
     trace: function(msg){
         // Uses memoizing to cache the implementation
-        if (!isReady) {
+        if (!domIsReady) {
             if (this._deferred.length === 0) {
                 easyXDM.whenReady(debug.flush, debug);
             }
@@ -85,7 +99,7 @@ var debug = {
                  */
                 this.trace = function(msg){
                     try {
-                        el.appendChild(document.createElement("div")).appendChild(document.createTextNode(location.host + "-" + new Date().valueOf() + ":" + msg));
+                        el.appendChild(document.createElement("div")).appendChild(document.createTextNode(location.host + (namespace ? ":" + namespace : "") + " - " + this.getTime() + ":" + msg));
                         el.scrollTop = el.scrollHeight;
                     } 
                     catch (e) {
@@ -100,7 +114,7 @@ var debug = {
                  * @param {String} msg
                  */
                 this.trace = function(msg){
-                    console.info(location.host + "-" + new Date().valueOf() + ":" + msg);
+                    console.info(location.host + (namespace ? ":" + namespace : "") + " - " + this.getTime() + ":" + msg);
                 };
             }
             else {
@@ -125,7 +139,7 @@ var debug = {
                     }
                     this.trace = function(msg){
                         try {
-                            el.appendChild(doc.createElement("div")).appendChild(doc.createTextNode(location.host + "-" + new Date().valueOf() + ":" + msg));
+                            el.appendChild(doc.createElement("div")).appendChild(doc.createTextNode(location.host + (namespace ? ":" + namespace : "") + " - " + this.getTime() + ":" + msg));
                             el.scrollTop = el.scrollHeight;
                         } 
                         catch (e) {

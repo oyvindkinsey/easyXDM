@@ -5,6 +5,15 @@
         <script type="text/javascript" src="../easyXDM.debug.js">
         </script>
         <script type="text/javascript">
+            /**
+             * Request the use of the JSON object
+             */
+            easyXDM.DomHelper.requiresJSON("../json2.js");
+        </script>
+        <script type="text/javascript">
+            
+            // this is just some bootstrapping code in order to provide
+            // the correct host name depending on where it is being run.
             var REMOTE = (function(){
                 var remote = location.href;
                 switch (location.host) {
@@ -24,11 +33,29 @@
                 return remote.substring(0, remote.lastIndexOf("/"));
             }());
             
-            var transport = new easyXDM.Socket(/** The configuration */{
-                remote: REMOTE + "/resize_intermediate.html?url=resized_iframe_1.html",
-                container: "embedded",
-                onMessage: function(message, origin){
-                    this.container.getElementsByTagName("iframe")[0].style.height = message + "px";
+            
+            
+            var btn;
+            var remote = new easyXDM.Rpc({
+                remote: REMOTE + "/upload_rpc.html",
+                onReady: function(){
+                    //display the upload form
+                    var frm = document.getElementById("frmUpload");
+                    frm.action = REMOTE + "/upload_handler.aspx";
+                    frm.style.display = "block";
+                    btn = document.getElementById("btnSubmit");
+                    
+                    frm.onsubmit = function(){
+                        btn.disabled = "disabled";
+                    };
+                }
+            }, {
+                local: {
+                    returnUploadResponse: function(response){
+                        // here you should call back into your regular workflow
+                        btn.disabled = null;
+                        alert(response.msg);
+                    }
                 }
             });
         </script>
@@ -48,8 +75,11 @@
         <!-- easyXDM.Debug.trace(msg) will output its messages to any element with the id "log" -->
         <div id="log" style="height:100px;border:1px dotted black;overflow:auto">
         </div>
-        <div id="embedded">
-        </div>
+        <form id="frmUpload" style="display:none" method="POST" target="upload_target" enctype="multipart/form-data">
+            <input type="file" name="upload_file"/><input type="submit" id="btnSubmit" value="Upload file"/>
+        </form><!--
+        tracking code
+        -->
         <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));

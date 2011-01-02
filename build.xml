@@ -4,7 +4,7 @@
 	<property file="build.secret.properties"/>
 	<property name="project.build.artifactdir" value="./artifacts/"/>
 	<property name="project.build.publishdir" value="./artifacts/"/>
-	<property name="project.build.version" value="2.4.9"/>
+	<property name="project.build.version" value="2.4.10"/>
 	
 	<!-- Setup classpath for js-build-tools ant tasks -->
 	<path id="js-build-tasks.classpath">
@@ -113,7 +113,11 @@
 			<fileset file= "${project.src.dir}/changes.txt"/>
 			<fileset file= "tools/json2.js"/>
 		</copy>
-		
+
+		<copy todir="${project.src.dir}/tests">
+			<fileset file="work/easyXDM.debug.js"/>
+		</copy>
+
 		<copy todir="${project.build.artifactdir}v${project.build.version}/example">
 			<fileset dir="${project.src.dir}/example"/>
 		</copy>
@@ -125,7 +129,7 @@
 		</copy>	
 	</target>
 	
-	<target name="document" depends="build">
+	<target name="document">
 		<delete dir="${project.build.artifactdir}v${project.build.version}-docs" quiet="true"/>
 		<java jar="tools/ext-doc/ext-doc.jar" fork="true" failonerror="true" maxmemory="128m" >
 			<arg line="-p docs.xml -o ${project.build.artifactdir}v${project.build.version}-docs -t tools/ext-doc/template/ext/template.xml"/>

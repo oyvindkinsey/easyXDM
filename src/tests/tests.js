@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyTest, easyXDM, window, checkAcl, getDomainName, getLocation, appendQueryParameters*/
+/*global easyTest, easyXDM, window, modules*/
 var REMOTE = (function(){
     var remote = location.href;
     switch (location.host) {
@@ -115,22 +115,22 @@ function runTests(){
         steps: [{
             name: "getDomainName",
             run: function(){
-                return getDomainName(this.url1) === "foo.bar";
+                return easyXDM.getDomainName(this.url1) === "foo.bar";
             }
         }, {
             name: "getLocation",
             run: function(){
-                return getLocation(this.url1) === "http://foo.bar";
+                return easyXDM.getLocation(this.url1) === "http://foo.bar";
             }
         }, {
             name: "getLocation with :port",
             run: function(){
-                return getLocation(this.url2) === "http://foo.bar:80";
+                return easyXDM.getLocation(this.url2) === "http://foo.bar:80";
             }
         }, {
             name: "appendQueryParameters",
             run: function(){
-                return appendQueryParameters(this.url2, {
+                return easyXDM.appendQueryParameters(this.url2, {
                     g: "h"
                 }) ===
                 "http://foo.bar:80/a/b/c?d=e&g=h#f";
@@ -149,27 +149,27 @@ function runTests(){
         steps: [{
             name: "Match complete string",
             run: function(){
-                return checkAcl(this.acl, "http://www.domain.invalid");
+                return easyXDM.checkAcl(this.acl, "http://www.domain.invalid");
             }
         }, {
             name: "Match *",
             run: function(){
-                return checkAcl(this.acl, "http://www.domaina.com");
+                return easyXDM.checkAcl(this.acl, "http://www.domaina.com");
             }
         }, {
             name: "Match ?",
             run: function(){
-                return checkAcl(this.acl, "http://domainb.com");
+                return easyXDM.checkAcl(this.acl, "http://domainb.com");
             }
         }, {
             name: "Match RegExp",
             run: function(){
-                return checkAcl(this.acl, "http://domcccain.com");
+                return easyXDM.checkAcl(this.acl, "http://domcccain.com");
             }
         }, {
             name: "No match",
             run: function(){
-                return !checkAcl(this.acl, "http://foo.com");
+                return !easyXDM.checkAcl(this.acl, "http://foo.com");
             }
         }]
     }, {
@@ -560,6 +560,52 @@ function runTests(){
             timeout: 5000,
             run: function(){
                 this.transport.postMessage(this.expectedMessage);
+            }
+        }]
+    }, {
+        name: "test easyXDM.noConflict {SameOriginTransport}",
+        setUp: function(){
+            this.expectedMessage = ++i + "_abcd1234%@¤/";
+        },
+        steps: [{
+            name: "window.easyXDM is released {namespace}",
+            timeout: 5000,
+            run: function(){
+                this.notifyResult(window.easyXDM._test_global && !modules.easyXDM._test_global);
+            }
+        }, {
+            name: "onReady is fired {namespace}",
+            timeout: 5000,
+            run: function(){
+                var scope = this;
+                var messages = 0;
+                this.transport = new modules.easyXDM.Socket({
+                    protocol: "4",
+                    remote: LOCAL + "/test_namespace.html",
+                    onMessage: function(message, origin){
+                        if (scope.expectedMessage === message) {
+                            if (++messages === 2) {
+                                scope.notifyResult(true);
+                            }
+                        }
+                    },
+                    onReady: function(){
+                        scope.notifyResult(true);
+                    }
+                });
+            }
+        }, {
+            name: "message is echoed back {namespace}",
+            timeout: 5000,
+            run: function(){
+                this.transport.postMessage(this.expectedMessage);
+                this.transport.postMessage(this.expectedMessage);
+            }
+        }, {
+            name: "destroy {namespace}",
+            run: function(){
+                this.transport.destroy();
+                return ((document.getElementsByTagName("iframe").length === 0));
             }
         }]
     }, {

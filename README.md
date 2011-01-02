@@ -77,6 +77,9 @@ These properties can be set only on the provider
 
 * `acl` {String || String[]} Use this to only allow specific domains to consume this provider. The patterns can contain the wildcards ? and * as in the examples 'http://example.com', '*.foo.com' and '*dom?.com', or they can be regular expressions starting with ^ and ending with $. If none of the patterns match an Error will be thrown.
 
+A socket can be teared down (iframe removed etc) using 
+
+    socket.destroy();
 
 The easyXDM.Rpc
 ---------------
@@ -161,6 +164,10 @@ If you want to conditionally include Douglas Crockfords JSON2 library (or any ot
 
 This will only include it if not natively supported.
 
+An rpc object can be teared down (iframe removed etc) using 
+
+    rpc.destroy();
+
 The shipped /cors/ interface
 -----
 Since either end is free to use AJAX etc the Rpc object can be used to easily expose enable cross-domain AJAX. For this the library comes with a default `/cors/index.html` (`/cors/`) document that exposes a method `request(object config, function successFn, function errorFn)`, where config can have the following properties:
@@ -183,6 +190,41 @@ If the request fail the error handler will be passed an object with the followin
 * `status` {number} - The status of the request
 * `message` {string} - A friendly message explaining the error
 
+This is how you can use it:
+
+    var rpc = new easyXDM.Rpc({
+		remote: "http://foo.bar/cors/"
+	},
+    {
+        remote: {
+			request: {}
+		}
+    });
+
+	rpc.request({
+		url: "/resource/x/y/z/",
+		method: "POST",
+		data: {foo: "bar", bar: "foo"}
+	}, function(response){
+		alert(response.data);
+	});
+
+easyXDM.noConflict
+-----
+
+If you want two or more instances of easyXDM to run on the same page, you can put your instance into a namespace using easyXDM.noConflict method. This method returns control of easyXDM global object to the other library and returns an instance of itself.
+
+This is useful if you embed your code on the page and cannot guarantee that it does not already define window.easyXDM.
+
+It also takes a single argument, a string representation of the namespace. We need it to get access to the instance in the parent window (when using SameOriginTransport).
+
+Example:
+
+	// Let's assume we already have an instance of easyXDM on the page, but
+	// we need to load another one and put it under PROJECT.easyXDM. Here is
+	// how you do it.
+	var PROJECT = { easyXDM: easyXDM.noConflict("PROJECT") };
+	
 For more information
 -----
 
@@ -200,6 +242,15 @@ License
 =======
 easyXDM is distributed under the MIT license. Please keep the exisisting headers.
 
-Author
+Attribution
 ======
+Main developer
 Øyvind Sean Kinsey - <oyvind@kinsey.no>, @okinsey, http://kinsey.no
+
+The following has contributed to the project
+
+* [Anton Kovalyov](http://self.kovalyov.net/) - Added the `noConflict` feature.
+* [Eli Grey](http://eligrey.com/) - The /cors/ interface is adapted from his project [pmxdr](http://github.com/eligrey/pmxdr/)
+* [Peter Michaux](http://peter.michaux.ca/articles/feature-detection-state-of-the-art-browser-scripting) - Feature detection is based on his article
+* [Juriy Zaytsev - kangax](http://perfectionkills.com/instanceof-considered-harmful-or-how-to-write-a-robust-isarray/) - Implementation of isArray 
+* ++ many people through feedback

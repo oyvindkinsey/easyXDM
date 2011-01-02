@@ -25,13 +25,17 @@
 //
 
 var global = this;
-var channelId = 0;
+var channelId = Math.floor(Math.random() * 100) * 100; // randomize the initial id in case of multiple closures loaded 
 var emptyFn = Function.prototype;
 var reURI = /^(http.?:\/\/([^\/\s]+))/; // returns groups for origin (1) and domain (2)
 var reParent = /[\-\w]+\/\.\.\//; // matches a foo/../ expression 
 var reDoubleSlash = /([^:])\/\//g; // matches // anywhere but in the protocol
+var namespace = ""; // stores namespace under which easyXDM object is stored on the page (empty if object is global)
+var easyXDM = {};
+var _easyXDM = window.easyXDM; // map over global easyXDM in case of overwrite
 var IFRAME_PREFIX = "easyXDM_";
 var HAS_NAME_PROPERTY_BUG;
+
 // #ifdef debug
 var _trace = emptyFn;
 // #endif
@@ -97,18 +101,19 @@ else {
 /*
  * Cross Browser implementation of DOMContentLoaded.
  */
-var isReady = false, domReadyQueue = [];
+var domIsReady = false, domReadyQueue = [], readyState;
 if ("readyState" in document) {
-    isReady = document.readyState == "complete";
+    // If browser is WebKit-powered, check for both 'loaded' (legacy browsers) and
+    // 'interactive' (HTML5 specs, recent WebKit builds) states.
+    // https://bugs.webkit.org/show_bug.cgi?id=45119
+    readyState = document.readyState;
+    domIsReady = readyState == "complete" || (~ navigator.userAgent.indexOf('AppleWebKit/') && (readyState == "loaded" || readyState == "interactive"));
 }
 else {
     // If readyState is not supported in the browser, then in order to be able to fire whenReady functions apropriately
     // when added dynamically _after_ DOM load, we have to deduce wether the DOM is ready or not.
-    if (document.body) {
-        // document.body is not available prior to the body being built
-        // This does mean that we might fire it prematurely, but we only need the body element to be available for appending.
-        isReady = true;
-    }
+    // We only need a body to add elements to, so the existence of document.body is enough for us.
+    domIsReady = !!document.body;
 }
 
 function dom_onReady(){
@@ -116,7 +121,7 @@ function dom_onReady(){
     // #ifdef debug
     _trace("firing dom_onReady");
     // #endif
-    isReady = true;
+    domIsReady = true;
     for (var i = 0; i < domReadyQueue.length; i++) {
         domReadyQueue[i]();
     }
@@ -124,7 +129,7 @@ function dom_onReady(){
 }
 
 
-if (!isReady) {
+if (!domIsReady) {
     if (isHostMethod(window, "addEventListener")) {
         on(document, "DOMContentLoaded", dom_onReady);
     }
@@ -136,7 +141,7 @@ if (!isReady) {
         });
         if (document.documentElement.doScroll && window === top) {
             (function doScrollCheck(){
-                if (isReady) {
+                if (domIsReady) {
                     return;
                 }
                 // http://javascript.nwbox.com/IEContentLoaded/
@@ -162,7 +167,7 @@ if (!isReady) {
  * @param {Object} scope An optional scope for the function to be called with.
  */
 function whenReady(fn, scope){
-    if (isReady) {
+    if (domIsReady) {
         fn.call(scope);
         return;
     }
@@ -171,13 +176,63 @@ function whenReady(fn, scope){
     });
 }
 
+/**
+ * Returns an instance of easyXDM from the parent window with
+ * respect to the namespace.
+ *
+ * @return An instance of easyXDM (in the parent window)
+ */
+function getParentObject(){
+    var obj = parent;
+    if (namespace !== "") {
+        for (var i = 0, ii = namespace.split("."); i < ii.length; i++) {
+            // #ifdef debug
+            if (!obj) {
+                throw new Error(ii.slice(0, i + 1).join('.') + ' is not an object');
+            }
+            // #endif
+            obj = obj[ii[i]];
+        }
+    }
+    // #ifdef debug
+    if (!obj || !obj.easyXDM) {
+        throw new Error('Could not find easyXDM in parent.' + namespace);
+    }
+    // #endif
+    return obj.easyXDM;
+}
+
+/**
+ * Removes easyXDM variable from the global scope. It also returns control
+ * of the easyXDM variable to whatever code used it before.
+ *
+ * @param {String} ns A string representation of an object that will hold
+ *                    an instance of easyXDM.
+ * @return An instance of easyXDM
+ */
+function noConflict(ns){
+    // #ifdef debug
+    if (typeof ns != "string" || !ns) {
+        throw new Error('namespace must be a non-empty string');
+    }
+    _trace("Settings namespace to '" + ns + "'");
+    // #endif
+    
+    window.easyXDM = _easyXDM;
+    namespace = ns;
+    if (namespace) {
+        IFRAME_PREFIX = "easyXDM_" + namespace.replace(".", "_") + "_";
+    }
+    return easyXDM;
+}
+
 /*
  * Methods for working with URLs
  */
 /**
  * Get the domain name from a url.
  * @param {String} url The url to extract the domain from.
- * @returns The domain part of the url.
+ * @return The domain part of the url.
  * @type {String}
  */
 function getDomainName(url){
@@ -360,7 +415,7 @@ function apply(destination, source, noOverwrite){
 // This tests for the bug in IE where setting the [name] property using javascript causes the value to be redirected into [submitName].
 function testForNamePropertyBug(){
     var el = document.createElement("iframe");
-    el.name = "easyXDM_TEST";
+    el.name = IFRAME_PREFIX + "TEST";
     apply(el.style, {
         position: "absolute",
         left: "-2000px",
@@ -697,7 +752,7 @@ function removeFromStack(element){
  * @version %%version%%
  * @singleton
  */
-global.easyXDM = {
+apply(easyXDM, {
     /**
      * The version of the library
      * @type {string}
@@ -732,5 +787,24 @@ global.easyXDM = {
      * @param {function} fn The function to add
      * @param {object} scope An optional scope for the function to be called with.
      */
-    whenReady: whenReady
-};
+    whenReady: whenReady,
+    /**
+     * Removes easyXDM variable from the global scope. It also returns control
+     * of the easyXDM variable to whatever code used it before.
+     *
+     * @param {String} ns A string representation of an object that will hold
+     *                    an instance of easyXDM.
+     * @return An instance of easyXDM
+     */
+    noConflict: noConflict
+});
+
+// #ifdef debug
+// Expose helper functions so we can test them
+apply(easyXDM, {
+    checkAcl: checkAcl,
+    getDomainName: getDomainName,
+    getLocation: getLocation,
+    appendQueryParameters: appendQueryParameters
+});
+// #endif

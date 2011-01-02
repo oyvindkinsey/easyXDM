@@ -137,46 +137,39 @@ easyXDM.stack.NixTransport = function(config){
                 frame.contentWindow.opener = proxy;
             }
             else {
-                if (document.referrer && document.referrer != query.xdm_e) {
-                    window.parent.location = query.xdm_e;
+                // This is to mitigate origin-spoofing
+                window.parent.location = query.xdm_e + "#";
+                try {
+                    // by storing this in a variable we negate replacement attacks
+                    proxy = window.opener;
+                } 
+                catch (e2) {
+                    throw new Error("Cannot access window.opener");
                 }
-                else {
-                    if (document.referrer != query.xdm_e) {
-                        // This is to mitigate origin-spoofing
-                        window.parent.location = query.xdm_e;
+                proxy.SetChild({
+                    send: function(msg){
+                        // the timeout is necessary to have execution continue in the correct context
+                        global.setTimeout(function(){
+                            // #ifdef debug
+                            trace("received message");
+                            // #endif
+                            pub.up.incoming(msg, targetOrigin);
+                        }, 0);
                     }
-                    try {
-                        // by storing this in a variable we negate replacement attacks
-                        proxy = window.opener;
-                    } 
-                    catch (e2) {
-                        throw new Error("Cannot access window.opener");
-                    }
-                    proxy.SetChild({
-                        send: function(msg){
-                            // the timeout is necessary to have execution continue in the correct context
-                            global.setTimeout(function(){
-                                // #ifdef debug
-                                trace("received message");
-                                // #endif
-                                pub.up.incoming(msg, targetOrigin);
-                            }, 0);
-                        }
-                    });
-                    
-                    send = function(msg){
-                        // #ifdef debug
-                        trace("sending");
-                        // #endif
-                        proxy.SendToParent(msg, config.secret);
-                    };
-                    setTimeout(function(){
-                        // #ifdef debug
-                        trace("firing onReady");
-                        // #endif
-                        pub.up.callback(true);
-                    }, 0);
-                }
+                });
+                
+                send = function(msg){
+                    // #ifdef debug
+                    trace("sending");
+                    // #endif
+                    proxy.SendToParent(msg, config.secret);
+                };
+                setTimeout(function(){
+                    // #ifdef debug
+                    trace("firing onReady");
+                    // #endif
+                    pub.up.callback(true);
+                }, 0);
             }
         },
         init: function(){
