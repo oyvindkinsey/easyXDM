@@ -112,11 +112,8 @@ if ("readyState" in document) {
 else {
     // If readyState is not supported in the browser, then in order to be able to fire whenReady functions apropriately
     // when added dynamically _after_ DOM load, we have to deduce wether the DOM is ready or not.
-    if (document.body) {
-        // document.body is not available prior to the body being built
-        // This does mean that we might fire it prematurely, but we only need the body element to be available for appending.
-        isReady = true;
-    }
+    // We only need a body to add elements to, so the existence of document.body is enough for us.
+    isReady = !!document.body;
 }
 
 function dom_onReady(){
