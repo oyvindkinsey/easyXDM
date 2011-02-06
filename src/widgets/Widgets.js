@@ -3,7 +3,7 @@
 /**
  * easyXDM
  * http://easyxdm.net/
- * Copyright(c) 2009, Øyvind Sean Kinsey, oyvind@kinsey.no.
+ * Copyright(c) 2009-2011, Øyvind Sean Kinsey, oyvind@kinsey.no.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
