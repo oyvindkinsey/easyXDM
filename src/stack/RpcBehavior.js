@@ -74,9 +74,9 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                 method: method
             };
             
-            if (l > 0 && typeof arguments[l - 1] === "function") {
+            if (l > 0 && isCallableFunction(arguments[l - 1])) {
                 //with callback, procedure
-                if (l > 1 && typeof arguments[l - 2] === "function") {
+                if (l > 1 && isCallableFunction(arguments[l - 2])) {
                     // two callbacks, success and error
                     callback = {
                         success: arguments[l - 2],

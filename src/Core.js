@@ -35,11 +35,40 @@ var easyXDM = {};
 var _easyXDM = window.easyXDM; // map over global easyXDM in case of overwrite
 var IFRAME_PREFIX = "easyXDM_";
 var HAS_NAME_PROPERTY_BUG;
+var functionObject = Function;
+var fnDuckTypes = {"call": null, "apply": null, "constructor": null, "toString": null};
 
 // #ifdef debug
 var _trace = emptyFn;
 // #endif
 
+
+function isCallableFunction(fn) {
+    if (typeof(fn) === "function") {
+        return true;
+    }
+
+    // IE specific (object, and looking at an object)
+    if (typeof(window.alert) === "object" && typeof(fn) === "object") {
+        for (var methodName in fnDuckTypes) {
+            if (!fnDuckTypes[methodName]) {
+                fnDuckTypes[methodName] = functionObject[methodName].toString();
+            }
+            
+            try {
+                if (fn[methodName].toString() !== fnDuckTypes[methodName]) {
+                    return false;
+                }
+            }
+            catch(e) {
+                return false; // fn[methodName].toString() was not executable
+            }
+        }
+        return true;
+    }
+    
+    return false;
+}
 
 // http://peter.michaux.ca/articles/feature-detection-state-of-the-art-browser-scripting
 function isHostMethod(object, property){
