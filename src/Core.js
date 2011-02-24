@@ -42,33 +42,26 @@ var fnDuckTypes = {"call": null, "apply": null, "constructor": null, "toString":
 var _trace = emptyFn;
 // #endif
 
-
+// http://www.kilometer0.com/blog/code/internet-explorer-ie-cross-window-javascript-object-typeof-bug/
 function isCallableFunction(fn) {
     if (typeof(fn) === "function") {
         return true;
     }
 
     // IE specific (object, and looking at an object)
-    if (typeof(window.alert) === "object" && typeof(fn) === "object") {
-        for (var methodName in fnDuckTypes) {
-            if (!fnDuckTypes[methodName]) {
-                fnDuckTypes[methodName] = functionObject[methodName].toString();
-            }
-            
-            try {
-                if (fn[methodName].toString() !== fnDuckTypes[methodName]) {
-                    return false;
-                }
-            }
-            catch(e) {
-                return false; // fn[methodName].toString() was not executable
-            }
+    if (typeof(window.alert) === "object" && typeof(fn) === "object" && typeof(fn.call) !== "undefined" && typeof(fn.toString) !== "undefined") {
+        try {
+            return !!(fn.toString().match(/^function/));
         }
-        return true;
+        catch(e) {
+            return false; // either toString() can't be called, or other assorted errors
+        }
     }
     
     return false;
 }
+
+// end
 
 // http://peter.michaux.ca/articles/feature-detection-state-of-the-art-browser-scripting
 function isHostMethod(object, property){
