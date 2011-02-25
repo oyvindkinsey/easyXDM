@@ -30,13 +30,12 @@ var emptyFn = Function.prototype;
 var reURI = /^(http.?:\/\/([^\/\s]+))/; // returns groups for origin (1) and domain (2)
 var reParent = /[\-\w]+\/\.\.\//; // matches a foo/../ expression 
 var reDoubleSlash = /([^:])\/\//g; // matches // anywhere but in the protocol
+var reFunction = /^function/; // matches the opening of a function declaration
 var namespace = ""; // stores namespace under which easyXDM object is stored on the page (empty if object is global)
 var easyXDM = {};
 var _easyXDM = window.easyXDM; // map over global easyXDM in case of overwrite
 var IFRAME_PREFIX = "easyXDM_";
 var HAS_NAME_PROPERTY_BUG;
-var functionObject = Function;
-var fnDuckTypes = {"call": null, "apply": null, "constructor": null, "toString": null};
 
 // #ifdef debug
 var _trace = emptyFn;
@@ -51,7 +50,7 @@ function isCallableFunction(fn) {
     // IE specific (object, and looking at an object)
     if (typeof(window.alert) === "object" && typeof(fn) === "object" && typeof(fn.call) !== "undefined" && typeof(fn.toString) !== "undefined") {
         try {
-            return !!(fn.toString().match(/^function/));
+            return !!(fn.toString().match(reFunction));
         }
         catch(e) {
             return false; // either toString() can't be called, or other assorted errors
