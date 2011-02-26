@@ -110,6 +110,7 @@ function runTests(){
         setUp: function(){
             this.url1 = "http://foo.bar/a/b/c?d=e#f";
             this.url2 = "http://foo.bar:80/a/b/c?d=e#f";
+            this.url3 = "http://foo.bar:88/a/b/c?d=e#f";
             
         },
         steps: [{
@@ -123,9 +124,14 @@ function runTests(){
                 return easyXDM.getLocation(this.url1) === "http://foo.bar";
             }
         }, {
-            name: "getLocation with :port",
+            name: "getLocation with standard port",
             run: function(){
-                return easyXDM.getLocation(this.url2) === "http://foo.bar:80";
+                return easyXDM.getLocation(this.url2) === "http://foo.bar";
+            }
+        }, {
+            name: "getLocation with non-standard port",
+            run: function(){
+                return easyXDM.getLocation(this.url3) === "http://foo.bar:88";
             }
         }, {
             name: "appendQueryParameters",

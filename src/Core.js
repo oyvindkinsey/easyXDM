@@ -27,7 +27,7 @@
 var global = this;
 var channelId = Math.floor(Math.random() * 100) * 100; // randomize the initial id in case of multiple closures loaded 
 var emptyFn = Function.prototype;
-var reURI = /^(http.?:\/\/([^\/\s]+))/; // returns groups for origin (1) and domain (2)
+var reURI = /^((http.?:)\/\/([^:\/\s]+)(:\d+)*)/; // returns groups for protocol (2), domain (3) and port (4) 
 var reParent = /[\-\w]+\/\.\.\//; // matches a foo/../ expression 
 var reDoubleSlash = /([^:])\/\//g; // matches // anywhere but in the protocol
 var namespace = ""; // stores namespace under which easyXDM object is stored on the page (empty if object is global)
@@ -241,7 +241,7 @@ function getDomainName(url){
         throw new Error("url is undefined or empty");
     }
     // #endif
-    return url.match(reURI)[2];
+    return url.match(reURI)[3];
 }
 
 /**
@@ -255,7 +255,12 @@ function getLocation(url){
         throw new Error("url is undefined or empty");
     }
     // #endif
-    return url.match(reURI)[1];
+    var m = url.match(reURI);
+    var proto = m[2], domain = m[3], port = m[4] || "";
+    if ((proto == "http:" && port == ":80") || (proto == "https:" && port == ":443")) {
+        port = "";
+    }
+    return proto + "//" + domain + port;
 }
 
 /**
