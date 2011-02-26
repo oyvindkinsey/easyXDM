@@ -148,10 +148,11 @@ easyXDM.stack.NameTransport = function(config){
                 },
                 onLoad: function onLoad(){
                     // Remove the handler
-                    un(callerWindow, "load", onLoad);
+                    var w = callerWindow || this;
+                    un(w, "load", onLoad);
                     easyXDM.Fn.set(config.channel + "_load", _onLoad);
                     (function test(){
-                        if (typeof callerWindow.contentWindow.sendMessage == "function") {
+                        if (typeof w.contentWindow.sendMessage == "function") {
                             _onReady();
                         }
                         else {
