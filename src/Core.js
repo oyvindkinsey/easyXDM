@@ -483,11 +483,12 @@ function createFrame(config){
         config.container = document.body;
     }
     
+    // transfer properties to the frame
+    apply(frame, config.props);
+
     frame.border = frame.frameBorder = 0;
     config.container.insertBefore(frame, config.container.firstChild);
     
-    // transfer properties to the frame
-    apply(frame, config.props);
     return frame;
 }
 
