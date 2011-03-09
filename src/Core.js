@@ -483,11 +483,22 @@ function createFrame(config){
         config.container = document.body;
     }
     
-    frame.border = frame.frameBorder = 0;
-    config.container.insertBefore(frame, config.container.firstChild);
-    
+    // HACK for some reason, IE needs the source set
+    // after the frame has been appended into the DOM
+    // so remove the src, and set it afterwards
+    var src = config.props.src;
+    delete config.props.src;
+
     // transfer properties to the frame
     apply(frame, config.props);
+
+    frame.border = frame.frameBorder = 0;
+    config.container.insertBefore(frame, config.container.firstChild);
+
+    // HACK see above
+    frame.src = src;
+    config.props.src = src;
+    
     return frame;
 }
 
