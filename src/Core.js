@@ -35,7 +35,7 @@ var easyXDM = {};
 var _easyXDM = window.easyXDM; // map over global easyXDM in case of overwrite
 var IFRAME_PREFIX = "easyXDM_";
 var HAS_NAME_PROPERTY_BUG;
-
+var useHash = false; // whether to use the hash over the query
 // #ifdef debug
 var _trace = emptyFn;
 // #endif
@@ -325,17 +325,20 @@ function appendQueryParameters(url, parameters){
             q.push(key + "=" + encodeURIComponent(parameters[key]));
         }
     }
-    return url + ((url.indexOf("?") === -1) ? "?" : "&") + q.join("&") + hash;
+    return url + (useHash ? "#" : (url.indexOf("?") == -1 ? "?" : "&")) + q.join("&") + hash;
 }
 
-var query = (function(){
-    var query = {}, pair, search = location.search.substring(1).split("&"), i = search.length;
+
+
+var query = (function(input){
+    input = input.substring(1).split("&");
+    var data = {}, pair, i = input.length;
     while (i--) {
-        pair = search[i].split("=");
-        query[pair[0]] = decodeURIComponent(pair[1]);
+        pair = input[i].split("=");
+        data[pair[0]] = decodeURIComponent(pair[1]);
     }
-    return query;
-}());
+    return data;
+}(location.search || location.hash));
 
 /*
  * Helper methods
@@ -488,13 +491,13 @@ function createFrame(config){
     // so remove the src, and set it afterwards
     var src = config.props.src;
     delete config.props.src;
-
+    
     // transfer properties to the frame
     apply(frame, config.props);
-
+    
     frame.border = frame.frameBorder = 0;
     config.container.insertBefore(frame, config.container.firstChild);
-
+    
     // HACK see above
     frame.src = src;
     config.props.src = src;
@@ -537,6 +540,7 @@ function checkAcl(acl, domain){
 function prepareTransportStack(config){
     var protocol = config.protocol, stackEls;
     config.isHost = config.isHost || undef(query.xdm_p);
+    useHash = config.hash || false;
     // #ifdef debug
     _trace("preparing transport stack");
     // #endif
