@@ -329,7 +329,7 @@ function appendQueryParameters(url, parameters){
 }
 
 
-
+// build the query object either from location.query, if it contains the xdm_e argument, or from location.hash
 var query = (function(input){
     input = input.substring(1).split("&");
     var data = {}, pair, i = input.length;
@@ -338,7 +338,7 @@ var query = (function(input){
         data[pair[0]] = decodeURIComponent(pair[1]);
     }
     return data;
-}(location.search || location.hash));
+}(/xdm_e=/.test(location.search) ? location.search : location.hash));
 
 /*
  * Helper methods
