@@ -3,7 +3,7 @@
 //
 // easyXDM
 // http://easyxdm.net/
-// Copyright(c) 2009, Øyvind Sean Kinsey, oyvind@kinsey.no.
+// Copyright(c) 2009-2011, Øyvind Sean Kinsey, oyvind@kinsey.no.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -148,10 +148,11 @@ easyXDM.stack.NameTransport = function(config){
                 },
                 onLoad: function onLoad(){
                     // Remove the handler
-                    un(callerWindow, "load", onLoad);
+                    var w = callerWindow || this;
+                    un(w, "load", onLoad);
                     easyXDM.Fn.set(config.channel + "_load", _onLoad);
                     (function test(){
-                        if (typeof callerWindow.contentWindow.sendMessage == "function") {
+                        if (typeof w.contentWindow.sendMessage == "function") {
                             _onReady();
                         }
                         else {

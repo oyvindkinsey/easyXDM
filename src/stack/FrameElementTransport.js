@@ -3,7 +3,7 @@
 //
 // easyXDM
 // http://easyxdm.net/
-// Copyright(c) 2009, Øyvind Sean Kinsey, oyvind@kinsey.no.
+// Copyright(c) 2009-2011, Øyvind Sean Kinsey, oyvind@kinsey.no.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -66,7 +66,7 @@ easyXDM.stack.FrameElementTransport = function(config){
                 // set up the iframe
                 apply(config.props, {
                     src: appendQueryParameters(config.remote, {
-                        xdm_e: location.protocol + "//" + location.host + location.pathname + location.search,
+                        xdm_e: getLocation(location.href),
                         xdm_c: config.channel,
                         xdm_p: 5 // 5 = FrameElementTransport
                     }),
@@ -87,7 +87,9 @@ easyXDM.stack.FrameElementTransport = function(config){
             }
             else {
                 // This is to mitigate origin-spoofing
-                window.parent.location = query.xdm_e + "#";
+                if (document.referrer && getLocation(document.referrer) != query.xdm_e) {
+                    window.parent.location = query.xdm_e;
+                }
                 send = window.frameElement.fn(function(msg){
                     pub.up.incoming(msg, targetOrigin);
                 });

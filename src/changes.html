@@ -6,6 +6,19 @@
     <body>
         <ul>
             <li>
+                2.4.11 22.03.11
+                <br/>
+                Move hidden iframes to the top instead of left in order to support both right-to-left and left-to-right pages (Anton Kovalyov)
+                <br/>
+                Refactored the way attributes/properties were applied to created iframes in order to avoid redraw bugs in IE (George Courtsunis)
+                <br/>
+                Added support for passing data from the consumer to the provider using the hash instead of the query.
+                <br/>
+                Switched from using insertBefore to appendChild for adding the iframe to the DOM
+                <br/>
+                Minor improvements regarding url comparisons etc.
+            </li>
+            <li>
                 2.4.10 02.01.11
                 <br/>
                 easyXDM.noConflict added by Anton Kovalyov, this enables you to easily embed easyXDM in a distribution without risking version collisions.

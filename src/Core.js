@@ -3,7 +3,7 @@
 //
 // easyXDM
 // http://easyxdm.net/
-// Copyright(c) 2009, Øyvind Sean Kinsey, oyvind@kinsey.no.
+// Copyright(c) 2009-2011, Øyvind Sean Kinsey, oyvind@kinsey.no.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@
 var global = this;
 var channelId = Math.floor(Math.random() * 100) * 100; // randomize the initial id in case of multiple closures loaded 
 var emptyFn = Function.prototype;
-var reURI = /^(http.?:\/\/([^\/\s]+))/; // returns groups for origin (1) and domain (2)
+var reURI = /^((http.?:)\/\/([^:\/\s]+)(:\d+)*)/; // returns groups for protocol (2), domain (3) and port (4) 
 var reParent = /[\-\w]+\/\.\.\//; // matches a foo/../ expression 
 var reDoubleSlash = /([^:])\/\//g; // matches // anywhere but in the protocol
 var namespace = ""; // stores namespace under which easyXDM object is stored on the page (empty if object is global)
@@ -35,7 +35,7 @@ var easyXDM = {};
 var _easyXDM = window.easyXDM; // map over global easyXDM in case of overwrite
 var IFRAME_PREFIX = "easyXDM_";
 var HAS_NAME_PROPERTY_BUG;
-
+var useHash = false; // whether to use the hash over the query
 // #ifdef debug
 var _trace = emptyFn;
 // #endif
@@ -241,7 +241,7 @@ function getDomainName(url){
         throw new Error("url is undefined or empty");
     }
     // #endif
-    return url.match(reURI)[2];
+    return url.match(reURI)[3];
 }
 
 /**
@@ -255,7 +255,12 @@ function getLocation(url){
         throw new Error("url is undefined or empty");
     }
     // #endif
-    return url.match(reURI)[1];
+    var m = url.match(reURI);
+    var proto = m[2], domain = m[3], port = m[4] || "";
+    if ((proto == "http:" && port == ":80") || (proto == "https:" && port == ":443")) {
+        port = "";
+    }
+    return proto + "//" + domain + port;
 }
 
 /**
@@ -320,17 +325,20 @@ function appendQueryParameters(url, parameters){
             q.push(key + "=" + encodeURIComponent(parameters[key]));
         }
     }
-    return url + ((url.indexOf("?") === -1) ? "?" : "&") + q.join("&") + hash;
+    return url + (useHash ? "#" : (url.indexOf("?") == -1 ? "?" : "&")) + q.join("&") + hash;
 }
 
-var query = (function(){
-    var query = {}, pair, search = location.search.substring(1).split("&"), i = search.length;
+
+// build the query object either from location.query, if it contains the xdm_e argument, or from location.hash
+var query = (function(input){
+    input = input.substring(1).split("&");
+    var data = {}, pair, i = input.length;
     while (i--) {
-        pair = search[i].split("=");
-        query[pair[0]] = decodeURIComponent(pair[1]);
+        pair = input[i].split("=");
+        data[pair[0]] = decodeURIComponent(pair[1]);
     }
-    return query;
-}());
+    return data;
+}(/xdm_e=/.test(location.search) ? location.search : location.hash));
 
 /*
  * Helper methods
@@ -474,16 +482,26 @@ function createFrame(config){
     if (!config.container) {
         // This needs to be hidden like this, simply setting display:none and the like will cause failures in some browsers.
         frame.style.position = "absolute";
-        frame.style.left = "-2000px";
-        frame.style.top = "0px";
+        frame.style.top = "-2000px";
         config.container = document.body;
     }
     
-    frame.border = frame.frameBorder = 0;
-    config.container.insertBefore(frame, config.container.firstChild);
+    // HACK for some reason, IE needs the source set
+    // after the frame has been appended into the DOM
+    // so remove the src, and set it afterwards
+    var src = config.props.src;
+    delete config.props.src;
     
     // transfer properties to the frame
     apply(frame, config.props);
+    
+    frame.border = frame.frameBorder = 0;
+    config.container.appendChild(frame);
+    
+    // HACK see above
+    frame.src = src;
+    config.props.src = src;
+    
     return frame;
 }
 
@@ -522,6 +540,7 @@ function checkAcl(acl, domain){
 function prepareTransportStack(config){
     var protocol = config.protocol, stackEls;
     config.isHost = config.isHost || undef(query.xdm_p);
+    useHash = config.hash || false;
     // #ifdef debug
     _trace("preparing transport stack");
     // #endif
