@@ -496,7 +496,7 @@ function createFrame(config){
     apply(frame, config.props);
     
     frame.border = frame.frameBorder = 0;
-    config.container.insertBefore(frame, config.container.firstChild);
+    config.container.appendChild(frame);
     
     // HACK see above
     frame.src = src;
