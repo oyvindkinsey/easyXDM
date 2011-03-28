@@ -30,16 +30,38 @@ var emptyFn = Function.prototype;
 var reURI = /^((http.?:)\/\/([^:\/\s]+)(:\d+)*)/; // returns groups for protocol (2), domain (3) and port (4) 
 var reParent = /[\-\w]+\/\.\.\//; // matches a foo/../ expression 
 var reDoubleSlash = /([^:])\/\//g; // matches // anywhere but in the protocol
+var reFunction = /^function/; // matches the opening of a function declaration
 var namespace = ""; // stores namespace under which easyXDM object is stored on the page (empty if object is global)
 var easyXDM = {};
 var _easyXDM = window.easyXDM; // map over global easyXDM in case of overwrite
 var IFRAME_PREFIX = "easyXDM_";
 var HAS_NAME_PROPERTY_BUG;
+var HAS_FUNCTION_RECAST_BUG = false/*@cc_on || ((ScriptEngineMajorVersion()+(ScriptEngineMinorVersion()/10)) <= 5.8)@*/;
 var useHash = false; // whether to use the hash over the query
+
 // #ifdef debug
 var _trace = emptyFn;
 // #endif
 
+// http://www.kilometer0.com/blog/code/internet-explorer-ie-cross-window-javascript-object-typeof-bug/
+function isCallableFunction(fn) {
+    if (typeof fn === "function") {
+        return true;
+    }
+
+    // IE specific (object, and looking at an object)
+    if (HAS_FUNCTION_RECAST_BUG && typeof fn === "object" && typeof fn.call !== "undefined" && typeof fn.apply !== "undefined") {
+        try {
+            return reFunction.test(fn.toString());
+        }
+        catch(e) {
+            return false; // either toString() can't be called, or other assorted errors
+        }
+    }
+    
+    return false;
+}
+// end
 
 // http://peter.michaux.ca/articles/feature-detection-state-of-the-art-browser-scripting
 function isHostMethod(object, property){
