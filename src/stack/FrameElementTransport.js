@@ -88,7 +88,7 @@ easyXDM.stack.FrameElementTransport = function(config){
             else {
                 // This is to mitigate origin-spoofing
                 if (document.referrer && getLocation(document.referrer) != query.xdm_e) {
-                    window.parent.location = query.xdm_e;
+                    window.top.location = query.xdm_e;
                 }
                 send = window.frameElement.fn(function(msg){
                     pub.up.incoming(msg, targetOrigin);
