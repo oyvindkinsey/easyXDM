@@ -56,7 +56,7 @@ easyXDM.DomHelper = {
             // #ifdef debug
             debug.log("loading external JSON");
             // #endif
-            document.write('<script type="text/javascript" src="' + path + '"></script>');
+            document.write('<scr'+'ipt type="text/javascript" src="' + path + '"></scr'+'ipt>');
         }
         // #ifdef debug
         else {
