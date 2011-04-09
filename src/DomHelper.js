@@ -58,7 +58,7 @@ easyXDM.DomHelper = {
             // #endif
             // we need to encode the < in order to avoid an illegal token error
             // when the script is inlined in a document.
-            document.write('%3Cscript type="text/javascript" src="' + path + '">%3C/script>');
+            document.write('<' + 'script type="text/javascript" src="' + path + '"><' + '/script>');
         }
         // #ifdef debug
         else {
