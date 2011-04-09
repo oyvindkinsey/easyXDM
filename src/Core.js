@@ -420,22 +420,6 @@ function apply(destination, source, noOverwrite){
     return destination;
 }
 
-// This tests for the bug in IE where setting the [name] property using javascript causes the value to be redirected into [submitName].
-function testForNamePropertyBug(){
-    var el = document.createElement("iframe");
-    el.name = IFRAME_PREFIX + "TEST";
-    apply(el.style, {
-        position: "absolute",
-        left: "-2000px",
-        top: "0px"
-    });
-    document.body.appendChild(el);
-    HAS_NAME_PROPERTY_BUG = !(el.contentWindow === window.frames[el.name]);
-    document.body.removeChild(el);
-    // #ifdef debug
-    _trace("HAS_NAME_PROPERTY_BUG: " + HAS_NAME_PROPERTY_BUG);
-    // #endif
-}
 
 /**
  * Creates a frame and appends it to the DOM.
@@ -453,9 +437,17 @@ function createFrame(config){
     // #ifdef debug
     _trace("creating frame: " + config.props.src);
     // #endif
+    
     if (undef(HAS_NAME_PROPERTY_BUG)) {
-        testForNamePropertyBug();
+        // This tests for the bug in IE where setting the [name] property using javascript causes the value to be redirected into [submitName].
+        var input = document.createElement("input");
+        input.style.display = "none";
+        document.body.appendChild(input);
+        input.name = IFRAME_PREFIX + "TEST";
+        HAS_NAME_PROPERTY_BUG = !document.getElementsByTagName("input")[IFRAME_PREFIX + "TEST"];
+        document.removeChild(input);
     }
+    
     var frame;
     // This is to work around the problems in IE6/7 with setting the name property. 
     // Internally this is set as 'submitName' instead when using 'iframe.name = ...'
