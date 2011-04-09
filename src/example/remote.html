@@ -11,7 +11,7 @@
             easyXDM.DomHelper.requiresJSON("../json2.js");
         </script>
         <script type="text/javascript">
-            var remoteapp; // reference to the popups window
+            var win, remoteapp; // reference to the popups window
             var proxy = new easyXDM.Rpc(/** The configuration */{
                 local: "../name.html"
             }, {
@@ -24,13 +24,17 @@
                         remoteapp = null;
                         // we now open the window, passing the name of this window (includes the channel name)
                         // in case it has to look us up using the framename
-                        window.open('remoteapp.html' + '#easyXDM_' + easyXDM.query.xdm_c + '_provider', name, "width=400, height=400");
+                        win = window.open('remoteapp.html' + '#easyXDM_' + easyXDM.query.xdm_c + '_provider', name, "width=400, height=400");
                     },
                     /**
                      * This is where we receive the data
                      * @param {Object} data The data
                      */
                     postMessage: function(data){
+                        if (win.closed) {
+                            alert("the popup has been closed - please open it again");
+                            return;
+                        }
                         var div = remoteapp.document.createElement("div");
                         div.innerHTML = "data from '" + proxy.origin + "'";
                         if (remoteapp) {
