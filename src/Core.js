@@ -443,8 +443,8 @@ function createFrame(config){
         var input = document.createElement("input");
         input.style.display = "none";
         document.body.appendChild(input);
-        input.name = IFRAME_PREFIX + "TEST";
-        HAS_NAME_PROPERTY_BUG = !document.getElementsByTagName("input")[IFRAME_PREFIX + "TEST"];
+        input.name = IFRAME_PREFIX + "TEST" + channelId;
+        HAS_NAME_PROPERTY_BUG = !document.getElementsByTagName("input")[IFRAME_PREFIX + "TEST" + channelId];
         document.removeChild(input);
     }
     
