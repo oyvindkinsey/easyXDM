@@ -70,7 +70,8 @@
                      * or a path relative to the root.
                      * @field
                      */
-                    local: "../hash.html",
+                    local: "../name.html",
+                    swf: "../easyxdm.swf",
                     /**
                      * Register the url to the remote interface
                      * @field
@@ -109,7 +110,7 @@
     </div>
     <br/>
     <br/>
-    <input type="text" id="code" size="100" value="channel.sendData({propC:'c',procD:'d',propE:88})"/>
+    <input type="text" id="code" size="100" value="channel.postMessage(serializer.stringify({propC:'c',procD:'d',propE:88}))"/>
     <button onclick="eval(document.getElementById('code').value);">
         eval code
     </button>

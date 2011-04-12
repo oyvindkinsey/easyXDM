@@ -266,6 +266,48 @@ function runTests(){
             }
         }]
     }, {
+        name: "test easyXDM.Socket{FlashTransport}",
+        setUp: function(){
+            this.expectedMessage = ++i + "_abcd1234%@¤/";
+        },
+        steps: [{
+            name: "onReady is fired",
+            timeout: 5000,
+            run: function(){
+                var scope = this;
+                var messages = 0;
+                this.transport = new easyXDM.Socket({
+                    protocol: "6",
+                    remote: REMOTE + "/test_transport.html",
+                    swf: "../easyxdm.swf",
+                    onMessage: function(message, origin){
+                        if (scope.expectedMessage === message) {
+                            if (++messages === 2) {
+                                scope.notifyResult(true);
+                            }
+                        }
+                    },
+                    container: "embedded",
+                    onReady: function(){
+                        scope.notifyResult(true);
+                    }
+                });
+            }
+        }, {
+            name: "message is echoed back",
+            timeout: 5000,
+            run: function(){
+                this.transport.postMessage(this.expectedMessage);
+                this.transport.postMessage(this.expectedMessage);
+            }
+        }, {
+            name: "destroy",
+            run: function(){
+                this.transport.destroy();
+                return ((document.getElementsByTagName("iframe").length === 0));
+            }
+        }]
+    }, {
         name: "test easyXDM.Socket{FrameElementTransport}",
         runIf: function(){
             if (!(navigator.product === "Gecko" && "frameElement" in window && !("postMessage" in window) && navigator.userAgent.indexOf('WebKit') == -1)) {
@@ -632,6 +674,7 @@ function runTests(){
                 var scope = this;
                 this.transport = new easyXDM.Socket({
                     local: "../name.html",
+                    swf: "../easyxdm.swf",
                     remote: REMOTE + "/test_transport.html",
                     onMessage: function(message, origin){
                         scope.notifyResult((scope.expectedMessage === message));
@@ -666,6 +709,7 @@ function runTests(){
                 var scope = this;
                 this.transport = new easyXDM.Socket({
                     local: "../name.html",
+                    swf: "../easyxdm.swf",
                     remote: REMOTE + "/test_transport.html?foo=bar",
                     hash: true,
                     onMessage: function(message, origin){
@@ -701,6 +745,7 @@ function runTests(){
                 var scope = this;
                 this.transport = new easyXDM.Socket({
                     local: "../name.html",
+                    swf: "../easyxdm.swf",
                     remote: REMOTE + "/test_transport.html",
                     onMessage: function(message, origin){
                         scope.notifyResult((scope.expectedMessage === message));
@@ -727,6 +772,7 @@ function runTests(){
                 var scope = this;
                 this.transport = new easyXDM.Socket({
                     local: "../name.html",
+                    swf: "../easyxdm.swf",
                     remote: REMOTE + "/test_transport.html?a=b&c=d#foo,faa",
                     onMessage: function(message, origin){
                         scope.notifyResult((scope.expectedMessage === message));
@@ -761,6 +807,7 @@ function runTests(){
                 var scope = this;
                 this.remote = new easyXDM.Rpc({
                     local: "../name.html",
+                    swf: "../easyxdm.swf",
                     remote: REMOTE + "/test_rpc.html",
                     remoteHelper: REMOTE + "/../name.html",
                     container: document.getElementById("embedded"),

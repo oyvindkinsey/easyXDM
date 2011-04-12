@@ -13,7 +13,7 @@
             var _widgetManager;
             easyXDM.whenReady(function(){
                 _widgetManager = new easyXDM.WidgetManager({
-                    local: "../name.html",
+                    swf: "../easyxdm.swf",
                     container: document.getElementById("widgets")
                 });
                 document.getElementById("widget1url").value = location.href.replace("consumer", "provider").replace("widgets.html", "widget.html");

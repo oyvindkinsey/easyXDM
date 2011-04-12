@@ -144,6 +144,7 @@ easyXDM.WidgetManager = function(config){
             local: _hashUrl,
             remote: url,
             container: widgetConfig.container || _container,
+            swf: config.swf,
             onReady: function(){
                 _initializeWidget(widget, url, widgetConfig);
             }
@@ -242,7 +243,9 @@ easyXDM.WidgetManager = function(config){
 easyXDM.Widget = function(config){
     var _widget = this;
     var _incomingMessageHandler;
-    var _widgetHost = new easyXDM.Rpc({}, {
+    var _widgetHost = new easyXDM.Rpc({
+        swf: config.swf
+    }, {
         remote: {
             subscribe: {
                 isVoid: true

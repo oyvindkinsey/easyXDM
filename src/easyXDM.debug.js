@@ -34,6 +34,7 @@
     document.write(unescape("%3Cscript src='" + src + "Fn.js' type='text/javascript'%3E%3C/script%3E"));
     document.write(unescape("%3Cscript src='" + src + "Socket.js' type='text/javascript'%3E%3C/script%3E"));
     document.write(unescape("%3Cscript src='" + src + "Rpc.js' type='text/javascript'%3E%3C/script%3E"));
+    document.write(unescape("%3Cscript src='" + src + "stack/FlashTransport.js' type='text/javascript'%3E%3C/script%3E"));
     document.write(unescape("%3Cscript src='" + src + "stack/SameOriginTransport.js' type='text/javascript'%3E%3C/script%3E"));
     document.write(unescape("%3Cscript src='" + src + "stack/PostMessageTransport.js' type='text/javascript'%3E%3C/script%3E"));
     document.write(unescape("%3Cscript src='" + src + "stack/FrameElementTransport.js' type='text/javascript'%3E%3C/script%3E"));

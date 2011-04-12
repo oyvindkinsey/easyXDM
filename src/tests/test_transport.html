@@ -9,6 +9,7 @@
             window.onload = function(){
                 transport = new easyXDM.Socket({
                     local: "../name.html",
+                    swf: "../easyxdm.swf",
                     onMessage: function(message, origin){
                         // Echo back the message
                         transport.postMessage(message);

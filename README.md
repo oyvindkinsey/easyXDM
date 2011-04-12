@@ -5,7 +5,7 @@ easyXDM is a Javascript library that enables you as a developer to easily work a
 **Some of the goals for the project are that it should**
 
 * be easy to use!!!
-* be self contained, no dependencies (not counting JSON)
+* be self contained, <s>no dependencies</s> (Now requires Flash for the FlashTransport) (not counting JSON)
 * be light weight
 * be flexible
 * have good code quality (uses jslint etc)
@@ -20,7 +20,7 @@ For all implementations the transport stack offers bi-directionality, reliabilit
 
 Using JavaScript only (no Flash, Silverlight, extra html files etc) easyXDM provides the following browsers with stacks with latency of less than 15ms:
 
-* IE6 and IE7 - using the NixTransport
+* IE6 and IE7 - using the <s>NixTransport</s> (see [Microsoft Security Bulletin MS11-018](http://www.microsoft.com/technet/security/Bulletin/MS11-018.mspx)) FlashTransport
 * IE8+ - using the PostMessageTransport
 * Opera 9+ - using the PostMessageTransport (support for both Operas old standard and the HTML5 standard)
 * Firefox 1-2 - using the FrameElementTransport
@@ -64,7 +64,8 @@ Use this for sending the strings to the other end:
 In addition the following config properties can be set for both consumer and provider
 
 * `onReady` - If you set this to a function, then this will be called once the communication has been established.
-* `local` {String} - To enable the NameTransport as a fallback, set this to point to the `name.html` file on the current domain. 
+* `local` {String} - To enable the NameTransport as a fallback, set this to point to the `name.html` file on the current domain.
+* `swf` {String} - To enable the FlashTransport for IE6/7 you need to point this towards you `easyxdm.swf` file. This can be hosted on any domain, and there is no requirement for a crossdomain.xml file.
 
 These properties can be set only on the consumer
 
