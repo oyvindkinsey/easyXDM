@@ -29,13 +29,15 @@
             function init(){
                 console.log("init " + channelId);
                 swf = document.getElementById(attributes.id);
-                swf.createChannel("easyXDM_channel" + channelId, "http://xdm1.local", false);
+                swf.createChannel("easyXDM_channel" + channelId, "http://xdm1.local", false, "foo[\"onMessage\"]", "key");
             }
             
-            function onMessage(msg, origin){
-                document.getElementById("output").appendChild(document.createTextNode(msg + ":" + origin));
-                
-            }
+            var foo = {
+                onMessage: function(msg, origin){
+                    document.getElementById("output").appendChild(document.createTextNode(msg + "-foo:" + origin));
+                    
+                }
+            };
             
             function log(msg){
                 console.log(location.host + ": " + msg);
@@ -46,7 +48,9 @@
             }
             
             
-            var flashvars = {};
+            var flashvars = {
+                init: "init"
+            };
             var params = {
                 menu: "false",
                 scale: "noScale",
@@ -57,7 +61,7 @@
             var attributes = {
                 id: "neteasyxdmflash"
             };
-            swfobject.embedSWF("../net.easyxdm.flash/neteasyxdmflash.swf", "altContent", "10", "10", "8.0.0", "expressInstall.swf", flashvars, params, attributes);
+            swfobject.embedSWF("../../../tools/easyxdm.swf", "altContent", "10", "10", "8.0.0", "expressInstall.swf", flashvars, params, attributes);
         </script>
     </body>
 </html>

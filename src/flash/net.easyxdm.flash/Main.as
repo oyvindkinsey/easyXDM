@@ -1,66 +1,95 @@
+//
+// easyXDM
+// http://easyxdm.net/
+// Copyright(c) 2009-2011, Øyvind Sean Kinsey, oyvind@kinsey.no.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+
 
 import flash.external.ExternalInterface;
 import System.security;
 
 /**
- * ...
+ * This class facilitates flash based communication between domains.
  * @author Øyvind Sean Kinsey
  */
 class Main 
-{
-	
+{	
 	public static function main(swfRoot:MovieClip):Void 
 	{
-		// entry point		
-		
-		// these should be stored in a map
+		// map of all the senders
 		var sendMap = { };
-		var callbackMap = { };
 		
-		ExternalInterface.addCallback("postMessage", { }, function(channel:String, message:String, origin:String) {
-				var fn = sendMap[channel];
-				ExternalInterface.call("log", "using fn " + channel + " from sendMap" );
-				fn(message, origin);
-				ExternalInterface.call("log", "typeof :" +  fn );
-			});
+		// our origin
+		var initCallback:String = _root.init;
+		var tracer:String = _root.log;
+		
+		var log = function(msg) {
+			if (tracer) {
+				ExternalInterface.call(tracer, msg);
+			}
+		}
+		
+		// add the postMessage method
+		ExternalInterface.addCallback("postMessage", { }, function(channel:String, message:String) {
+			sendMap[channel](message);
+		});
 				
-			// add the postMessage method
-
-		 
-		
-		ExternalInterface.addCallback("createChannel", { }, function(channel:String, remoteOrigin:String, isHost:Boolean, callback:") {
-			// reference a new instance added to the map
-			var sendingChannelName = "_" + channel + (isHost ? "_consumer" : "_provider");
-			var receivingChannelName = "_" +  channel + (isHost ? "_provider" : "_consumer");	
+		ExternalInterface.addCallback("createChannel", { }, function(channel:String, remoteOrigin:String, isHost:Boolean, callback:String, key:String) {
+			var allowedDomain = remoteOrigin.substring(remoteOrigin.indexOf("://") + 3) + ":";
+			allowedDomain = allowedDomain.substring(0, allowedDomain.indexOf(":"));
 			
+			// reference a new instance added to the map
+			var sendingChannelName = "_" + channel + "_" + key + "_" + (isHost ? "_consumer" : "_provider");
+			var receivingChannelName = "_" +  channel + "_" + key + "_" + (isHost ? "_provider" : "_consumer");	
+			
+			// set up the sending connection and store it in the map
 			var sendingConnection:LocalConnection = new LocalConnection();
-			sendMap[channel] = function(message, origin) {
-				ExternalInterface.call("log", "sending to " + sendingChannelName);
+			sendMap[channel] = function(message) {
+				log("sending to " + sendingChannelName);
 				sendingConnection.send(sendingChannelName, "onMessage", message);
 			};
 
+			// set up the listening connection
 			var listeningConnection:LocalConnection  = new LocalConnection();
 			listeningConnection.onMessage = function(message) {
-				ExternalInterface.call("onMessage", message, remoteOrigin);
+				ExternalInterface.call(callback, message, remoteOrigin);
 			};
-			listeningConnection.allowDomain = function(origin:String) {
-				ExternalInterface.call("log", "allowing " + origin);
-				return true;
+			
+			// only allow the intended domain access to this connection
+			listeningConnection.allowDomain = function(domain:String) {
+				return allowedDomain === domain;
 			};
-        });
 
+			// connect 
 			if (listeningConnection.connect(receivingChannelName)) {
-				ExternalInterface.call("log", "listening on " + receivingChannelName);	
+				log("listening on " + receivingChannelName);	
 			} else {
-				ExternalInterface.call("log", "could not listen on " + receivingChannelName);	
+				log("could not listen on " + receivingChannelName);	
 			}
-			
-			
-			//ExternalInterface.call("alert", "setup");
+		});
+		ExternalInterface.addCallback("destroyChannel", { }, function(channel:String) {
+			delete sendMap[channel];
 		});
 		
-		
-		ExternalInterface.call("init");
+		ExternalInterface.call(initCallback);
 	}
 	
 	public function Main() 

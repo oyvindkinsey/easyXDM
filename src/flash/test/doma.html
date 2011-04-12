@@ -23,19 +23,13 @@
         <div id="altContent">
         </div>
         <script type="text/javascript">
-            var vars = {
-                myOrigin: "http://xdm1.local",
-                remoteOrigin: "http://xdm2.local",
-                callback: "init"
-            }
-            
             var channelId = Math.floor(Math.random() * 100) * 100;
             
             function init(){
                 console.log("init " + channelId);
                 swf = document.getElementById(attributes.id);
-				
-                swf.createChannel("easyXDM_channel" + channelId, "http://xdm2.local", true);
+                
+                swf.createChannel("easyXDM_channel" + channelId, "http://xdm2.local", true, "foo[\"onMessage\"]", "key");
                 
                 var ifr = document.createElement("iframe");
                 document.body.appendChild(ifr);
@@ -43,20 +37,23 @@
                 
             }
             
+            var foo = {
+                onMessage: function(msg, origin){
+                    document.getElementById("output").appendChild(document.createTextNode(msg + "-foo:" + origin));
+                    
+                }
+            };
             function log(msg){
                 console.log(location.host + ": " + msg);
-            }
-            
-            function onMessage(msg, origin){
-                document.getElementById("output").appendChild(document.createTextNode(msg + ":" + origin));
-                
             }
             
             function send(){
                 swf.postMessage("easyXDM_channel" + channelId, document.getElementById("txtIn").value, "http://xdm2.local");
             }
             
-            var flashvars = {};
+            var flashvars = {
+				init:"init"
+			};
             var params = {
                 menu: "false",
                 scale: "noScale",
@@ -67,7 +64,7 @@
             var attributes = {
                 id: "neteasyxdmflash"
             };
-            swfobject.embedSWF("../net.easyxdm.flash/neteasyxdmflash.swf", "altContent", "10", "10", "8.0.0", "expressInstall.swf", flashvars, params, attributes);
+            swfobject.embedSWF("../../../tools/easyxdm.swf", "altContent", "10", "10", "8.0.0", "expressInstall.swf", flashvars, params, attributes);
         </script>
     </body>
 </html>
