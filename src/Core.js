@@ -373,7 +373,7 @@ function getJSON(){
         a: [1, 2, 3]
     }, json = "{\"a\":[1,2,3]}";
     
-    if (JSON && typeof JSON.stringify === "function" && JSON.stringify(obj).replace((/\s/g), "") === json) {
+    if (typeof JSON != "undefined" && typeof JSON.stringify === "function" && JSON.stringify(obj).replace((/\s/g), "") === json) {
         // this is a working JSON instance
         return JSON;
     }
