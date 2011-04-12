@@ -65,7 +65,7 @@ In addition the following config properties can be set for both consumer and pro
 
 * `onReady` - If you set this to a function, then this will be called once the communication has been established.
 * `local` {String} - To enable the NameTransport as a fallback, set this to point to the `name.html` file on the current domain.
-* `swf` {String} - To enable the FlashTransport for IE6/7 you need to point this towards you `easyxdm.swf` file. This can be hosted on any domain, and there is no requirement for a crossdomain.xml file.
+* `swf` {String} - To enable the FlashTransport for IE6/7 you need to point this towards your `easyxdm.swf` file. Both ends MUST point to the providers copy, and there is no requirement for a crossdomain.xml file.
 
 These properties can be set only on the consumer
 
