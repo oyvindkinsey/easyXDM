@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=7">
+        <title>Flash</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js" type="text/javascript">
+        </script>
+        <script type="text/javascript">
+            var swf;
+            
+            function init(){
+                console.log("init");
+                swf = document.getElementById(attributes.id);
+                swf.setup("easyXDM_channel", "http://xdm1.local", false);
+            }
+            
+            function onMessage(msg, origin){
+                document.getElementById("output").appendChild(document.createTextNode(msg + ":" + origin));
+                
+            }
+            
+			function log(msg){
+				console.log(location.host + ": " + msg);
+			}
+            function send(){
+                swf.postMessage("easyXDM_channel", document.getElementById("txtIn").value, "http://xdm1.local");
+            }
+            
+            
+            var flashvars = {
+                domain: "xdm2.local",
+                proto: "http:"
+            };
+            var params = {
+                menu: "false",
+                scale: "noScale",
+                allowFullscreen: "true",
+                allowScriptAccess: "always",
+                bgcolor: "#FFFFFF"
+            };
+            var attributes = {
+                id: "neteasyxdmflash"
+            };
+            swfobject.embedSWF("../net.easyxdm.flash/neteasyxdmflash.swf", "altContent", "10", "10", "8.0.0", "expressInstall.swf", flashvars, params, attributes);
+        </script>
+        <style>
+            body {
+                background-color: blue;
+            }
+        </style>
+    </head>
+    <body>
+        DOMB<input type="text" id="txtIn"/>
+        <button onclick="send()">
+            send
+        </button>
+        <div id="output">
+        </div>
+        <div id="altContent">
+        </div>
+    </body>
+</html>
