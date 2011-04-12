@@ -11,18 +11,7 @@ class Main
 	
 	public static function main(swfRoot:MovieClip):Void 
 	{
-		ExternalInterface.call("console.log", "main");
-				
 		// entry point		
-		var domain = _root.domain;
-		
-		if (_root.proto === "http:") {
-			ExternalInterface.call("log", "allowInsecureDomain" );
-			security.allowInsecureDomain(domain);
-		} else {
-			ExternalInterface.call("log", "allowDomain" );
-			security.allowDomain(domain);
-		}
 		
 		// these should be stored in a map
 		var sendMap = { };
@@ -37,30 +26,35 @@ class Main
 				
 			// add the postMessage method
 
-		ExternalInterface.addCallback("setup", { }, function(channel:String, remoteOrigin:String, isHost:Boolean) {
+		 
+		
+		ExternalInterface.addCallback("createChannel", { }, function(channel:String, remoteOrigin:String, isHost:Boolean, callback:") {
 			// reference a new instance added to the map
 			var sendingChannelName = "_" + channel + (isHost ? "_consumer" : "_provider");
-			var receivingChannelName = "_" + channel + (isHost ? "_provider" : "_consumer");
-			
-			var listeningConnection:LocalConnection  = new LocalConnection();
-			listeningConnection.allowDomain = function(origin) {
-				var allowed:Boolean = origin === remoteOrigin.substring(remoteOrigin.indexOf("://") + 3);
-				ExternalInterface.call("log", "allowing " + origin +": " + allowed);
-				return allowed;
-			};
+			var receivingChannelName = "_" +  channel + (isHost ? "_provider" : "_consumer");	
 			
 			var sendingConnection:LocalConnection = new LocalConnection();
-			listeningConnection.connect(receivingChannelName);
-			ExternalInterface.call("log", "listening on " + receivingChannelName);
-				
 			sendMap[channel] = function(message, origin) {
 				ExternalInterface.call("log", "sending to " + sendingChannelName);
 				sendingConnection.send(sendingChannelName, "onMessage", message);
 			};
 
+			var listeningConnection:LocalConnection  = new LocalConnection();
 			listeningConnection.onMessage = function(message) {
 				ExternalInterface.call("onMessage", message, remoteOrigin);
 			};
+			listeningConnection.allowDomain = function(origin:String) {
+				ExternalInterface.call("log", "allowing " + origin);
+				return true;
+			};
+        });
+
+			if (listeningConnection.connect(receivingChannelName)) {
+				ExternalInterface.call("log", "listening on " + receivingChannelName);	
+			} else {
+				ExternalInterface.call("log", "could not listen on " + receivingChannelName);	
+			}
+			
 			
 			//ExternalInterface.call("alert", "setup");
 		});
