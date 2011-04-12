@@ -53,7 +53,7 @@ class Main
 		});
 				
 		ExternalInterface.addCallback("createChannel", { }, function(channel:String, remoteOrigin:String, isHost:Boolean, callback:String, key:String) {
-			var allowedDomain = remoteOrigin.substring(remoteOrigin.indexOf("://") + 3) + ":";
+			var allowedDomain = remoteOrigin.substring(remoteOrigin.indexOf("://") + 3).split("/")[0] + ":";
 			allowedDomain = allowedDomain.substring(0, allowedDomain.indexOf(":"));
 			
 			// reference a new instance added to the map
@@ -70,11 +70,13 @@ class Main
 			// set up the listening connection
 			var listeningConnection:LocalConnection  = new LocalConnection();
 			listeningConnection.onMessage = function(message) {
+				log("received message");	
 				ExternalInterface.call(callback, message, remoteOrigin);
 			};
 			
 			// only allow the intended domain access to this connection
 			listeningConnection.allowDomain = function(domain:String) {
+				log("allowed: " + allowedDomain === domain);	
 				return allowedDomain === domain;
 			};
 
@@ -88,7 +90,6 @@ class Main
 		ExternalInterface.addCallback("destroyChannel", { }, function(channel:String) {
 			delete sendMap[channel];
 		});
-		
 		ExternalInterface.call(initCallback);
 	}
 	

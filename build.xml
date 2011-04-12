@@ -4,7 +4,7 @@
 	<property file="build.secret.properties"/>
 	<property name="project.build.artifactdir" value="./artifacts/"/>
 	<property name="project.build.publishdir" value="./artifacts/"/>
-	<property name="project.build.version" value="2.4.11"/>
+	<property name="project.build.version" value="2.4.12b"/>
 	
 	<!-- Setup classpath for js-build-tools ant tasks -->
 	<path id="js-build-tasks.classpath">
@@ -52,6 +52,7 @@
 			<fileset dir="." includes="${project.src.dir}/Socket.js" />
 			<fileset dir="." includes="${project.src.dir}/Rpc.js" />
 			<fileset dir="." includes="${project.src.dir}/stack/SameOriginTransport.js" />
+			<fileset dir="." includes="${project.src.dir}/stack/FlashTransport.js" />
 			<fileset dir="." includes="${project.src.dir}/stack/PostMessageTransport.js" />
 			<fileset dir="." includes="${project.src.dir}/stack/FrameElementTransport.js" />
 			<fileset dir="." includes="${project.src.dir}/stack/NixTransport.js" />
@@ -112,6 +113,7 @@
 			<fileset file= "README.txt"/>
 			<fileset file= "${project.src.dir}/changes.txt"/>
 			<fileset file= "tools/json2.js"/>
+			<fileset file= "tools/easyxdm.swf"/>
 		</copy>
 
 		<copy todir="${project.src.dir}/tests">
