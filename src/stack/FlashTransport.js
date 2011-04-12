@@ -106,7 +106,11 @@ easyXDM.stack.FlashTransport = function(config){
             // #ifdef debug
             trace("destroy");
             // #endif
-            swf.destroyChannel(config.channel);
+            try {
+                swf.destroyChannel(config.channel);
+            } 
+            catch (e) {
+            }
             swf = null;
             if (frame) {
                 frame.parentNode.removeChild(frame);
