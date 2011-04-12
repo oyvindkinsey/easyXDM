@@ -25,7 +25,7 @@
 //
 
 var global = this;
-var channelId = Math.floor(Math.random() * 100) * 100; // randomize the initial id in case of multiple closures loaded 
+var channelId = Math.floor(Math.random() * 10000); // randomize the initial id in case of multiple closures loaded 
 var emptyFn = Function.prototype;
 var reURI = /^((http.?:)\/\/([^:\/\s]+)(:\d+)*)/; // returns groups for protocol (2), domain (3) and port (4) 
 var reParent = /[\-\w]+\/\.\.\//; // matches a foo/../ expression 
