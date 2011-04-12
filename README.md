@@ -5,7 +5,7 @@ easyXDM is a Javascript library that enables you as a developer to easily work a
 **Some of the goals for the project are that it should**
 
 * be easy to use!!!
-* be self contained, <s>no dependencies</s> (Now requires Flash for the FlashTransport) (not counting JSON)
+* be self contained, <del>no dependencies</del> (Now requires Flash for the FlashTransport) (not counting JSON)
 * be light weight
 * be flexible
 * have good code quality (uses jslint etc)
@@ -20,7 +20,7 @@ For all implementations the transport stack offers bi-directionality, reliabilit
 
 Using JavaScript only (no Flash, Silverlight, extra html files etc) easyXDM provides the following browsers with stacks with latency of less than 15ms:
 
-* IE6 and IE7 - using the <s>NixTransport</s> (see [Microsoft Security Bulletin MS11-018](http://www.microsoft.com/technet/security/Bulletin/MS11-018.mspx)) FlashTransport
+* IE6 and IE7 - using the <del>NixTransport</del> (see [Microsoft Security Bulletin MS11-018](http://www.microsoft.com/technet/security/Bulletin/MS11-018.mspx)) FlashTransport
 * IE8+ - using the PostMessageTransport
 * Opera 9+ - using the PostMessageTransport (support for both Operas old standard and the HTML5 standard)
 * Firefox 1-2 - using the FrameElementTransport
