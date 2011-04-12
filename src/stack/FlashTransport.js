@@ -40,7 +40,7 @@ easyXDM.stack.FlashTransport = function(config){
     trace("constructor");
     // #endif
     var pub, // the public interface
- frame, send, targetOrigin, swf, swfContainer;
+ frame, send, targetOrigin, swf, swfContainer, onInit;
     
     function onMessage(message){
         trace("receiving");
@@ -53,50 +53,30 @@ easyXDM.stack.FlashTransport = function(config){
     }
     
     function addSwf(){
-        var id = "easyXDM_swf_" + Math.floor(Math.random() * 10000);
+    
         var url = config.swf;
+        var id = "easyXDM_swf_" + Math.floor(Math.random() * 10000);
         var init = "easyXDM.Fn.get(\"flash_" + id + "_init\")";
+        
         easyXDM.Fn.set("flash_" + id + "_init", function(){
-            // create the channel
-            swf.createChannel(config.channel, config.remote, config.isHost, "easyXDM.Fn.get(\"flash_" + id + "_onMessage\")", config.secret);
-            if (!config.isHost) {
-                swf.postMessage(config.channel, config.channel + "-ready");
-                setTimeout(function(){
-                    // #ifdef debug
-                    trace("firing onReady");
-                    // #endif
-                    pub.up.callback(true);
-                }, 0);
+        
+            easyXDM.stack.FlashTransport.__swf = swf = swfContainer.firstChild;
+            if (onInit) {
+                onInit();
+                onInit = null;
             }
         });
-        if (config.isHost) {
-            easyXDM.Fn.set("flash_" + id + "_onMessage", function(message){
-                if (message == config.channel + "-ready") {
-                    trace("ready");
-                    easyXDM.Fn.set("flash_" + id + "_onMessage", onMessage);
-                    setTimeout(function(){
-                        // #ifdef debug
-                        trace("firing onReady");
-                        // #endif
-                        pub.up.callback(true);
-                    }, 0);
-                }
-            });
-        }
-        else {
-            easyXDM.Fn.set("flash_" + id + "_onMessage", onMessage);
-        }
         
         swfContainer = document.createElement('div');
         swfContainer.style.height = '1px';
         swfContainer.style.width = '1px';
         
-        var html = "<object height='1' width='1' id='" + id + "' type='application/x-shockwave-flash' data='" + url + "'>" +
+        var html = "<object height='1' width='1' type='application/x-shockwave-flash' id='" + id + "' data='" + url + "'>" +
         "<param name='allowScriptAccess' value='always'></param>" +
         "<param name='movie' value='" +
         url +
         "'></param>" +
-        "<param name='flashvars' value='init=" +
+        "<param name='flashvars' value='log=console.log&init=" +
         init +
         "'></param>" +
         "<embed type='application/x-shockwave-flash' allowScriptAccess='always' src='" +
@@ -106,7 +86,6 @@ easyXDM.stack.FlashTransport = function(config){
         
         document.body.appendChild(swfContainer);
         swfContainer.innerHTML = html;
-        window.swf = easyXDM.stack.NixTransport.__swf = swf = swfContainer.firstChild;
     }
     
     return (pub = {
@@ -133,10 +112,51 @@ easyXDM.stack.FlashTransport = function(config){
             trace("init");
             // #endif
             targetOrigin = getLocation(config.remote);
+            swf = easyXDM.stack.FlashTransport.__swf;
+            
+            var fn = function(){
+                var id = Math.floor(Math.random() * 10000);
+                
+                // set up the omMessage handler
+                if (config.isHost) {
+                    easyXDM.Fn.set("flash_" + id + "_onMessage", function(message){
+                        if (message == config.channel + "-ready") {
+                            trace("ready");
+                            easyXDM.Fn.set("flash_" + id + "_onMessage", onMessage);
+                            setTimeout(function(){
+                                // #ifdef debug
+                                trace("firing onReady");
+                                // #endif
+                                pub.up.callback(true);
+                            }, 0);
+                        }
+                    });
+                }
+                else {
+                    easyXDM.Fn.set("flash_" + id + "_onMessage", onMessage);
+                }
+                
+                // create the channel
+                swf.createChannel(config.channel, config.remote, config.isHost, "easyXDM.Fn.get(\"flash_" + id + "_onMessage\")", config.secret);
+                if (!config.isHost) {
+                    swf.postMessage(config.channel, config.channel + "-ready");
+                    setTimeout(function(){
+                        // #ifdef debug
+                        trace("firing onReady");
+                        // #endif
+                        pub.up.callback(true);
+                    }, 0);
+                }
+            };
+            
             if (config.isHost) {
-                if (!easyXDM.stack.NixTransport.__swf) {
+                if (swf) {
+                    fn();
+                }
+                else {
                     // we need to add the flash to the document
                     addSwf();
+                    onInit = fn;
                 }
                 // set up the iframe
                 apply(config.props, {
@@ -152,7 +172,10 @@ easyXDM.stack.FlashTransport = function(config){
             }
             else {
                 addSwf();
+                onInit = fn;
             }
+            
+            
         },
         init: function(){
             whenReady(pub.onDOMReady, pub);
