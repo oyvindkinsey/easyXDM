@@ -26,7 +26,7 @@
             
             var transport = new easyXDM.Socket(/** The configuration */{
                 remote: REMOTE + "/resize_intermediate.html?url=resized_iframe_1.html",
-                swf: "../easyxdm.swf",
+                swf: REMOTE + "/../easyxdm.swf",
                 container: "embedded",
                 onMessage: function(message, origin){
                     this.container.getElementsByTagName("iframe")[0].style.height = message + "px";

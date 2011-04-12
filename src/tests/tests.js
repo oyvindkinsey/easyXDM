@@ -279,7 +279,7 @@ function runTests(){
                 this.transport = new easyXDM.Socket({
                     protocol: "6",
                     remote: REMOTE + "/test_transport.html",
-                    swf: "../easyxdm.swf",
+                    swf: REMOTE + "/../easyxdm.swf",
                     onMessage: function(message, origin){
                         if (scope.expectedMessage === message) {
                             if (++messages === 2) {
@@ -674,7 +674,7 @@ function runTests(){
                 var scope = this;
                 this.transport = new easyXDM.Socket({
                     local: "../name.html",
-                    swf: "../easyxdm.swf",
+                    swf: REMOTE + "/../easyxdm.swf",
                     remote: REMOTE + "/test_transport.html",
                     onMessage: function(message, origin){
                         scope.notifyResult((scope.expectedMessage === message));
@@ -709,7 +709,7 @@ function runTests(){
                 var scope = this;
                 this.transport = new easyXDM.Socket({
                     local: "../name.html",
-                    swf: "../easyxdm.swf",
+                    swf: REMOTE + "/../easyxdm.swf",
                     remote: REMOTE + "/test_transport.html?foo=bar",
                     hash: true,
                     onMessage: function(message, origin){
@@ -745,7 +745,7 @@ function runTests(){
                 var scope = this;
                 this.transport = new easyXDM.Socket({
                     local: "../name.html",
-                    swf: "../easyxdm.swf",
+                    swf: REMOTE + "/../easyxdm.swf",
                     remote: REMOTE + "/test_transport.html",
                     onMessage: function(message, origin){
                         scope.notifyResult((scope.expectedMessage === message));
@@ -772,7 +772,7 @@ function runTests(){
                 var scope = this;
                 this.transport = new easyXDM.Socket({
                     local: "../name.html",
-                    swf: "../easyxdm.swf",
+                    swf: REMOTE + "/../easyxdm.swf",
                     remote: REMOTE + "/test_transport.html?a=b&c=d#foo,faa",
                     onMessage: function(message, origin){
                         scope.notifyResult((scope.expectedMessage === message));
@@ -807,7 +807,7 @@ function runTests(){
                 var scope = this;
                 this.remote = new easyXDM.Rpc({
                     local: "../name.html",
-                    swf: "../easyxdm.swf",
+                    swf: REMOTE + "/../easyxdm.swf",
                     remote: REMOTE + "/test_rpc.html",
                     remoteHelper: REMOTE + "/../name.html",
                     container: document.getElementById("embedded"),
