@@ -37,7 +37,6 @@ class Main
 		// map of all the senders
 		var sendMap = { };
 		
-		// our origin
 		var initCallback:String = _root.init;
 		var tracer:String = _root.log;
 		
@@ -51,7 +50,8 @@ class Main
 		ExternalInterface.addCallback("postMessage", { }, function(channel:String, message:String) {
 			sendMap[channel](message);
 		});
-				
+
+		// add the createChannel method
 		ExternalInterface.addCallback("createChannel", { }, function(channel:String, remoteOrigin:String, isHost:Boolean, callback:String, key:String) {
 			var allowedDomain = remoteOrigin.substring(remoteOrigin.indexOf("://") + 3).split("/")[0] + ":";
 			allowedDomain = allowedDomain.substring(0, allowedDomain.indexOf(":"));
@@ -71,7 +71,8 @@ class Main
 			var listeningConnection:LocalConnection  = new LocalConnection();
 			listeningConnection.onMessage = function(message) {
 				log("received message");	
-				ExternalInterface.call(callback, message, remoteOrigin);
+				// escape \\ and pass on 
+				ExternalInterface.call(callback, message.split("\\").join("\\\\"), remoteOrigin);
 			};
 			
 			// only allow the intended domain access to this connection
@@ -87,9 +88,13 @@ class Main
 				log("could not listen on " + receivingChannelName);	
 			}
 		});
+		
+		// add the destroyChannel method
 		ExternalInterface.addCallback("destroyChannel", { }, function(channel:String) {
 			delete sendMap[channel];
 		});
+		
+		// kick things off
 		ExternalInterface.call(initCallback);
 	}
 	
