@@ -25,7 +25,7 @@
 //
 
 var global = this;
-var channelId = Math.floor(Math.random() * 100) * 100; // randomize the initial id in case of multiple closures loaded 
+var channelId = Math.floor(Math.random() * 10000); // randomize the initial id in case of multiple closures loaded 
 var emptyFn = Function.prototype;
 var reURI = /^((http.?:)\/\/([^:\/\s]+)(:\d+)*)/; // returns groups for protocol (2), domain (3) and port (4) 
 var reParent = /[\-\w]+\/\.\.\//; // matches a foo/../ expression 
@@ -61,6 +61,17 @@ function isArray(o){
 }
 
 // end
+
+function hasActiveX(name){
+    try {
+        var activeX = new ActiveXObject(name);
+        activeX = null;
+        return true;
+    } 
+    catch (notSupportedException) {
+        return false;
+    }
+}
 
 /*
  * Cross Browser implementation for adding and removing event listeners.
@@ -362,7 +373,7 @@ function getJSON(){
         a: [1, 2, 3]
     }, json = "{\"a\":[1,2,3]}";
     
-    if (JSON && typeof JSON.stringify === "function" && JSON.stringify(obj).replace((/\s/g), "") === json) {
+    if (typeof JSON != "undefined" && typeof JSON.stringify === "function" && JSON.stringify(obj).replace((/\s/g), "") === json) {
         // this is a working JSON instance
         return JSON;
     }
@@ -420,22 +431,6 @@ function apply(destination, source, noOverwrite){
     return destination;
 }
 
-// This tests for the bug in IE where setting the [name] property using javascript causes the value to be redirected into [submitName].
-function testForNamePropertyBug(){
-    var el = document.createElement("iframe");
-    el.name = IFRAME_PREFIX + "TEST";
-    apply(el.style, {
-        position: "absolute",
-        left: "-2000px",
-        top: "0px"
-    });
-    document.body.appendChild(el);
-    HAS_NAME_PROPERTY_BUG = !(el.contentWindow === window.frames[el.name]);
-    document.body.removeChild(el);
-    // #ifdef debug
-    _trace("HAS_NAME_PROPERTY_BUG: " + HAS_NAME_PROPERTY_BUG);
-    // #endif
-}
 
 /**
  * Creates a frame and appends it to the DOM.
@@ -453,9 +448,17 @@ function createFrame(config){
     // #ifdef debug
     _trace("creating frame: " + config.props.src);
     // #endif
+    
     if (undef(HAS_NAME_PROPERTY_BUG)) {
-        testForNamePropertyBug();
+        // This tests for the bug in IE where setting the [name] property using javascript causes the value to be redirected into [submitName].
+        var input = document.createElement("input");
+        input.style.display = "none";
+        document.body.appendChild(input);
+        input.name = IFRAME_PREFIX + "TEST" + channelId;
+        HAS_NAME_PROPERTY_BUG = !document.getElementsByTagName("input")[IFRAME_PREFIX + "TEST" + channelId];
+        document.body.removeChild(input);
     }
+    
     var frame;
     // This is to work around the problems in IE6/7 with setting the name property. 
     // Internally this is set as 'submitName' instead when using 'iframe.name = ...'
@@ -577,11 +580,11 @@ function prepareTransportStack(config){
                  */
                 protocol = "1";
             }
-            else if (isHostMethod(window, "ActiveXObject") && isHostMethod(window, "execScript")) {
+            else if (isHostMethod(window, "ActiveXObject") && hasActiveX("ShockwaveFlash.ShockwaveFlash")) {
                 /*
-                 * This is supported in IE6 and IE7
+                 * The Flash transport superseedes the NixTransport as the NixTransport has been blocked by MS
                  */
-                protocol = "3";
+                protocol = "6";
             }
             else if (navigator.product === "Gecko" && "frameElement" in window && navigator.userAgent.indexOf('WebKit') == -1) {
                 /*
@@ -705,6 +708,12 @@ function prepareTransportStack(config){
             break;
         case "5":
             stackEls = [new easyXDM.stack.FrameElementTransport(config)];
+            break;
+        case "6":
+            if (!config.swf) {
+                config.swf = "../../tools/easyxdm.swf";
+            }
+            stackEls = [new easyXDM.stack.FlashTransport(config)];
             break;
     }
     // this behavior is responsible for buffering outgoing messages, and for performing lazy initialization

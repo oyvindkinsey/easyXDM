@@ -56,7 +56,9 @@ easyXDM.DomHelper = {
             // #ifdef debug
             debug.log("loading external JSON");
             // #endif
-            document.write('<script type="text/javascript" src="' + path + '"></script>');
+            // we need to encode the < in order to avoid an illegal token error
+            // when the script is inlined in a document.
+            document.write('<' + 'script type="text/javascript" src="' + path + '"><' + '/script>');
         }
         // #ifdef debug
         else {

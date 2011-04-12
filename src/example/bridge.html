@@ -36,44 +36,67 @@
                 }
                 return remote.substring(0, remote.lastIndexOf("/"));
             }());
+            
+            
+            
+            
             var proxy, win;
             function openPopup(){
                 if (win) {
+                    // this allows to open new windows if the popup was closed
+                    if (win.closed) {
+                        win = window.open(REMOTE + '/blank.html', 'mainapp', "width=400, height=400");
+                        proxy.open("mainapp");
+                    }
                     return;
                 }
-                win = window.open(REMOTE + '/remoteapp.html' + '#easyXDM_xyz_provider', 'mainapp', "width=400, height=400");
+                // open up the popup 
+                win = window.open(REMOTE + '/blank.html', 'mainapp', "width=400, height=400");
+                
                 document.getElementById("btn").disabled = "";
-                proxy = new easyXDM.Socket(/** The configuration */{
-                    /**
-                     * Register the method that should handle incoming data
-                     * @param {Object} data
-                     * @param {String} origin
-                     */
-                    onMessage: function(data, origin){
-                        data = JSON.parse(data);
-                        var div = document.createElement("div");
-                        div.innerHTML = "data from '" + origin + "'";
-                        document.body.appendChild(div);
-                        for (var key in data) {
-                            div = document.createElement("div");
-                            div.innerHTML = key + "=" + data[key];
-                            document.body.appendChild(div);
-                        }
-                    },
-                    channel: "xyz",
+                
+                proxy = new easyXDM.Rpc(/** The configuration */{
                     /**
                      * Register the url to name.html, this must be an absolute path
                      * or a path relative to the root.
                      * @field
                      */
                     local: "../name.html",
+                    swf: "../easyxdm.swf",
                     /**
                      * Register the url to the remote interface
                      * @field
                      */
                     remote: REMOTE + "/remote.html",
                     remoteHelper: REMOTE + "/../name.html"
+                }, {
+                    remote: {
+                        open: {},
+                        postMessage: {}
+                    },
+                    local: {
+                        /**
+                         * Register the method that should handle incoming data
+                         * @param {Object} data
+                         * @param {String} origin
+                         */
+                        postMessage: function(data){
+                            var div = document.createElement("div");
+                            div.innerHTML = "data from '" + proxy.origin + "'";
+                            document.body.appendChild(div);
+                            for (var key in data) {
+                                if (data.hasOwnProperty(key)) {
+                                    div = document.createElement("div");
+                                    div.innerHTML = key + "=" + data[key];
+                                    document.body.appendChild(div);
+                                }
+                            }
+                        }
+                    }
                 });
+                
+                // lets tell the proxy to open up the window as soon as possible
+                proxy.open("mainapp");
             }
         </script>
     </head>
@@ -92,7 +115,7 @@
         <!-- easyXDM.Debug.trace(msg) will output its messages to any element with the id "log" -->
         <div id="log" style="height:100px;border:1px dotted black;overflow:auto">
         </div>
-        <input type="button" onclick="openPopup();" value="Open popup"/><!-- Send som data to the other side --><input id="btn" disabled="disabled" type="button" onclick="proxy.postMessage(JSON.stringify({a:'b',c:'d',e:'f'}));" value="send data to remote"/>
+        <input id="btnOpen" type="button" onclick="openPopup();" value="Open popup"/><!-- Send som data to the other side --><input id="btn" disabled="disabled" type="button" onclick="proxy.postMessage({a:'b',c:'d',e:'f'});" value="send data to remote"/>
         <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
