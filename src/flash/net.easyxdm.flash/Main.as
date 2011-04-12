@@ -46,6 +46,13 @@ class Main
 			}
 		}
 		
+		if (_root.proto == "http:") {
+			security.allowInsecureDomain(_root.domain);
+		} else {
+			security.allowDomain(_root.domain);
+		}
+
+		
 		// add the postMessage method
 		ExternalInterface.addCallback("postMessage", { }, function(channel:String, message:String) {
 			sendMap[channel](message);
@@ -75,12 +82,6 @@ class Main
 				ExternalInterface.call(callback, message.split("\\").join("\\\\"), remoteOrigin);
 			};
 			
-			// only allow the intended domain access to this connection
-			listeningConnection.allowDomain = function(domain:String) {
-				log("allowed: " + allowedDomain === domain);	
-				return allowedDomain === domain;
-			};
-
 			// connect 
 			if (listeningConnection.connect(receivingChannelName)) {
 				log("listening on " + receivingChannelName);	

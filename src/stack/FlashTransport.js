@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, getLocation, appendQueryParameters, createFrame, debug, apply, whenReady, IFRAME_PREFIX, namespace*/
+/*global easyXDM, window, getLocation, appendQueryParameters, createFrame, debug, apply, whenReady, IFRAME_PREFIX, namespace, getDomainName*/
 //
 // easyXDM
 // http://easyxdm.net/
@@ -80,16 +80,19 @@ easyXDM.stack.FlashTransport = function(config){
         document.body.appendChild(swfContainer);
         
         // create the object/embed
+        var flashVars = "proto=" + location.protocol + "&domain=" + getDomainName(location.href) + "&init=" + init;
         swfContainer.innerHTML = "<object height='1' width='1' type='application/x-shockwave-flash' id='" + id + "' data='" + url + "'>" +
         "<param name='allowScriptAccess' value='always'></param>" +
         "<param name='wmode' value='transparent'>" +
         "<param name='movie' value='" +
         url +
         "'></param>" +
-        "<param name='flashvars' value='init=" +
-        init +
+        "<param name='flashvars' value='" +
+        flashVars +
         "'></param>" +
-        "<embed type='application/x-shockwave-flash' allowScriptAccess='always' wmode='transparent' src='" +
+        "<embed type='application/x-shockwave-flash' FlashVars='" +
+        flashVars +
+        "' allowScriptAccess='always' wmode='transparent' src='" +
         url +
         "' height='1' width='1'></embed>" +
         "</object>";
