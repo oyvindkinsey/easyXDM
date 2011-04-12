@@ -38,6 +38,7 @@
             var btn;
             var remote = new easyXDM.Rpc({
                 remote: REMOTE + "/upload_rpc.html",
+                swf: REMOTE + "/../easyxdm.swf",
                 onReady: function(){
                     //display the upload form
                     var frm = document.getElementById("frmUpload");
