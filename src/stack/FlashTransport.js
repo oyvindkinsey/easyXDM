@@ -82,7 +82,7 @@ easyXDM.stack.FlashTransport = function(config){
         // create the object/embed
         var flashVars = "proto=" + location.protocol + "&domain=" + getDomainName(location.href) + "&init=" + init;
         // #ifdef debug
-        flashVars += "&log=console.log";
+        flashVars += "&log=" + ns + "easyXDM.Debug.trace";
         // #endif
         swfContainer.innerHTML = "<object height='1' width='1' type='application/x-shockwave-flash' id='" + id + "' data='" + url + "'>" +
         "<param name='allowScriptAccess' value='always'></param>" +
