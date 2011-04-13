@@ -42,16 +42,17 @@ class Main
 		
 		var log = function(msg) {
 			if (tracer) {
-				ExternalInterface.call(tracer, msg);
+				// for debug purposes we expect the domain to be the correct one
+				ExternalInterface.call(tracer, _root.domain + ": " +msg);
 			}
 		}
 		
+		log("allowing communication to " + _root.domain);
 		if (_root.proto == "http:") {
 			security.allowInsecureDomain(_root.domain);
 		} else {
 			security.allowDomain(_root.domain);
 		}
-
 		
 		// add the postMessage method
 		ExternalInterface.addCallback("postMessage", { }, function(channel:String, message:String) {
@@ -60,6 +61,7 @@ class Main
 
 		// add the createChannel method
 		ExternalInterface.addCallback("createChannel", { }, function(channel:String, remoteOrigin:String, isHost:Boolean, callback:String, key:String) {
+			log("creating channel " + channel);
 			// reference a new instance added to the map
 			var sendingChannelName = "_" + channel + "_" + key + "_" + (isHost ? "_consumer" : "_provider");
 			var receivingChannelName = "_" +  channel + "_" + key + "_" + (isHost ? "_provider" : "_consumer");	
@@ -97,6 +99,7 @@ class Main
 		});
 		
 		// kick things off
+		log("calling init");
 		ExternalInterface.call(initCallback);
 	}
 	
