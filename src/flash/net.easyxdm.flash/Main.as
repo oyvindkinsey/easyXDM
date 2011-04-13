@@ -43,7 +43,7 @@ class Main
 		var log = function(msg) {
 			if (tracer) {
 				// for debug purposes we expect the domain to be the correct one
-				ExternalInterface.call(tracer, _root.domain + ": " +msg);
+				ExternalInterface.call(tracer, " swf: " + msg);
 			}
 		}
 		
@@ -83,6 +83,11 @@ class Main
 				}
 				// escape \\ and pass on 
 				ExternalInterface.call(callback, message.split("\\").join("\\\\"), origin);
+			};
+			
+			// allow all domains to connect as we enforce the origin check in the onMessage handler and in the js
+			listeningConnection.allowDomain = function() {
+				return true;
 			};
 			
 			// connect 

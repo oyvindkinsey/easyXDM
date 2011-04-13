@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, getLocation, appendQueryParameters, createFrame, debug, apply, whenReady, IFRAME_PREFIX, namespace, getDomainName*/
+/*global easyXDM, window, getLocation, appendQueryParameters, createFrame, debug, apply, whenReady, IFRAME_PREFIX, namespace, getDomainName, query*/
 //
 // easyXDM
 // http://easyxdm.net/
@@ -128,7 +128,12 @@ easyXDM.stack.FlashTransport = function(config){
             trace("init");
             // #endif
             
-            targetOrigin = getLocation(config.remote);
+            targetOrigin = config.remote;
+            
+            // This is to mitigate origin-spoofing
+            if (!config.isHost && document.referrer && getLocation(document.referrer) != targetOrigin) {
+                window.top.location = query.xdm_e;
+            }
             swf = easyXDM.stack.FlashTransport.__swf;
             
             /**
