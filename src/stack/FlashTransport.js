@@ -46,7 +46,6 @@ easyXDM.stack.FlashTransport = function(config){
  frame, send, targetOrigin, swf, swfContainer, ns = (namespace ? namespace + "." : "");
     
     function onMessage(message, origin){
-        console.log("origin: " + origin);
         setTimeout(function(){
             // #ifdef debug
             trace("received message");
