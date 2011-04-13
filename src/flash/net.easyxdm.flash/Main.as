@@ -60,9 +60,6 @@ class Main
 
 		// add the createChannel method
 		ExternalInterface.addCallback("createChannel", { }, function(channel:String, remoteOrigin:String, isHost:Boolean, callback:String, key:String) {
-			var allowedDomain = remoteOrigin.substring(remoteOrigin.indexOf("://") + 3).split("/")[0] + ":";
-			allowedDomain = allowedDomain.substring(0, allowedDomain.indexOf(":"));
-			
 			// reference a new instance added to the map
 			var sendingChannelName = "_" + channel + "_" + key + "_" + (isHost ? "_consumer" : "_provider");
 			var receivingChannelName = "_" +  channel + "_" + key + "_" + (isHost ? "_provider" : "_consumer");	
@@ -71,15 +68,19 @@ class Main
 			var sendingConnection:LocalConnection = new LocalConnection();
 			sendMap[channel] = function(message) {
 				log("sending to " + sendingChannelName);
-				sendingConnection.send(sendingChannelName, "onMessage", message);
+				sendingConnection.send(sendingChannelName, "onMessage", message, _root.proto + "//" + _root.domain);
 			};
 
 			// set up the listening connection
 			var listeningConnection:LocalConnection  = new LocalConnection();
-			listeningConnection.onMessage = function(message) {
-				log("received message");	
+			listeningConnection.onMessage = function(message, origin) {
+				log("received message from " + origin);	
+				if (origin !== remoteOrigin) {
+					log("wrong origin, expected " + remoteOrigin);	
+					return;
+				}
 				// escape \\ and pass on 
-				ExternalInterface.call(callback, message.split("\\").join("\\\\"), remoteOrigin);
+				ExternalInterface.call(callback, message.split("\\").join("\\\\"), origin);
 			};
 			
 			// connect 

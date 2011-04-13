@@ -45,7 +45,8 @@ easyXDM.stack.FlashTransport = function(config){
     var pub, // the public interface
  frame, send, targetOrigin, swf, swfContainer, ns = (namespace ? namespace + "." : "");
     
-    function onMessage(message){
+    function onMessage(message, origin){
+        console.log("origin: " + origin);
         setTimeout(function(){
             // #ifdef debug
             trace("received message");
@@ -81,6 +82,9 @@ easyXDM.stack.FlashTransport = function(config){
         
         // create the object/embed
         var flashVars = "proto=" + location.protocol + "&domain=" + getDomainName(location.href) + "&init=" + init;
+        // #ifdef debug
+        flashVars += "&log=console.log";
+        // #endif
         swfContainer.innerHTML = "<object height='1' width='1' type='application/x-shockwave-flash' id='" + id + "' data='" + url + "'>" +
         "<param name='allowScriptAccess' value='always'></param>" +
         "<param name='wmode' value='transparent'>" +
@@ -134,7 +138,7 @@ easyXDM.stack.FlashTransport = function(config){
             var fn = function(){
                 // set up the omMessage handler
                 if (config.isHost) {
-                    easyXDM.Fn.set("flash_" + config.channel + "_onMessage", function(message){
+                    easyXDM.Fn.set("flash_" + config.channel + "_onMessage", function(message, origin){
                         if (message == config.channel + "-ready") {
                             easyXDM.Fn.set("flash_" + config.channel + "_onMessage", onMessage);
                             setTimeout(function(){
@@ -151,7 +155,7 @@ easyXDM.stack.FlashTransport = function(config){
                 }
                 
                 // create the channel
-                swf.createChannel(config.channel, config.remote, config.isHost, ns + "easyXDM.Fn.get(\"flash_" + config.channel + "_onMessage\")", config.secret);
+                swf.createChannel(config.channel, getLocation(config.remote), config.isHost, ns + "easyXDM.Fn.get(\"flash_" + config.channel + "_onMessage\")", config.secret);
                 
                 if (config.isHost) {
                     // set up the iframe
