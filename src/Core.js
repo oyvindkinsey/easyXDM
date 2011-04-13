@@ -455,7 +455,14 @@ function createFrame(config){
         input.style.display = "none";
         document.body.appendChild(input);
         input.name = IFRAME_PREFIX + "TEST" + channelId;
-        HAS_NAME_PROPERTY_BUG = !document.getElementsByTagName("input")[IFRAME_PREFIX + "TEST" + channelId];
+        HAS_NAME_PROPERTY_BUG = HAS_NAME_PROPERTY_BUG =  (function () {
+            for (var i = 0, el; el = document.getElementsByTagName("input")[i]; i++) {
+                if (el.name == IFRAME_PREFIX + "TEST" + channelId) {
+                    return false;
+                }
+            }
+            return true;
+        }());
         document.body.removeChild(input);
     }
     
