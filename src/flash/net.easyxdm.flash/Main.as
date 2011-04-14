@@ -76,7 +76,7 @@ class Main
 				log("sending to " + sendingChannelName + ", length is " + message.length);
 				
 				var origin = _root.proto + "//" + _root.domain;
-				var fragments = [], fragment,length = message.length, pos = 0 ;
+				var fragments = [], fragment, length = message.length, pos = 0;
 				while (pos <= length) {
 					fragment = message.substr(pos, maxMessageLength);;
 					pos += maxMessageLength;
