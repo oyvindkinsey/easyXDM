@@ -128,11 +128,13 @@ else {
 }
 
 function dom_onReady(){
-    dom_onReady = emptyFn;
+    if (domIsReady) {
+        return;
+    }
+    domIsReady = true;
     // #ifdef debug
     _trace("firing dom_onReady");
     // #endif
-    domIsReady = true;
     for (var i = 0; i < domReadyQueue.length; i++) {
         domReadyQueue[i]();
     }
