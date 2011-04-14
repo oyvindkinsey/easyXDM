@@ -4,7 +4,7 @@
   <output>
     <movie disabled="False" />
     <movie input="" />
-    <movie path="..\..\..\tools\easyxdm.swf" />
+    <movie path="..\..\..\src\easyxdm.swf" />
     <movie fps="30" />
     <movie width="800" />
     <movie height="600" />

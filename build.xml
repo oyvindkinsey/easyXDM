@@ -113,7 +113,7 @@
 			<fileset file= "README.txt"/>
 			<fileset file= "${project.src.dir}/changes.txt"/>
 			<fileset file= "tools/json2.js"/>
-			<fileset file= "tools/easyxdm.swf"/>
+			<fileset file= "src/easyxdm.swf"/>
 		</copy>
 
 		<copy todir="${project.src.dir}/tests">
