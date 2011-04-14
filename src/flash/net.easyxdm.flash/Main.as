@@ -23,6 +23,12 @@
 //
 
 
+
+/* Security model:
+ * SWF's can be loaded from any of the two domains, and messages are only received from these two.
+ * security.allowXDomain is used to let the page interact with the SWF.
+ * */
+
 import flash.external.ExternalInterface;
 import System.security;
 
@@ -32,6 +38,7 @@ import System.security;
  */
 class Main 
 {	
+	// docs at http://livedocs.adobe.com/flash/9.0/main/wwhelp/wwhimpl/js/html/wwhelp.htm
 	public static function main(swfRoot:MovieClip):Void 
 
 	{	
@@ -41,85 +48,102 @@ class Main
 		// map of all the senders
 		var sendMap = { };
 		
-		var initCallback:String = _root.init;
+		// set up the prefix as a string based accessor to remove the risk of XSS
+		var prefix:String = _root.ns ? ("window[\"" + _root.ns.split(".").join("\"][\"") + "\"].") : "";
 		var tracer:String = _root.log;
 		
-		var log = function(msg) {
-			if (tracer) {
-				// for debug purposes we expect the domain to be the correct one
-				ExternalInterface.call(tracer, " swf: " + msg);
-			}
-		}
+		// this will be our origin
+		var origin = _root.proto + "//" + _root.domain;
+		
+		// set up the logger, if any
+		var log = _root.log =="true" ? function(msg) {
+			ExternalInterface.call(prefix + "easyXDM.Debug.trace", " swf: " + msg);
+		} : function() {
+		};
 		
 		log("allowing communication to " + _root.domain);
+		// allow javascript in the page to interact with the SWF
 		if (_root.proto == "http:") {
 			security.allowInsecureDomain(_root.domain);
 		} else {
 			security.allowDomain(_root.domain);
 		}
-		
+			
 		// add the postMessage method
 		ExternalInterface.addCallback("postMessage", { }, function(channel:String, message:String) {
 			sendMap[channel](message);
 		});
-
+		
 		// add the createChannel method
-		ExternalInterface.addCallback("createChannel", { }, function(channel:String, remoteOrigin:String, isHost:Boolean, callback:String, key:String) {
+		ExternalInterface.addCallback("createChannel", { }, function(channel:String, remoteOrigin:String, isHost:Boolean) {
 			log("creating channel " + channel);
-			// reference a new instance added to the map
-			var sendingChannelName = "_" + channel + "_" + key + "_" + (isHost ? "_consumer" : "_provider");
-			var receivingChannelName = "_" +  channel + "_" + key + "_" + (isHost ? "_provider" : "_consumer");	
+			
+			// get the remote domain
+			var remoteDomain = remoteOrigin.substr(remoteOrigin.indexOf("://") + 3), if (remoteDomain.indexOf(":") != -1) remoteDomain = remoteDomain.substr(0, remoteDomain.indexOf(":"));
+			// AS2 only uses the superdomain when generating the 
+			var remoteSuperDomain = remoteDomain.split(".").reverse().splice(0, 2).reverse().join(".");
+			log("remote domain: " + remoteSuperDomain);
+			
+			// the sending channel has the domain prepended so that only this domain can receive the message
+			var sendingChannelName =  "_" + channel + "_" +  (isHost ? "_consumer" : "_provider");
+			var receivingChannelName = "_" + channel + "_" + (isHost ? "_provider" : "_consumer");	
 			
 			// set up the sending connection and store it in the map
 			var sendingConnection:LocalConnection = new LocalConnection();
 			sendMap[channel] = function(message) {
 				log("sending to " + sendingChannelName + ", length is " + message.length);
 				
-				var origin = _root.proto + "//" + _root.domain;
 				var fragments = [], fragment, length = message.length, pos = 0;
 				while (pos <= length) {
 					fragment = message.substr(pos, maxMessageLength);;
 					pos += maxMessageLength;
 					log("fragmentlength: " + fragment.length + ", remaining: " + (length - pos))
-					if (!sendingConnection.send(sendingChannelName, "onMessage", fragment, origin, length - pos)) {
+					if (!sendingConnection.send(sendingChannelName, "onMessage", fragment, length - pos)) {
 						log("sending failed");
 					}
 				}
 			};
 
-			var incommingFragments = [];
-			
 			// set up the listening connection
 			var listeningConnection:LocalConnection  = new LocalConnection();
-			listeningConnection.onMessage = function(message, origin, remaining) {
-				log("received message from " + origin  + " of length " + message.length + " with " + remaining + " remaining");	
-				if (origin !== remoteOrigin) {
-					log("wrong origin, expected " + remoteOrigin);	
-					return;
-				}
-				
+			if (isHost) {
+				// the host must delay calling channel_init until the other end is ready
+				listeningConnection.ready = function() {
+					ExternalInterface.call(prefix + "easyXDM.Fn.get(\"flash_" + channel + "_init\")");	
+				};
+			}
+			
+			// set up the onMessage handler - this combines fragmented messages
+			var incommingFragments = [];
+			listeningConnection.onMessage = function(message, remaining) {
 				incommingFragments.push(message);
-				
-				// escape \\ and pass on 
 				if (remaining <= 0) {
 					log("received final fragment");	
-					ExternalInterface.call(callback, incommingFragments.join("").split("\\").join("\\\\"), origin);
+					// escape \\ and pass on 
+					ExternalInterface.call(prefix + "easyXDM.Fn.get(\"flash_" + channel + "_onMessage\")", incommingFragments.join("").split("\\").join("\\\\"), remoteOrigin);
 					incommingFragments = [];
 				}else {
 					log("received fragment, length is " + message.length + " remaining is " + remaining);	
 				}
 			};
-			
-			// allow all domains to connect as we enforce the origin check in the onMessage handler and in the js
-			listeningConnection.allowDomain = function() {
-				return true;
+						
+			// allow messages from only the two possible domains
+			listeningConnection.allowDomain = function(domain) {
+				return (domain == remoteDomain || domain == _root.domain);
 			};
 			
 			// connect 
+			// http://livedocs.adobe.com/flash/9.0/main/wwhelp/wwhimpl/js/html/wwhelp.htm
 			if (listeningConnection.connect(receivingChannelName)) {
 				log("listening on " + receivingChannelName);	
 			} else {
 				log("could not listen on " + receivingChannelName);	
+			}
+			
+			// start the channel
+			if (!isHost) {
+				sendingConnection.send(sendingChannelName, "ready");
+				ExternalInterface.call(prefix + "easyXDM.Fn.get(\"flash_" + channel + "_init\")");	
 			}
 		});
 		
@@ -130,12 +154,6 @@ class Main
 		
 		// kick things off
 		log("calling init");
-		ExternalInterface.call(initCallback);
+		ExternalInterface.call(prefix + "easyXDM.Fn.get(\"flash_loaded\")");		
 	}
-	
-	public function Main() 
-	{
-		
-	}
-	
 }
