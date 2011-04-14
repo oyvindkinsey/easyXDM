@@ -33,7 +33,11 @@ import System.security;
 class Main 
 {	
 	public static function main(swfRoot:MovieClip):Void 
-	{
+
+	{	
+		// LocalConnection has a max length 
+		var maxMessageLength = 40900;
+		
 		// map of all the senders
 		var sendMap = { };
 		
@@ -69,20 +73,38 @@ class Main
 			// set up the sending connection and store it in the map
 			var sendingConnection:LocalConnection = new LocalConnection();
 			sendMap[channel] = function(message) {
-				log("sending to " + sendingChannelName);
-				sendingConnection.send(sendingChannelName, "onMessage", message, _root.proto + "//" + _root.domain);
+				log("sending to " + sendingChannelName + ", length is " + message.length);
+				
+				var origin = _root.proto + "//" + _root.domain;
+				var fragments = [], fragment, length = message.length, pos = 0, nextPos ;
+				while (pos <= length) {
+					nextPos = pos + maxMessageLength;
+					sendingConnection.send(sendingChannelName, "onMessage", message.substr(pos, maxMessageLength), _root.proto + "//" + _root.domain, length - nextPos);
+					pos = nextPos;
+				}
 			};
 
+			var incommingFragments = [];
+			
 			// set up the listening connection
 			var listeningConnection:LocalConnection  = new LocalConnection();
-			listeningConnection.onMessage = function(message, origin) {
+			listeningConnection.onMessage = function(message, origin, remaining) {
 				log("received message from " + origin);	
 				if (origin !== remoteOrigin) {
 					log("wrong origin, expected " + remoteOrigin);	
 					return;
 				}
+				
+				incommingFragments.push(message);
+				
 				// escape \\ and pass on 
-				ExternalInterface.call(callback, message.split("\\").join("\\\\"), origin);
+				if (remaining <= 0) {
+					log("received final fragment");	
+					ExternalInterface.call(callback, incommingFragments.join("").split("\\").join("\\\\"), origin);
+					incommingFragments = [];
+				}else {
+					log("received fragment, length is " + message.length + " remaining is " + remaining);	
+				}
 			};
 			
 			// allow all domains to connect as we enforce the origin check in the onMessage handler and in the js
