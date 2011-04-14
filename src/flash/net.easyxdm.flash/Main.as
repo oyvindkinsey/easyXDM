@@ -36,7 +36,7 @@ class Main
 
 	{	
 		// LocalConnection has a max length 
-		var maxMessageLength = 40900;
+		var maxMessageLength = 40000;
 		
 		// map of all the senders
 		var sendMap = { };
@@ -76,11 +76,14 @@ class Main
 				log("sending to " + sendingChannelName + ", length is " + message.length);
 				
 				var origin = _root.proto + "//" + _root.domain;
-				var fragments = [], fragment, length = message.length, pos = 0, nextPos ;
+				var fragments = [], fragment,length = message.length, pos = 0 ;
 				while (pos <= length) {
-					nextPos = pos + maxMessageLength;
-					sendingConnection.send(sendingChannelName, "onMessage", message.substr(pos, maxMessageLength), _root.proto + "//" + _root.domain, length - nextPos);
-					pos = nextPos;
+					fragment = message.substr(pos, maxMessageLength);;
+					pos += maxMessageLength;
+					log("fragmentlength: " + fragment.length + ", remaining: " + (length - pos))
+					if (!sendingConnection.send(sendingChannelName, "onMessage", fragment, origin, length - pos)) {
+						log("sending failed");
+					}
 				}
 			};
 
@@ -89,7 +92,7 @@ class Main
 			// set up the listening connection
 			var listeningConnection:LocalConnection  = new LocalConnection();
 			listeningConnection.onMessage = function(message, origin, remaining) {
-				log("received message from " + origin);	
+				log("received message from " + origin  + " of length " + message.length + " with " + remaining + " remaining");	
 				if (origin !== remoteOrigin) {
 					log("wrong origin, expected " + remoteOrigin);	
 					return;
