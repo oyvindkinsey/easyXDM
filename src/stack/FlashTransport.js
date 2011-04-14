@@ -128,11 +128,6 @@ easyXDM.stack.FlashTransport = function(config){
             // #endif
             
             targetOrigin = config.remote;
-            
-            // This is to mitigate origin-spoofing
-            if (!config.isHost && document.referrer && getLocation(document.referrer) != targetOrigin) {
-                window.top.location = query.xdm_e;
-            }
             swf = easyXDM.stack.FlashTransport.__swf;
             
             /**
