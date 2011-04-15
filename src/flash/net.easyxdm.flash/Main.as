@@ -38,6 +38,19 @@ import System.security;
  */
 class Main 
 {	
+	// only allow javascript accessors
+	private static function Validate(input:String):Boolean {
+		var i = input.length;
+		while (i--) {
+			var charCode = input.charCodeAt(i);
+			if ( (charCode >= 64 && charCode <= 90 /*Uppercase*/) || (charCode >= 97 && charCode <= 122 /*Lowercase*/) || (charCode >=48 && charCode <=57 /*Numbers*/) ) continue;
+			if (charCode == 95/*_*/ || charCode == 36 /*$*/ || charCode == 46 /*.*/) continue;
+			return false;
+		}
+		return true;
+	}
+	
+	
 	// docs at http://livedocs.adobe.com/flash/9.0/main/wwhelp/wwhimpl/js/html/wwhelp.htm
 	public static function main(swfRoot:MovieClip):Void 
 
@@ -49,14 +62,13 @@ class Main
 		var sendMap = { };
 		
 		// set up the prefix as a string based accessor to remove the risk of XSS
-		var prefix:String = _root.ns ? ("window[\"" + _root.ns.split(".").join("\"][\"") + "\"].") : "";
-		var tracer:String = _root.log;
+		var prefix:String = _root.ns && Validate(_root.ns) ? _root.ns + "." : "";
 		
 		// this will be our origin
 		var origin = _root.proto + "//" + _root.domain;
 		
 		// set up the logger, if any
-		var log = _root.log =="true" ? function(msg) {
+		var log = _root.log == "true" ? function(msg) {
 			ExternalInterface.call(prefix + "easyXDM.Debug.trace", " swf: " + msg);
 		} : function() {
 		};
