@@ -147,7 +147,7 @@ easyXDM.stack.FlashTransport = function(config){
             
             var fn = function(){
                 // create the channel
-                swf.createChannel(config.channel, getLocation(config.remote), config.isHost);
+                swf.createChannel(config.channel, config.secret, getLocation(config.remote), config.isHost);
                 
                 if (config.isHost) {
                     // set up the iframe
@@ -155,7 +155,8 @@ easyXDM.stack.FlashTransport = function(config){
                         src: appendQueryParameters(config.remote, {
                             xdm_e: getLocation(location.href),
                             xdm_c: config.channel,
-                            xdm_p: 6 // 6 = FlashTransport
+                            xdm_p: 6, // 6 = FlashTransport
+                            xdm_s: config.secret
                         }),
                         name: IFRAME_PREFIX + config.channel + "_provider"
                     });

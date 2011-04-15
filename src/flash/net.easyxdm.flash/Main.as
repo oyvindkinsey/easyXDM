@@ -87,15 +87,15 @@ class Main
 		});
 		
 		// add the createChannel method
-		ExternalInterface.addCallback("createChannel", { }, function(channel:String, remoteOrigin:String, isHost:Boolean) {
+		ExternalInterface.addCallback("createChannel", { }, function(channel:String, secret:String, remoteOrigin:String, isHost:Boolean) {
 			log("creating channel " + channel);
 			
 			// get the remote domain
 			var remoteDomain = remoteOrigin.substr(remoteOrigin.indexOf("://") + 3), if (remoteDomain.indexOf(":") != -1) remoteDomain = remoteDomain.substr(0, remoteDomain.indexOf(":"));
 			
 			// the sending channel has _ prepended so that all allowed domains can use it
-			var sendingChannelName =  "_" + channel + "_" +  (isHost ? "_consumer" : "_provider");
-			var receivingChannelName = "_" + channel + "_" + (isHost ? "_provider" : "_consumer");	
+			var sendingChannelName =  "_" + channel + secret + "_" +  (isHost ? "consumer" : "provider");
+			var receivingChannelName = "_" + channel + secret + "_" + (isHost ? "provider" : "consumer");	
 			
 			// set up the sending connection and store it in the map
 			var sendingConnection:LocalConnection = new LocalConnection();
@@ -107,7 +107,7 @@ class Main
 					fragment = message.substr(pos, maxMessageLength);;
 					pos += maxMessageLength;
 					log("fragmentlength: " + fragment.length + ", remaining: " + (length - pos))
-					if (!sendingConnection.send(sendingChannelName, "onMessage", fragment, length - pos)) {
+					if (!sendingConnection.send(sendingChannelName, "onMessage", fragment, origin, length - pos)) {
 						log("sending failed");
 					}
 				}
@@ -118,13 +118,18 @@ class Main
 			if (isHost) {
 				// the host must delay calling channel_init until the other end is ready
 				listeningConnection.ready = function() {
+					log("received ready");
 					ExternalInterface.call(prefix + "easyXDM.Fn.get(\"flash_" + channel + "_init\")");	
 				};
 			}
 			
 			// set up the onMessage handler - this combines fragmented messages
 			var incommingFragments = [];
-			listeningConnection.onMessage = function(message, remaining) {
+			listeningConnection.onMessage = function(message, fromOrigin, remaining) {
+				if (fromOrigin !== remoteOrigin) {
+					log("received message from " + fromOrigin + ", expected from " + remoteOrigin);	
+					return;
+				}
 				incommingFragments.push(message);
 				if (remaining <= 0) {
 					log("received final fragment");	
@@ -151,6 +156,7 @@ class Main
 			
 			// start the channel
 			if (!isHost) {
+				log("calling ready");
 				sendingConnection.send(sendingChannelName, "ready");
 				ExternalInterface.call(prefix + "easyXDM.Fn.get(\"flash_" + channel + "_init\")");	
 			}
