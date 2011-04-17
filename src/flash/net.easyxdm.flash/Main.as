@@ -79,14 +79,10 @@ class Main
 		} : function() {
 		};
 		
-		log("allowing communication to " + _root.domain);
-		// allow javascript in the page to interact with the SWF
-		if (_root.proto == "http:") {
-			security.allowInsecureDomain(_root.domain);
-		} else {
-			security.allowDomain(_root.domain);
-		}
 			
+		log("enabling communication with " + _root.domain);
+		// allow javascript in the page to interact with the SWF
+		security[_root.proto == "http" ? "allowInsecureDomain" : "allowDomain"](_root.domain);
 		// add the postMessage method
 		ExternalInterface.addCallback("postMessage", { }, function(channel:String, message:String) {
 			sendMap[channel](message);
@@ -97,30 +93,20 @@ class Main
 			log("creating channel " + channel);
 			
 			// get the remote domain
-			var remoteDomain = remoteOrigin.substr(remoteOrigin.indexOf("://") + 3), if (remoteDomain.indexOf(":") != -1) remoteDomain = remoteDomain.substr(0, remoteDomain.indexOf(":"));
+			var remoteDomain:String = remoteOrigin.substr(remoteOrigin.indexOf("://") + 3), if (remoteDomain.indexOf(":") != -1) remoteDomain = remoteDomain.substr(0, remoteDomain.indexOf(":"));
 			
 			// the sending channel has _ prepended so that all allowed domains can use it
-			var sendingChannelName =  "_" + channel + secret + "_" +  (isHost ? "consumer" : "provider");
-			var receivingChannelName = "_" + channel + secret + "_" + (isHost ? "provider" : "consumer");	
+			var sendingChannelName:String =  "_" + channel + secret + "_" +  (isHost ? "consumer" : "provider");
+			var receivingChannelName:String = "_" + channel + secret + "_" + (isHost ? "provider" : "consumer");	
 			
-			// set up the sending connection and store it in the map
-			var sendingConnection:LocalConnection = new LocalConnection();
-			sendMap[channel] = function(message) {
-				log("sending to " + sendingChannelName + ", length is " + message.length);
-				
-				var fragments = [], fragment, length = message.length, pos = 0;
-				while (pos <= length) {
-					fragment = message.substr(pos, maxMessageLength);;
-					pos += maxMessageLength;
-					log("fragmentlength: " + fragment.length + ", remaining: " + (length - pos))
-					if (!sendingConnection.send(sendingChannelName, "onMessage", fragment, origin, length - pos)) {
-						log("sending failed");
-					}
-				}
-			};
-
 			// set up the listening connection
 			var listeningConnection:LocalConnection  = new LocalConnection();
+					
+			// allow messages from only the two possible domains
+			listeningConnection.allowDomain = function(domain) {
+				return (domain == remoteDomain || domain == _root.domain);
+			};
+			
 			if (isHost) {
 				// the host must delay calling channel_init until the other end is ready
 				listeningConnection.ready = function() {
@@ -146,11 +132,24 @@ class Main
 					log("received fragment, length is " + message.length + " remaining is " + remaining);	
 				}
 			};
-						
-			// allow messages from only the two possible domains
-			listeningConnection.allowDomain = function(domain) {
-				return (domain == remoteDomain || domain == _root.domain);
+			
+			
+			// set up the sending connection and store it in the map
+			var sendingConnection:LocalConnection = new LocalConnection();
+			sendMap[channel] = function(message:String) {
+				log("sending to " + sendingChannelName + ", length is " + message.length);
+				
+				var fragments = [], fragment, length = message.length, pos = 0;
+				while (pos <= length) {
+					fragment = message.substr(pos, maxMessageLength);;
+					pos += maxMessageLength;
+					log("fragmentlength: " + fragment.length + ", remaining: " + (length - pos))
+					if (!sendingConnection.send(sendingChannelName, "onMessage", fragment, origin, length - pos)) {
+						log("sending failed");
+					}
+				}
 			};
+
 			
 			// connect 
 			// http://livedocs.adobe.com/flash/9.0/main/wwhelp/wwhimpl/js/html/wwhelp.htm
