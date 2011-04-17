@@ -38,12 +38,15 @@ import System.security;
  */
 class Main 
 {	
+	private static var INITIALIZED:Boolean = false;
+	
 	// only allow javascript accessors
 	private static function Validate(input:String):Boolean {
 		var i = input.length;
 		while (i--) {
 			var charCode = input.charCodeAt(i);
-			if ( (charCode >= 64 && charCode <= 90 /*Uppercase*/) || (charCode >= 97 && charCode <= 122 /*Lowercase*/) || (charCode >=48 && charCode <=57 /*Numbers*/) ) continue;
+			if ( (charCode >= 64 && charCode <= 90 /*Uppercase*/) || (charCode >= 97 && charCode <= 122 /*Lowercase*/) ) continue;
+			if (charCode >= 48 && charCode <= 57 /*Numbers*/) continue;
 			if (charCode == 95/*_*/ || charCode == 36 /*$*/ || charCode == 46 /*.*/) continue;
 			return false;
 		}
@@ -53,8 +56,11 @@ class Main
 	
 	// docs at http://livedocs.adobe.com/flash/9.0/main/wwhelp/wwhimpl/js/html/wwhelp.htm
 	public static function main(swfRoot:MovieClip):Void 
-
 	{	
+		// this is so that main can only be run once - this ensures that the domain passed really is the one
+		// being used to communicate with the SWF.
+		if (Main.INITIALIZED) return; else Main.INITIALIZED = true;
+		
 		// LocalConnection has a max length 
 		var maxMessageLength = 40000;
 		
