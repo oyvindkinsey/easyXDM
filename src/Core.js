@@ -267,6 +267,9 @@ function getLocation(url){
     if (!url) {
         throw new Error("url is undefined or empty");
     }
+    if (/^file/.test(url)) {
+        throw new Error("The file:// protocol is not supported");
+    }
     // #endif
     var m = url.match(reURI);
     var proto = m[2], domain = m[3], port = m[4] || "";
