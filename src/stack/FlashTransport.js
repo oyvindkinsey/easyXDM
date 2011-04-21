@@ -103,7 +103,7 @@ easyXDM.stack.FlashTransport = function(config){
     
     return (pub = {
         outgoing: function(message, domain, fn){
-            swf.postMessage(config.channel, message);
+            swf.postMessage(config.channel, message.toString());
             if (fn) {
                 fn();
             }
