@@ -58,7 +58,8 @@ easyXDM.stack.FlashTransport = function(config){
      * This method adds the SWF to the DOM and prepares the initialization of the channel
      */
     function addSwf(callback){
-        var url = config.swf;
+        // the differentiating query argument is needed in Flash9 to avoid a caching issue where LocalConnection would throw an error.
+        var url = config.swf + "?host=" + config.isHost;
         var id = "easyXDM_swf_" + Math.floor(Math.random() * 10000);
         
         // prepare the init function that will fire once the swf is ready
