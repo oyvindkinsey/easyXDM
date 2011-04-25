@@ -55,7 +55,6 @@
 			<fileset dir="." includes="${project.src.dir}/stack/FlashTransport.js" />
 			<fileset dir="." includes="${project.src.dir}/stack/PostMessageTransport.js" />
 			<fileset dir="." includes="${project.src.dir}/stack/FrameElementTransport.js" />
-			<fileset dir="." includes="${project.src.dir}/stack/NixTransport.js" />
 			<fileset dir="." includes="${project.src.dir}/stack/NameTransport.js" />
 			<fileset dir="." includes="${project.src.dir}/stack/HashTransport.js" />
 			<fileset dir="." includes="${project.src.dir}/stack/ReliableBehavior.js" />
