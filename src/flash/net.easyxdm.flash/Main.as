@@ -65,7 +65,7 @@ class Main
 		var maxMessageLength = 40000;
 		
 		// map of all the senders
-		var sendMap = { };
+		var sendMap = { }, connectionMap = { };
 		
 		// set up the prefix as a string based accessor to remove the risk of XSS
 		var prefix:String = _root.ns && Validate(_root.ns) ? _root.ns + "." : "";
@@ -94,29 +94,22 @@ class Main
 			
 			// get the remote domain
 			var remoteDomain:String = remoteOrigin.substr(remoteOrigin.indexOf("://") + 3), if (remoteDomain.indexOf(":") != -1) remoteDomain = remoteDomain.substr(0, remoteDomain.indexOf(":"));
-			
 			// the sending channel has _ prepended so that all allowed domains can use it
 			var sendingChannelName:String =  "_" + channel + secret + "_" +  (isHost ? "consumer" : "provider");
 			var receivingChannelName:String = "_" + channel + secret + "_" + (isHost ? "provider" : "consumer");	
+			var incommingFragments = [];
 			
 			// set up the listening connection
-			var listeningConnection:LocalConnection  = new LocalConnection();
+			var listeningConnection:LocalConnection = connectionMap[channel] = new LocalConnection();
 					
 			// allow messages from only the two possible domains
-			listeningConnection.allowDomain = function(domain) {
+			listeningConnection.allowDomain = 
+			listeningConnection.allowInsecureDomain = function(domain) {
+				log("allowDomain: " + (domain == remoteDomain || domain == _root.domain));
 				return (domain == remoteDomain || domain == _root.domain);
 			};
 			
-			if (isHost) {
-				// the host must delay calling channel_init until the other end is ready
-				listeningConnection.ready = function() {
-					log("received ready");
-					ExternalInterface.call(prefix + "easyXDM.Fn.get(\"flash_" + channel + "_init\")");	
-				};
-			}
-			
 			// set up the onMessage handler - this combines fragmented messages
-			var incommingFragments = [];
 			listeningConnection.onMessage = function(message, fromOrigin, remaining) {
 				if (fromOrigin !== remoteOrigin) {
 					log("received message from " + fromOrigin + ", expected from " + remoteOrigin);	
@@ -133,9 +126,28 @@ class Main
 				}
 			};
 			
+			if (isHost) {
+				// the host must delay calling channel_init until the other end is ready
+				listeningConnection.onReady = function() {
+					log("received ready");
+					ExternalInterface.call(prefix + "easyXDM.Fn.get(\"flash_" + channel + "_init\")");	
+				};
+			}
+			
+			// connect 
+			if (listeningConnection.connect(receivingChannelName)) {
+				log("listening on " + receivingChannelName);	
+			} else {
+				log("could not listen on " + receivingChannelName);	
+			}
 			
 			// set up the sending connection and store it in the map
 			var sendingConnection:LocalConnection = new LocalConnection();
+			
+			sendingConnection.onStatus = function(infoObject:Object) {
+				log("level: " + infoObject.level);
+			};
+			
 			sendMap[channel] = function(message:String) {
 				log("sending to " + sendingChannelName + ", length is " + message.length);
 				
@@ -150,19 +162,10 @@ class Main
 				}
 			};
 
-			
-			// connect 
-			// http://livedocs.adobe.com/flash/9.0/main/wwhelp/wwhimpl/js/html/wwhelp.htm
-			if (listeningConnection.connect(receivingChannelName)) {
-				log("listening on " + receivingChannelName);	
-			} else {
-				log("could not listen on " + receivingChannelName);	
-			}
-			
 			// start the channel
 			if (!isHost) {
 				log("calling ready");
-				sendingConnection.send(sendingChannelName, "ready");
+				sendingConnection.send(sendingChannelName, "onReady");
 				ExternalInterface.call(prefix + "easyXDM.Fn.get(\"flash_" + channel + "_init\")");	
 			}
 		});
@@ -170,6 +173,8 @@ class Main
 		// add the destroyChannel method
 		ExternalInterface.addCallback("destroyChannel", { }, function(channel:String) {
 			delete sendMap[channel];
+			connectionMap[channel].close();
+			delete connectionMap[channel];
 		});
 		
 		// kick things off

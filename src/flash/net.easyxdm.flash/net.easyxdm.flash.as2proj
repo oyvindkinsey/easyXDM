@@ -23,7 +23,7 @@
     <option useMain="True" />
     <option useMX="False" />
     <option warnUnusedImports="False" />
-    <option traceMode="FlashConnectExtended" />
+    <option traceMode="FlashMX" />
     <option traceFunction="" />
     <option libraryPrefix="" />
     <option excludeFile="" />
