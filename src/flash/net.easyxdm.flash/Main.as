@@ -95,8 +95,8 @@ class Main
 			// get the remote domain
 			var remoteDomain:String = remoteOrigin.substr(remoteOrigin.indexOf("://") + 3), if (remoteDomain.indexOf(":") != -1) remoteDomain = remoteDomain.substr(0, remoteDomain.indexOf(":"));
 			// the sending channel has _ prepended so that all allowed domains can use it
-			var sendingChannelName:String =  "_" + channel + secret + "_" +  (isHost ? "consumer" : "provider");
-			var receivingChannelName:String = "_" + channel + secret + "_" + (isHost ? "provider" : "consumer");	
+			var sendingChannelName:String =  "_" + channel + "_" + secret + "_" +  (isHost ? "consumer" : "provider");
+			var receivingChannelName:String = "_" + channel + "_" + secret + "_" + (isHost ? "provider" : "consumer");	
 			var incommingFragments = [];
 			
 			// set up the listening connection
