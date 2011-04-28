@@ -61,6 +61,9 @@ class Main
 		// being used to communicate with the SWF.
 		if (Main.INITIALIZED) return; else Main.INITIALIZED = true;
 		
+		// validate the passed arguments
+		if (!Validate(_root.ns) || !Validate(_root.proto) || !Validate(_root.domain)) return;
+		
 		// LocalConnection has a max length 
 		var maxMessageLength = 40000;
 		
@@ -68,7 +71,7 @@ class Main
 		var sendMap = { }, connectionMap = { };
 		
 		// set up the prefix as a string based accessor to remove the risk of XSS
-		var prefix:String = _root.ns && Validate(_root.ns) ? _root.ns + "." : "";
+		var prefix:String = _root.ns ? _root.ns + "." : "";
 		
 		// this will be our origin
 		var origin = _root.proto + "//" + _root.domain;
