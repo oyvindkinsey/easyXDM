@@ -101,6 +101,8 @@ class Main
 			
 			// set up the listening connection
 			var listeningConnection:LocalConnection = connectionMap[channel] = new LocalConnection();
+			// set up the sending connection 
+			var sendingConnection:LocalConnection = new LocalConnection();
 					
 			// allow messages from only the two possible domains
 			listeningConnection.allowDomain = 
@@ -126,13 +128,15 @@ class Main
 				}
 			};
 			
-			if (isHost) {
-				// the host must delay calling channel_init until the other end is ready
-				listeningConnection.onReady = function() {
-					log("received ready");
+			// the host must delay calling channel_init until the other end is ready
+			listeningConnection.onReady = function() {
+				log("received ready");
+				if (isHost) {
+					log("calling ready");
+					sendingConnection.send(sendingChannelName, "onReady");
 					ExternalInterface.call(prefix + "easyXDM.Fn.get(\"flash_" + channel + "_init\")");	
-				};
-			}
+				}
+			};
 			
 			// connect 
 			if (listeningConnection.connect(receivingChannelName)) {
@@ -140,9 +144,6 @@ class Main
 			} else {
 				log("could not listen on " + receivingChannelName);	
 			}
-			
-			// set up the sending connection and store it in the map
-			var sendingConnection:LocalConnection = new LocalConnection();
 			
 			sendingConnection.onStatus = function(infoObject:Object) {
 				log("level: " + infoObject.level);
