@@ -47,7 +47,8 @@ class Main
 			var charCode = input.charCodeAt(i);
 			if ( (charCode >= 64 && charCode <= 90 /*Uppercase*/) || (charCode >= 97 && charCode <= 122 /*Lowercase*/) ) continue;
 			if (charCode >= 48 && charCode <= 57 /*Numbers*/) continue;
-			if (charCode == 95/*_*/ || charCode == 36 /*$*/ || charCode == 46 /*.*/) continue;
+			if (charCode == 95/*_*/ || charCode == 36 /*$*/ || charCode == 46 /*.*/ || charCode == 58 /*:*/) continue;
+			
 			return false;
 		}
 		return true;

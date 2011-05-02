@@ -73,7 +73,7 @@ easyXDM.stack.FlashTransport = function(config){
         apply(swfContainer.style, {
             height: "1px",
             width: "1px",
-            postition: "abosolute",
+            postition: "absolute",
             left: 0,
             top: 0
         });
