@@ -107,7 +107,7 @@ easyXDM.stack.PostMessageTransport = function(config){
             targetOrigin = getLocation(config.remote);
             if (config.isHost) {
                 // add the event handler for listening
-                on(window, "message", function waitForReady(event){
+                var waitForReady = function(event){  
                     if (event.data == config.channel + "-ready") {
                         // #ifdef debug
                         trace("firing onReady");
@@ -120,7 +120,8 @@ easyXDM.stack.PostMessageTransport = function(config){
                             pub.up.callback(true);
                         }, 0);
                     }
-                });
+                };
+                on(window, "message", waitForReady);
                 
                 // set up the iframe
                 apply(config.props, {
