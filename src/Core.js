@@ -279,6 +279,21 @@ function getLocation(url){
     return proto + "//" + domain + port;
 }
 
+function getLocationWithoutPort(url){
+    // #ifdef debug
+    if (!url) {
+        throw new Error("url is undefined or empty");
+    }
+    if (/^file/.test(url)) {
+        throw new Error("The file:// protocol is not supported");
+    }
+    // #endif
+    var m = url.match(reURI);
+    var proto = m[2], domain = m[3];
+
+    return proto + "//" + domain;
+}
+
 /**
  * Resolves a relative url into an absolute one.
  * @param {String} url The path to resolve.
@@ -846,6 +861,7 @@ apply(easyXDM, {
     checkAcl: checkAcl,
     getDomainName: getDomainName,
     getLocation: getLocation,
+    getLocationWithoutPort: getLocationWithoutPort,
     appendQueryParameters: appendQueryParameters
 });
 // #endif

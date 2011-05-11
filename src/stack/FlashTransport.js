@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global global, easyXDM, window, getLocation, appendQueryParameters, createFrame, debug, apply, whenReady, IFRAME_PREFIX, namespace, getDomainName, query*/
+/*global global, easyXDM, window, getLocation, getLocationWithoutPort, appendQueryParameters, createFrame, debug, apply, whenReady, IFRAME_PREFIX, namespace, getDomainName, query*/
 //
 // easyXDM
 // http://easyxdm.net/
@@ -148,7 +148,7 @@ easyXDM.stack.FlashTransport = function(config){
             
             var fn = function(){
                 // create the channel
-                swf.createChannel(config.channel, config.secret, getLocation(config.remote), config.isHost);
+                swf.createChannel(config.channel, config.secret, getLocationWithoutPort(config.remote), config.isHost);
                 
                 if (config.isHost) {
                     // set up the iframe

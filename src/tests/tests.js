@@ -134,6 +134,11 @@ function runTests(){
                 return easyXDM.getLocation(this.url3) === "http://foo.bar:88";
             }
         }, {
+            name: "getLocationWithoutPort with non-standard port",
+            run: function(){
+                return easyXDM.getLocationWithoutPort(this.url3) === "http://foo.bar";
+            }
+        }, {
             name: "appendQueryParameters",
             run: function(){
                 return easyXDM.appendQueryParameters(this.url2, {
