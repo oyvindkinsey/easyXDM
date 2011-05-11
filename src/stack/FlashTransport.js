@@ -80,7 +80,7 @@ easyXDM.stack.FlashTransport = function(config){
         document.body.appendChild(swfContainer);
         
         // create the object/embed
-        var flashVars = "proto=" + global.location.protocol + "&domain=" + getDomainName(global.location.href) + "&port=" + getPort(global.location.href) + " + &ns=" + namespace;
+        var flashVars = "proto=" + global.location.protocol + "&domain=" + getDomainName(global.location.href) + "&port=" + getPort(global.location.href) + "&ns=" + namespace;
         // #ifdef debug
         flashVars += "&log=true";
         // #endif
