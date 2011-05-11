@@ -63,7 +63,7 @@ class Main
 		if (Main.INITIALIZED) return; else Main.INITIALIZED = true;
 		
 		// validate the passed arguments
-		if (!Validate(_root.ns) || !Validate(_root.proto) || !Validate(_root.domain)) return;
+		if (!Validate(_root.ns) || !Validate(_root.proto) || !Validate(_root.domain) || !Validate(_root.port)) return;
 		
 		// LocalConnection has a max length 
 		var maxMessageLength = 40000;
@@ -75,7 +75,7 @@ class Main
 		var prefix:String = _root.ns ? _root.ns + "." : "";
 		
 		// this will be our origin
-		var origin = _root.proto + "//" + _root.domain;
+		var origin = _root.proto + "//" + _root.domain + _root.port;
 		
 		// set up the logger, if any
 		var log = _root.log == "true" ? function(msg) {
