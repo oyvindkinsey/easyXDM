@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global global, easyXDM, window, getLocation, appendQueryParameters, createFrame, debug, apply, whenReady, IFRAME_PREFIX, namespace, getDomainName, query*/
+/*global global, easyXDM, window, getLocation, appendQueryParameters, createFrame, debug, apply, whenReady, IFRAME_PREFIX, namespace, getDomainName,, getPort, query*/
 //
 // easyXDM
 // http://easyxdm.net/
@@ -80,7 +80,7 @@ easyXDM.stack.FlashTransport = function(config){
         document.body.appendChild(swfContainer);
         
         // create the object/embed
-        var flashVars = "proto=" + global.location.protocol + "&domain=" + getDomainName(global.location.href) + "&ns=" + namespace;
+        var flashVars = "proto=" + global.location.protocol + "&domain=" + getDomainName(global.location.href) + "&port=" + getPort(global.location.href) + " + &ns=" + namespace;
         // #ifdef debug
         flashVars += "&log=true";
         // #endif
