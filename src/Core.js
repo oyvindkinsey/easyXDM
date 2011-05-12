@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, JSON, XMLHttpRequest, window, escape, unescape, ActiveXObject */
+/*global JSON, XMLHttpRequest, window, escape, unescape, ActiveXObject */
 //
 // easyXDM
 // http://easyxdm.net/
@@ -372,7 +372,7 @@ function undef(v){
  * A safe implementation of HTML5 JSON. Feature testing is used to make sure the implementation works.
  * @return {JSON} A valid JSON conforming object, or null if not found.
  */
-function getJSON(){
+var getJSON = function(){
     var cached = {};
     var obj = {
         a: [1, 2, 3]
@@ -407,7 +407,7 @@ function getJSON(){
         return cached;
     }
     return null;
-}
+};
 
 /**
  * Applies properties from the source object to the target object.<br/>
@@ -446,7 +446,7 @@ function testForNamePropertyBug(){
         top: "0px"
     });
     document.body.appendChild(el);
-    HAS_NAME_PROPERTY_BUG = !(el.contentWindow === window.frames[el.name]);
+    HAS_NAME_PROPERTY_BUG = el.contentWindow !== window.frames[el.name];
     document.body.removeChild(el);
     // #ifdef debug
     _trace("HAS_NAME_PROPERTY_BUG: " + HAS_NAME_PROPERTY_BUG);
