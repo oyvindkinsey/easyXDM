@@ -258,6 +258,21 @@ function getDomainName(url){
 }
 
 /**
+ * Get the port for a given URL, or "" if none
+ * @param {String} url The url to extract the port from.
+ * @return The port part of the url.
+ * @type {String}
+ */
+function getPort(url){
+    // #ifdef debug
+    if (!url) {
+        throw new Error("url is undefined or empty");
+    }
+    // #endif
+    return url.match(reURI)[4] || "";
+}
+
+/**
  * Returns  a string containing the schema, domain and if present the port
  * @param {String} url The url to extract the location from
  * @return {String} The location part of the url
