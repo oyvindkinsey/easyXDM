@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global global, easyXDM, window, getLocation, appendQueryParameters, createFrame, debug, apply, whenReady, IFRAME_PREFIX, namespace, getDomainName,, getPort, query*/
+/*global global, easyXDM, window, getLocation, appendQueryParameters, createFrame, debug, apply, whenReady, IFRAME_PREFIX, namespace, getDomainName, HAS_FLASH_THROTTLED_BUG, getPort, query*/
 //
 // easyXDM
 // http://easyxdm.net/
@@ -73,10 +73,16 @@ easyXDM.stack.FlashTransport = function(config){
         // http://bugs.adobe.com/jira/browse/FP-4796
         // http://tech.groups.yahoo.com/group/flexcoders/message/162365
         // https://groups.google.com/forum/#!topic/easyxdm/mJZJhWagoLc
-        apply(swfContainer.style, {
+        apply(swfContainer.style, HAS_FLASH_THROTTLED_BUG ? {
             height: "20px",
             width: "20px",
             position: "fixed",
+            right: 0,
+            top: 0
+        } : {
+            height: "1",
+            width: "1",
+            position: "absolute",
             right: 0,
             top: 0
         });

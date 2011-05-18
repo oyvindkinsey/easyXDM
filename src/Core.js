@@ -36,6 +36,8 @@ var _easyXDM = window.easyXDM; // map over global easyXDM in case of overwrite
 var IFRAME_PREFIX = "easyXDM_";
 var HAS_NAME_PROPERTY_BUG;
 var useHash = false; // whether to use the hash over the query
+var flashVersion; // will be set if using flash
+var HAS_FLASH_THROTTLED_BUG;
 // #ifdef debug
 var _trace = emptyFn;
 // #endif
@@ -61,10 +63,11 @@ function isArray(o){
 }
 
 // end
-
-function hasActiveX(name){
+function hasFlash(){
     try {
-        var activeX = new ActiveXObject(name);
+        var activeX = new ActiveXObject("ShockwaveFlash.ShockwaveFlash");
+        flashVersion = Array.prototype.slice.call(activeX.GetVariable("$version").match(/(\d+),(\d+),(\d+),(\d+)/), 1);
+        HAS_FLASH_THROTTLED_BUG = parseInt(flashVersion[0], 10) > 9 && parseInt(flashVersion[1], 10) > 0;
         activeX = null;
         return true;
     } 
@@ -513,7 +516,7 @@ function createFrame(config){
     if (!config.container) {
         // This needs to be hidden like this, simply setting display:none and the like will cause failures in some browsers.
         // Also, Flash requires the frame to be actually visible in order to not throttle the LocalConnection
-        apply(frame.style, config.protocol == "6" ? {
+        apply(frame.style, HAS_FLASH_THROTTLED_BUG ? {
             position: "fixed",
             right: 0,
             top: 0,
@@ -617,7 +620,7 @@ function prepareTransportStack(config){
                  */
                 protocol = "1";
             }
-            else if (isHostMethod(window, "ActiveXObject") && hasActiveX("ShockwaveFlash.ShockwaveFlash")) {
+            else if (isHostMethod(window, "ActiveXObject") && hasFlash()) {
                 /*
                  * The Flash transport superseedes the NixTransport as the NixTransport has been blocked by MS
                  */
@@ -750,6 +753,9 @@ function prepareTransportStack(config){
         case "6":
             if (!config.swf) {
                 config.swf = "../../tools/easyxdm.swf";
+            }
+            if (!flashVersion){
+                hasFlash();
             }
             stackEls = [new easyXDM.stack.FlashTransport(config)];
             break;
