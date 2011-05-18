@@ -70,11 +70,14 @@ easyXDM.stack.FlashTransport = function(config){
         
         // create the container that will hold the swf
         swfContainer = document.createElement('div');
+        // http://bugs.adobe.com/jira/browse/FP-4796
+        // http://tech.groups.yahoo.com/group/flexcoders/message/162365
+        // https://groups.google.com/forum/#!topic/easyxdm/mJZJhWagoLc
         apply(swfContainer.style, {
-            height: "1px",
-            width: "1px",
-            position: "absolute",
-            left: 0,
+            height: "20px",
+            width: "20px",
+            position: "fixed",
+            right: 0,
             top: 0
         });
         document.body.appendChild(swfContainer);
@@ -84,7 +87,7 @@ easyXDM.stack.FlashTransport = function(config){
         // #ifdef debug
         flashVars += "&log=true";
         // #endif
-        swfContainer.innerHTML = "<object height='1' width='1' type='application/x-shockwave-flash' id='" + id + "' data='" + url + "'>" +
+        swfContainer.innerHTML = "<object height='20' width='20' type='application/x-shockwave-flash' id='" + id + "' data='" + url + "'>" +
         "<param name='allowScriptAccess' value='always'></param>" +
         "<param name='wmode' value='transparent'>" +
         "<param name='movie' value='" +

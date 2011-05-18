@@ -512,8 +512,17 @@ function createFrame(config){
     
     if (!config.container) {
         // This needs to be hidden like this, simply setting display:none and the like will cause failures in some browsers.
-        frame.style.position = "absolute";
-        frame.style.top = "-2000px";
+        // Also, Flash requires the frame to be actually visible in order to not throttle the LocalConnection
+        apply(frame.style, config.protocol == "6" ? {
+            position: "fixed",
+            right: 0,
+            top: 0,
+            height: "20px",
+            width: "20px"
+        } : {
+            position: "absolute",
+            top : "-2000px"
+        });
         config.container = document.body;
     }
     
@@ -647,6 +656,7 @@ function prepareTransportStack(config){
         }
         // #endif
     }
+    config.protocol = protocol; // for conditional branching
     
     switch (protocol) {
         case "0":// 0 = HashTransport
