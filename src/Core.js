@@ -456,16 +456,11 @@ function apply(destination, source, noOverwrite){
 
 // This tests for the bug in IE where setting the [name] property using javascript causes the value to be redirected into [submitName].
 function testForNamePropertyBug(){
-    var el = document.createElement("iframe");
-    el.name = IFRAME_PREFIX + "TEST" + channelId; // append channelId in order to avoid caching issues
-    apply(el.style, {
-        position: "absolute",
-        left: "-2000px",
-        top: "0px"
-    });
-    document.body.appendChild(el);
-    HAS_NAME_PROPERTY_BUG = el.contentWindow !== window.frames[el.name];
-    document.body.removeChild(el);
+    var form = document.body.appendChild(document.createElement("form")),
+    input = form.appendChild(document.createElement("input"));
+    input.name = IFRAME_PREFIX + "TEST" + channelId; // append channelId in order to avoid caching issues
+    HAS_NAME_PROPERTY_BUG = input !== form.elements[input.name];
+    document.body.removeChild(form);
     // #ifdef debug
     _trace("HAS_NAME_PROPERTY_BUG: " + HAS_NAME_PROPERTY_BUG);
     // #endif
