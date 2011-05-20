@@ -83,6 +83,7 @@ easyXDM.stack.FlashTransport = function(config){
             height: "1",
             width: "1",
             position: "absolute",
+            overflow: "hidden",
             right: 0,
             top: 0
         });
