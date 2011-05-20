@@ -539,6 +539,7 @@ function createFrame(config){
     apply(frame, config.props);
     
     frame.border = frame.frameBorder = 0;
+    frame.allowTransparency = true;
     config.container.appendChild(frame);
     
     // HACK see above
