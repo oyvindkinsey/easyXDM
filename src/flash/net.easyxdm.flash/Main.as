@@ -86,7 +86,7 @@ class Main
 			
 		log("enabling communication with " + _root.domain);
 		// allow javascript in the page to interact with the SWF
-		security[_root.proto == "http" ? "allowInsecureDomain" : "allowDomain"](_root.domain);
+		security[_root.proto == "http:" ? "allowInsecureDomain" : "allowDomain"](_root.domain);
 		// add the postMessage method
 		ExternalInterface.addCallback("postMessage", { }, function(channel:String, message:String) {
 			sendMap[channel](message);
