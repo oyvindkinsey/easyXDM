@@ -457,7 +457,7 @@ function apply(destination, source, noOverwrite){
 // This tests for the bug in IE where setting the [name] property using javascript causes the value to be redirected into [submitName].
 function testForNamePropertyBug(){
     var el = document.createElement("iframe");
-    el.name = IFRAME_PREFIX + "TEST";
+    el.name = IFRAME_PREFIX + "TEST" + channelId; // append channelId in order to avoid caching issues
     apply(el.style, {
         position: "absolute",
         left: "-2000px",
