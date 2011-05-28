@@ -63,7 +63,7 @@ class Main
 		if (Main.INITIALIZED) return; else Main.INITIALIZED = true;
 		
 		// validate the passed arguments
-		if (!Validate(_root.ns) || !Validate(_root.proto) || !Validate(_root.domain) || !Validate(_root.port)) || !Validate(_root.whenloaded) return;
+		if (!Validate(_root.ns) || !Validate(_root.proto) || !Validate(_root.domain) || !Validate(_root.port)) || !Validate(_root.callback) return;
 		
 		// LocalConnection has a max length 
 		var maxMessageLength = 40000;
@@ -184,6 +184,6 @@ class Main
 		
 		// kick things off
 		log("calling init");
-		ExternalInterface.call(prefix + "easyXDM.Fn.get(\"" + _root.whenloaded + "\")");
+		ExternalInterface.call(prefix + "easyXDM.Fn.get(\"" + _root.callback + "\")");
 	}
 }
