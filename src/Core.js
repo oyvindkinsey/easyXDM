@@ -289,7 +289,7 @@ function getLocation(url){
         throw new Error("The file:// protocol is not supported");
     }
     // #endif
-    var m = url.match(reURI);
+    var m = url.toLowerCase().match(reURI);
     var proto = m[2], domain = m[3], port = m[4] || "";
     if ((proto == "http:" && port == ":80") || (proto == "https:" && port == ":443")) {
         port = "";

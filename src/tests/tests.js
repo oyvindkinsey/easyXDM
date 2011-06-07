@@ -111,6 +111,7 @@ function runTests(){
             this.url1 = "http://foo.bar/a/b/c?d=e#f";
             this.url2 = "http://foo.bar:80/a/b/c?d=e#f";
             this.url3 = "http://foo.bar:88/a/b/c?d=e#f";
+            this.url4 = "hTtp://Foo.Bar:88/a/b/c?d=e#f";
             
         },
         steps: [{
@@ -132,6 +133,11 @@ function runTests(){
             name: "getLocation with non-standard port",
             run: function(){
                 return easyXDM.getLocation(this.url3) === "http://foo.bar:88";
+            }
+        }, {
+            name: "getLocation with capitals",
+            run: function(){
+                return easyXDM.getLocation(this.url4) === "http://foo.bar:88";
             }
         }, {
             name: "appendQueryParameters",
