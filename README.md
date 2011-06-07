@@ -66,6 +66,8 @@ In addition the following config properties can be set for both consumer and pro
 * `onReady` - If you set this to a function, then this will be called once the communication has been established.
 * `local` {String} - To enable the NameTransport as a fallback, set this to point to the `name.html` file on the current domain.
 * `swf` {String} - To enable the FlashTransport for IE6/7 you need to point this towards your `easyxdm.swf` file. Both ends MUST point to the providers copy, and there is no requirement for a crossdomain.xml file.
+* `swfNoThrottle` {Boolean} - Set this to true if you want to have the swf/iframe placed visibly (20x20px top right corner) in order to avoid being throttled in never versions of Flash
+* `swfContainer` {String || DOMElement) - Set this if you want to control where the swf is placed.
 
 These properties can be set only on the consumer
 
@@ -73,7 +75,7 @@ These properties can be set only on the consumer
 * `container` {String || DOMElement} - Set this to an id or element if you want the iframe to be visible for interaction.
 * `props` {Object} - The key/value pairs of this object will be deep-copied onto the iframe. As an example, use `props: {style: {border: "1px solid red"} }` to set the border of the iframe to 1px solid red.
 * `remoteHelper` {String} - To enable the NameTransport as a fallback, set this to point to the `name.html` file on the provider.
-* hash {Boolean} - Whether to pass the setup data using the hash instead of using the query. This is mainly useful in scenarios where query arguments affects efficient caching or where the providers HTTP server does not support URL's with query parameters. Using the hash is not compatible with hash based history managers etc.
+* `hash` {Boolean} - Whether to pass the setup data using the hash instead of using the query. This is mainly useful in scenarios where query arguments affects efficient caching or where the providers HTTP server does not support URL's with query parameters. Using the hash is not compatible with hash based history managers etc.
 
 These properties can be set only on the provider
 

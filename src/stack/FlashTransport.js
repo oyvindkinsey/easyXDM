@@ -33,6 +33,8 @@
  * @cfg {String} remote The remote domain to communicate with.
  * @cfg {String} secret the pre-shared secret used to secure the communication.
  * @cfg {String} swf The path to the swf file
+ * @cfg {Boolean} swfNoThrottle Set this to true if you want to take steps to avoid beeing throttled when hidden.
+ * @cfg {String || DOMElement} swfContainer Set this if you want to control where the swf is placed
  */
 easyXDM.stack.FlashTransport = function(config){
     // #ifdef debug
@@ -79,26 +81,32 @@ easyXDM.stack.FlashTransport = function(config){
             queue.length = 0;
         });
         
-        // create the container that will hold the swf
-        swfContainer = document.createElement('div');
-        // http://bugs.adobe.com/jira/browse/FP-4796
-        // http://tech.groups.yahoo.com/group/flexcoders/message/162365
-        // https://groups.google.com/forum/#!topic/easyxdm/mJZJhWagoLc
-        apply(swfContainer.style, HAS_FLASH_THROTTLED_BUG ? {
-            height: "20px",
-            width: "20px",
-            position: "fixed",
-            right: 0,
-            top: 0
-        } : {
-            height: "1px",
-            width: "1px",
-            position: "absolute",
-            overflow: "hidden",
-            right: 0,
-            top: 0
-        });
-        document.body.appendChild(swfContainer);
+        if (config.swfContainer) {
+            swfContainer = (typeof config.swfContainer == "string") ? document.getElementById(config.swfContainer) : config.swfContainer;
+        }
+        else {
+            // create the container that will hold the swf
+            swfContainer = document.createElement('div');
+            
+            // http://bugs.adobe.com/jira/browse/FP-4796
+            // http://tech.groups.yahoo.com/group/flexcoders/message/162365
+            // https://groups.google.com/forum/#!topic/easyxdm/mJZJhWagoLc
+            apply(swfContainer.style, HAS_FLASH_THROTTLED_BUG && config.swfNoThrottle ? {
+                height: "20px",
+                width: "20px",
+                position: "fixed",
+                right: 0,
+                top: 0
+            } : {
+                height: "1px",
+                width: "1px",
+                position: "absolute",
+                overflow: "hidden",
+                right: 0,
+                top: 0
+            });
+            document.body.appendChild(swfContainer);
+        }
         
         // create the object/embed
         var flashVars = "callback=flash_loaded" + domain.replace(/-\./g, "_") + "&proto=" + global.location.protocol + "&domain=" + getDomainName(global.location.href) + "&port=" + getPort(global.location.href) + "&ns=" + namespace;
@@ -175,7 +183,7 @@ easyXDM.stack.FlashTransport = function(config){
                 
                 if (config.isHost) {
                     // if Flash is going to be throttled and we want to avoid this
-                    if (HAS_FLASH_THROTTLED_BUG) {
+                    if (HAS_FLASH_THROTTLED_BUG && config.swfNoThrottle) {
                         apply(config.props, {
                             position: "fixed",
                             right: 0,
