@@ -26,6 +26,7 @@
 
 /* Security model:
  * SWF's can be loaded from any of the two domains, and messages are only received from these two.
+ * Alternatively a single SWF can be loaded from a common domain (CDN).
  * security.allowXDomain is used to let the page interact with the SWF.
  * */
 
@@ -114,8 +115,9 @@ class Main
 			// allow messages from only the two possible domains
 			listeningConnection.allowDomain = 
 			listeningConnection.allowInsecureDomain = function(domain) {
-				log("allowDomain: " + (domain == remoteDomain || domain == _root.domain || domain == localSwfDomain));
-				return (domain == remoteDomain || domain == _root.domain || domain == localSwfDomain);
+				var allowed:Boolean = (domain == remoteDomain || domain == _root.domain || domain == localSwfDomain);
+				log("allowDomain: " + allowed.toString());
+				return allowed;
 			};
 			
 			// set up the onMessage handler - this combines fragmented messages
