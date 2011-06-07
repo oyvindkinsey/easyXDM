@@ -510,14 +510,7 @@ function createFrame(config){
     
     if (!config.container) {
         // This needs to be hidden like this, simply setting display:none and the like will cause failures in some browsers.
-        // Also, Flash requires the frame to be actually visible in order to not throttle the LocalConnection
-        apply(frame.style, HAS_FLASH_THROTTLED_BUG ? {
-            position: "fixed",
-            right: 0,
-            top: 0,
-            height: "20px",
-            width: "20px"
-        } : {
+        apply(frame.style, {
             position: "absolute",
             top : "-2000px"
         });

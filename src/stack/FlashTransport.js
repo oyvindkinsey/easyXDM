@@ -174,6 +174,16 @@ easyXDM.stack.FlashTransport = function(config){
                 swf.createChannel(config.channel, config.secret, getLocation(config.remote), config.isHost);
                 
                 if (config.isHost) {
+                    // if Flash is going to be throttled and we want to avoid this
+                    if (HAS_FLASH_THROTTLED_BUG) {
+                        apply(config.props, {
+                            position: "fixed",
+                            right: 0,
+                            top: 0,
+                            height: "20px",
+                            width: "20px"
+                        });
+                    }
                     // set up the iframe
                     apply(config.props, {
                         src: appendQueryParameters(config.remote, {
