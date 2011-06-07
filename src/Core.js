@@ -456,8 +456,7 @@ function apply(destination, source, noOverwrite){
 
 // This tests for the bug in IE where setting the [name] property using javascript causes the value to be redirected into [submitName].
 function testForNamePropertyBug(){
-    var form = document.body.appendChild(document.createElement("form")),
-    input = form.appendChild(document.createElement("input"));
+    var form = document.body.appendChild(document.createElement("form")), input = form.appendChild(document.createElement("input"));
     input.name = IFRAME_PREFIX + "TEST" + channelId; // append channelId in order to avoid caching issues
     HAS_NAME_PROPERTY_BUG = input !== form.elements[input.name];
     document.body.removeChild(form);
@@ -512,7 +511,7 @@ function createFrame(config){
         // This needs to be hidden like this, simply setting display:none and the like will cause failures in some browsers.
         apply(frame.style, {
             position: "absolute",
-            top : "-2000px"
+            top: "-2000px"
         });
         config.container = document.body;
     }
@@ -641,15 +640,13 @@ function prepareTransportStack(config){
             // #ifdef debug
             _trace("selecting protocol: " + protocol);
             // #endif
-        }
-        // #ifdef debug
+        } // #ifdef debug
         else {
             _trace("using protocol: " + protocol);
         }
         // #endif
     }
     config.protocol = protocol; // for conditional branching
-    
     switch (protocol) {
         case "0":// 0 = HashTransport
             apply(config, {
@@ -743,7 +740,7 @@ function prepareTransportStack(config){
             if (!config.swf) {
                 config.swf = "../../tools/easyxdm.swf";
             }
-            if (!flashVersion){
+            if (!flashVersion) {
                 hasFlash();
             }
             stackEls = [new easyXDM.stack.FlashTransport(config)];
