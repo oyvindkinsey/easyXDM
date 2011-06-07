@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, JSON, XMLHttpRequest, window, escape, unescape, ActiveXObject */
+/*global JSON, XMLHttpRequest, window, escape, unescape, ActiveXObject */
 //
 // easyXDM
 // http://easyxdm.net/
@@ -36,6 +36,8 @@ var _easyXDM = window.easyXDM; // map over global easyXDM in case of overwrite
 var IFRAME_PREFIX = "easyXDM_";
 var HAS_NAME_PROPERTY_BUG;
 var useHash = false; // whether to use the hash over the query
+var flashVersion; // will be set if using flash
+var HAS_FLASH_THROTTLED_BUG;
 // #ifdef debug
 var _trace = emptyFn;
 // #endif
@@ -61,10 +63,11 @@ function isArray(o){
 }
 
 // end
-
-function hasActiveX(name){
+function hasFlash(){
     try {
-        var activeX = new ActiveXObject(name);
+        var activeX = new ActiveXObject("ShockwaveFlash.ShockwaveFlash");
+        flashVersion = Array.prototype.slice.call(activeX.GetVariable("$version").match(/(\d+),(\d+),(\d+),(\d+)/), 1);
+        HAS_FLASH_THROTTLED_BUG = parseInt(flashVersion[0], 10) > 9 && parseInt(flashVersion[1], 10) > 0;
         activeX = null;
         return true;
     } 
@@ -258,6 +261,21 @@ function getDomainName(url){
 }
 
 /**
+ * Get the port for a given URL, or "" if none
+ * @param {String} url The url to extract the port from.
+ * @return The port part of the url.
+ * @type {String}
+ */
+function getPort(url){
+    // #ifdef debug
+    if (!url) {
+        throw new Error("url is undefined or empty");
+    }
+    // #endif
+    return url.match(reURI)[4] || "";
+}
+
+/**
  * Returns  a string containing the schema, domain and if present the port
  * @param {String} url The url to extract the location from
  * @return {String} The location part of the url
@@ -271,7 +289,7 @@ function getLocation(url){
         throw new Error("The file:// protocol is not supported");
     }
     // #endif
-    var m = url.match(reURI);
+    var m = url.toLowerCase().match(reURI);
     var proto = m[2], domain = m[3], port = m[4] || "";
     if ((proto == "http:" && port == ":80") || (proto == "https:" && port == ":443")) {
         port = "";
@@ -372,7 +390,7 @@ function undef(v){
  * A safe implementation of HTML5 JSON. Feature testing is used to make sure the implementation works.
  * @return {JSON} A valid JSON conforming object, or null if not found.
  */
-function getJSON(){
+var getJSON = function(){
     var cached = {};
     var obj = {
         a: [1, 2, 3]
@@ -407,7 +425,7 @@ function getJSON(){
         return cached;
     }
     return null;
-}
+};
 
 /**
  * Applies properties from the source object to the target object.<br/>
@@ -438,16 +456,10 @@ function apply(destination, source, noOverwrite){
 
 // This tests for the bug in IE where setting the [name] property using javascript causes the value to be redirected into [submitName].
 function testForNamePropertyBug(){
-    var el = document.createElement("iframe");
-    el.name = IFRAME_PREFIX + "TEST";
-    apply(el.style, {
-        position: "absolute",
-        left: "-2000px",
-        top: "0px"
-    });
-    document.body.appendChild(el);
-    HAS_NAME_PROPERTY_BUG = !(el.contentWindow === window.frames[el.name]);
-    document.body.removeChild(el);
+    var form = document.body.appendChild(document.createElement("form")), input = form.appendChild(document.createElement("input"));
+    input.name = IFRAME_PREFIX + "TEST" + channelId; // append channelId in order to avoid caching issues
+    HAS_NAME_PROPERTY_BUG = input !== form.elements[input.name];
+    document.body.removeChild(form);
     // #ifdef debug
     _trace("HAS_NAME_PROPERTY_BUG: " + HAS_NAME_PROPERTY_BUG);
     // #endif
@@ -497,8 +509,10 @@ function createFrame(config){
     
     if (!config.container) {
         // This needs to be hidden like this, simply setting display:none and the like will cause failures in some browsers.
-        frame.style.position = "absolute";
-        frame.style.top = "-2000px";
+        apply(frame.style, {
+            position: "absolute",
+            top: "-2000px"
+        });
         config.container = document.body;
     }
     
@@ -512,6 +526,7 @@ function createFrame(config){
     apply(frame, config.props);
     
     frame.border = frame.frameBorder = 0;
+    frame.allowTransparency = true;
     config.container.appendChild(frame);
     
     // HACK see above
@@ -593,7 +608,7 @@ function prepareTransportStack(config){
                  */
                 protocol = "1";
             }
-            else if (isHostMethod(window, "ActiveXObject") && hasActiveX("ShockwaveFlash.ShockwaveFlash")) {
+            else if (isHostMethod(window, "ActiveXObject") && hasFlash()) {
                 /*
                  * The Flash transport superseedes the NixTransport as the NixTransport has been blocked by MS
                  */
@@ -625,14 +640,13 @@ function prepareTransportStack(config){
             // #ifdef debug
             _trace("selecting protocol: " + protocol);
             // #endif
-        }
-        // #ifdef debug
+        } // #ifdef debug
         else {
             _trace("using protocol: " + protocol);
         }
         // #endif
     }
-    
+    config.protocol = protocol; // for conditional branching
     switch (protocol) {
         case "0":// 0 = HashTransport
             apply(config, {
@@ -725,6 +739,9 @@ function prepareTransportStack(config){
         case "6":
             if (!config.swf) {
                 config.swf = "../../tools/easyxdm.swf";
+            }
+            if (!flashVersion) {
+                hasFlash();
             }
             stackEls = [new easyXDM.stack.FlashTransport(config)];
             break;

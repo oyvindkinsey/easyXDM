@@ -6,6 +6,18 @@
     <body>
         <ul>
             <li>
+                2.4.14 07.06.11
+                <br/>
+                Fixed several issues with the FlashTransport. These includes proper support for valid domain names, non-standard ports, a race condition relating to
+                creating multiple transports rapidly, allowing multiple transports to different providers, support for CDN.
+                <br/>
+                Refactored the testForNamePropertyBug so that it no longer errs when subjected to refreshing
+                <br/>
+                Fixed an issue with Safari, capitalized urls and the PostMessageTransport.
+                <br/>
+                Fixed an issue with some errors being thrown in IE8 due to named FE's having two 'references' in IE, one inside and one outside the function.
+            </li>
+            <li>
                 2.4.13 02.05.11
                 <br/>
                 Improved the FlashTransport in many ways, worked around a bug in Flash<10, added support for messages above 40k, the swf can now be hosted on both domains.

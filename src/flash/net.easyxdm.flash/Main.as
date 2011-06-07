@@ -26,6 +26,7 @@
 
 /* Security model:
  * SWF's can be loaded from any of the two domains, and messages are only received from these two.
+ * Alternatively a single SWF can be loaded from a common domain (CDN).
  * security.allowXDomain is used to let the page interact with the SWF.
  * */
 
@@ -47,7 +48,8 @@ class Main
 			var charCode = input.charCodeAt(i);
 			if ( (charCode >= 64 && charCode <= 90 /*Uppercase*/) || (charCode >= 97 && charCode <= 122 /*Lowercase*/) ) continue;
 			if (charCode >= 48 && charCode <= 57 /*Numbers*/) continue;
-			if (charCode == 95/*_*/ || charCode == 36 /*$*/ || charCode == 46 /*.*/) continue;
+			if (charCode == 95/*_*/ || charCode == 36 /*$*/ || charCode == 45 /*-*/ || charCode == 46 /*.*/ || charCode == 58 /*:*/) continue;
+			
 			return false;
 		}
 		return true;
@@ -62,7 +64,7 @@ class Main
 		if (Main.INITIALIZED) return; else Main.INITIALIZED = true;
 		
 		// validate the passed arguments
-		if (!Validate(_root.ns) || !Validate(_root.proto) || !Validate(_root.domain)) return;
+		if (!Validate(_root.ns) || !Validate(_root.proto) || !Validate(_root.domain) || !Validate(_root.port)) || !Validate(_root.callback) return;
 		
 		// LocalConnection has a max length 
 		var maxMessageLength = 40000;
@@ -74,7 +76,7 @@ class Main
 		var prefix:String = _root.ns ? _root.ns + "." : "";
 		
 		// this will be our origin
-		var origin = _root.proto + "//" + _root.domain;
+		var origin = _root.proto + "//" + _root.domain + _root.port;
 		
 		// set up the logger, if any
 		var log = _root.log == "true" ? function(msg) {
@@ -85,7 +87,7 @@ class Main
 			
 		log("enabling communication with " + _root.domain);
 		// allow javascript in the page to interact with the SWF
-		security[_root.proto == "http" ? "allowInsecureDomain" : "allowDomain"](_root.domain);
+		security[_root.proto == "http:" ? "allowInsecureDomain" : "allowDomain"](_root.domain);
 		// add the postMessage method
 		ExternalInterface.addCallback("postMessage", { }, function(channel:String, message:String) {
 			sendMap[channel](message);
@@ -106,12 +108,16 @@ class Main
 			var listeningConnection:LocalConnection = connectionMap[channel] = new LocalConnection();
 			// set up the sending connection 
 			var sendingConnection:LocalConnection = new LocalConnection();
+			
+			// domain of the current SWF (for cdn support)
+			var localSwfDomain:String = listeningConnection.domain();
 					
 			// allow messages from only the two possible domains
 			listeningConnection.allowDomain = 
 			listeningConnection.allowInsecureDomain = function(domain) {
-				log("allowDomain: " + (domain == remoteDomain || domain == _root.domain));
-				return (domain == remoteDomain || domain == _root.domain);
+				var allowed:Boolean = (domain == remoteDomain || domain == _root.domain || domain == localSwfDomain);
+				log("allowDomain: " + allowed.toString());
+				return allowed;
 			};
 			
 			// set up the onMessage handler - this combines fragmented messages
@@ -183,6 +189,6 @@ class Main
 		
 		// kick things off
 		log("calling init");
-		ExternalInterface.call(prefix + "easyXDM.Fn.get(\"flash_loaded\")");		
+		ExternalInterface.call(prefix + "easyXDM.Fn.get(\"" + _root.callback + "\")");
 	}
 }

@@ -122,7 +122,7 @@ var debug = {
                  * Create log window
                  * @ignore
                  */
-                var domain = location.host, windowname = domain.replace(/\.|:/g, "") + "easyxdm_log", logWin;
+                var domain = location.host, windowname = domain.replace(/\[-.:]/g, "") + "easyxdm_log", logWin;
                 try {
                     logWin = window.open("", windowname, "width=800,height=200,status=0,navigation=0,scrollbars=1");
                 } 

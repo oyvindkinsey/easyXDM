@@ -65,9 +65,9 @@ function runTests(){
                 return this.Assert.isFunction(easyXDM.stack.PostMessageTransport);
             }
         }, {
-            name: "check for the presence of easyXDM.stack.NixTransport",
+            name: "check for the presence of easyXDM.stack.FlashTransport",
             run: function(){
-                return this.Assert.isFunction(easyXDM.stack.NixTransport);
+                return this.Assert.isFunction(easyXDM.stack.FlashTransport);
             }
         }, {
             name: "check for the presence of easyXDM.stack.NameTransport",
@@ -111,6 +111,7 @@ function runTests(){
             this.url1 = "http://foo.bar/a/b/c?d=e#f";
             this.url2 = "http://foo.bar:80/a/b/c?d=e#f";
             this.url3 = "http://foo.bar:88/a/b/c?d=e#f";
+            this.url4 = "hTtp://Foo.Bar:88/a/b/c?d=e#f";
             
         },
         steps: [{
@@ -132,6 +133,11 @@ function runTests(){
             name: "getLocation with non-standard port",
             run: function(){
                 return easyXDM.getLocation(this.url3) === "http://foo.bar:88";
+            }
+        }, {
+            name: "getLocation with capitals",
+            run: function(){
+                return easyXDM.getLocation(this.url4) === "http://foo.bar:88";
             }
         }, {
             name: "appendQueryParameters",
@@ -325,53 +331,6 @@ function runTests(){
                 var messages = 0;
                 this.transport = new easyXDM.Socket({
                     protocol: "5",
-                    remote: REMOTE + "/test_transport.html",
-                    onMessage: function(message, origin){
-                        if (scope.expectedMessage === message) {
-                            if (++messages === 2) {
-                                scope.notifyResult(true);
-                            }
-                        }
-                    },
-                    onReady: function(){
-                        scope.notifyResult(true);
-                    }
-                });
-            }
-        }, {
-            name: "message is echoed back",
-            timeout: 5000,
-            run: function(){
-                this.transport.postMessage(this.expectedMessage);
-                this.transport.postMessage(this.expectedMessage);
-            }
-        }, {
-            name: "destroy",
-            run: function(){
-                this.transport.destroy();
-                return ((document.getElementsByTagName("iframe").length === 0));
-            }
-        }]
-    }, {
-        name: "test easyXDM.Socket{NixTransport}",
-        runIf: function(){
-            if (!("ActiveXObject" in window && (/msie [67]/i).test(navigator.userAgent))) {
-                return "This test requires IE6/7";
-            }
-        },
-        
-        setUp: function(){
-            this.expectedMessage = ++i + "_abcd1234%@¤/";
-        },
-        steps: [{
-            name: "onReady is fired",
-            timeout: 5000,
-            run: function(){
-                var scope = this;
-                var messages = 0;
-                this.transport = new easyXDM.Socket({
-                    protocol: "3",
-                    local: "../name.html",
                     remote: REMOTE + "/test_transport.html",
                     onMessage: function(message, origin){
                         if (scope.expectedMessage === message) {
