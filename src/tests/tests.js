@@ -65,9 +65,9 @@ function runTests(){
                 return this.Assert.isFunction(easyXDM.stack.PostMessageTransport);
             }
         }, {
-            name: "check for the presence of easyXDM.stack.NixTransport",
+            name: "check for the presence of easyXDM.stack.FlashTransport",
             run: function(){
-                return this.Assert.isFunction(easyXDM.stack.NixTransport);
+                return this.Assert.isFunction(easyXDM.stack.FlashTransport);
             }
         }, {
             name: "check for the presence of easyXDM.stack.NameTransport",
