@@ -640,7 +640,8 @@ function prepareTransportStack(config){
             // #ifdef debug
             _trace("selecting protocol: " + protocol);
             // #endif
-        } // #ifdef debug
+        }
+        // #ifdef debug
         else {
             _trace("using protocol: " + protocol);
         }
