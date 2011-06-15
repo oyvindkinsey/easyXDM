@@ -156,20 +156,21 @@ if (!domIsReady) {
             }
         });
         if (document.documentElement.doScroll && window === top) {
-            (function doScrollCheck(){
+            var doScrollCheck = function(){
                 if (domIsReady) {
                     return;
                 }
                 // http://javascript.nwbox.com/IEContentLoaded/
                 try {
                     document.documentElement.doScroll("left");
-                } 
+                }
                 catch (e) {
                     setTimeout(doScrollCheck, 1);
                     return;
                 }
                 dom_onReady();
-            }());
+            };
+            doScrollCheck();
         }
     }
     
