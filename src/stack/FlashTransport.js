@@ -72,7 +72,7 @@ easyXDM.stack.FlashTransport = function(config){
         var id = "easyXDM_swf_" + Math.floor(Math.random() * 10000);
         
         // prepare the init function that will fire once the swf is ready
-        easyXDM.Fn.set("flash_loaded" + domain.replace(/-\./g, "_"), function(){
+        easyXDM.Fn.set("flash_loaded" + domain.replace(/[-\.]/g, "_"), function(){
             easyXDM.stack.FlashTransport[domain].swf = swf = swfContainer.firstChild;
             var queue = easyXDM.stack.FlashTransport[domain].queue;
             for (var i = 0; i < queue.length; i++) {
@@ -109,7 +109,7 @@ easyXDM.stack.FlashTransport = function(config){
         }
         
         // create the object/embed
-        var flashVars = "callback=flash_loaded" + domain.replace(/-\./g, "_") + "&proto=" + global.location.protocol + "&domain=" + getDomainName(global.location.href) + "&port=" + getPort(global.location.href) + "&ns=" + namespace;
+        var flashVars = "callback=flash_loaded" + domain.replace(/[-\.]/g, "_") + "&proto=" + global.location.protocol + "&domain=" + getDomainName(global.location.href) + "&port=" + getPort(global.location.href) + "&ns=" + namespace;
         // #ifdef debug
         flashVars += "&log=true";
         // #endif
