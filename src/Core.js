@@ -444,7 +444,7 @@ function apply(destination, source, noOverwrite){
                 }
             }
             catch (e) {}
-            if (prop in destination) {
+            if (prop_in_destination) {
                 member = source[prop];
                 if (typeof member === "object") {
                     apply(destination[prop], member, noOverwrite);
