@@ -63,10 +63,6 @@ easyXDM.stack.FlashTransport = function(config){
         // #ifdef debug
         trace("creating factory with SWF from " + domain);
         // #endif
-        // add the queue to hold the init fn's
-        easyXDM.stack.FlashTransport[domain] = {
-            queue: []
-        };
         // the differentiating query argument is needed in Flash9 to avoid a caching issue where LocalConnection would throw an error.
         var url = config.swf + "?host=" + config.isHost;
         var id = "easyXDM_swf_" + Math.floor(Math.random() * 10000);
@@ -213,9 +209,15 @@ easyXDM.stack.FlashTransport = function(config){
             else {
                 // if the swf does not yet exist
                 if (!easyXDM.stack.FlashTransport[swfdomain]) {
+                    // add the queue to hold the init fn's
+                    easyXDM.stack.FlashTransport[swfdomain] = {
+                        queue: [fn]
+                    };
                     addSwf(swfdomain);
                 }
-                easyXDM.stack.FlashTransport[swfdomain].queue.push(fn);
+                else {
+                    easyXDM.stack.FlashTransport[swfdomain].queue.push(fn);
+                }
             }
         },
         init: function(){
