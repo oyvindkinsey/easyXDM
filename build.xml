@@ -32,7 +32,7 @@
 	</target>
 	
 	<target name="jslint">
-		<jslint>
+		<jslint encoding="UTF-8">
 			<formatter type="plain" />
 			<fileset dir="${project.src.dir}" includes="easyXDM*.js"/>
 			<fileset dir="${project.src.dir}/stack/" includes="*.js"/>
