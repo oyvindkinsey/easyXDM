@@ -20,7 +20,6 @@ For all implementations the transport stack offers bi-directionality, reliabilit
 
 Using JavaScript only (no Flash, Silverlight, extra html files etc) easyXDM provides the following browsers with stacks with latency of less than 15ms:
 
-* IE6 and IE7 - using the <del>NixTransport</del> (see [Microsoft Security Bulletin MS11-018](http://www.microsoft.com/technet/security/Bulletin/MS11-018.mspx)) FlashTransport
 * IE8+ - using the PostMessageTransport
 * Opera 9+ - using the PostMessageTransport (support for both Operas old standard and the HTML5 standard)
 * Firefox 1-2 - using the FrameElementTransport
@@ -28,8 +27,12 @@ Using JavaScript only (no Flash, Silverlight, extra html files etc) easyXDM prov
 * Safari 4+ - using the PostMessageTransport
 * Chrome 2+ - using the PostMessageTransport
 
-In browsers not mentioned here, and not supporting the *postMessage* API, the HashTransport will be used as a fallback.     
-*If you want to enable the faster NameTransport as a fallback instead (almost identical in speed as postMessage) then you need to upload the provided `name.html` file to both domains and configure the stack appropriately.*
+In browsers not mentioned here, and not supporting the *postMessage* API, the following transports will be used, depending on support and configuation:
+
+* FlashTransport - Requires Flash 6+ and the swf property to be configured and will load a single swf into the document that functions as a factory. The swf has been audited by Google Security researchers. 
+* NameTransport - Requires an html-file (name.html) to be hosted on each of the two domain. The cache-directives in the file allows the transport to pass messages with speeds similar to postMessage without incurring extra HTTP-requests.
+* HashTransport - If no other transport can be used, then the HashTransport will be used.
+
 How to use easyXDM
 ------------------
 When using easyXDM you first load the *consumer* document and then **let easyXDM load** the *provider*. This is by default done in a hidden iframe, but you can also configure easyXDM to display the iframe in a specific container, and with a specific style attached. 
@@ -65,7 +68,7 @@ In addition the following config properties can be set for both consumer and pro
 
 * `onReady` - If you set this to a function, then this will be called once the communication has been established.
 * `local` {String} - To enable the NameTransport as a fallback, set this to point to the `name.html` file on the current domain.
-* `swf` {String} - To enable the FlashTransport for IE6/7 you need to point this towards your `easyxdm.swf` file. Both ends MUST point to the providers copy, and there is no requirement for a crossdomain.xml file.
+* `swf` {String} - To enable the FlashTransport for IE6/7 you need to point this towards your `easyxdm.swf` file. The swf must reside on one of the two domains (consumer and provider can use its own copy), or on a shared CDN used by both the consumer and provider.
 * `swfNoThrottle` {Boolean} - Set this to true if you want to have the swf/iframe placed visibly (20x20px top right corner) in order to avoid being throttled in never versions of Flash
 * `swfContainer` {String || DOMElement) - Set this if you want to control where the swf is placed.
 
