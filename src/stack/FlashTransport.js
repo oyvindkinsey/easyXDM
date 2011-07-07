@@ -63,16 +63,12 @@ easyXDM.stack.FlashTransport = function(config){
         // #ifdef debug
         trace("creating factory with SWF from " + domain);
         // #endif
-        // add the queue to hold the init fn's
-        easyXDM.stack.FlashTransport[domain] = {
-            queue: []
-        };
         // the differentiating query argument is needed in Flash9 to avoid a caching issue where LocalConnection would throw an error.
         var url = config.swf + "?host=" + config.isHost;
         var id = "easyXDM_swf_" + Math.floor(Math.random() * 10000);
         
         // prepare the init function that will fire once the swf is ready
-        easyXDM.Fn.set("flash_loaded" + domain.replace(/-\./g, "_"), function(){
+        easyXDM.Fn.set("flash_loaded" + domain.replace(/[\-.]/g, "_"), function(){
             easyXDM.stack.FlashTransport[domain].swf = swf = swfContainer.firstChild;
             var queue = easyXDM.stack.FlashTransport[domain].queue;
             for (var i = 0; i < queue.length; i++) {
@@ -109,7 +105,7 @@ easyXDM.stack.FlashTransport = function(config){
         }
         
         // create the object/embed
-        var flashVars = "callback=flash_loaded" + domain.replace(/-\./g, "_") + "&proto=" + global.location.protocol + "&domain=" + getDomainName(global.location.href) + "&port=" + getPort(global.location.href) + "&ns=" + namespace;
+        var flashVars = "callback=flash_loaded" + domain.replace(/[\-.]/g, "_") + "&proto=" + global.location.protocol + "&domain=" + getDomainName(global.location.href) + "&port=" + getPort(global.location.href) + "&ns=" + namespace;
         // #ifdef debug
         flashVars += "&log=true";
         // #endif
@@ -213,9 +209,15 @@ easyXDM.stack.FlashTransport = function(config){
             else {
                 // if the swf does not yet exist
                 if (!easyXDM.stack.FlashTransport[swfdomain]) {
+                    // add the queue to hold the init fn's
+                    easyXDM.stack.FlashTransport[swfdomain] = {
+                        queue: [fn]
+                    };
                     addSwf(swfdomain);
                 }
-                easyXDM.stack.FlashTransport[swfdomain].queue.push(fn);
+                else {
+                    easyXDM.stack.FlashTransport[swfdomain].queue.push(fn);
+                }
             }
         },
         init: function(){

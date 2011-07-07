@@ -156,20 +156,21 @@ if (!domIsReady) {
             }
         });
         if (document.documentElement.doScroll && window === top) {
-            (function doScrollCheck(){
+            var doScrollCheck = function(){
                 if (domIsReady) {
                     return;
                 }
                 // http://javascript.nwbox.com/IEContentLoaded/
                 try {
                     document.documentElement.doScroll("left");
-                } 
+                }
                 catch (e) {
                     setTimeout(doScrollCheck, 1);
                     return;
                 }
                 dom_onReady();
-            }());
+            };
+            doScrollCheck();
         }
     }
     
@@ -608,7 +609,7 @@ function prepareTransportStack(config){
                  */
                 protocol = "1";
             }
-            else if (isHostMethod(window, "ActiveXObject") && hasFlash()) {
+            else if (config.swf && isHostMethod(window, "ActiveXObject") && hasFlash()) {
                 /*
                  * The Flash transport superseedes the NixTransport as the NixTransport has been blocked by MS
                  */
@@ -738,9 +739,6 @@ function prepareTransportStack(config){
             stackEls = [new easyXDM.stack.FrameElementTransport(config)];
             break;
         case "6":
-            if (!config.swf) {
-                config.swf = "../../tools/easyxdm.swf";
-            }
             if (!flashVersion) {
                 hasFlash();
             }
