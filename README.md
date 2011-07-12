@@ -231,7 +231,15 @@ Example:
 	// we need to load another one and put it under PROJECT.easyXDM. Here is
 	// how you do it.
 	var PROJECT = { easyXDM: easyXDM.noConflict("PROJECT") };
-	
+
+
+Upgrading EasyXDM
+-----
+You should always upgrade both the consumer and the provider as it is not guaranteed that different versions will be "compatible". This is because the communication setup requires complex processing between the two parties and if one of these are out of sync, then it will fail.
+
+If you cannot upgrade both sides at the same time, the best approach is to save multiple versions of EasyXDM and provide a way of switching between the different versions. This way you can introduce new versions in the provider and update the consumer later.
+
+
 For more information
 -----
 
