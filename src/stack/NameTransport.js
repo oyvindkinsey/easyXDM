@@ -140,26 +140,28 @@ easyXDM.stack.NameTransport = function(config){
                 config.remoteHelper = config.remote;
                 easyXDM.Fn.set(config.channel, _onMessage);
             }
+            
             // Set up the iframe that will be used for the transport
+            var onLoad = function(){
+                // Remove the handler
+                var w = callerWindow || this;
+                un(w, "load", onLoad);
+                easyXDM.Fn.set(config.channel + "_load", _onLoad);
+                (function test(){
+                    if (typeof w.contentWindow.sendMessage == "function") {
+                        _onReady();
+                    }
+                    else {
+                        setTimeout(test, 50);
+                    }
+                }());
+            };
             
             callerWindow = createFrame({
                 props: {
                     src: config.local + "#_4" + config.channel
                 },
-                onLoad: function onLoad(){
-                    // Remove the handler
-                    var w = callerWindow || this;
-                    un(w, "load", onLoad);
-                    easyXDM.Fn.set(config.channel + "_load", _onLoad);
-                    (function test(){
-                        if (typeof w.contentWindow.sendMessage == "function") {
-                            _onReady();
-                        }
-                        else {
-                            setTimeout(test, 50);
-                        }
-                    }());
-                }
+                onLoad: onLoad
             });
         },
         init: function(){
