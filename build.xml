@@ -126,6 +126,112 @@
 			<fileset dir="${project.src.dir}/tests"/>
 		</copy>	
 	</target>
+	<target name="buildasync" depends="clean,jslint">
+		<buildnumber/>
+		<mkdir dir="work/stack"/>
+		
+		<concat destfile="work/easyXDM.combined.js">	
+			<fileset dir="." includes="${project.src.dir}/begin_scope.txt" />
+			<fileset dir="." includes="${project.src.dir}/Core.js" />
+			<fileset dir="." includes="${project.src.dir}/end_scope.txt" />
+		</concat>
+		
+		<replace file="work/easyXDM.combined.js" token="%%version%%" value="${project.build.version}.${build.number}"/>
+		
+		<!-- Process pre proccesing instructions like #if/#endif etc -->
+		<preprocess infile="work/easyXDM.combined.js" outfile="work/easyXDM.js"/>
+		<preprocess infile="work/easyXDM.combined.js" outfile="work/easyXDM.debug.js" defines="debug"/>
+		<preprocess infile="${project.src.dir}/name.html" outfile="work/name.html"/>
+		
+		<preprocess infile="${project.src.dir}/Socket.js" outfile="work/Socket.js"/>
+		<preprocess infile="${project.src.dir}/Socket.js" outfile="work/Socket.debug.js" defines="debug"/>
+		<preprocess infile="${project.src.dir}/Rpc.js" outfile="work/Rpc.js"/>
+		<preprocess infile="${project.src.dir}/Rpc.js" outfile="work/Rpc.debug.js" defines="debug"/>
+		
+		<preprocess infile="${project.src.dir}/stack/SameOriginTransport.js" outfile="work/stack/SameOriginTransport.js"/>
+		<preprocess infile="${project.src.dir}/stack/SameOriginTransport.js" outfile="work/stack/SameOriginTransport.debug.js" defines="debug"/>
+		
+		<preprocess infile="${project.src.dir}/stack/FlashTransport.js" outfile="work/stack/FlashTransport.js"/>
+		<preprocess infile="${project.src.dir}/stack/FlashTransport.js" outfile="work/stack/FlashTransport.debug.js" defines="debug"/>
+		
+		<preprocess infile="${project.src.dir}/stack/PostMessageTransport.js" outfile="work/stack/PostMessageTransport.js"/>
+		<preprocess infile="${project.src.dir}/stack/PostMessageTransport.js" outfile="work/stack/PostMessageTransport.debug.js" defines="debug"/>
+		
+		<preprocess infile="${project.src.dir}/stack/FrameElementTransport.js" outfile="work/stack/FrameElementTransport.js"/>
+		<preprocess infile="${project.src.dir}/stack/FrameElementTransport.js" outfile="work/stack/FrameElementTransport.debug.js" defines="debug"/>
+		
+		<preprocess infile="${project.src.dir}/stack/NameTransport.js" outfile="work/stack/NameTransport.js"/>
+		<preprocess infile="${project.src.dir}/stack/NameTransport.js" outfile="work/stack/NameTransport.debug.js" defines="debug"/>
+		
+		<preprocess infile="${project.src.dir}/stack/HashTransport.js" outfile="work/stack/HashTransport.js"/>
+		<preprocess infile="${project.src.dir}/stack/HashTransport.js" outfile="work/stack/HashTransport.debug.js" defines="debug"/>
+		
+		<preprocess infile="${project.src.dir}/stack/ReliableBehavior.js" outfile="work/stack/ReliableBehavior.js"/>
+		<preprocess infile="${project.src.dir}/stack/ReliableBehavior.js" outfile="work/stack/ReliableBehavior.debug.js" defines="debug"/>
+		
+		<preprocess infile="${project.src.dir}/stack/QueueBehavior.js" outfile="work/stack/QueueBehavior.js"/>
+		<preprocess infile="${project.src.dir}/stack/QueueBehavior.js" outfile="work/stack/QueueBehavior.debug.js" defines="debug"/>
+		
+		<preprocess infile="${project.src.dir}/stack/VerifyBehavior.js" outfile="work/stack/VerifyBehavior.js"/>
+		<preprocess infile="${project.src.dir}/stack/VerifyBehavior.js" outfile="work/stack/VerifyBehavior.debug.js" defines="debug"/>
+		
+		<preprocess infile="${project.src.dir}/stack/RpcBehavior.js" outfile="work/stack/RpcBehavior.js"/>
+		<preprocess infile="${project.src.dir}/stack/RpcBehavior.js" outfile="work/stack/RpcBehavior.debug.js" defines="debug"/>
+			
+		<!-- Compress the file using the YUI Compressor -->
+		<yuicompress infile="work/easyXDM.js" outfile="work/easyXDM.min.js" />
+		<yuicompress infile="work/Socket.js" outfile="work/Socket.min.js" />
+		<yuicompress infile="work/Rpc.js" outfile="work/Rpc.min.js" />
+		<yuicompress infile="work/stack/SameOriginTransport.js" outfile="work/stack/SameOriginTransport.min.js" />
+		<yuicompress infile="work/stack/FlashTransport.js" outfile="work/stack/FlashTransport.min.js" />
+		<yuicompress infile="work/stack/PostMessageTransport.js" outfile="work/stack/PostMessageTransport.min.js" />
+		<yuicompress infile="work/stack/FrameElementTransport.js" outfile="work/stack/FrameElementTransport.min.js" />
+		<yuicompress infile="work/stack/NameTransport.js" outfile="work/stack/NameTransport.min.js" />
+		<yuicompress infile="work/stack/HashTransport.js" outfile="work/stack/HashTransport.min.js" />
+		<yuicompress infile="work/stack/ReliableBehavior.js" outfile="work/stack/ReliableBehavior.min.js" />
+		<yuicompress infile="work/stack/QueueBehavior.js" outfile="work/stack/QueueBehavior.min.js" />
+		<yuicompress infile="work/stack/VerifyBehavior.js" outfile="work/stack/VerifyBehavior.min.js" />
+		<yuicompress infile="work/stack/RpcBehavior.js" outfile="work/stack/RpcBehavior.min.js" />
+		
+		<!-- concat header files -->
+		<concat destfile="${project.build.artifactdir}v${project.build.version}/easyXDM.js">
+			<fileset dir="." includes="${project.src.dir}/header.js" />
+			<fileset dir="." includes="work/easyXDM.js" />
+		</concat>
+		<concat destfile="${project.build.artifactdir}v${project.build.version}/easyXDM.debug.js">
+			<fileset dir="." includes="${project.src.dir}/header.js" />
+			<fileset dir="." includes="work/easyXDM.debug.js" />
+		</concat>
+		<concat destfile="${project.build.artifactdir}v${project.build.version}/easyXDM.min.js">
+			<fileset dir="." includes="${project.src.dir}/header.js" />
+			<fileset dir="." includes="work/easyXDM.min.js" />
+		</concat>
+		
+		<delete file="work/easyXDM.combined.js" quiet="true"/>
+		
+		<copy todir="${project.build.artifactdir}v${project.build.version}">
+			<fileset dir="work"/>
+			<fileset file= "MIT-license.txt"/>
+			<fileset file= "README.txt"/>
+			<fileset file= "${project.src.dir}/changes.txt"/>
+			<fileset file= "tools/json2.js"/>
+			<fileset file= "src/easyxdm.swf"/>
+		</copy>
+
+		<copy todir="${project.src.dir}/tests">
+			<fileset file="work/easyXDM.debug.js"/>
+		</copy>
+
+		<copy todir="${project.build.artifactdir}v${project.build.version}/example">
+			<fileset dir="${project.src.dir}/example"/>
+		</copy>
+		<copy todir="${project.build.artifactdir}v${project.build.version}/cors">
+			<fileset dir="${project.src.dir}/cors"/>
+		</copy>
+		<copy todir="${project.build.artifactdir}v${project.build.version}/tests">
+			<fileset dir="${project.src.dir}/tests"/>
+		</copy>	
+	</target>
 	
 	<target name="document">
 		<delete dir="${project.build.artifactdir}v${project.build.version}-docs" quiet="true"/>

@@ -564,6 +564,70 @@ function checkAcl(acl, domain){
 /*
  * Functions related to stacks
  */
+var transportDependencies = {
+    "0": ["HashTransport", "ReliableBehavior", "VerifyBehavior"],
+    "1": ["PostMessageTransport"],
+    "2": ["NameTransport", "VerifyBehavior"],
+    "4": ["SameOriginTransport"],
+    "5": ["FrameElementTransport"],
+    "6": ["FlashTransport"]
+};
+function resolve(config, fn){
+    var protocol = config.protocol || query.xdm_p;
+    if (undef(protocol)) {
+        if (getLocation(location.href) == getLocation(config.remote)) {
+            /*
+             * Both documents has the same origin, lets use direct access.
+             */
+            protocol = "4";
+        }
+        else if (isHostMethod(window, "postMessage") || isHostMethod(document, "postMessage")) {
+            /*
+             * This is supported in IE8+, Firefox 3+, Opera 9+, Chrome 2+ and Safari 4+
+             */
+            protocol = "1";
+        }
+        else if (config.swf && isHostMethod(window, "ActiveXObject") && hasFlash()) {
+            /*
+             * The Flash transport superseedes the NixTransport as the NixTransport has been blocked by MS
+             */
+            protocol = "6";
+        }
+        else if (navigator.product === "Gecko" && "frameElement" in window && navigator.userAgent.indexOf('WebKit') == -1) {
+            /*
+             * This is supported in Gecko (Firefox 1+)
+             */
+            protocol = "5";
+        }
+        else if (config.remoteHelper) {
+            /*
+             * This is supported in all browsers that retains the value of window.name when
+             * navigating from one domain to another, and where parent.frames[foo] can be used
+             * to get access to a frame from the same domain
+             */
+            config.remoteHelper = resolveUrl(config.remoteHelper);
+            protocol = "2";
+        }
+        else {
+            /*
+             * This is supported in all browsers where [window].location is writable for all
+             * The resize event will be used if resize is supported and the iframe is not put
+             * into a container, else polling will be used.
+             */
+            protocol = "0";
+        }
+    }
+    
+    if (!fn) {
+        return protocol;
+    }
+    var list = [], scripts = transportDependencies[protocol].concat("QueueBehavior");
+    for (var i = 0; i < scripts.length; i++) {
+        list.push("stack/" + scripts[i]);
+    }
+    fn(protocol, list);
+}
+
 /**
  * Prepares an array of stack-elements suitable for the current configuration
  * @param {Object} config The Transports configuration. See easyXDM.Socket for more.
@@ -597,47 +661,7 @@ function prepareTransportStack(config){
         config.channel = config.channel || "default" + channelId++;
         config.secret = Math.random().toString(16).substring(2);
         if (undef(protocol)) {
-            if (getLocation(location.href) == getLocation(config.remote)) {
-                /*
-                 * Both documents has the same origin, lets use direct access.
-                 */
-                protocol = "4";
-            }
-            else if (isHostMethod(window, "postMessage") || isHostMethod(document, "postMessage")) {
-                /*
-                 * This is supported in IE8+, Firefox 3+, Opera 9+, Chrome 2+ and Safari 4+
-                 */
-                protocol = "1";
-            }
-            else if (config.swf && isHostMethod(window, "ActiveXObject") && hasFlash()) {
-                /*
-                 * The Flash transport superseedes the NixTransport as the NixTransport has been blocked by MS
-                 */
-                protocol = "6";
-            }
-            else if (navigator.product === "Gecko" && "frameElement" in window && navigator.userAgent.indexOf('WebKit') == -1) {
-                /*
-                 * This is supported in Gecko (Firefox 1+)
-                 */
-                protocol = "5";
-            }
-            else if (config.remoteHelper) {
-                /*
-                 * This is supported in all browsers that retains the value of window.name when
-                 * navigating from one domain to another, and where parent.frames[foo] can be used
-                 * to get access to a frame from the same domain
-                 */
-                config.remoteHelper = resolveUrl(config.remoteHelper);
-                protocol = "2";
-            }
-            else {
-                /*
-                 * This is supported in all browsers where [window].location is writable for all
-                 * The resize event will be used if resize is supported and the iframe is not put
-                 * into a container, else polling will be used.
-                 */
-                protocol = "0";
-            }
+            protocol = resolve(config);
             // #ifdef debug
             _trace("selecting protocol: " + protocol);
             // #endif
@@ -946,6 +970,51 @@ var debug = {
 };
 debug.log("easyXDM present on '" + location.href);
 _trace = debug.getTracer("{Private}");
+
+var loaded = {};
+function loadScript(url, fn){
+    if (loaded[url]) {
+        fn(url);
+        return;
+    }
+    
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src = url;
+    function onLoad(){
+        loaded[url] = true;
+        script.parentNode.removeChild(script);
+        fn(url);
+    }
+    script.onload = onLoad;
+    script.onreadystatechange = function(){
+        if (/^loaded|complete$/.test(script.readyState)) {
+            onLoad();
+        }
+    };
+    document.head.appendChild(script);
+}
+
+function loadScripts(base, stage, list, fn){
+    var loaded = 0, i = list.length;
+    while (i--) {
+        loadScript(base + list[i] + stage + ".js", function(url){
+            if (++loaded == list.length) {
+                fn();
+            }
+        });
+    }
+}
+
+function async(base, target, config, fn, stage){
+    stage = stage || ".debug";
+    whenReady(function(){
+        resolve(config, function(protocol, list){
+            list.push((target == "rpc" ? "rpc" : "socket"));
+            loadScripts(base, stage, list, fn);
+        });
+    });
+}
 
 
 /*

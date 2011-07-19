@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+    <head>
+        <title>easyXDM</title>
+        <script type="text/javascript" src="../core.js">
+        </script>
+        <script type="text/javascript">
+            var transport;
+            var config = {
+                local: "../name.html",
+                swf: "../easyxdm.swf",
+                onMessage: function(message, origin){
+                    // Echo back the message
+                    transport.postMessage(message);
+                }
+            };
+            easyXDM.async("../", "socket", config, function(){
+                transport = new easyXDM.Socket(config);
+            });
+            window.onunload = function(){
+                if (transport) {
+                    transport.destroy();
+                }
+            };
+        </script>
+    </head>
+    <body>
+    </body>
+</html>
