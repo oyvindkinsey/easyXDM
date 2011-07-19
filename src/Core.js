@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global JSON, XMLHttpRequest, window, escape, unescape, ActiveXObject */
+/*global JSON, document, console, XMLHttpRequest, window, escape, unescape, ActiveXObject */
 //
 // easyXDM
 // http://easyxdm.net/
@@ -163,7 +163,7 @@ if (!domIsReady) {
                 // http://javascript.nwbox.com/IEContentLoaded/
                 try {
                     document.documentElement.doScroll("left");
-                }
+                } 
                 catch (e) {
                     setTimeout(doScrollCheck, 1);
                     return;
@@ -800,6 +800,154 @@ function removeFromStack(element){
     element.up = element.down = null;
 }
 
+
+var debug = {
+    _deferred: [],
+    flush: function(){
+        this.trace("... deferred messages ...");
+        for (var i = 0, len = this._deferred.length; i < len; i++) {
+            this.trace(this._deferred[i]);
+        }
+        this._deferred.length = 0;
+        this.trace("... end of deferred messages ...");
+    },
+    getTime: function(){
+        var d = new Date(), h = d.getHours() + "", m = d.getMinutes() + "", s = d.getSeconds() + "", ms = d.getMilliseconds() + "", zeros = "000";
+        if (h.length == 1) {
+            h = "0" + h;
+        }
+        if (m.length == 1) {
+            m = "0" + m;
+        }
+        if (s.length == 1) {
+            s = "0" + s;
+        }
+        ms = zeros.substring(ms.length) + ms;
+        return h + ":" + m + ":" + s + "." + ms;
+    },
+    /**
+     * Logs the message to console.log if available
+     * @param {String} msg The message to log
+     */
+    log: function(msg){
+        // Uses memoizing to cache the implementation
+        if (!isHostObject(window, "console") || undef(console.log)) {
+            /**
+             * Sets log to be an empty function since we have no output available
+             * @ignore
+             */
+            this.log = emptyFn;
+        }
+        else {
+            /**
+             * Sets log to be a wrapper around console.log
+             * @ignore
+             * @param {String} msg
+             */
+            this.log = function(msg){
+                console.log(location.host + (namespace ? ":" + namespace : "") + " - " + this.getTime() + ": " + msg);
+            };
+        }
+        this.log(msg);
+    },
+    /**
+     * Will try to trace the given message either to a DOMElement with the id "log",
+     * or by using console.info.
+     * @param {String} msg The message to trace
+     */
+    trace: function(msg){
+        // Uses memoizing to cache the implementation
+        if (!domIsReady) {
+            if (this._deferred.length === 0) {
+                easyXDM.whenReady(debug.flush, debug);
+            }
+            this._deferred.push(msg);
+            this.log(msg);
+        }
+        else {
+            var el = document.getElementById("log");
+            // is there a log element present?
+            if (el) {
+                /**
+                 * Sets trace to be a function that outputs the messages to the DOMElement with id "log"
+                 * @ignore
+                 * @param {String} msg
+                 */
+                this.trace = function(msg){
+                    try {
+                        el.appendChild(document.createElement("div")).appendChild(document.createTextNode(location.host + (namespace ? ":" + namespace : "") + " - " + this.getTime() + ":" + msg));
+                        el.scrollTop = el.scrollHeight;
+                    } 
+                    catch (e) {
+                        //In case we are unloading
+                    }
+                };
+            }
+            else if (isHostObject(window, "console") && !undef(console.info)) {
+                /**
+                 * Sets trace to be a wrapper around console.info
+                 * @ignore
+                 * @param {String} msg
+                 */
+                this.trace = function(msg){
+                    console.info(location.host + (namespace ? ":" + namespace : "") + " - " + this.getTime() + ":" + msg);
+                };
+            }
+            else {
+                /**
+                 * Create log window
+                 * @ignore
+                 */
+                var domain = location.host, windowname = domain.replace(/\[-.:]/g, "") + "easyxdm_log", logWin;
+                try {
+                    logWin = window.open("", windowname, "width=800,height=200,status=0,navigation=0,scrollbars=1");
+                } 
+                catch (e) {
+                }
+                if (logWin) {
+                    var doc = logWin.document;
+                    el = doc.getElementById("log");
+                    if (!el) {
+                        doc.write("<html><head><title>easyXDM log " + domain + "</title></head>");
+                        doc.write("<body><div id=\"log\"></div></body></html>");
+                        doc.close();
+                        el = doc.getElementById("log");
+                    }
+                    this.trace = function(msg){
+                        try {
+                            el.appendChild(doc.createElement("div")).appendChild(doc.createTextNode(location.host + (namespace ? ":" + namespace : "") + " - " + this.getTime() + ":" + msg));
+                            el.scrollTop = el.scrollHeight;
+                        } 
+                        catch (e) {
+                            //In case we are unloading
+                        }
+                    };
+                    this.trace("---- new logger at " + location.href);
+                }
+                
+                if (!el) {
+                    // We are unable to use any logging
+                    this.trace = emptyFn;
+                }
+            }
+            this.trace(msg);
+        }
+    },
+    /**
+     * Creates a method usable for tracing.
+     * @param {String} name The name the messages should be marked with
+     * @return {Function} A function that accepts a single string as argument.
+     */
+    getTracer: function(name){
+        return function(msg){
+            debug.trace(name + ": " + msg);
+        };
+    }
+};
+debug.log("easyXDM present on '" + location.href);
+_trace = debug.getTracer("{Private}");
+
+
 /*
  * Export the main object and any other methods applicable
  */
@@ -810,6 +958,8 @@ function removeFromStack(element){
  * @singleton
  */
 apply(easyXDM, {
+    async: async,
+    debug: debug,
     /**
      * The version of the library
      * @type {string}
@@ -853,7 +1003,103 @@ apply(easyXDM, {
      *                    an instance of easyXDM.
      * @return An instance of easyXDM
      */
-    noConflict: noConflict
+    noConflict: noConflict,
+    /** 
+     * @class easyXDM.DomHelper
+     * Contains methods for dealing with the DOM
+     * @singleton
+     */
+    DomHelper: {
+        /**
+         * Provides a consistent interface for adding eventhandlers
+         * @param {Object} target The target to add the event to
+         * @param {String} type The name of the event
+         * @param {Function} listener The listener
+         */
+        on: on,
+        /**
+         * Provides a consistent interface for removing eventhandlers
+         * @param {Object} target The target to remove the event from
+         * @param {String} type The name of the event
+         * @param {Function} listener The listener
+         */
+        un: un,
+        /**
+         * Checks for the presence of the JSON object.
+         * If it is not present it will use the supplied path to load the JSON2 library.
+         * This should be called in the documents head right after the easyXDM script tag.
+         * http://json.org/json2.js
+         * @param {String} path A valid path to json2.js
+         */
+        requiresJSON: function(path){
+            if (!isHostObject(window, "JSON")) {
+                // #ifdef debug
+                debug.log("loading external JSON");
+                // #endif
+                // we need to encode the < in order to avoid an illegal token error
+                // when the script is inlined in a document.
+                document.write('<' + 'script type="text/javascript" src="' + path + '"><' + '/script>');
+            }
+            // #ifdef debug
+            else {
+                debug.log("native JSON found");
+            }
+            // #endif
+        }
+    },
+    
+    /**
+     * @class easyXDM.Fn
+     * This contains methods related to function handling, such as storing callbacks.
+     * @singleton
+     * @namespace easyXDM
+     */
+    Fn: (function(){
+        // The map containing the stored functions
+        var _map = {};
+        
+        return {
+            // #ifdef debug
+            _trace: debug.getTracer("easyXDM.Fn"),
+            // #endif
+            /**
+             * Stores a function using the given name for reference
+             * @param {String} name The name that the function should be referred by
+             * @param {Function} fn The function to store
+             * @namespace easyXDM.fn
+             */
+            set: function(name, fn){
+                // #ifdef debug
+                this._trace("storing function " + name);
+                // #endif
+                _map[name] = fn;
+            },
+            /**
+             * Retrieves the function referred to by the given name
+             * @param {String} name The name of the function to retrieve
+             * @param {Boolean} del If the function should be deleted after retrieval
+             * @return {Function} The stored function
+             * @namespace easyXDM.fn
+             */
+            get: function(name, del){
+                // #ifdef debug
+                this._trace("retrieving function " + name);
+                // #endif
+                var fn = _map[name];
+                // #ifdef debug
+                if (!fn) {
+                    this._trace(name + " not found");
+                }
+                // #endif
+                
+                if (del) {
+                    delete _map[name];
+                }
+                return fn;
+            }
+        };
+        
+    }())
 });
 
 // #ifdef debug

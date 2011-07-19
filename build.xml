@@ -46,9 +46,6 @@
 		<concat destfile="work/easyXDM.combined.js">	
 			<fileset dir="." includes="${project.src.dir}/begin_scope.txt" />
 			<fileset dir="." includes="${project.src.dir}/Core.js" />
-			<fileset dir="." includes="${project.src.dir}/Debug.js" />
-			<fileset dir="." includes="${project.src.dir}/DomHelper.js" />
-			<fileset dir="." includes="${project.src.dir}/Fn.js" />
 			<fileset dir="." includes="${project.src.dir}/Socket.js" />
 			<fileset dir="." includes="${project.src.dir}/Rpc.js" />
 			<fileset dir="." includes="${project.src.dir}/stack/SameOriginTransport.js" />
