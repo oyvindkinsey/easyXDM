@@ -47,7 +47,7 @@ var myBookmark = (function(){
     }
     s1 = document.createElement("script");
     s1.type = "text/javascript";
-    s1.src = REMOTE + "/../easyXDM.debug.js";
+    s1.src = REMOTE + "/../easyXDM.Debug.js";
     s1.onreadystatechange = function(){
         if (this.readyState === "complete" || this.readyState === "loaded") {
             scriptOnLoad();

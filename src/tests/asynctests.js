@@ -32,10 +32,11 @@ function runTests(){
             name: "Asynchronously load the dependencies",
             timeout: 5000,
             run: function(){
-				var scope = this;
-				var basePath = REMOTE + "/../";
+                var scope = this;
+                var basePath = REMOTE + "/../";
                 easyXDM.async(basePath, "socket", {
-                    remote: REMOTE
+                    remote: REMOTE,
+                    protocol: "0"
                 }, function(){
                     scope.notifyResult(true);
                 });
@@ -47,7 +48,11 @@ function runTests(){
                 var scope = this;
                 var messages = 0;
                 this.transport = new easyXDM.Socket({
-                    remote: REMOTE	 + "/test_async.html",
+                    remote: REMOTE + "/test_async.html",
+                    protocol: "0",
+                    swf: "../easyxdm.swf",
+                    local: "../name.html",
+                    remoteHelper: REMOTE + "/../name.html",
                     onMessage: function(message, origin){
                         if (scope.expectedMessage === message) {
                             if (++messages === 2) {

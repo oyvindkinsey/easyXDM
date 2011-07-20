@@ -129,7 +129,7 @@
  */
 easyXDM.Rpc = function(config, jsonRpcConfig){
     // #ifdef debug
-    var trace = debug.getTracer("easyXDM.Rpc");
+    var trace = easyXDM.Debug.getTracer("easyXDM.Rpc");
     trace("constructor");
     // #endif
     

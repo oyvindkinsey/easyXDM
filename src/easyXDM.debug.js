@@ -26,12 +26,9 @@
  * This just aggregates all the separate files
  */
 (function(){
-    var scripts = document.getElementsByTagName("script"), src = scripts[scripts.length - 1].src.replace("easyXDM.debug.js", "");
+    var scripts = document.getElementsByTagName("script"), src = scripts[scripts.length - 1].src.replace("easyXDM.Debug.js", "");
     
     document.write(unescape("%3Cscript src='" + src + "Core.js' type='text/javascript'%3E%3C/script%3E"));
-    document.write(unescape("%3Cscript src='" + src + "Debug.js' type='text/javascript'%3E%3C/script%3E"));
-    document.write(unescape("%3Cscript src='" + src + "DomHelper.js' type='text/javascript'%3E%3C/script%3E"));
-    document.write(unescape("%3Cscript src='" + src + "Fn.js' type='text/javascript'%3E%3C/script%3E"));
     document.write(unescape("%3Cscript src='" + src + "Socket.js' type='text/javascript'%3E%3C/script%3E"));
     document.write(unescape("%3Cscript src='" + src + "Rpc.js' type='text/javascript'%3E%3C/script%3E"));
     document.write(unescape("%3Cscript src='" + src + "stack/FlashTransport.js' type='text/javascript'%3E%3C/script%3E"));

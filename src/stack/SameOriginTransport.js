@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, un, on, apply, whenReady, getParentObject, IFRAME_PREFIX*/
+/*global easyXDM, window, escape, unescape*/
 //
 // easyXDM
 // http://easyxdm.net/
@@ -24,6 +24,10 @@
 // THE SOFTWARE.
 //
 
+// #ifdef async
+var exports = easyXDM.exports, getLocation = exports.getLocation, appendQueryParameters = exports.appendQueryParameters, createFrame = exports.createFrame, debug = easyXDM.Debug, un = easyXDM.DomHelper.un, on = easyXDM.DomHelper.on, apply = exports.apply, whenReady = easyXDM.whenReady, getParentObject = exports.getParentObject, IFRAME_PREFIX = exports.IFRAME_PREFIX;
+// #endif
+
 /**
  * @class easyXDM.stack.SameOriginTransport
  * SameOriginTransport is a transport class that can be used when both domains have the same origin.<br/>
@@ -35,7 +39,7 @@
  */
 easyXDM.stack.SameOriginTransport = function(config){
     // #ifdef debug
-    var trace = debug.getTracer("easyXDM.stack.SameOriginTransport");
+    var trace = easyXDM.Debug.getTracer("easyXDM.stack.SameOriginTransport");
     trace("constructor");
     // #endif
     var pub, frame, send, targetOrigin;

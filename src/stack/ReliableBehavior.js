@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, debug */
+/*global easyXDM, window, escape, unescape */
 //
 // easyXDM
 // http://easyxdm.net/
@@ -24,6 +24,10 @@
 // THE SOFTWARE.
 //
 
+// #ifdef async
+var namespace = "";
+// #endif
+
 /**
  * @class easyXDM.stack.ReliableBehavior
  * This is a behavior that tries to make the underlying transport reliable by using acknowledgements.
@@ -33,7 +37,7 @@
  */
 easyXDM.stack.ReliableBehavior = function(config){
     // #ifdef debug
-    var trace = debug.getTracer("easyXDM.stack.ReliableBehavior");
+    var trace = easyXDM.Debug.getTracer("easyXDM.stack.ReliableBehavior");
     trace("constructor");
     // #endif
     var pub, // the public interface

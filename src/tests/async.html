@@ -4,12 +4,25 @@
         <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=100">
         <title>easyTest results</title>
-        <script type="text/javascript" src="../easyXDM.debug.js">
+        <script type="text/javascript" src="../easyXDM.async.debug.js">
+            // The first instance of easyXDM
+        </script>
+        <script type="text/javascript">
+            if (location.href.indexOf("src") !== -1) {
+                if (typeof JSON === "undefined") {
+                    document.write(unescape("%3Cscript src='../../tools/json2.js' type='text/javascript'%3E%3C/script%3E"));
+                }
+            }
+            else {
+                if (typeof JSON === "undefined") {
+                    document.write(unescape("%3Cscript src='../json2.js' type='text/javascript'%3E%3C/script%3E"));
+                }
+            }
         </script>
         <script type="text/javascript" src="easyTest.js">
         </script>
         <link type="text/css" rel="stylesheet" href="easyTest.css"/>
-        <script type="text/javascript" src="asynctests.js">
+        <script type="text/javascript" src="tests.js">
         </script>
         <style type="text/css">
             
@@ -33,8 +46,22 @@
                 overflow: auto;
             }
         </style>
+        <script type="text/javascript">
+            function runAsyncTests(){
+                // delay the call to runTests untill all files has been loaded async
+                var base = "../", list = ["stack/QueueBehavior.debug.js", "stack/RpcBehavior.debug.js", "stack/HashTransport.debug.js", "stack/ReliableBehavior.debug.js", "stack/VerifyBehavior.debug.js", "stack/PostMessageTransport.debug.js", "stack/NameTransport.debug.js", "stack/SameOriginTransport.debug.js", "stack/FrameElementTransport.debug.js", "stack/FlashTransport.debug.js", "Socket.debug.js", "Rpc.debug.js"];
+                var loaded = 0, i = list.length;
+                while (i--) {
+                    easyXDM.loadScript(base + list[i], function(url){
+                        if (++loaded == list.length) {
+                            runTests();
+                        }
+                    });
+                }
+            }
+        </script>
     </head>
-    <body onload="runTests();">
+    <body onload="runAsyncTests();">
         <h1>easyXDM test suite</h1>
         <h4>easyTest messages</h4>
         <div id="messages">
@@ -45,5 +72,22 @@
         </div>
         <div id="embedded">
         </div>
+        <script type="text/javascript">
+            if (location.host.indexOf("easyxdm.net") !== -1) {
+                var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+                document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+            }
+        </script>
+        <script type="text/javascript">
+            if (location.host.indexOf("easyxdm.net") !== -1) {
+                try {
+                    var pageTracker = _gat._getTracker("UA-9535591-3");
+                    pageTracker._setDomainName(".easyxdm.net");
+                    pageTracker._trackPageview();
+                } 
+                catch (err) {
+                }
+            }
+        </script>
     </body>
 </html>

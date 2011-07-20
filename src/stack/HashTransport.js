@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, getLocation, createFrame, debug, un, on, apply, whenReady, IFRAME_PREFIX*/
+/*global easyXDM, window, escape, unescape*/
 //
 // easyXDM
 // http://easyxdm.net/
@@ -24,6 +24,12 @@
 // THE SOFTWARE.
 //
 
+// #ifdef async
+var namespace = "";
+var exports = easyXDM.exports, getLocation = exports.getLocation, createFrame = exports.createFrame, debug = easyXDM.Debug, apply = exports.apply, whenReady = easyXDM.whenReady, IFRAME_PREFIX = exports.IFRAME_PREFIX, on = easyXDM.DomHelper.on, un = easyXDM.DomHelper.un;
+// #endif
+
+
 /**
  * @class easyXDM.stack.HashTransport
  * HashTransport is a transport class that uses the IFrame URL Technique for communication.<br/>
@@ -37,7 +43,7 @@
  */
 easyXDM.stack.HashTransport = function(config){
     // #ifdef debug
-    var trace = debug.getTracer("easyXDM.stack.HashTransport");
+    var trace = easyXDM.Debug.getTracer("easyXDM.stack.HashTransport");
     trace("constructor");
     // #endif    
     var pub;

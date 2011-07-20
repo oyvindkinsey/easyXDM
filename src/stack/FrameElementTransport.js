@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, apply, query, whenReady, IFRAME_PREFIX*/
+/*global easyXDM, window, escape, unescape*/
 //
 // easyXDM
 // http://easyxdm.net/
@@ -23,6 +23,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+// #ifdef async
+var namespace = "";
+var exports = easyXDM.exports, getLocation = exports.getLocation, appendQueryParameters = exports.appendQueryParameters, createFrame = exports.createFrame, debug = easyXDM.Debug, apply = exports.apply, query = easyXDM.query, whenReady = easyXDM.whenReady, IFRAME_PREFIX = exports.IFRAME_PREFIX;
+// #endif
 
 /**
  * @class easyXDM.stack.FrameElementTransport
@@ -35,7 +39,7 @@
  */
 easyXDM.stack.FrameElementTransport = function(config){
     // #ifdef debug
-    var trace = debug.getTracer("easyXDM.stack.FrameElementTransport");
+    var trace = easyXDM.Debug.getTracer("easyXDM.stack.FrameElementTransport");
     trace("constructor");
     // #endif
     var pub, frame, send, targetOrigin;

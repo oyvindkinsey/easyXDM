@@ -971,6 +971,7 @@ var debug = {
 debug.log("easyXDM present on '" + location.href);
 _trace = debug.getTracer("{Private}");
 
+// #ifdef async
 var loaded = {};
 function loadScript(url, fn){
     if (loaded[url]) {
@@ -981,18 +982,18 @@ function loadScript(url, fn){
     var script = document.createElement("script");
     script.type = "text/javascript";
     script.src = url;
-    function onLoad(){
+    script.onload = function(){
         loaded[url] = true;
         script.parentNode.removeChild(script);
         fn(url);
-    }
-    script.onload = onLoad;
+        this.onload = emptyFn;
+    };
     script.onreadystatechange = function(){
         if (/^loaded|complete$/.test(script.readyState)) {
-            onLoad();
+            this.onload();
         }
     };
-    document.head.appendChild(script);
+    document.getElementsByTagName("head")[0].appendChild(script);
 }
 
 function loadScripts(base, stage, list, fn){
@@ -1010,12 +1011,19 @@ function async(base, target, config, fn, stage){
     stage = stage || ".debug";
     whenReady(function(){
         resolve(config, function(protocol, list){
-            list.push((target == "rpc" ? "rpc" : "socket"));
+            if (target == "rpc") {
+                list.push("stack/RpcBehavior");
+                list.push("rpc");
+            }
+            else {
+                list.push("socket");
+            }
             loadScripts(base, stage, list, fn);
         });
     });
 }
 
+// #endif
 
 /*
  * Export the main object and any other methods applicable
@@ -1027,8 +1035,29 @@ function async(base, target, config, fn, stage){
  * @singleton
  */
 apply(easyXDM, {
+    // #ifdef async
     async: async,
-    debug: debug,
+    loadScript: loadScript,
+    exports: {
+        appendQueryParameters: appendQueryParameters,
+        createFrame: createFrame,
+        apply: apply,
+        getParentObject: getParentObject,
+        IFRAME_PREFIX: IFRAME_PREFIX,
+        prepareTransportStack: prepareTransportStack,
+        chainStack: chainStack,
+        removeFromStack: removeFromStack,
+        getLocation: getLocation,
+        getDomainName: getDomainName,
+        resolveUrl: resolveUrl,
+        getPort: getPort,
+        undef: undef,
+        global: global,
+        emptyFn: emptyFn,
+        isArray: isArray
+    },
+    // #endif
+    Debug: debug,
     /**
      * The version of the library
      * @type {string}

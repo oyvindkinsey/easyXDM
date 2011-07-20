@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, chainStack, prepareTransportStack, getLocation, debug */
+/*global easyXDM, window, escape, unescape*/
 //
 // easyXDM
 // http://easyxdm.net/
@@ -24,6 +24,11 @@
 // THE SOFTWARE.
 //
 
+
+// #ifdef async
+var exports = easyXDM.exports, prepareTransportStack = exports.prepareTransportStack, chainStack = exports.chainStack, 
+getLocation = exports.getLocation;
+// #endif
 /**
  * @class easyXDM.Socket
  * This class creates a transport channel between two domains that is usable for sending and receiving string-based messages.<br/>
@@ -79,7 +84,7 @@
  */
 easyXDM.Socket = function(config){
     // #ifdef debug
-    var trace = debug.getTracer("easyXDM.Socket");
+    var trace = easyXDM.Debug.getTracer("easyXDM.Socket");
     trace("constructor");
     // #endif
     

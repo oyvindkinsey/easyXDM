@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global global, easyXDM, window, getLocation, appendQueryParameters, createFrame, debug, apply, whenReady, IFRAME_PREFIX, namespace, resolveUrl, getDomainName, HAS_FLASH_THROTTLED_BUG, getPort, query*/
+/*global easyXDM, window*/
 //
 // easyXDM
 // http://easyxdm.net/
@@ -24,6 +24,10 @@
 // THE SOFTWARE.
 //
 
+// #ifdef async
+var namespace = "";
+var exports = easyXDM.exports,global = exports.global, getLocation = exports.getLocation, appendQueryParameters = exports.appendQueryParameters, createFrame = exports.createFrame, debug = easyXDM.Debug, apply = exports.apply, whenReady = easyXDM.whenReady, IFRAME_PREFIX = exports.IFRAME_PREFIX, HAS_FLASH_THROTTLED_BUG = exports.HAS_FLASH_THROTTLED_BUG, getDomainName = exports.getDomainName, getPort = exports.getPort, resolveUrl = exports.resolveUrl;
+// #endif
 /**
  * @class easyXDM.stack.FlashTransport
  * FlashTransport is a transport class that uses an SWF with LocalConnection to pass messages back and forth.
@@ -38,7 +42,7 @@
  */
 easyXDM.stack.FlashTransport = function(config){
     // #ifdef debug
-    var trace = debug.getTracer("easyXDM.stack.FlashTransport");
+    var trace = easyXDM.Debug.getTracer("easyXDM.stack.FlashTransport");
     trace("constructor");
     if (!config.swf) {
         throw new Error("Path to easyxdm.swf is missing");

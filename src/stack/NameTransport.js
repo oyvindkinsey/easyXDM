@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, undef, getLocation, appendQueryParameters, resolveUrl, createFrame, debug, un, apply, whenReady, IFRAME_PREFIX*/
+/*global easyXDM, window, escape, unescape*/
 //
 // easyXDM
 // http://easyxdm.net/
@@ -24,6 +24,11 @@
 // THE SOFTWARE.
 //
 
+// #ifdef async
+var namespace = "";
+var exports = easyXDM.exports, getLocation = exports.getLocation, appendQueryParameters = exports.appendQueryParameters, createFrame = exports.createFrame, debug = easyXDM.Debug, apply = exports.apply, whenReady = easyXDM.whenReady, IFRAME_PREFIX = exports.IFRAME_PREFIX, resolveUrl = exports.resolveUrl, un = easyXDM.DomHelper.un, undef = exports.undef;
+// #endif
+
 /**
  * @class easyXDM.stack.NameTransport
  * NameTransport uses the window.name property to relay data.
@@ -36,7 +41,7 @@
  */
 easyXDM.stack.NameTransport = function(config){
     // #ifdef debug
-    var trace = debug.getTracer("easyXDM.stack.NameTransport");
+    var trace = easyXDM.Debug.getTracer("easyXDM.stack.NameTransport");
     trace("constructor");
     if (config.isHost && undef(config.remoteHelper)) {
         trace("missing remoteHelper");

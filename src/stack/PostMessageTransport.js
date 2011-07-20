@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, un, on, apply, whenReady, IFRAME_PREFIX*/
+/*global easyXDM, window, escape, unescape*/
 //
 // easyXDM
 // http://easyxdm.net/
@@ -24,6 +24,11 @@
 // THE SOFTWARE.
 //
 
+// #ifdef async
+var namespace = "";
+var exports = easyXDM.exports, getLocation = exports.getLocation, appendQueryParameters = exports.appendQueryParameters, createFrame = exports.createFrame, debug = easyXDM.Debug, apply = exports.apply, whenReady = easyXDM.whenReady, IFRAME_PREFIX = exports.IFRAME_PREFIX, on = easyXDM.DomHelper.on, un = easyXDM.DomHelper.un;
+// #endif
+
 /**
  * @class easyXDM.stack.PostMessageTransport
  * PostMessageTransport is a transport class that uses HTML5 postMessage for communication.<br/>
@@ -36,7 +41,7 @@
  */
 easyXDM.stack.PostMessageTransport = function(config){
     // #ifdef debug
-    var trace = debug.getTracer("easyXDM.stack.PostMessageTransport");
+    var trace = easyXDM.Debug.getTracer("easyXDM.stack.PostMessageTransport");
     trace("constructor");
     // #endif
     var pub, // the public interface
@@ -107,7 +112,7 @@ easyXDM.stack.PostMessageTransport = function(config){
             targetOrigin = getLocation(config.remote);
             if (config.isHost) {
                 // add the event handler for listening
-                var waitForReady = function(event){  
+                var waitForReady = function(event){
                     if (event.data == config.channel + "-ready") {
                         // #ifdef debug
                         trace("firing onReady");

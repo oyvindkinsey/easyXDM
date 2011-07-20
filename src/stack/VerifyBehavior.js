@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, undef, debug */
+/*global easyXDM, window, escape, unescape */
 //
 // easyXDM
 // http://easyxdm.net/
@@ -24,6 +24,11 @@
 // THE SOFTWARE.
 //
 
+// #ifdef async
+var namespace = "";
+var exports = easyXDM.exports, undef = exports.undef;
+// #endif
+
 /**
  * @class easyXDM.stack.VerifyBehavior
  * This behavior will verify that communication with the remote end is possible, and will also sign all outgoing,
@@ -35,7 +40,7 @@
  */
 easyXDM.stack.VerifyBehavior = function(config){
     // #ifdef debug
-    var trace = debug.getTracer("easyXDM.stack.VerifyBehavior");
+    var trace = easyXDM.Debug.getTracer("easyXDM.stack.VerifyBehavior");
     trace("constructor");
     if (undef(config.initiate)) {
         throw new Error("settings.initiate is not set");

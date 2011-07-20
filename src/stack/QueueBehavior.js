@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, debug, undef, removeFromStack*/
+/*global easyXDM, window, escape, unescape*/
 //
 // easyXDM
 // http://easyxdm.net/
@@ -24,6 +24,10 @@
 // THE SOFTWARE.
 //
 
+// #ifdef async
+var exports = easyXDM.exports, removeFromStack = exports.removeFromStack, undef = exports.undef;
+// #endif
+
 /**
  * @class easyXDM.stack.QueueBehavior
  * This is a behavior that enables queueing of messages. <br/>
@@ -37,7 +41,7 @@
  */
 easyXDM.stack.QueueBehavior = function(config){
     // #ifdef debug
-    var trace = debug.getTracer("easyXDM.stack.QueueBehavior");
+    var trace = easyXDM.Debug.getTracer("easyXDM.stack.QueueBehavior");
     trace("constructor");
     // #endif
     var pub, queue = [], waiting = true, incoming = "", destroying, maxLength = 0, lazy = false, doFragment = false;

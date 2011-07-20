@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, undef, getJSON, debug, emptyFn, isArray */
+/*global easyXDM, window, escape, unescape */
 //
 // easyXDM
 // http://easyxdm.net/
@@ -24,6 +24,11 @@
 // THE SOFTWARE.
 //
 
+// #ifdef async
+var namespace = "";
+var exports = easyXDM.exports, undef = exports.undef, getJSON = easyXDM.getJSONObject, emptyFn= exports.emptyFn, isArray = exports.isArray;
+// #endif
+
 /**
  * @class easyXDM.stack.RpcBehavior
  * This uses JSON-RPC 2.0 to expose local methods and to invoke remote methods and have responses returned over the the string based transport stack.<br/>
@@ -38,7 +43,7 @@
  */
 easyXDM.stack.RpcBehavior = function(proxy, config){
     // #ifdef debug
-    var trace = debug.getTracer("easyXDM.stack.RpcBehavior");
+    var trace = easyXDM.Debug.getTracer("easyXDM.stack.RpcBehavior");
     // #endif
     var pub, serializer = config.serializer || getJSON();
     var _callbackCounter = 0, _callbacks = {};
