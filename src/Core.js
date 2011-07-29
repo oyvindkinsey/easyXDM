@@ -584,9 +584,9 @@ function prepareTransportStack(config){
         // #ifdef debug
         _trace("using parameters from query");
         // #endif
-        config.channel = query.xdm_c;
+        config.channel = query.xdm_c.replace(/["'<>\\]/g,"");
         config.secret = query.xdm_s;
-        config.remote = query.xdm_e;
+        config.remote = query.xdm_e.replace(/["'<>\\]/g,"");;
         protocol = query.xdm_p;
         if (config.acl && !checkAcl(config.acl, config.remote)) {
             throw new Error("Access denied for " + config.remote);
