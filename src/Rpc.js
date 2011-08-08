@@ -148,9 +148,11 @@ easyXDM.Rpc = function(config, jsonRpcConfig){
     }
 	
     // create the stack
+    var scope = this;
     var stack = chainStack(prepareTransportStack(config).concat([new easyXDM.stack.RpcBehavior(this, jsonRpcConfig), {
         callback: function(success){
             if (config.onReady) {
+		scope.success = success;
                 config.onReady(success);
             }
         }
