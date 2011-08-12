@@ -13,6 +13,10 @@
                     iframe.frameBorder = 0;
                     document.body.appendChild(iframe);
                     iframe.src = easyXDM.query.url;
+                    iframe.onload = function(){
+                        var d = iframe.contentWindow.document;
+                        socket.postMessage(d.body.clientHeight || d.body.offsetHeight || d.body.scrollHeight);
+                    };
                 },
                 onMessage: function(url, origin){
                     iframe.src = url;
