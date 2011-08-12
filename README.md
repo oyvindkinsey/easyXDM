@@ -45,24 +45,31 @@ The easyXDM.Socket
 
 To set up a simple Socket this is what you will need to add to the *consumer*
 
+```javascript
+
     var socket = new easyXDM.Socket({
         remote: "http://path.to/provider/", // the path to the provider
         onMessage:function(message, origin) {
             //do something with message
         }
     });
+```
 
 And this is what's needed for the *provider*
 
+```javascript
     var socket = new easyXDM.Socket({
         onMessage:function(message, origin) {
             //do something with message
         }
     });
+```
 
 Use this for sending the strings to the other end:
 
+```javascript
     socket.postMessage("hello world");
+```
 
 In addition the following config properties can be set for both consumer and provider
 
@@ -86,7 +93,9 @@ These properties can be set only on the provider
 
 A socket can be teared down (iframe removed etc) using 
 
+```javascript
     socket.destroy();
+```
 
 The easyXDM.Rpc
 ---------------
@@ -96,6 +105,7 @@ The Rpc uses the same transport stack as the Socket, and so **uses the same conf
 
 To set up a simple Rpc this is what you will need to add to the *consumer*
 
+```javascript
     var rpc = new easyXDM.Rpc({
         remote: "http://path.to/provider/" // the path to the provider
     }, 
@@ -114,17 +124,21 @@ To set up a simple Rpc this is what you will need to add to the *consumer*
             }
         }
     });
+```
 
 Call the methods like this 
 
+```javascript
     rpc.helloWorld(1,2,3, function(response){
         // here we can do something with the return value from `helloWorld`
     }, function(errorObj){
         // here we can react to a possible error
     };
+```
 
 And this is what's needed for the *provider*
 
+```javascript
     var rpc = new easyXDM.Rpc({},
     {
         local: {
@@ -142,11 +156,14 @@ And this is what's needed for the *provider*
             }
         }
     });
+```
 
 Call the methods like this 
 
+```javascript
     rpc.helloWorld(); // easyXDM automatically changes it's behavior depending on the presence of callback methods for `success` and for `error`. 
-    
+```
+
 The Rpc configurations `local` and `remote` properties can be left out if empty. Both properties can have multiple methods defined.
 
 When calling the stubs you can provide up to two callback functions after the expected arguments, the first one being the method that will receive the callback in case of a success, and the next the method that will receive the callback in case of an error.
@@ -165,15 +182,19 @@ In order for easyXDM.Rpc to use JSON-RPC it needs access to functioning encode/d
 
 If you want to conditionally include Douglas Crockfords JSON2 library (or any other that will provide window.JSON) then you can add this directly after the script that includes easyXDM
 
+```html
     <script type="text/javascript">
         easyXDM.DomHelper.requiresJSON("http://path/to/json2.js");
     </script>
+```
 
 This will only include it if not natively supported.
 
 An rpc object can be teared down (iframe removed etc) using 
 
+```javascript
     rpc.destroy();
+```
 
 The shipped /cors/ interface
 -----
@@ -199,6 +220,7 @@ If the request fail the error handler will be passed an object with the followin
 
 This is how you can use it:
 
+```javascript
     var rpc = new easyXDM.Rpc({
 		remote: "http://foo.bar/cors/"
 	},
@@ -215,6 +237,7 @@ This is how you can use it:
 	}, function(response){
 		alert(response.data);
 	});
+```
 
 easyXDM.noConflict
 -----
@@ -227,11 +250,13 @@ It also takes a single argument, a string representation of the namespace. We ne
 
 Example:
 
+```javascript
 	// Let's assume we already have an instance of easyXDM on the page, but
 	// we need to load another one and put it under PROJECT.easyXDM. Here is
 	// how you do it.
 	var PROJECT = { easyXDM: easyXDM.noConflict("PROJECT") };
-	
+```
+
 For more information
 -----
 
