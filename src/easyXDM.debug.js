@@ -1,4 +1,4 @@
-/*jslint evil: true */
+﻿/*jslint evil: true */
 /**
  * easyXDM
  * http://easyxdm.net/
