@@ -82,6 +82,9 @@
                         timeout: 10 * 1000
                     }, true);
                     
+                    // set the CORS request header
+                    config.headers.Origin = remote.origin;
+                    
                     var isPOST = config.method == "POST";
                     
                     // convert the data into a format we can send to the server 
