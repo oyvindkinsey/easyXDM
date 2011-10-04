@@ -1,4 +1,4 @@
-﻿/*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
+/*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
 /*global JSON, XMLHttpRequest, window, escape, unescape, ActiveXObject */
 //
 // easyXDM

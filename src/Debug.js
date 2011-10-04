@@ -1,4 +1,4 @@
-﻿/*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
+/*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
 /*global console, _FirebugCommandLine,  easyXDM, window, escape, unescape, isHostObject, undef, _trace, domIsReady, emptyFn, namespace */
 //
 // easyXDM

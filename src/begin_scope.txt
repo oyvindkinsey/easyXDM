@@ -1,1 +1,1 @@
-﻿(function (window, document, location, setTimeout, decodeURIComponent, encodeURIComponent) {
+(function (window, document, location, setTimeout, decodeURIComponent, encodeURIComponent) {

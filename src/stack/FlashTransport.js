@@ -1,4 +1,4 @@
-﻿/*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
+/*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
 /*global global, easyXDM, window, getLocation, appendQueryParameters, createFrame, debug, apply, whenReady, IFRAME_PREFIX, namespace, resolveUrl, getDomainName, HAS_FLASH_THROTTLED_BUG, getPort, query*/
 //
 // easyXDM

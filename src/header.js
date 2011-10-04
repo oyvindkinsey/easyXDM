@@ -1,4 +1,4 @@
-﻿/**
+/**
  * easyXDM
  * http://easyxdm.net/
  * Copyright(c) 2009-2011, Øyvind Sean Kinsey, oyvind@kinsey.no.

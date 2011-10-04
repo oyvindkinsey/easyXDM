@@ -1,4 +1,4 @@
-﻿/*jslint browser: true, immed: true, passfail: true, undef: true, newcap: true*/
+/*jslint browser: true, immed: true, passfail: true, undef: true, newcap: true*/
 /*global easyXDM, window */
 /**
  * easyXDM

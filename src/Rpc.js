@@ -1,4 +1,4 @@
-﻿/*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
+/*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
 /*global easyXDM, window, escape, unescape, undef,, chainStack, prepareTransportStack, debug, getLocation */
 //
 // easyXDM
