@@ -64,16 +64,31 @@ function isArray(o){
 
 // end
 function hasFlash(){
-    try {
-        var activeX = new ActiveXObject("ShockwaveFlash.ShockwaveFlash");
-        flashVersion = Array.prototype.slice.call(activeX.GetVariable("$version").match(/(\d+),(\d+),(\d+),(\d+)/), 1);
-        HAS_FLASH_THROTTLED_BUG = parseInt(flashVersion[0], 10) > 9 && parseInt(flashVersion[1], 10) > 0;
-        activeX = null;
-        return true;
-    } 
-    catch (notSupportedException) {
+    var name = "Shockwave Flash", mimeType = "application/x-shockwave-flash";
+    
+    if (!undef(navigator.plugins) && typeof navigator.plugins[name] == "object") {
+        // adapted from the swfobject code
+        var description = navigator.plugins[name].description;
+        if (description && !undef(navigator.mimeTypes) && navigator.mimeTypes[mimeType] && navigator.mimeTypes[mimeType].enabledPlugin) {
+            flashVersion = description.match(/\d+/g);
+        }
+    }
+    if (!flashVersion) {
+        var flash;
+        try {
+            flash = new ActiveXObject("ShockwaveFlash.ShockwaveFlash");
+            flashVersion = Array.prototype.slice.call(flash.GetVariable("$version").match(/(\d+),(\d+),(\d+),(\d+)/), 1);
+            flash = null;
+        } 
+        catch (notSupportedException) {
+        }
+    }
+    if (!flashVersion) {
         return false;
     }
+    var major = parseInt(flashVersion[0], 10), minor = parseInt(flashVersion[1], 10);
+    HAS_FLASH_THROTTLED_BUG = major > 9 && minor > 0;
+    return true;
 }
 
 /*
@@ -163,7 +178,7 @@ if (!domIsReady) {
                 // http://javascript.nwbox.com/IEContentLoaded/
                 try {
                     document.documentElement.doScroll("left");
-                }
+                } 
                 catch (e) {
                     setTimeout(doScrollCheck, 1);
                     return;
@@ -584,9 +599,10 @@ function prepareTransportStack(config){
         // #ifdef debug
         _trace("using parameters from query");
         // #endif
-        config.channel = query.xdm_c.replace(/["'<>\\]/g,"");
+        config.channel = query.xdm_c.replace(/["'<>\\]/g, "");
         config.secret = query.xdm_s;
-        config.remote = query.xdm_e.replace(/["'<>\\]/g,"");;
+        config.remote = query.xdm_e.replace(/["'<>\\]/g, "");
+        ;
         protocol = query.xdm_p;
         if (config.acl && !checkAcl(config.acl, config.remote)) {
             throw new Error("Access denied for " + config.remote);
