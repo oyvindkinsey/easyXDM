@@ -527,7 +527,9 @@ function createFrame(config){
         // This needs to be hidden like this, simply setting display:none and the like will cause failures in some browsers.
         apply(frame.style, {
             position: "absolute",
-            top: "-2000px"
+            top: "-2000px",
+            // Avoid potential horizontal scrollbar
+            left: "0px"
         });
         config.container = document.body;
     }
