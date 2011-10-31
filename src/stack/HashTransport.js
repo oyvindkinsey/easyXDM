@@ -112,10 +112,10 @@ easyXDM.stack.HashTransport = function(config){
             useParent = config.useParent;
             _remoteOrigin = getLocation(config.remote);
             if (isHost) {
-                config.props = {
+                apply(config.props, {
                     src: config.remote,
                     name: IFRAME_PREFIX + config.channel + "_provider"
-                };
+                });
                 if (useParent) {
                     config.onLoad = function(){
                         _listenerWindow = window;
