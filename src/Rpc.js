@@ -133,20 +133,6 @@ easyXDM.Rpc = function(config, jsonRpcConfig){
     trace("constructor");
     // #endif
     
-    // expand shorthand notation
-    if (jsonRpcConfig.local) {
-        for (var method in jsonRpcConfig.local) {
-            if (jsonRpcConfig.local.hasOwnProperty(method)) {
-                var member = jsonRpcConfig.local[method];
-                if (typeof member === "function") {
-                    jsonRpcConfig.local[method] = {
-                        method: member
-                    };
-                }
-            }
-        }
-    }
-	
     // create the stack
     var stack = chainStack(prepareTransportStack(config).concat([new easyXDM.stack.RpcBehavior(this, jsonRpcConfig), {
         callback: function(success){

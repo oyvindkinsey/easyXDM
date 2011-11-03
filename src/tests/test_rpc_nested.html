@@ -24,32 +24,13 @@
                 local: "../name.html",
                 swf: "../easyxdm.swf"
             }, {
-                remote: {
-                    voidCallback: true 
-                },
                 local: {
-                    voidMethod: function(msg){
-                        // Echo back the message
-                        remote.voidCallback(msg);
-                    },
-                    asyncMethod: function(msg, fn){
-                        window.setTimeout(function(){
+		    nested: {
+			func: function(msg){
                             // Echo back the msg
-                            fn(msg);
-                        }, 100);
-                    },
-                    // use the shorthand notation
-                    method: function(msg){
-                        // Echo back the msg
-                        return msg;
-                    },
-                    error: function(){
-                        var a, b = a.c;
-                    },
-                    namedParamsMethod: function(params){
-                        return params.msg;
+                            return msg;
+                        }
                     }
-                    
                 }
             });
             window.onunload = function(){

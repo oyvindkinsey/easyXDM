@@ -41,7 +41,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
     var trace = debug.getTracer("easyXDM.stack.RpcBehavior");
     // #endif
     var pub, serializer = config.serializer || getJSON();
-    var _callbackCounter = 0, _callbacks = {};
+    var _callbackCounter = 0, _callbacks = {}, _functions = {};
     
     /**
      * Serializes and sends the message
@@ -166,7 +166,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
             params = [params];
         }
         try {
-            var result = fn.method.apply(fn.scope, params.concat([success, error]));
+            var result = fn.apply(fn.scope, params.concat([success, error]));
             if (!undef(result)) {
                 success(result);
             }
@@ -188,7 +188,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                     config.handle(data, _send);
                 }
                 else {
-                    _executeMethod(data.method, data.id, config.local[data.method], data.params);
+                    _executeMethod(data.method, data.id, _functions[data.method], data.params);
                 }
             }
             else {
@@ -217,17 +217,52 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
             // #ifdef debug
             trace("init");
             // #endif
+	    function iterate_remote(obj, proxy, prefix){
+                for (var method in obj) {
+                    if (obj.hasOwnProperty(method)) {
+                        if (typeof obj[method] == "object" && !("__config" in obj[method])) {
+                            // #ifdef debug
+                            trace("creating nested stubs");
+                            // #endif
+                            proxy[method] = {};
+                            iterate_remote(obj[method], proxy[method], prefix + method + ".");
+                        }else{
+                            proxy[method] = _createMethod(obj[method], prefix + method);
+                        }
+                    }
+                }
+            }
+ 
+            function iterate_local(obj, prefix){
+                for (var method in obj) {
+                    if (obj.hasOwnProperty(method)) {
+                        if (typeof obj[method] == "function") {
+                            // #ifdef debug 
+                            trace("found method " + prefix +  method); 
+                            // #endif 
+                            _functions[prefix + method] = obj[method];
+                        }
+                        else {
+                            trace("iterating over " + method);
+                            iterate_local(obj[method], prefix + method + ".");
+                        }
+                    }
+                }
+            }
+		
             if (config.remote) {
                 // #ifdef debug
                 trace("creating stubs");
                 // #endif
                 // Implement the remote sides exposed methods
-                for (var method in config.remote) {
-                    if (config.remote.hasOwnProperty(method)) {
-                        proxy[method] = _createMethod(config.remote[method], method);
-                    }
-                }
+		iterate_remote(config.remote, proxy, "");
             }
+	    if (config.local) {
+                // #ifdef debug
+                trace("parsing method declarations");
+                // #endif
+                iterate_local(config.local, "");
+	    }
             pub.down.init();
         },
         destroy: function(){

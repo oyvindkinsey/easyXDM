@@ -775,20 +775,19 @@ function runTests(){
                     }
                 }, {
                     remote: {
-                        voidMethod: {},
-                        asyncMethod: {},
-                        method: {},
-                        error: {},
-                        nonexistent: {},
+                        voidMethod: true,
+                        asyncMethod: true,
+                        method: true,
+                        error: true,
+                        nonexistent: true,
                         namedParamsMethod: {
+                            __config: true,
                             namedParams: true
                         }
                     },
                     local: {
-                        voidCallback: {
-                            method: function(message){
-                                scope.notifyResult((scope.expectedMessage === message));
-                            }
+                        voidCallback: function(message){
+                            scope.notifyResult((scope.expectedMessage === message));
                         }
                     }
                 });
@@ -851,5 +850,48 @@ function runTests(){
                 });
             }
         }]
+    }, {
+        name: "test easyXDM.Rpc with nested objects",
+        setUp: function(){
+            this.expectedMessage = ++i + "_abcd1234%@¤/";
+        },
+        tearDown: function(){
+            this.remote.destroy();
+            if (document.getElementsByTagName("iframe").length !== 0) {
+                throw new Error("iframe still present");
+            }
+        },
+        steps: [{
+            name: "onReady is fired",
+            timeout: 5000,
+            run: function(){
+                var scope = this;
+                this.remote = new easyXDM.Rpc({
+                    local: "../name.html",
+                    swf: REMOTE + "/../easyxdm.swf",
+                    remote: REMOTE + "/test_rpc_nested.html",
+                    remoteHelper: REMOTE + "/../name.html",
+                    container: document.getElementById("embedded"),
+                    onReady: function(){
+                        scope.notifyResult(true);
+                    }
+                }, {
+                    remote: {
+                        nested: {			    
+                       	     func: true
+                        }
+                    }
+                });
+            }
+        }, {
+            name: "nested method",
+            timeout: 5000,
+            run: function(){
+                var scope = this;
+                this.remote.nested.func(this.expectedMessage, function(message){
+                    scope.notifyResult((scope.expectedMessage === message));
+                });
+            }
+	}]
     }]);
 }
