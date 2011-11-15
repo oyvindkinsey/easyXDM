@@ -534,11 +534,13 @@ function createFrame(config){
         config.container = document.body;
     }
     
-    // HACK for some reason, IE needs the source set
-    // after the frame has been appended into the DOM
-    // so remove the src, and set it afterwards
+    // HACK: IE cannot have the src attribute set when the frame is appended
+    //       into the container, so we set it to "javascript:false" as a
+    //       placeholder for now.  If we left the src undefined, it would
+    //       instead default to "about:blank", which causes SSL mixed-content
+    //       warnings in IE6 when on an SSL parent page.
     var src = config.props.src;
-    delete config.props.src;
+    config.props.src = "javascript:false";
     
     // transfer properties to the frame
     apply(frame, config.props);
@@ -547,7 +549,8 @@ function createFrame(config){
     frame.allowTransparency = true;
     config.container.appendChild(frame);
     
-    // HACK see above
+    // set the frame URL to the proper value (we previously set it to
+    // "javascript:false" to work around the IE issue mentioned above)
     frame.src = src;
     config.props.src = src;
     
