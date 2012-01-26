@@ -83,7 +83,10 @@
                     }, true);
                     
                     // set the CORS request header
-                    config.headers.Origin = remote.origin;
+                    // only if there is no XHR2 features
+                    if (!XMLHttpRequest || !('withCredentials' in (new XMLHttpRequest))) {
+                        config.headers.Origin = remote.origin;
+                    }
                     
                     var isPOST = config.method == "POST";
                     
