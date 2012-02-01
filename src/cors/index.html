@@ -113,9 +113,9 @@
                     // set a timeout
                     var timeout;
                     timeout = setTimeout(function(){
-                        req.abort();
                         // reset the handler
                         req.onreadystatechange = Function.prototype;
+                        req.abort();
                         req = null;
                         error({
                             message: "timeout after " + config.timeout + " second",
