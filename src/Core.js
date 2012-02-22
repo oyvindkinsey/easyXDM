@@ -500,32 +500,19 @@ function createFrame(config){
     if (undef(HAS_NAME_PROPERTY_BUG)) {
         testForNamePropertyBug();
     }
-    var frame,form;
+    var frame;
     // This is to work around the problems in IE6/7 with setting the name property. 
     // Internally this is set as 'submitName' instead when using 'iframe.name = ...'
     // This is not required by easyXDM itself, but is to facilitate other use cases 
     if (HAS_NAME_PROPERTY_BUG) {
         frame = document.createElement("<iframe name=\"" + config.props.name + "\"/>");
-        if('postToIframe' in config.props && config.props.postToIframe) {
-	    form = document.createElement("<form name=\"" + config.props.name + "_form\" />");
-	}
     }
     else {
         frame = document.createElement("IFRAME");
         frame.name = config.props.name;
-    	if('postToIframe' in config.props && config.props.postToIframe) {
-    	    form = document.createElement("FORM");
-    	    form.name = config.props.name+'_form';
-    	}
     }
     
     frame.id = frame.name = config.props.name;
-    if(form)
-    {
-	form.id = config.props.name+'_form';
-	form.method = 'post';
-	form.target = config.props.name;
-    }
     delete config.props.name;
     
     if (config.onLoad) {
@@ -561,30 +548,31 @@ function createFrame(config){
     frame.border = frame.frameBorder = 0;
     frame.allowTransparency = true;
     config.container.appendChild(frame);
-    if(form) {
-	config.container.appendChild(form);
-    }
     
-    if(form) {
-	form.action = src;
-	for(var i in config.props.postToIframe) {
-	    if (HAS_NAME_PROPERTY_BUG) {
-		var input = "<input name=\""+i+"\" />"
-	    }
-	    else {
-		var input = document.createElement("INPUT");
-		input.name = i ;
-	    }
-	    input.type='hidden';
-	    input.value=config.props.postToIframe[i];
-	    form.appendChild(input);
-	}
-	form.submit();
-    }
-    else {
-	// set the frame URL to the proper value (we previously set it to
-	// "javascript:false" to work around the IE issue mentioned above)
-	frame.src = src;
+    // set the frame URL to the proper value (we previously set it to
+    // "javascript:false" to work around the IE issue mentioned above)
+    if(config.usePost) {
+        var form = config.container.appendChild(document.createElement('form'));
+        form.target = frame.name;
+        form.action = src;
+        form.method = 'POST';
+        if(typeof(config.usePost) === 'object') {
+            for(var i in config.usePost) {
+                if (HAS_NAME_PROPERTY_BUG) {
+                    var input = document.createElement("<input name=\""+i+"\" />");
+                }
+                else {
+                    var input = document.createElement("INPUT");
+                    input.name = i ;
+                }
+                input.value = config.usePost[i];
+                form.appendChild(input);
+            }
+        }
+        form.submit();
+        form.parentNode.removeChild(form);
+    } else {
+        frame.src = src;
     }
     config.props.src = src;
     
