@@ -84,7 +84,7 @@
                     
                     // set the CORS request header
                     // only if there is no XHR2 features
-                    if (!XMLHttpRequest || !('withCredentials' in (new XMLHttpRequest))) {
+                    if (!window.XMLHttpRequest || !('withCredentials' in (new window.XMLHttpRequest))) {
                         config.headers.Origin = remote.origin;
                     }
                     
