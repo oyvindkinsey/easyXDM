@@ -515,10 +515,6 @@ function createFrame(config){
     frame.id = frame.name = config.props.name;
     delete config.props.name;
     
-    if (config.onLoad) {
-        on(frame, "load", config.onLoad);
-    }
-    
     if (typeof config.container == "string") {
         config.container = document.getElementById(config.container);
     }
@@ -548,6 +544,10 @@ function createFrame(config){
     frame.border = frame.frameBorder = 0;
     frame.allowTransparency = true;
     config.container.appendChild(frame);
+    
+    if (config.onLoad) {
+        on(frame, "load", config.onLoad);
+    }
     
     // set the frame URL to the proper value (we previously set it to
     // "javascript:false" to work around the IE issue mentioned above)
