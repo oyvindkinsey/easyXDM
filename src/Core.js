@@ -648,7 +648,6 @@ function prepareTransportStack(config){
                  * navigating from one domain to another, and where parent.frames[foo] can be used
                  * to get access to a frame from the same domain
                  */
-                config.remoteHelper = resolveUrl(config.remoteHelper);
                 protocol = "2";
             }
             else {
@@ -746,6 +745,7 @@ function prepareTransportStack(config){
             stackEls = [new easyXDM.stack.PostMessageTransport(config)];
             break;
         case "2":
+            config.remoteHelper = resolveUrl(config.remoteHelper);
             stackEls = [new easyXDM.stack.NameTransport(config), new easyXDM.stack.QueueBehavior(), new easyXDM.stack.VerifyBehavior({
                 initiate: config.isHost
             })];
