@@ -101,7 +101,10 @@
                     
                     // create the XMLHttpRequest object
                     var req = getXhr();
-                    req.open(config.method, config.url + (isPOST ? "" : "?" + data), true);
+                    var url = !isPOST && data
+                        ? config.url + (~config.url.indexOf('?') ? '&' : '?') + data
+                        : config.url;
+                    req.open(config.method, url, true);
                     
                     // apply the request headers
                     for (var prop in config.headers) {
