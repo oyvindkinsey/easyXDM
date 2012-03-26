@@ -86,6 +86,7 @@ These properties can be set only on the consumer
 * `props` {Object} - The key/value pairs of this object will be deep-copied onto the iframe. As an example, use `props: {style: {border: "1px solid red"} }` to set the border of the iframe to 1px solid red.
 * `remoteHelper` {String} - To enable the NameTransport as a fallback, set this to point to the `name.html` file on the provider.
 * `hash` {Boolean} - Whether to pass the setup data using the hash instead of using the query. This is mainly useful in scenarios where query arguments affects efficient caching or where the providers HTTP server does not support URL's with query parameters. Using the hash is not compatible with hash based history managers etc.
+* `usePost` {Boolean || Object} - Add support to create iframe with post request. If usePost is Object then key/value pairs to will be posted to iframe.               
 
 These properties can be set only on the provider
 
