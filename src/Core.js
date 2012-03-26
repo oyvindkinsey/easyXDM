@@ -552,21 +552,22 @@ function createFrame(config){
     // set the frame URL to the proper value (we previously set it to
     // "javascript:false" to work around the IE issue mentioned above)
     if(config.usePost) {
-        var form = config.container.appendChild(document.createElement('form'));
+        var form = config.container.appendChild(document.createElement('form')), input;
         form.target = frame.name;
         form.action = src;
         form.method = 'POST';
-        if(typeof(config.usePost) === 'object') {
-            for(var i in config.usePost) {
-                if (HAS_NAME_PROPERTY_BUG) {
-                    var input = document.createElement("<input name=\""+i+"\" />");
+        if (typeof(config.usePost) === 'object') {
+            for (var i in config.usePost) {
+                if (config.usePost.hasOwnProperty(i)) {
+                    if (HAS_NAME_PROPERTY_BUG) {
+                        input = document.createElement('<input name="' + i + '"/>');
+                    } else {
+                        input = document.createElement("INPUT");
+                        input.name = i;
+                    }
+                    input.value = config.usePost[i];
+                    form.appendChild(input);
                 }
-                else {
-                    var input = document.createElement("INPUT");
-                    input.name = i ;
-                }
-                input.value = config.usePost[i];
-                form.appendChild(input);
             }
         }
         form.submit();
