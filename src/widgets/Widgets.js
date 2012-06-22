@@ -65,8 +65,8 @@ easyXDM.WidgetManager = function(config){
      * @param {Object} arg
      */
     function _raiseEvent(event, arg){
-        if (config.listeners && config.listeners.event) {
-            config.listeners.event(WidgetManager, arg);
+        if (config.listeners && config.listeners[event]) {
+            config.listeners[event](WidgetManager, arg);
         }
     }
     
