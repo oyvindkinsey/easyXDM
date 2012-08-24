@@ -5,14 +5,17 @@
         <script type="text/javascript" src="../easyXDM.debug.js">
         </script>
         <script type="text/javascript">
+            
+            var example = { easyXDM: easyXDM.noConflict("example") };
+            
             /**
              * Request the use of the JSON object
              */
-            easyXDM.DomHelper.requiresJSON("../json2.js");
+            example.easyXDM.DomHelper.requiresJSON("../json2.js");
         </script>
         <script type="text/javascript">
             var win, remoteapp; // reference to the popups window
-            var proxy = new easyXDM.Rpc(/** The configuration */{
+            var proxy = new example.easyXDM.Rpc(/** The configuration */{
                 local: "../name.html",
                 swf: "../easyxdm.swf"
             }, {
@@ -25,7 +28,7 @@
                         remoteapp = null;
                         // we now open the window, passing the name of this window (includes the channel name)
                         // in case it has to look us up using the framename
-                        win = window.open('remoteapp.html' + '#easyXDM_' + easyXDM.query.xdm_c + '_provider', name, "width=400, height=400");
+                        win = window.open('remoteapp.html' + '#easyXDM_' + example.easyXDM.query.xdm_c + '_provider', name, "width=400, height=400");
                     },
                     /**
                      * This is where we receive the data
@@ -73,7 +76,7 @@
             function sendData(data){
                 var copy = {};
                 // copy the object in order to avoid the JSON serialization bug
-                easyXDM.apply(copy, data);
+                example.easyXDM.apply(copy, data);
                 proxy.postMessage(copy);
             }
         </script>
