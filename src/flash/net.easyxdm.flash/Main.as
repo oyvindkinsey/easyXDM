@@ -64,7 +64,7 @@ class Main
 		if (Main.INITIALIZED) return; else Main.INITIALIZED = true;
 		
 		// validate the passed arguments
-		if (!Validate(_root.ns) || !Validate(_root.proto) || !Validate(_root.domain) || !Validate(_root.port)) || !Validate(_root.callback) return;
+		if (!Validate(_root.ns) || !Validate(_root.proto) || !Validate(_root.domain) || !Validate(_root.port) || !Validate(_root.callback)) return;
 		
 		// LocalConnection has a max length 
 		var maxMessageLength = 40000;
@@ -95,10 +95,12 @@ class Main
 		
 		// add the createChannel method
 		ExternalInterface.addCallback("createChannel", { }, function(channel:String, secret:String, remoteOrigin:String, isHost:Boolean) {
+			if (!Main.Validate(channel)) return;
 			log("creating channel " + channel);
 			
 			// get the remote domain
-			var remoteDomain:String = remoteOrigin.substr(remoteOrigin.indexOf("://") + 3), if (remoteDomain.indexOf(":") != -1) remoteDomain = remoteDomain.substr(0, remoteDomain.indexOf(":"));
+			var remoteDomain:String = remoteOrigin.substr(remoteOrigin.indexOf("://") + 3);
+			if (remoteDomain.indexOf(":") != -1) remoteDomain = remoteDomain.substr(0, remoteDomain.indexOf(":"));
 			// the sending channel has _ prepended so that all allowed domains can use it
 			var sendingChannelName:String =  "_" + channel + "_" + secret + "_" +  (isHost ? "consumer" : "provider");
 			var receivingChannelName:String = "_" + channel + "_" + secret + "_" + (isHost ? "provider" : "consumer");	
