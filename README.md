@@ -91,7 +91,7 @@ These properties can be set only on the provider
 
 * `acl` {String || String[]} Use this to only allow specific domains to consume this provider. The patterns can contain the wildcards ? and * as in the examples 'http://example.com', '*.foo.com' and '*dom?.com', or they can be regular expressions starting with ^ and ending with $. If none of the patterns match an Error will be thrown.
 
-A socket can be teared down (iframe removed etc) using 
+A socket can be torn down (removing the `iframe`, etc.) using 
 
 ```javascript
     socket.destroy();
