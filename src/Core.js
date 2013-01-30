@@ -897,7 +897,17 @@ apply(easyXDM, {
      *                    an instance of easyXDM.
      * @return An instance of easyXDM
      */
-    noConflict: noConflict
+    noConflict: noConflict,
+    /**
+     * The prefix used for the iframe name.
+     * @type {string}
+     */
+    iframePrefix: IFRAME_PREFIX,
+    /**
+     * The iframe name.
+     * @type {string}
+     */
+    iframeName: IFRAME_PREFIX + query.xdm_c + '_provider'
 });
 
 // #ifdef debug

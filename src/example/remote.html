@@ -28,7 +28,7 @@
                         remoteapp = null;
                         // we now open the window, passing the name of this window (includes the channel name)
                         // in case it has to look us up using the framename
-                        win = window.open('remoteapp.html' + '#easyXDM_example_' + example.easyXDM.query.xdm_c + '_provider', name, "width=400, height=400");
+                        win = window.open('remoteapp.html#' + example.easyXDM.iframeName, name, "width=400, height=400");
                     },
                     /**
                      * This is where we receive the data
