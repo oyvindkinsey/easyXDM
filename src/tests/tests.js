@@ -112,6 +112,8 @@ function runTests(){
             this.url2 = "http://foo.bar:80/a/b/c?d=e#f";
             this.url3 = "http://foo.bar:88/a/b/c?d=e#f";
             this.url4 = "hTtp://Foo.Bar:88/a/b/c?d=e#f";
+            this.url5 = "http://foo.bar:80/a/b/c?d=e#f=g&y=z";
+            this.url6 = "http://foo.bar:80/a/b/c?d=e";
             
         },
         steps: [{
@@ -146,6 +148,28 @@ function runTests(){
                     g: "h"
                 }) ===
                 "http://foo.bar:80/a/b/c?d=e&g=h#f";
+            }
+        }, {
+            name: "appendQueryParameters hash without existing hash",
+            run: function(){
+                // Override value for `hash` in config by making new easyXDM.Socket
+                socket = new easyXDM.Socket({remote:location.href, lazy:true, hash: true });
+
+                return easyXDM.appendQueryParameters(this.url6, {
+                    g: "h"
+                }) ===
+                "http://foo.bar:80/a/b/c?d=e#g=h";
+            }
+        }, {
+            name: "appendQueryParameters hash with existing hash",
+            run: function(){
+                // Override value for `hash` in config by making new easyXDM.Socket
+                socket = new easyXDM.Socket({remote:location.href, lazy:true, hash: true });
+
+                return easyXDM.appendQueryParameters(this.url5, {
+                    g: "h"
+                }) ===
+                "http://foo.bar:80/a/b/c?d=e#f=g&y=z&g=h";
             }
         }]
     }, {
