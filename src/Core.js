@@ -250,7 +250,9 @@ function noConflict(ns){
     _trace("Settings namespace to '" + ns + "'");
     // #endif
     
-    window.easyXDM = _easyXDM;
+    if (typeof _easyXDM !== "undefined") {
+        window.easyXDM = _easyXDM;
+    }
     namespace = ns;
     if (namespace) {
         IFRAME_PREFIX = "easyXDM_" + namespace.replace(".", "_") + "_";
