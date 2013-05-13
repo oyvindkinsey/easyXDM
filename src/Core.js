@@ -432,6 +432,21 @@ var getJSON = function(){
             };
         }
     }
+
+    if (typeof JSON != "undefined" && typeof JSON.encode === "function" && JSON.encode(obj).replace((/\s/g), "") === json) {
+        // this is a working stringify method
+        cached.stringify = JSON.encode;
+    }
+
+    if (typeof JSON.decode === 'function') {
+        obj = JSON.decode(json);
+        if (obj.a && obj.a.length === 3 && obj.a[2] === 3) {
+            // this is a working parse method
+            cached.parse = function(str){
+                return JSON.decode(str);
+            };
+        }
+    }
     
     if (cached.stringify && cached.parse) {
         // Only memoize the result if we have valid instance
