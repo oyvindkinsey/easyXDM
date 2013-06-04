@@ -125,11 +125,11 @@ easyXDM.stack.NameTransport = function(config){
                 });
                 
                 // Set up the frame that points to the remote instance
-                remoteUrl = appendQueryParameters(config.remote, {
-                    xdm_e: config.local,
-                    xdm_c: config.channel,
-                    xdm_p: 2
-                });
+                remoteUrl = appendQueryParameters(config.remote, getParamObj(config, {
+                    e: config.local,
+                    c: config.channel,
+                    p: 2
+                }));
                 apply(config.props, {
                     src: remoteUrl + '#' + config.channel,
                     name: IFRAME_PREFIX + config.channel + "_provider"

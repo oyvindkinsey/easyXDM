@@ -83,6 +83,9 @@ easyXDM.Socket = function(config){
     trace("constructor");
     // #endif
     
+    // read query data
+    buildQuery(config);
+    
     // create the stack
     var stack = chainStack(prepareTransportStack(config).concat([{
         incoming: function(message, origin){

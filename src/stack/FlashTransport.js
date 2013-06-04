@@ -190,12 +190,12 @@ easyXDM.stack.FlashTransport = function(config){
                     }
                     // set up the iframe
                     apply(config.props, {
-                        src: appendQueryParameters(config.remote, {
-                            xdm_e: getLocation(location.href),
-                            xdm_c: config.channel,
-                            xdm_p: 6, // 6 = FlashTransport
-                            xdm_s: config.secret
-                        }),
+                        src: appendQueryParameters(config.remote, getParamObj(config, {
+                            e: getLocation(location.href),
+                            c: config.channel,
+                            p: 6, // 6 = FlashTransport
+                            s: config.secret
+                        })),
                         name: IFRAME_PREFIX + config.channel + "_provider"
                     });
                     frame = createFrame(config);

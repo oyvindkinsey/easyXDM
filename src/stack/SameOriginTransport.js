@@ -65,11 +65,11 @@ easyXDM.stack.SameOriginTransport = function(config){
             if (config.isHost) {
                 // set up the iframe
                 apply(config.props, {
-                    src: appendQueryParameters(config.remote, {
-                        xdm_e: location.protocol + "//" + location.host + location.pathname,
-                        xdm_c: config.channel,
-                        xdm_p: 4 // 4 = SameOriginTransport
-                    }),
+                    src: appendQueryParameters(config.remote, getParamObj(config, {
+                        e: location.protocol + "//" + location.host + location.pathname,
+                        c: config.channel,
+                        p: 4 // 4 = SameOriginTransport
+                    })),
                     name: IFRAME_PREFIX + config.channel + "_provider"
                 });
                 frame = createFrame(config);
