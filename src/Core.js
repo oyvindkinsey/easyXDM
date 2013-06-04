@@ -385,7 +385,7 @@ function appendQueryParameters(url, parameters){
  * @return {String} Properly prefixed parameter name
  */
 function getParam(config, param){
-    return config.param + '_' + param;
+    return config.prefix + '_' + param;
 }
 
 /**
@@ -412,7 +412,7 @@ var query = {};
 function buildQuery(config){
   config.prefix = config.prefix || 'xdm';
 
-  var input = new RegExp(getParam(config, 'e')).test(location.search) ? location.search : location.hash;
+  var input = new RegExp(getParam(config, 'e') + '=').test(location.search) ? location.search : location.hash;
   input = input.substring(1).split("&");
   var pair, i = input.length;
   while (i--) {
