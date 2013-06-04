@@ -197,9 +197,10 @@ if (!domIsReady) {
  * If functions are added after this event then they will be executed immediately.
  * @param {function} fn The function to add
  * @param {Object} scope An optional scope for the function to be called with.
+ * @param {Boolean} immediate An optional boolean indicating whether to not wait for domIsReady
  */
-function whenReady(fn, scope){
-    if (domIsReady) {
+function whenReady(fn, scope, immediate){
+    if (domIsReady || immediate) {
         fn.call(scope);
         return;
     }

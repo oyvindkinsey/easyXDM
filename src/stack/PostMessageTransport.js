@@ -146,7 +146,7 @@ easyXDM.stack.PostMessageTransport = function(config){
             }
         },
         init: function(){
-            whenReady(pub.onDOMReady, pub);
+            whenReady(pub.onDOMReady, pub, config.immediate);
         }
     });
 };
