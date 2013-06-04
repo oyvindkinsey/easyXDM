@@ -20,7 +20,9 @@
             easyXDM.DomHelper.requiresJSON("../json2.js");
         </script>
         <script type="text/javascript">
+            var prefix_match = location.search.match(/[?&]prefix=([^&]+)/);
             var remote = new easyXDM.Rpc({
+                prefix: prefix_match ? prefix_match[1] : '',
                 local: "../name.html",
                 swf: "../easyxdm.swf"
             }, {

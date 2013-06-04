@@ -5,9 +5,11 @@
         <script type="text/javascript" src="../easyXDM.debug.js">
         </script>
         <script type="text/javascript">
-            var transport;
+            var transport,
+                prefix_match = location.search.match(/[?&]prefix=([^&]+)/);
             window.onload = function(){
                 transport = new easyXDM.Socket({
+                    prefix: prefix_match ? prefix_match[1] : '',
                     local: "../name.html",
                     swf: "../easyxdm.swf",
                     onMessage: function(message, origin){
