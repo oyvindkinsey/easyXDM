@@ -10,7 +10,7 @@
             };
             
             var transport,
-                prefix_match = location.search.match(/[?&]prefix=([^&]+)/);
+                prefix_match = location.search.match(/[?&]prefix=([^&#]+)/);
             window.onload = function(){
                 transport = new modules.easyXDM.Socket({
                     prefix: prefix_match ? prefix_match[1] : '',
