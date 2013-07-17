@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global global, easyXDM, window, getLocation, getParamObj, appendQueryParameters, createFrame, debug, apply, whenReady, IFRAME_PREFIX, namespace, resolveUrl, getDomainName, HAS_FLASH_THROTTLED_BUG, getPort, query*/
+/*global global, easyXDM, window, getLocation, appendQueryParameters, createFrame, debug, apply, whenReady, IFRAME_PREFIX, namespace, resolveUrl, getDomainName, HAS_FLASH_THROTTLED_BUG, getPort, query*/
 //
 // easyXDM
 // http://easyxdm.net/
@@ -190,12 +190,12 @@ easyXDM.stack.FlashTransport = function(config){
                     }
                     // set up the iframe
                     apply(config.props, {
-                        src: appendQueryParameters(config.remote, getParamObj(config, {
+                        src: appendQueryParameters(config.remote, {
                             e: getLocation(location.href),
                             c: config.channel,
                             p: 6, // 6 = FlashTransport
                             s: config.secret
-                        })),
+                        }, config.prefix),
                         name: IFRAME_PREFIX + config.channel + "_provider"
                     });
                     frame = createFrame(config);

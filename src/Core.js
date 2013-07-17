@@ -355,15 +355,22 @@ function resolveUrl(url){
  * The base url can contain existing query parameters.
  * @param {String} url The base url.
  * @param {Object} parameters The parameters to add.
+ * @param {String} prefix The parameter prefix.
  * @return {String} A new valid url with the parameters appended.
  */
-function appendQueryParameters(url, parameters){
+function appendQueryParameters(url, parameters, prefix){
     // #ifdef debug
     if (!parameters) {
         throw new Error("parameters is undefined or null");
     }
     // #endif
-    
+
+    if (!prefix) {
+      prefix = '';
+    } else {
+      prefix += '_';
+    }
+
     var hash = "", indexOf = url.indexOf("#");
     if (indexOf !== -1) {
         hash = url.substring(indexOf);
@@ -372,34 +379,10 @@ function appendQueryParameters(url, parameters){
     var q = [];
     for (var key in parameters) {
         if (parameters.hasOwnProperty(key)) {
-            q.push(key + "=" + encodeURIComponent(parameters[key]));
+            q.push(prefix + key + "=" + encodeURIComponent(parameters[key]));
         }
     }
     return url + (useHash ? "#" : (url.indexOf("?") == -1 ? "?" : "&")) + q.join("&") + hash;
-}
-
-/**
- * Get properly prefixed parameter name.
- * @param {Object} config Main config object holding prefix
- * @param {String} param Base parameter name
- * @return {String} Properly prefixed parameter name
- */
-function getParam(config, param){
-    return config.prefix + '_' + param;
-}
-
-/**
- * Get properly prefixed object keys.
- * @param {Object} config Main config object holding prefix
- * @param {Object} obj Object whose keys are base parameter names
- * @return {Object} New object whose keys are properly prefixed parameter names
- */
-function getParamObj(config, obj){
-    var paramObj = {};
-    for (var param in obj) {
-        paramObj[getParam(config, param)] = obj[param];
-    }
-    return paramObj;
 }
 
 // build the query object either from location.query, if it contains the xdm_e argument, or from location.hash
@@ -412,12 +395,17 @@ var query = {};
 function buildQuery(config){
   config.prefix = config.prefix || 'xdm';
 
-  var input = new RegExp(getParam(config, 'e') + '=').test(location.search) ? location.search : location.hash;
+  var input = new RegExp(config.prefix + '_e=').test(location.search) ? location.search : location.hash;
   input = input.substring(1).split("&");
-  var pair, i = input.length;
+
+  var pair,
+      i = input.length,
+      prefix_reg = new RegExp('^' + config.prefix + '_');
   while (i--) {
       pair = input[i].split("=");
-      query[pair[0]] = decodeURIComponent(pair[1]);
+      if (pair[0].match(prefix_reg)) {
+        query[pair[0].replace(prefix_reg, '')] = decodeURIComponent(pair[1]);
+      }
   }
 }
 
@@ -645,7 +633,7 @@ function checkAcl(acl, domain){
  */
 function prepareTransportStack(config){
     var protocol = config.protocol, stackEls;
-    config.isHost = config.isHost || undef(query[getParam(config, 'p')]);
+    config.isHost = config.isHost || undef(query.p);
     useHash = config.hash || false;
     // #ifdef debug
     _trace("preparing transport stack");
@@ -658,11 +646,11 @@ function prepareTransportStack(config){
         // #ifdef debug
         _trace("using parameters from query");
         // #endif
-        config.channel = query[getParam(config, 'c')].replace(/["'<>\\]/g, "");
-        config.secret = query[getParam(config, 's')];
-        config.remote = query[getParam(config, 'e')].replace(/["'<>\\]/g, "");
+        config.channel = query.c.replace(/["'<>\\]/g, "");
+        config.secret = query.s;
+        config.remote = query.e.replace(/["'<>\\]/g, "");
         ;
-        protocol = query[getParam(config, 'p')];
+        protocol = query.p;
         if (config.acl && !checkAcl(config.acl, config.remote)) {
             throw new Error("Access denied for " + config.remote);
         }
@@ -756,35 +744,35 @@ function prepareTransportStack(config){
                     }
                 }
                 
-                var parameters = getParamObj(config, {
+                var parameters = {
                     c: config.channel,
                     p: 0
-                });
+                };
                 
                 if (config.local === window) {
                     // We are using the current window to listen to
                     config.usePolling = true;
                     config.useParent = true;
                     config.local = location.protocol + "//" + location.host + location.pathname + location.search;
-                    parameters[getParam(config, 'e')] = config.local;
-                    parameters[getParam(config, 'pa')] = 1; // use parent
+                    parameters.e = config.local;
+                    parameters.pa = 1; // use parent
                 }
                 else {
-                    parameters[getParam(config, 'e')] = resolveUrl(config.local);
+                    parameters.e = resolveUrl(config.local);
                 }
                 
                 if (config.container) {
                     config.useResize = false;
-                    parameters[getParam(config, 'po')] = 1; // use polling
+                    parameters.po = 1; // use polling
                 }
-                config.remote = appendQueryParameters(config.remote, parameters);
+                config.remote = appendQueryParameters(config.remote, parameters, config.prefix);
             }
             else {
                 apply(config, {
-                    channel: query[getParam(config, 'c')],
-                    remote: query[getParam(config, 'e')],
-                    useParent: !undef(query[getParam(config, 'pa')]),
-                    usePolling: !undef(query[getParam(config, 'po')]),
+                    channel: query.c,
+                    remote: query.e,
+                    useParent: !undef(query.pa),
+                    usePolling: !undef(query.po),
                     useResize: config.useParent ? false : config.useResize
                 });
             }

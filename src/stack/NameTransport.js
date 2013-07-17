@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, undef, getLocation, getParamObj, appendQueryParameters, resolveUrl, createFrame, debug, un, apply, whenReady, IFRAME_PREFIX*/
+/*global easyXDM, window, escape, unescape, undef, getLocation, appendQueryParameters, resolveUrl, createFrame, debug, un, apply, whenReady, IFRAME_PREFIX*/
 //
 // easyXDM
 // http://easyxdm.net/
@@ -125,11 +125,11 @@ easyXDM.stack.NameTransport = function(config){
                 });
                 
                 // Set up the frame that points to the remote instance
-                remoteUrl = appendQueryParameters(config.remote, getParamObj(config, {
+                remoteUrl = appendQueryParameters(config.remote, {
                     e: config.local,
                     c: config.channel,
                     p: 2
-                }));
+                }, config.prefix);
                 apply(config.props, {
                     src: remoteUrl + '#' + config.channel,
                     name: IFRAME_PREFIX + config.channel + "_provider"

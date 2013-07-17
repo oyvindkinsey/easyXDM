@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, getLocation, getParamObj, appendQueryParameters, createFrame, debug, un, on, apply, whenReady, getParentObject, IFRAME_PREFIX*/
+/*global easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, un, on, apply, whenReady, getParentObject, IFRAME_PREFIX*/
 //
 // easyXDM
 // http://easyxdm.net/
@@ -65,11 +65,11 @@ easyXDM.stack.SameOriginTransport = function(config){
             if (config.isHost) {
                 // set up the iframe
                 apply(config.props, {
-                    src: appendQueryParameters(config.remote, getParamObj(config, {
+                    src: appendQueryParameters(config.remote, {
                         e: location.protocol + "//" + location.host + location.pathname,
                         c: config.channel,
                         p: 4 // 4 = SameOriginTransport
-                    })),
+                    }, config.prefix),
                     name: IFRAME_PREFIX + config.channel + "_provider"
                 });
                 frame = createFrame(config);

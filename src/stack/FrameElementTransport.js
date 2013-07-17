@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, getLocation, getParam, getParamObj, appendQueryParameters, createFrame, debug, apply, query, whenReady, IFRAME_PREFIX*/
+/*global easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, apply, query, whenReady, IFRAME_PREFIX*/
 //
 // easyXDM
 // http://easyxdm.net/
@@ -65,11 +65,11 @@ easyXDM.stack.FrameElementTransport = function(config){
             if (config.isHost) {
                 // set up the iframe
                 apply(config.props, {
-                    src: appendQueryParameters(config.remote, getParamObj(config, {
+                    src: appendQueryParameters(config.remote, {
                         e: getLocation(location.href),
                         c: config.channel,
                         p: 5 // 5 = FrameElementTransport
-                    })),
+                    }, config.prefix),
                     name: IFRAME_PREFIX + config.channel + "_provider"
                 });
                 frame = createFrame(config);
@@ -87,8 +87,8 @@ easyXDM.stack.FrameElementTransport = function(config){
             }
             else {
                 // This is to mitigate origin-spoofing
-                if (document.referrer && getLocation(document.referrer) != query[getParam(config, 'e')]) {
-                    window.top.location = query[getParam(config, 'e')];
+                if (document.referrer && getLocation(document.referrer) != query.e) {
+                    window.top.location = query.e;
                 }
                 send = window.frameElement.fn(function(msg){
                     pub.up.incoming(msg, targetOrigin);

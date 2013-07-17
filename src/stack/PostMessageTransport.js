@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, getLocation, getParamObj, appendQueryParameters, createFrame, debug, un, on, apply, whenReady, IFRAME_PREFIX*/
+/*global easyXDM, window, escape, unescape, getLocation, appendQueryParameters, createFrame, debug, un, on, apply, whenReady, IFRAME_PREFIX*/
 //
 // easyXDM
 // http://easyxdm.net/
@@ -125,11 +125,11 @@ easyXDM.stack.PostMessageTransport = function(config){
                 
                 // set up the iframe
                 apply(config.props, {
-                    src: appendQueryParameters(config.remote, getParamObj(config, {
+                    src: appendQueryParameters(config.remote, {
                         e: getLocation(location.href),
                         c: config.channel,
                         p: 1 // 1 = PostMessage
-                    })),
+                    }, config.prefix),
                     name: IFRAME_PREFIX + config.channel + "_provider"
                 });
                 frame = createFrame(config);
