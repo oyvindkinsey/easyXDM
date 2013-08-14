@@ -158,7 +158,9 @@ easyXDM.Rpc = function(config, jsonRpcConfig){
 	
     // set the origin 
     this.origin = getLocation(config.remote);
-	
+
+    // set context for this object's local rpc functions
+    this.context = config.context || null;
     
     /**
      * Initiates the destruction of the stack.
