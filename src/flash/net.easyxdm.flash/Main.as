@@ -95,7 +95,7 @@ class Main
 		
 		// add the createChannel method
 		ExternalInterface.addCallback("createChannel", { }, function(channel:String, secret:String, remoteOrigin:String, isHost:Boolean) {
-			if (!Main.Validate(channel)) return;
+			if (!Main.Validate(channel) || !Main.Validate(secret)) return;
 			log("creating channel " + channel);
 			
 			// get the remote domain
