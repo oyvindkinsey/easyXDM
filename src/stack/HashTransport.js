@@ -173,7 +173,11 @@ easyXDM.stack.HashTransport = function(config){
             }
         },
         init: function(){
-            whenReady(pub.onDOMReady, pub, config.immediate);
+            if (config.immediate) {
+              pub.onDOMReady.call(pub);
+            } else {
+              whenReady(pub.onDOMReady, pub);
+            }
         }
     });
 };
