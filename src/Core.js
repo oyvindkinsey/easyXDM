@@ -768,7 +768,9 @@ function prepareTransportStack(config){
             stackEls = [new easyXDM.stack.PostMessageTransport(config)];
             break;
         case "2":
-            config.remoteHelper = resolveUrl(config.remoteHelper);
+            if (config.isHost) {
+                config.remoteHelper = resolveUrl(config.remoteHelper);
+            }
             stackEls = [new easyXDM.stack.NameTransport(config), new easyXDM.stack.QueueBehavior(), new easyXDM.stack.VerifyBehavior({
                 initiate: config.isHost
             })];
