@@ -260,7 +260,7 @@ Example:
 For more information
 -----
 
-There are several examples and demos available through the main [website](http://easyxdm.net/), and in the [documentation](http://easyxdm.net/docs/).
+There are several examples and demos available through the main [website](http://easyxdm.net/). See both the [examples](http://easyxdm.net/wp/category/examples/) and the [getting started guide](http://easyxdm.net/wp/category/getting-started/).
 
 Tests
 -----
