@@ -37,9 +37,12 @@
  * @cfg {String || DOMElement} swfContainer Set this if you want to control where the swf is placed
  */
 easyXDM.stack.FlashTransport = function(config){
-    // #ifdef debug
+    // #ifdef log
     var trace = debug.getTracer("easyXDM.stack.FlashTransport");
     trace("constructor");
+    // #endif
+
+    // #ifdef debug
     if (!config.swf) {
         throw new Error("Path to easyxdm.swf is missing");
     }
@@ -49,7 +52,7 @@ easyXDM.stack.FlashTransport = function(config){
     
     function onMessage(message, origin){
         setTimeout(function(){
-            // #ifdef debug
+            // #ifdef log
             trace("received message");
             // #endif
             pub.up.incoming(message, targetOrigin);
@@ -60,7 +63,7 @@ easyXDM.stack.FlashTransport = function(config){
      * This method adds the SWF to the DOM and prepares the initialization of the channel
      */
     function addSwf(domain){
-        // #ifdef debug
+        // #ifdef log
         trace("creating factory with SWF from " + domain);
         // #endif
         // the differentiating query argument is needed in Flash9 to avoid a caching issue where LocalConnection would throw an error.
@@ -110,7 +113,7 @@ easyXDM.stack.FlashTransport = function(config){
             + "&domain=" + encodeURIComponent(getDomainName(global.location.href))
             + "&port=" + encodeURIComponent(getPort(global.location.href))
             + "&ns=" + encodeURIComponent(namespace);
-        // #ifdef debug
+        // #ifdef log
         flashVars += "&log=true";
         // #endif
         swfContainer.innerHTML = "<object height='20' width='20' type='application/x-shockwave-flash' id='" + id + "' data='" + url + "'>" +
@@ -138,7 +141,7 @@ easyXDM.stack.FlashTransport = function(config){
             }
         },
         destroy: function(){
-            // #ifdef debug
+            // #ifdef log
             trace("destroy");
             // #endif
             try {
@@ -153,7 +156,7 @@ easyXDM.stack.FlashTransport = function(config){
             }
         },
         onDOMReady: function(){
-            // #ifdef debug
+            // #ifdef log
             trace("init");
             // #endif
             
@@ -162,7 +165,7 @@ easyXDM.stack.FlashTransport = function(config){
             // Prepare the code that will be run after the swf has been intialized
             easyXDM.Fn.set("flash_" + config.channel + "_init", function(){
                 setTimeout(function(){
-                    // #ifdef debug
+                    // #ifdef log
                     trace("firing onReady");
                     // #endif
                     pub.up.callback(true);

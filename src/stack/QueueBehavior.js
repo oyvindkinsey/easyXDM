@@ -36,7 +36,7 @@
  * @cfg {Number} maxLength The maximum length of each outgoing message. Set this to enable fragmentation.
  */
 easyXDM.stack.QueueBehavior = function(config){
-    // #ifdef debug
+    // #ifdef log
     var trace = debug.getTracer("easyXDM.stack.QueueBehavior");
     trace("constructor");
     // #endif
@@ -44,7 +44,7 @@ easyXDM.stack.QueueBehavior = function(config){
     
     function dispatch(){
         if (config.remove && queue.length === 0) {
-            // #ifdef debug
+            // #ifdef log
             trace("removing myself from the stack");
             // #endif
             removeFromStack(pub);
@@ -53,7 +53,7 @@ easyXDM.stack.QueueBehavior = function(config){
         if (waiting || queue.length === 0 || destroying) {
             return;
         }
-        // #ifdef debug
+        // #ifdef log
         trace("dispatching from queue");
         // #endif
         waiting = true;
@@ -96,7 +96,7 @@ easyXDM.stack.QueueBehavior = function(config){
                 var indexOf = message.indexOf("_"), seq = parseInt(message.substring(0, indexOf), 10);
                 incoming += message.substring(indexOf + 1);
                 if (seq === 0) {
-                    // #ifdef debug
+                    // #ifdef log
                     trace("received the last fragment");
                     // #endif
                     if (config.encode) {
@@ -105,7 +105,7 @@ easyXDM.stack.QueueBehavior = function(config){
                     pub.up.incoming(incoming, origin);
                     incoming = "";
                 }
-                // #ifdef debug
+                // #ifdef log
                 else {
                     trace("waiting for more fragments, seq=" + message);
                 }
@@ -129,7 +129,7 @@ easyXDM.stack.QueueBehavior = function(config){
                 }
                 // enqueue the chunks
                 while ((fragment = fragments.shift())) {
-                    // #ifdef debug
+                    // #ifdef log
                     trace("enqueuing");
                     // #endif
                     queue.push({
@@ -154,7 +154,7 @@ easyXDM.stack.QueueBehavior = function(config){
             }
         },
         destroy: function(){
-            // #ifdef debug
+            // #ifdef log
             trace("destroy");
             // #endif
             destroying = true;

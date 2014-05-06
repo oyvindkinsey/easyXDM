@@ -42,7 +42,7 @@
          * @namespace easyXDM.fn
          */
         set: function(name, fn){
-            // #ifdef debug
+            // #ifdef log
             this._trace("storing function " + name);
             // #endif
             _map[name] = fn;
@@ -55,14 +55,14 @@
          * @namespace easyXDM.fn
          */
         get: function(name, del){
-            // #ifdef debug
+            // #ifdef log
             this._trace("retrieving function " + name);
             // #endif
             if (!_map.hasOwnProperty(name)) {
                 return;
             }
             var fn = _map[name];
-            // #ifdef debug
+            // #ifdef log
             if (!fn) {
                 this._trace(name + " not found");
             }
@@ -75,7 +75,7 @@
         }
     };
     
-    // #ifdef debug
+    // #ifdef log
     easyXDM.Fn._trace = debug.getTracer("easyXDM.Fn");
     // #endif
 }());

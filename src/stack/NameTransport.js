@@ -35,21 +35,23 @@
  * @namespace easyXDM.stack
  */
 easyXDM.stack.NameTransport = function(config){
-    // #ifdef debug
+    // #ifdef log
     var trace = debug.getTracer("easyXDM.stack.NameTransport");
     trace("constructor");
     if (config.isHost && undef(config.remoteHelper)) {
         trace("missing remoteHelper");
+        // #ifdef debug
         throw new Error("missing remoteHelper");
+        // #endif
     }
     // #endif
-    
+
     var pub; // the public interface
     var isHost, callerWindow, remoteWindow, readyCount, callback, remoteOrigin, remoteUrl;
     
     function _sendMessage(message){
         var url = config.remoteHelper + (isHost ? "#_3" : "#_2") + config.channel;
-        // #ifdef debug
+        // #ifdef log
         trace("sending message " + message);
         trace("navigating to  '" + url + "'");
         // #endif
@@ -64,7 +66,7 @@ easyXDM.stack.NameTransport = function(config){
         }
         else {
             _sendMessage("ready");
-            // #ifdef debug
+            // #ifdef log
             trace("calling onReady");
             // #endif
             pub.up.callback(true);
@@ -72,7 +74,7 @@ easyXDM.stack.NameTransport = function(config){
     }
     
     function _onMessage(message){
-        // #ifdef debug
+        // #ifdef log
         trace("received message " + message);
         // #endif
         pub.up.incoming(message, remoteOrigin);
@@ -92,7 +94,7 @@ easyXDM.stack.NameTransport = function(config){
             _sendMessage(message);
         },
         destroy: function(){
-            // #ifdef debug
+            // #ifdef log
             trace("destroy");
             // #endif
             callerWindow.parentNode.removeChild(callerWindow);
@@ -103,7 +105,7 @@ easyXDM.stack.NameTransport = function(config){
             }
         },
         onDOMReady: function(){
-            // #ifdef debug
+            // #ifdef log
             trace("init");
             // #endif
             isHost = config.isHost;
@@ -114,7 +116,7 @@ easyXDM.stack.NameTransport = function(config){
             if (isHost) {
                 // Register the callback
                 easyXDM.Fn.set(config.channel, function(message){
-                    // #ifdef debug
+                    // #ifdef log
                     trace("received initial message " + message);
                     // #endif
                     if (isHost && message === "ready") {

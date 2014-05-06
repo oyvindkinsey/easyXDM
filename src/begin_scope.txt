@@ -1,1 +1,19 @@
+// #ifdef jasper
+(function (factory) {
+    "use strict";
+
+    define(["json3", "logger"], factory);
+}(function(json, logger) {
+    if (typeof document === "undefined") {
+        //Running in non browser environment (probably it's optimization process), return immediately
+        return {};
+    }
+
+    var setTimeout = window.setTimeout,
+        log = logger.register("EasyXDM");
+
+// #endif
+
+// #ifndef jasper
 (function (window, document, location, setTimeout, decodeURIComponent, encodeURIComponent) {
+// #endif

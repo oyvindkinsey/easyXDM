@@ -128,7 +128,7 @@
  * @param {Object} jsonRpcConfig The description of the interface to implement.
  */
 easyXDM.Rpc = function(config, jsonRpcConfig){
-    // #ifdef debug
+    // #ifdef log
     var trace = debug.getTracer("easyXDM.Rpc");
     trace("constructor");
     // #endif

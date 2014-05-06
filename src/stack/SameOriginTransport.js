@@ -34,7 +34,7 @@
  * @cfg {String} remote The remote document to communicate with.
  */
 easyXDM.stack.SameOriginTransport = function(config){
-    // #ifdef debug
+    // #ifdef log
     var trace = debug.getTracer("easyXDM.stack.SameOriginTransport");
     trace("constructor");
     // #endif
@@ -48,7 +48,7 @@ easyXDM.stack.SameOriginTransport = function(config){
             }
         },
         destroy: function(){
-            // #ifdef debug
+            // #ifdef log
             trace("destroy");
             // #endif
             if (frame) {
@@ -57,7 +57,7 @@ easyXDM.stack.SameOriginTransport = function(config){
             }
         },
         onDOMReady: function(){
-            // #ifdef debug
+            // #ifdef log
             trace("init");
             // #endif
             targetOrigin = getLocation(config.remote);

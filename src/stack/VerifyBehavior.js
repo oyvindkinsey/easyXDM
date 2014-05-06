@@ -34,9 +34,11 @@
  * @cfg {Boolean} initiate If the verification should be initiated from this end.
  */
 easyXDM.stack.VerifyBehavior = function(config){
-    // #ifdef debug
+    // #ifdef log
     var trace = debug.getTracer("easyXDM.stack.VerifyBehavior");
     trace("constructor");
+    // #endif
+    // #ifdef debug
     if (undef(config.initiate)) {
         throw new Error("settings.initiate is not set");
     }
@@ -44,7 +46,7 @@ easyXDM.stack.VerifyBehavior = function(config){
     var pub, mySecret, theirSecret, verified = false;
     
     function startVerification(){
-        // #ifdef debug
+        // #ifdef log
         trace("requesting verification");
         // #endif
         mySecret = Math.random().toString(16).substring(2);
@@ -56,13 +58,13 @@ easyXDM.stack.VerifyBehavior = function(config){
             var indexOf = message.indexOf("_");
             if (indexOf === -1) {
                 if (message === mySecret) {
-                    // #ifdef debug
+                    // #ifdef log
                     trace("verified, calling callback");
                     // #endif
                     pub.up.callback(true);
                 }
                 else if (!theirSecret) {
-                    // #ifdef debug
+                    // #ifdef log
                     trace("returning secret");
                     // #endif
                     theirSecret = message;

@@ -53,14 +53,14 @@ easyXDM.DomHelper = {
      */
     requiresJSON: function(path){
         if (!isHostObject(window, "JSON")) {
-            // #ifdef debug
+            // #ifdef log
             debug.log("loading external JSON");
             // #endif
             // we need to encode the < in order to avoid an illegal token error
             // when the script is inlined in a document.
             document.write('<' + 'script type="text/javascript" src="' + path + '"><' + '/script>');
         }
-        // #ifdef debug
+        // #ifdef log
         else {
             debug.log("native JSON found");
         }

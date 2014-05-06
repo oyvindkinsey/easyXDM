@@ -36,7 +36,7 @@
  * @cfg {Number} interval The interval used when polling for messages.
  */
 easyXDM.stack.HashTransport = function(config){
-    // #ifdef debug
+    // #ifdef log
     var trace = debug.getTracer("easyXDM.stack.HashTransport");
     trace("constructor");
     // #endif    
@@ -45,11 +45,11 @@ easyXDM.stack.HashTransport = function(config){
     var useParent, _remoteOrigin;
     
     function _sendMessage(message){
-        // #ifdef debug
+        // #ifdef log
         trace("sending message '" + (_msgNr + 1) + " " + message + "' to " + _remoteOrigin);
         // #endif
         if (!_callerWindow) {
-            // #ifdef debug
+            // #ifdef log
             trace("no caller window");
             // #endif
             return;
@@ -60,7 +60,7 @@ easyXDM.stack.HashTransport = function(config){
     
     function _handleHash(hash){
         _lastMsg = hash;
-        // #ifdef debug
+        // #ifdef log
         trace("received message '" + _lastMsg + "' from " + _remoteOrigin);
         // #endif
         pub.up.incoming(_lastMsg.substring(_lastMsg.indexOf("_") + 1), _remoteOrigin);
@@ -79,7 +79,7 @@ easyXDM.stack.HashTransport = function(config){
             hash = href.substring(indexOf);
         }
         if (hash && hash != _lastMsg) {
-            // #ifdef debug
+            // #ifdef log
             trace("poll: new message");
             // #endif
             _handleHash(hash);
@@ -87,7 +87,7 @@ easyXDM.stack.HashTransport = function(config){
     }
     
     function _attachListeners(){
-        // #ifdef debug
+        // #ifdef log
         trace("starting polling");
         // #endif
         _timer = setInterval(_pollHash, pollInterval);
@@ -127,7 +127,7 @@ easyXDM.stack.HashTransport = function(config){
                     var tries = 0, max = config.delay / 50;
                     (function getRef(){
                         if (++tries > max) {
-                            // #ifdef debug
+                            // #ifdef log
                             trace("unable to get reference to _listenerWindow, giving up");
                             // #endif
                             throw new Error("Unable to reference listenerwindow");
@@ -139,7 +139,7 @@ easyXDM.stack.HashTransport = function(config){
                         }
                         if (_listenerWindow) {
                             _attachListeners();
-                            // #ifdef debug
+                            // #ifdef log
                             trace("got a reference to _listenerWindow");
                             // #endif
                             pub.up.callback(true);

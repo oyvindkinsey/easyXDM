@@ -35,7 +35,7 @@
  * @cfg {String} remote The remote domain to communicate with.
  */
 easyXDM.stack.PostMessageTransport = function(config){
-    // #ifdef debug
+    // #ifdef log
     var trace = debug.getTracer("easyXDM.stack.PostMessageTransport");
     trace("constructor");
     // #endif
@@ -74,7 +74,7 @@ easyXDM.stack.PostMessageTransport = function(config){
      */
     function _window_onMessage(event){
         var origin = _getOrigin(event);
-        // #ifdef debug
+        // #ifdef log
         trace("received message '" + event.data + "' from " + origin);
         // #endif
         if (origin == targetOrigin && event.data.substring(0, config.channel.length + 1) == config.channel + " ") {
@@ -90,7 +90,7 @@ easyXDM.stack.PostMessageTransport = function(config){
             }
         },
         destroy: function(){
-            // #ifdef debug
+            // #ifdef log
             trace("destroy");
             // #endif
             un(window, "message", _window_onMessage);
@@ -101,7 +101,7 @@ easyXDM.stack.PostMessageTransport = function(config){
             }
         },
         onDOMReady: function(){
-            // #ifdef debug
+            // #ifdef log
             trace("init");
             // #endif
             targetOrigin = getLocation(config.remote);
@@ -109,7 +109,7 @@ easyXDM.stack.PostMessageTransport = function(config){
                 // add the event handler for listening
                 var waitForReady = function(event){  
                     if (event.data == config.channel + "-ready") {
-                        // #ifdef debug
+                        // #ifdef log
                         trace("firing onReady");
                         // #endif
                         // replace the eventlistener

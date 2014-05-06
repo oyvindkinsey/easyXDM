@@ -37,7 +37,7 @@
  * @cfg {Object} serializer The serializer to use for serializing and deserializing the JSON. Should be compatible with the HTML5 JSON object. Optional, will default to JSON.
  */
 easyXDM.stack.RpcBehavior = function(proxy, config){
-    // #ifdef debug
+    // #ifdef log
     var trace = debug.getTracer("easyXDM.stack.RpcBehavior");
     // #endif
     var pub, serializer = config.serializer || getJSON();
@@ -63,11 +63,11 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
     function _createMethod(definition, method){
         var slice = Array.prototype.slice;
         
-        // #ifdef debug
+        // #ifdef log
         trace("creating method " + method);
         // #endif
         return function(){
-            // #ifdef debug
+            // #ifdef log
             trace("executing method " + method);
             // #endif
             var l = arguments.length, callback, message = {
@@ -116,7 +116,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
      */
     function _executeMethod(method, id, fn, params){
         if (!fn) {
-            // #ifdef debug
+            // #ifdef log
             trace("requested to execute non-existent procedure " + method);
             // #endif
             if (id) {
@@ -131,7 +131,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
             return;
         }
         
-        // #ifdef debug
+        // #ifdef log
         trace("requested to execute procedure " + method);
         // #endif
         var success, error;
@@ -180,7 +180,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
         incoming: function(message, origin){
             var data = serializer.parse(message);
             if (data.method) {
-                // #ifdef debug
+                // #ifdef log
                 trace("received request to execute method " + data.method + (data.id ? (" using callback id " + data.id) : ""));
                 // #endif
                 // A method call from the remote end
@@ -192,7 +192,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                 }
             }
             else {
-                // #ifdef debug
+                // #ifdef log
                 trace("received return value destined to callback with id " + data.id);
                 // #endif
                 // A method response from the other end
@@ -201,7 +201,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
                     if (callback.error) {
                         callback.error(data.error);
                     }
-                    // #ifdef debug
+                    // #ifdef log
                     else {
                         trace("unhandled error returned.");
                     }
@@ -214,11 +214,11 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
             }
         },
         init: function(){
-            // #ifdef debug
+            // #ifdef log
             trace("init");
             // #endif
             if (config.remote) {
-                // #ifdef debug
+                // #ifdef log
                 trace("creating stubs");
                 // #endif
                 // Implement the remote sides exposed methods
@@ -231,7 +231,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
             pub.down.init();
         },
         destroy: function(){
-            // #ifdef debug
+            // #ifdef log
             trace("destroy");
             // #endif
             for (var method in config.remote) {

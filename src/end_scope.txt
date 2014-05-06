@@ -1,2 +1,9 @@
+// #ifdef jasper
+return easyXDM;
+}));
+// #endif
+
+// #ifndef jasper
 global.easyXDM = easyXDM;
 })(window, document, location, window.setTimeout, decodeURIComponent, encodeURIComponent);
+// #endif

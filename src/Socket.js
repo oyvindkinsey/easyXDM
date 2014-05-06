@@ -78,7 +78,7 @@
  * Properties such as 'name' and 'src' will be overrided. Optional.
  */
 easyXDM.Socket = function(config){
-    // #ifdef debug
+    // #ifdef log
     var trace = debug.getTracer("easyXDM.Socket");
     trace("constructor");
     // #endif

@@ -32,7 +32,7 @@
  * @param {Object} config The behaviors configuration.
  */
 easyXDM.stack.ReliableBehavior = function(config){
-    // #ifdef debug
+    // #ifdef log
     var trace = debug.getTracer("easyXDM.stack.ReliableBehavior");
     trace("constructor");
     // #endif
@@ -42,14 +42,14 @@ easyXDM.stack.ReliableBehavior = function(config){
     
     return (pub = {
         incoming: function(message, origin){
-            // #ifdef debug
+            // #ifdef log
             trace("incoming: " + message);
             // #endif
             var indexOf = message.indexOf("_"), ack = message.substring(0, indexOf).split(",");
             message = message.substring(indexOf + 1);
             
             if (ack[0] == idOut) {
-                // #ifdef debug
+                // #ifdef log
                 trace("message delivered");
                 // #endif
                 currentMessage = "";
@@ -58,7 +58,7 @@ easyXDM.stack.ReliableBehavior = function(config){
                 }
             }
             if (message.length > 0) {
-                // #ifdef debug
+                // #ifdef log
                 trace("sending ack, and passing on " + message);
                 // #endif
                 pub.down.outgoing(ack[1] + "," + idOut + "_" + currentMessage, origin);

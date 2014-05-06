@@ -38,7 +38,7 @@ var HAS_NAME_PROPERTY_BUG;
 var useHash = false; // whether to use the hash over the query
 var flashVersion; // will be set if using flash
 var HAS_FLASH_THROTTLED_BUG;
-// #ifdef debug
+// #ifdef log
 var _trace = emptyFn;
 // #endif
 
@@ -97,13 +97,13 @@ function hasFlash(){
 var on, un;
 if (isHostMethod(window, "addEventListener")) {
     on = function(target, type, listener){
-        // #ifdef debug
+        // #ifdef log
         _trace("adding listener " + type);
         // #endif
         target.addEventListener(type, listener, false);
     };
     un = function(target, type, listener){
-        // #ifdef debug
+        // #ifdef log
         _trace("removing listener " + type);
         // #endif
         target.removeEventListener(type, listener, false);
@@ -111,13 +111,13 @@ if (isHostMethod(window, "addEventListener")) {
 }
 else if (isHostMethod(window, "attachEvent")) {
     on = function(object, sEvent, fpNotify){
-        // #ifdef debug
+        // #ifdef log
         _trace("adding listener " + sEvent);
         // #endif
         object.attachEvent("on" + sEvent, fpNotify);
     };
     un = function(object, sEvent, fpNotify){
-        // #ifdef debug
+        // #ifdef log
         _trace("removing listener " + sEvent);
         // #endif
         object.detachEvent("on" + sEvent, fpNotify);
@@ -150,7 +150,7 @@ function dom_onReady(){
         return;
     }
     domIsReady = true;
-    // #ifdef debug
+    // #ifdef log
     _trace("firing dom_onReady");
     // #endif
     for (var i = 0; i < domReadyQueue.length; i++) {
@@ -247,6 +247,9 @@ function noConflict(ns){
     if (typeof ns != "string" || !ns) {
         throw new Error('namespace must be a non-empty string');
     }
+    // #endif
+
+    // #ifdef log
     _trace("Settings namespace to '" + ns + "'");
     // #endif
     
@@ -344,7 +347,7 @@ function resolveUrl(url){
         url = url.replace(reParent, "");
     }
     
-    // #ifdef debug
+    // #ifdef log
     _trace("resolved url '" + url + "'");
     // #endif
     return url;
@@ -476,7 +479,7 @@ function testForNamePropertyBug(){
     input.name = IFRAME_PREFIX + "TEST" + channelId; // append channelId in order to avoid caching issues
     HAS_NAME_PROPERTY_BUG = input !== form.elements[input.name];
     document.body.removeChild(form);
-    // #ifdef debug
+    // #ifdef log
     _trace("HAS_NAME_PROPERTY_BUG: " + HAS_NAME_PROPERTY_BUG);
     // #endif
 }
@@ -494,7 +497,7 @@ function testForNamePropertyBug(){
  * @type DOMElement
  */
 function createFrame(config){
-    // #ifdef debug
+    // #ifdef log
     _trace("creating frame: " + config.props.src);
     // #endif
     if (undef(HAS_NAME_PROPERTY_BUG)) {
@@ -616,7 +619,7 @@ function prepareTransportStack(config){
     var protocol = config.protocol, stackEls;
     config.isHost = config.isHost || undef(query.xdm_p);
     useHash = config.hash || false;
-    // #ifdef debug
+    // #ifdef log
     _trace("preparing transport stack");
     // #endif
     
@@ -624,7 +627,7 @@ function prepareTransportStack(config){
         config.props = {};
     }
     if (!config.isHost) {
-        // #ifdef debug
+        // #ifdef log
         _trace("using parameters from query");
         // #endif
         config.channel = query.xdm_c.replace(/["'<>\\]/g, "");
@@ -681,11 +684,11 @@ function prepareTransportStack(config){
                  */
                 protocol = "0";
             }
-            // #ifdef debug
+            // #ifdef log
             _trace("selecting protocol: " + protocol);
             // #endif
         }
-        // #ifdef debug
+        // #ifdef log
         else {
             _trace("using protocol: " + protocol);
         }
@@ -703,7 +706,7 @@ function prepareTransportStack(config){
             }, true);
             if (config.isHost) {
                 if (!config.local) {
-                    // #ifdef debug
+                    // #ifdef log
                     _trace("looking for image to use as local");
                     // #endif
                     // If no local is set then we need to find an image hosted on the current domain
@@ -717,7 +720,7 @@ function prepareTransportStack(config){
                         }
                     }
                     if (!config.local) {
-                        // #ifdef debug
+                        // #ifdef log
                         _trace("no image found, defaulting to using the window");
                         // #endif
                         // If no local was set, and we are unable to find a suitable file, then we resort to using the current window 

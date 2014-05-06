@@ -1,5 +1,5 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global console, _FirebugCommandLine,  easyXDM, window, escape, unescape, isHostObject, undef, _trace, domIsReady, emptyFn, namespace */
+/*global console, _FirebugCommandLine,  easyXDM, window, escape, unescape, isHostObject, undef, _trace, domIsReady, emptyFn, namespace, log, logger */
 //
 // easyXDM
 // http://easyxdm.net/
@@ -24,7 +24,7 @@
 // THE SOFTWARE.
 //
 
-// #ifdef debug
+// #ifdef log
 var debug = {
     _deferred: [],
     flush: function(){
@@ -54,6 +54,7 @@ var debug = {
      * @param {String} msg The message to log
      */
     log: function(msg){
+        // #ifndef jasper
         // Uses memoizing to cache the implementation
         if (!isHostObject(window, "console") || undef(console.log)) {
             /**
@@ -73,7 +74,13 @@ var debug = {
             };
         }
         this.log(msg);
+        // #endif
+
+        // #ifdef jasper
+            log.debug(location.host + (namespace ? ":" + namespace : "") + " - " + this.getTime() + ": " + msg);
+        // #endif
     },
+    // #ifndef jasper
     /**
      * Will try to trace the given message either to a DOMElement with the id "log",
      * or by using console.info.
@@ -157,18 +164,28 @@ var debug = {
             this.trace(msg);
         }
     },
+    // #endif
     /**
      * Creates a method usable for tracing.
      * @param {String} name The name the messages should be marked with
      * @return {Function} A function that accepts a single string as argument.
      */
     getTracer: function(name){
+        // #ifdef jasper
+        var log = logger.register(name);
+        return function(msg){
+            log.debug(msg);
+        };
+        // #endif
+
+        // #ifndef jasper
         return function(msg){
             debug.trace(name + ": " + msg);
         };
+        // #endif
     }
 };
 debug.log("easyXDM present on '" + location.href);
 easyXDM.Debug = debug;
-_trace = debug.getTracer("{Private}");
+_trace = debug.getTracer("EasyXDM.{Private}");
 // #endif
