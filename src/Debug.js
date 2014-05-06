@@ -77,7 +77,7 @@ var debug = {
         // #endif
 
         // #ifdef jasper
-            log.debug(location.host + (namespace ? ":" + namespace : "") + " - " + this.getTime() + ": " + msg);
+            log.debug(location.host + (namespace ? ":" + namespace : "") + ": " + msg);
         // #endif
     },
     // #ifndef jasper
