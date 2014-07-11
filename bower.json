@@ -1,0 +1,28 @@
+{
+  "name": "easyXDM-jasper",
+  "version": "2.4.19",
+  "homepage": "https://github.com/oyvindkinsey/easyXDM",
+  "authors": [
+    "nesterone <igornester@gmail.com>"
+  ],
+  "description": "Patched version of easyXDM for jasper",
+  "keywords": [
+    "xdomain",
+    "cross-domain",
+    "transfer"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "tools",
+    "work",
+    "src",
+    "artifacts/easyXDM-2.4.17.1",
+    "artifacts/v2.4.17"
+  ]
+}

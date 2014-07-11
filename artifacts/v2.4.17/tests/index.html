@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=100">
+        <title>easyTest results</title>
+        <script type="text/javascript" src="../easyXDM.debug.js">
+            // The first instance of easyXDM
+        </script>
+        <script type="text/javascript">
+            easyXDM._test_global = true;
+        </script>
+        <script type="text/javascript" src="../easyXDM.debug.js">
+            // The second instance of easyXDM (to test noConflict)
+        </script>
+        <script type="text/javascript">
+            // Used in the noConflict test
+            var modules = {
+                easyXDM: easyXDM.noConflict("modules")
+            };
+        </script>
+        <script type="text/javascript">
+            if (location.href.indexOf("src") !== -1) {
+                if (typeof JSON === "undefined") {
+                    document.write(unescape("%3Cscript src='../../tools/json2.js' type='text/javascript'%3E%3C/script%3E"));
+                }
+            }
+            else {
+                if (typeof JSON === "undefined") {
+                    document.write(unescape("%3Cscript src='../json2.js' type='text/javascript'%3E%3C/script%3E"));
+                }
+            }
+        </script>
+        <script type="text/javascript" src="easyTest.js">
+        </script>
+        <link type="text/css" rel="stylesheet" href="easyTest.css"/>
+        <script type="text/javascript" src="tests.js">
+        </script>
+        <style type="text/css">
+            
+            #embedded {
+                height: 100px;
+            }
+            
+            #embedded iframe {
+                height: 50px;
+            }
+            
+            #log {
+                height: 100px;
+                border: 1px dotted black;
+                overflow: auto
+            }
+            
+            .easyTest_messages {
+                height: 300px;
+                border: 1px dotted black;
+                overflow: auto;
+            }
+        </style>
+    </head>
+    <body onload="runTests();">
+        <h1>easyXDM test suite</h1>
+        <h4>easyTest messages</h4>
+        <div id="messages">
+        </div>
+        <h4>easyXDM tracelog</h4>
+        <!-- easyXDM.Debug.trace(msg) will output its messages to any element with the id "log" -->
+        <div id="log">
+        </div>
+        <div id="embedded">
+        </div>
+        <script type="text/javascript">
+            if (location.host.indexOf("easyxdm.net") !== -1) {
+                var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+                document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+            }
+        </script>
+        <script type="text/javascript">
+            if (location.host.indexOf("easyxdm.net") !== -1) {
+                try {
+                    var pageTracker = _gat._getTracker("UA-9535591-3");
+                    pageTracker._setDomainName(".easyxdm.net");
+                    pageTracker._trackPageview();
+                } 
+                catch (err) {
+                }
+            }
+        </script>
+    </body>
+</html>

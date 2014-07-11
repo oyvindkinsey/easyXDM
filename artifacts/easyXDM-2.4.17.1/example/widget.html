@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+    <head>
+        <title>easyXDM.Widget</title>
+        <script type="text/javascript" src="../easyXDM.debug.js">
+        </script>
+        <script type="text/javascript">
+            easyXDM.DomHelper.requiresJSON("../json2.js");
+        </script>
+        <script type="text/javascript" src="../easyXDM.Widgets.debug.js">
+        </script>
+        <script type="text/javascript">
+            easyXDM.whenReady(function(){
+                var widget = new easyXDM.Widget({
+                    subscriptions: ["testtopic"],
+                    swf: "../easyxdm.swf",
+                    initialize: function(widget, widgetManager){
+                        // Set up the widget
+                        var _container, _btnPublish;
+                        
+                        // Render the UI
+                        _container = document.body.appendChild(document.createElement("div"));
+                        _btnPublish = _container.appendChild(document.createElement("button"));
+                        _btnPublish.innerHTML = "Publish";
+                        easyXDM.DomHelper.on(_btnPublish, "click", function(){
+                            widget.publish("testtopic", {
+                                latitude: 1,
+                                longitude: 2
+                            });
+                        });
+                        
+                        // Register the handler for incoming messages
+                        widget.registerMessageHandler(function(url, topic, data){
+                            _container.appendChild(document.createElement("div")).innerHTML = "got data on topic " + topic + " from " + url;
+                        });
+                    },
+                    initialized: function(widget, widgetManager){
+                        widget.publish("testtopic", {
+                            latitude: 1,
+                            longitude: 2
+                        });
+                    }
+                });
+            });
+        </script>
+    </head>
+    <body>
+    </body>
+</html>

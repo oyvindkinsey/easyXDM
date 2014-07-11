@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+    <head>
+        <title>easyXDM</title>
+        <script type="text/javascript" src="../easyXDM.debug.js">
+        </script>
+        <script type="text/javascript">
+            if (location.href.indexOf("src") !== -1) {
+                if (typeof JSON === "undefined") {
+                    document.write(unescape("%3Cscript src='../../tools/json2.js' type='text/javascript'%3E%3C/script%3E"));
+                }
+            }
+            else {
+                if (typeof JSON === "undefined") {
+                    document.write(unescape("%3Cscript src='../json2.js' type='text/javascript'%3E%3C/script%3E"));
+                }
+            }
+        </script>
+        <script type="text/javascript">
+            easyXDM.DomHelper.requiresJSON("../json2.js");
+        </script>
+        <script type="text/javascript">
+            var remote = new easyXDM.Rpc({
+                local: "../name.html",
+                swf: "../easyxdm.swf"
+            }, {
+                remote: {
+                    voidCallback: {}
+                },
+                local: {
+                    voidMethod: function(msg){
+                        // Echo back the message
+                        remote.voidCallback(msg);
+                    },
+                    asyncMethod: function(msg, fn){
+                        window.setTimeout(function(){
+                            // Echo back the msg
+                            fn(msg);
+                        }, 100);
+                    },
+                    // use the shorthand notation
+                    method: function(msg){
+                        // Echo back the msg
+                        return msg;
+                    },
+                    error: function(){
+                        var a, b = a.c;
+                    },
+                    namedParamsMethod: {
+                        method: function(params){
+                            return params.msg;
+                        }
+                    }
+                }
+            });
+            window.onunload = function(){
+                if (remote) {
+                    remote.destroy();
+                }
+            };
+        </script>
+    </head>
+    <body>
+    </body>
+</html>

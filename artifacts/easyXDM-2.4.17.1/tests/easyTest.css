@@ -1,0 +1,14 @@
+.easyTest_messages {
+}
+
+.easyTest_error {
+    color: red;
+}
+
+.easyTest_success {
+    color: green;
+}
+
+.easyTest_msg {
+    color: black;
+}

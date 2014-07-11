@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+    <head>
+        <title>easyXDM</title>
+        <script type="text/javascript">
+            var target = location.hash.substring(1);
+            
+            var host = window.opener.frames[target];
+            
+            if (window.opener) {
+                try {
+                    // test if we have access to the document 
+                    if (window.opener.document.title) {
+                        host = window.opener;
+                    }
+                    
+                } 
+                catch (xDomainError) {
+                    // we have an opener, but it's not on our domain, 
+                    host = window.opener.frames[target];
+                }
+                
+                if (host) {
+                    try {
+                        host.setApp(window);
+                    } 
+                    catch (browserHostError) {
+                        alert("was unable to gain a reference to the iframe");
+                    }
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <!-- Send some data to the other side using the proxy --><input type="button" onclick="host.sendData({a:'b',c:'d',e:'f'});" value="send data to local"/>
+    </body>
+</html>

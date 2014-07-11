@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+    <head>
+        <title>easyXDM</title>
+        <style type="text/css">
+            html, body {
+                overflow: hidden;
+                margin: 0px;
+                padding: 0px;
+                background-color: red;
+            }
+        </style>
+    </head>
+    <body>
+        <a href="resized_iframe_1.html">resized_iframe_1.html</a>
+        <br/>
+        (This page will resize its content after three seconds)
+        <br/>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eu felis libero, non ultricies ligula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed in lorem libero. Phasellus malesuada, mauris eget suscipit tristique, dolor dui blandit purus, ut mollis eros dolor et elit. Ut consequat ultrices metus, pretium mattis dui adipiscing vitae. Nunc cursus, sapien vehicula auctor faucibus, enim orci pretium risus, id congue ligula justo sed felis. Proin nec quam justo. Cras tempor odio eget orci lacinia sit amet malesuada leo feugiat. In accumsan tincidunt enim, vitae ultricies arcu egestas in. Nulla rhoncus eros vel ipsum venenatis porta. Suspendisse id erat nec mauris ultricies consectetur id feugiat odio. Vestibulum pretium tristique magna sed ultrices. Suspendisse tortor mauris, facilisis et lobortis quis, suscipit sed est. Sed vitae tortor at lacus pretium blandit. Donec vitae nibh quis orci mollis fringilla. Duis tempus augue nec ipsum euismod elementum.
+        Donec pharetra sem nec lacus posuere et lacinia ligula sollicitudin. Morbi semper commodo posuere. In adipiscing nulla ut urna fermentum vestibulum. Sed consectetur massa non neque facilisis interdum. Quisque semper massa et urna euismod nec fermentum metus feugiat. Morbi tempor commodo enim non lacinia. Aliquam elementum tortor mattis odio congue a egestas lacus bibendum. Integer nec leo massa, a ullamcorper mi. Morbi vitae massa arcu. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+        Nam nulla nibh, tempus ut dictum eget, euismod vitae metus. Donec vitae nulla nec quam sagittis gravida vel quis eros. Nullam vel est justo. Donec euismod interdum magna, et rutrum libero tincidunt vel. Praesent imperdiet, magna et suscipit facilisis, nulla justo consequat nisl, et mollis elit nunc a est. Sed felis quam, condimentum eget gravida non, semper non quam. Duis vestibulum sem id erat tristique eleifend. Phasellus ante nunc, pulvinar nec facilisis at, hendrerit sed leo. Morbi lacinia nisl id nunc faucibus lacinia. Curabitur adipiscing leo a odio aliquet hendrerit. Nullam laoreet pulvinar suscipit.
+        Cras ante tortor, rutrum non pharetra vel, tempor et velit. Mauris semper, libero sit amet interdum interdum, metus purus rutrum libero, eget suscipit lectus augue eu magna. Aliquam quis dui a nunc luctus faucibus. Sed viverra augue rutrum odio placerat laoreet. Nulla scelerisque augue nec enim condimentum sollicitudin. Proin accumsan, turpis in viverra lobortis, nulla mauris euismod turpis, sit amet auctor felis lacus sed leo. Nullam posuere bibendum urna, ut mattis eros varius ac. Mauris sed metus orci, ut lobortis eros. Sed imperdiet bibendum tincidunt. Donec adipiscing sapien vitae ligula faucibus quis auctor nisi pretium. Morbi at nulla quam, in aliquet quam. Suspendisse potenti. Fusce varius gravida egestas. Nulla lectus velit, posuere et auctor a, congue id massa. Quisque ut lectus eu metus malesuada sollicitudin ac a risus.
+        Nullam massa ipsum, pulvinar ut facilisis a, commodo ut orci. Mauris ac ipsum diam, sit amet laoreet tortor. In pretium, nulla vel ornare euismod, nibh augue pharetra magna, at semper felis diam in ipsum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus blandit ornare dignissim. Fusce et nulla urna. Morbi nec ante erat. Nullam ut urna libero. Nulla non ipsum purus, et cursus lectus. Etiam vehicula, mauris in faucibus vehicula, dolor quam sodales neque, sed laoreet est augue at lacus. Nunc tincidunt lacinia elit eu dignissim. Mauris at enim mauris. Donec congue auctor dui, eget posuere ante accumsan in. Nulla non quam enim, eget tempor arcu. Suspendisse nec nibh diam, ut congue est. Fusce at urna eget velit posuere ornare nec eget mauris. Sed accumsan magna et enim mollis dignissim.
+        <script type="text/javascript">
+            // here we fake an action that would the casue the body's size to mutate.
+            setTimeout(function() {
+                var html = document.body.innerHTML;
+                document.body.innerHTML = html.substring(0, html.length / 2);
+            }, 3000);
+
+        </script>
+    </body>
+</html>

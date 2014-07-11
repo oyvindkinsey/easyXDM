@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+    <head>
+        <title>easyXDM</title>
+        <script type="text/javascript" src="../easyXDM.debug.js">
+        </script>
+        <script type="text/javascript">
+            /**
+             * Request the use of the JSON object
+             */
+            easyXDM.DomHelper.requiresJSON("../json2.js");
+        </script>
+        <script type="text/javascript">
+            var remote = new easyXDM.Rpc(/** The channel configuration*/{
+                local: "../name.html",
+                swf: "../easyxdm.swf"
+            }, /** The configuration */ {
+                remote: {
+                    alertMessage: {}
+                },
+                local: {
+                    addNumbers: function(a, b){
+                        return a + b;
+                    },
+                    multiplyNumbers: function(a, b, fn){
+                        window.setTimeout(function(){
+                            fn(a * b);
+                        }, 5000);
+                    },
+                    noOp: function(){
+                        alert("Method not returning any data");
+                    }
+                }
+            });
+        </script>
+    </head>
+    <body>
+        <script type="text/javascript">
+            document.write("Domain: " + location.host);
+        </script>
+        <!-- easyXDM.Debug.trace(msg) will output its messages to any element with the id "log" -->
+        <div id="log" style="height:100px;border:1px dotted black;overflow:auto">
+        </div>
+        <input type="button" onclick="remote.alertMessage('message from remote');" value="call alertMessage on local domain"/>
+    </body>
+</html>

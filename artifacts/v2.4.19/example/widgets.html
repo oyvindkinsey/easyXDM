@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+    <head>
+        <title>easyXDM</title>
+        <script type="text/javascript" src="../easyXDM.debug.js">
+        </script>
+        <script type="text/javascript">
+            easyXDM.DomHelper.requiresJSON("../json2.js");
+        </script>
+        <script type="text/javascript" src="../easyXDM.Widgets.debug.js">
+        </script>
+        <script type="text/javascript">
+            var _widgetManager;
+            easyXDM.whenReady(function(){
+                _widgetManager = new easyXDM.WidgetManager({
+                    swf: "../easyxdm.swf",
+                    container: document.getElementById("widgets")
+                });
+                document.getElementById("widget1url").value = location.href.replace("consumer", "provider").replace("widgets.html", "widget.html");
+                document.getElementById("widget2url").value = location.href.replace("consumer.", "").replace("widgets.html", "widget.html");
+            });
+        </script>
+        <style type="text/css">
+            
+            #widgets {
+                height: 400px;
+            }
+            
+            #widgets iframe {
+                width: 200px;
+                height: 300px;
+                float: left;
+            }
+        </style>
+    </head>
+    <body>
+        <div style="border:1px solid black;padding:3px;margin:10px;">
+            <a href="index.html">Index of examples</a>
+            | <a href="http://github.com/oyvindkinsey/easyXDM/#readme">Readme at github</a>
+            | 
+            | <a href="http://easyxdm.net/">easyXDM.net</a>
+            | <a href="http://groups.google.com/group/easyxdm">easyXDM at Google Groups</a>
+            <br/>
+            The examples are executing slower than the production build due to the extensive tracing.
+            <br/>
+            If you are alerted about a popup, then this is only the trace log feature. You can ignore this.
+        </div>
+        <!-- easyXDM.Debug.trace(msg) will output its messages to any element with the id "log" -->
+        <div id="log" style="height:100px;border:1px dotted black;overflow:auto">
+        </div>
+        <div>
+            <input type="text" id="widget1url" style="width:300px" value=""/><input type="button" onclick="_widgetManager.addWidget(document.getElementById('widget1url').value,{});" value="Add Widget"/><input type="button" onclick="_widgetManager.removeWidget(document.getElementById('widget1url').value);" value="Remove Widget"/>
+        </div>
+        <div>
+            <input type="text" id="widget2url" style="width:300px" value=""/><input type="button" onclick="_widgetManager.addWidget(document.getElementById('widget2url').value,{});" value="Add Widget"/><input type="button" onclick="_widgetManager.removeWidget(document.getElementById('widget2url').value);" value="Remove Widget"/>
+        </div><input type="button" onclick="_widgetManager.publish('testtopic','abc');" value="publish"/>
+        <div id="widgets">
+        </div>
+        <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+        </script>
+        <script type="text/javascript">
+            if (location.host.indexOf("easyxdm.net") !== -1) {
+                try {
+                    var pageTracker = _gat._getTracker("UA-9535591-3");
+                    pageTracker._setDomainName(".easyxdm.net");
+                    pageTracker._trackPageview();
+                } 
+                catch (err) {
+                }
+            }
+        </script>
+    </body>
+</html>

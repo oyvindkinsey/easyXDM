@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+    <head>
+        <title>easyXDM</title>
+        <script type="text/javascript" src="../easyXDM.debug.js">
+        </script>
+        <script type="text/javascript">
+            var serializer = {
+                /**
+                 * Serializes a hashtable and returns it as a string
+                 * @param {Object} data The data to serialize
+                 * @returns The serialized string
+                 * @type {String}
+                 */
+                stringify: function(data){
+                    var message = "";
+                    for (var key in data) {
+                        if (data.hasOwnProperty(key)) {
+                            message += key + "=" + escape(data[key]) + "&";
+                        }
+                    }
+                    return message.substring(0, message.length - 1);
+                },
+                /**
+                 * Deserializes a string and returns a hashtable
+                 * @param {String} message The string to deserialize
+                 * @returns An hashtable populated with key-value pairs
+                 * @type {Object}
+                 */
+                parse: function(message){
+                    var data = {};
+                    var d = message.split("&");
+                    var pair, key, value;
+                    for (var i = 0, len = d.length; i < len; i++) {
+                        pair = d[i];
+                        key = pair.substring(0, pair.indexOf("="));
+                        value = pair.substring(key.length + 1);
+                        data[key] = unescape(value);
+                    }
+                    return data;
+                }
+            };
+            
+            var socket = new easyXDM.Socket(/** The configuration */{
+                local: "../name.html",
+                swf: "../easyxdm.swf",
+                /**
+                 * Register the method that should handle incoming data
+                 * @param {Object} data
+                 * @param {String} origin
+                 */
+                onMessage: function(data, origin){
+                    data = serializer.parse(data);
+                    alert("Received data from '" + origin + "':");
+                    for (var key in data) {
+                        alert("Property '" + key + "'=" + data[key]);
+                    }
+                }
+            });
+        </script>
+    </head>
+    <body>
+    </body>
+</html>

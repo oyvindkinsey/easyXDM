@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+    <head>
+        <title>easyXDM</title>
+    </head>
+    <body>
+        <div style="border:1px solid black;padding:3px;margin:10px;">
+            <a href="http://github.com/oyvindkinsey/easyXDM/#readme">Readme at github</a>
+            | 
+            | <a href="http://easyxdm.net/">easyXDM.net</a>
+            | <a href="http://groups.google.com/group/easyxdm">easyXDM at Google Groups</a>
+            <br/>
+            The examples are executing slower than the production build due to the extensive tracing.
+            <br/>
+            If you are alerted about a popup, then this is only the trace log feature. You can ignore this.
+        </div>
+        <ul>
+        	<li>
+                <a href="transport.html">Transport</a>
+                <br/>
+                Example of passing a string message from one domain to another using the Socket.
+            </li>
+            <li>
+                <a href="data.html">Data</a>
+                <br/>
+                Example of passing data using a Socket and a custom serializer/deserializer.
+            </li>
+            <li>
+                <a href="methods.html">Methods</a>
+                <br/>
+                Example of using the Rpc object for executing Remote Procedure Calls with arguments and having results returned.
+            </li>
+            <li>
+                <a href="resize_iframe.html">Resize iframe</a>
+                <br/>
+                Example on how to use easyXDM to automatically resize an iframe. This uses an intermediate frame to enable navigation of the contained document
+            </li>
+            <li>
+                <a href="upload.html">Upload</a>
+                <br/>
+                Example on how to facilitate 'cross domain AJAX upload'. 
+            </li>
+            <li>
+                <a href="widgets.html">Widgets</a>
+                <br/>
+                Example on how to use easyXDM to build a framework for widgets using a pub/sub schema.
+            </li>
+            <li>
+                <a href="xhr.html">XHR</a>
+                <br/>
+                Example of using the shipped /cors/ endpoint to retrieve resources across the domain boundary.
+            </li>
+            <li>
+                <a href="bridge.html">Bridge</a>
+                <br/>
+                Experimental example of how to 'bridge' two web apps together. 
+            </li>
+        </ul>
+        <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+        </script>
+        <script type="text/javascript">
+            if (location.host.indexOf("easyxdm.net") !== -1) {
+                try {
+                    var pageTracker = _gat._getTracker("UA-9535591-3");
+                    pageTracker._setDomainName(".easyxdm.net");
+                    pageTracker._trackPageview();
+                } 
+                catch (err) {
+                }
+            }
+        </script>
+    </body>
+</html>

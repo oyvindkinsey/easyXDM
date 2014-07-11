@@ -1,0 +1,133 @@
+<!doctype html>
+<html>
+    <head>
+        <title>easyXDM</title>
+        <script type="text/javascript" src="../easyXDM.debug.js">
+        </script>
+        <script type="text/javascript">
+            var serializer = {
+                /**
+                 * Serializes a hashtable and returns it as a string
+                 * @param {Object} data The data to serialize
+                 * @returns The serialized string
+                 * @type {String}
+                 */
+                stringify: function(data){
+                    var message = "";
+                    for (var key in data) {
+                        if (data.hasOwnProperty(key)) {
+                            message += key + "=" + escape(data[key]) + "&";
+                        }
+                    }
+                    return message.substring(0, message.length - 1);
+                },
+                /**
+                 * Deserializes a string and returns a hashtable
+                 * @param {String} message The string to deserialize
+                 * @returns An hashtable populated with key-value pairs
+                 * @type {Object}
+                 */
+                parse: function(message){
+                    var data = {};
+                    var d = message.split("&");
+                    var pair, key, value;
+                    for (var i = 0, len = d.length; i < len; i++) {
+                        pair = d[i];
+                        key = pair.substring(0, pair.indexOf("="));
+                        value = pair.substring(key.length + 1);
+                        data[key] = unescape(value);
+                    }
+                    return data;
+                }
+            };
+            
+            var channel;
+            var REMOTE = (function(){
+                var remote = location.href;
+                switch (location.host) {
+                    case "provider.easyxdm.net":
+                        location.href = remote.replace("provider", "consumer");
+                        break;
+                    case "easyxdm.net":
+                        remote = remote.replace("easyxdm.net", "consumer.easyxdm.net");
+                        break;
+                    case "consumer.easyxdm.net":
+                        remote = remote.replace("consumer", "provider");
+                        break;
+                    case "xdm1":
+                        remote = remote.replace("xdm1", "xdm2");
+                        break;
+                }
+                return remote.substring(0, remote.lastIndexOf("/"));
+            }());
+            window.onload = function(){
+                /**
+                 * When the window is finished loading start setting up the channel
+                 */
+                channel = new easyXDM.Socket(/** The configuration */{
+                    /**
+                     * Register the url to hash.html, this must be an absolute path
+                     * or a path relative to the root.
+                     * @field
+                     */
+                    local: "../name.html",
+                    swf: REMOTE + "/../easyxdm.swf",
+                    /**
+                     * Register the url to the remote interface
+                     * @field
+                     */
+                    remote: REMOTE + "/remotedata.html",
+                    remoteHelper: REMOTE + "/../name.html",
+                    onReady: function(){
+                        /**
+                         * Send some data to the other side
+                         */
+                        channel.postMessage(serializer.stringify({
+                            propA: "abc",
+                            propB: "def",
+                            propC: 44
+                        }));
+                    }
+                });
+            };
+        </script>
+    </head>
+    <body>
+    <div style="border:1px solid black;padding:3px;margin:10px;">
+        <a href="index.html">Index of examples</a>
+        | <a href="http://github.com/oyvindkinsey/easyXDM/#readme">Readme at github</a>
+        | 
+        | <a href="http://easyxdm.net/">easyXDM.net</a>
+        | <a href="http://groups.google.com/group/easyxdm">easyXDM at Google Groups</a>
+        <br/>
+        The examples are executing slower than the production build due to the extensive tracing.
+        <br/>
+        If you are alerted about a popup, then this is only the trace log feature. You can ignore this.
+    </div>
+    <!-- easyXDM.Debug.trace(msg) will output its messages to any element with the id "log" -->
+    <div id="log" style="height:100px;border:1px dotted black;overflow:auto">
+    </div>
+    </div>
+    <br/>
+    <br/>
+    <input type="text" id="code" size="100" value="channel.postMessage(serializer.stringify({propC:'c',procD:'d',propE:88}))"/>
+    <button onclick="eval(document.getElementById('code').value);">
+        eval code
+    </button>
+    <script type="text/javascript">
+        var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+        document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+        if (location.host.indexOf("easyxdm.net") !== -1) {
+            try {
+                var pageTracker = _gat._getTracker("UA-9535591-3");
+                pageTracker._setDomainName(".easyxdm.net");
+                pageTracker._trackPageview();
+            } 
+            catch (err) {
+            }
+        }
+    </script>
+</body>
+</html>

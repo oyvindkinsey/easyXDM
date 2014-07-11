@@ -1,0 +1,135 @@
+<!doctype html>
+<html>
+    <head>
+        <title>easyXDM</title>
+        <script type="text/javascript" src="../easyXDM.debug.js">
+        </script>
+        <script type="text/javascript">
+            /**
+             * Request the use of the JSON object
+             */
+            easyXDM.DomHelper.requiresJSON("../json2.js");
+        </script>
+        <script type="text/javascript">
+            /* Here we demo how to have two visible web applications communicate together.
+             * This is done by having the remote interface open a visible window and loading
+             * the application in this.
+             * Since the remote interface has access to the entire DOM (including javascript)
+             * of the opened window, the remote interface is able to interface freely with the
+             * remote web application and can serve as a bridge between the two applications.
+             */
+            var REMOTE = (function(){
+                var remote = location.href;
+                switch (location.host) {
+                    case "provider.easyxdm.net":
+                        location.href = remote.replace("provider", "consumer");
+                        break;
+                    case "easyxdm.net":
+                        remote = remote.replace("easyxdm.net", "consumer.easyxdm.net");
+                        break;
+                    case "consumer.easyxdm.net":
+                        remote = remote.replace("consumer", "provider");
+                        break;
+                    case "xdm1":
+                        remote = remote.replace("xdm1", "xdm2");
+                        break;
+                }
+                return remote.substring(0, remote.lastIndexOf("/"));
+            }());
+            
+            
+            
+            
+            var proxy, win;
+            function openPopup(){
+                if (win) {
+                    // this allows to open new windows if the popup was closed
+                    if (win.closed) {
+                        win = window.open(REMOTE + '/blank.html', 'mainapp', "width=400, height=400");
+                        proxy.open("mainapp");
+                    }
+                    return;
+                }
+                // open up the popup 
+                win = window.open(REMOTE + '/blank.html', 'mainapp', "width=400, height=400");
+                
+                document.getElementById("btn").disabled = "";
+                
+                proxy = new easyXDM.Rpc(/** The configuration */{
+                    /**
+                     * Register the url to name.html, this must be an absolute path
+                     * or a path relative to the root.
+                     * @field
+                     */
+                    local: "../name.html",
+                    swf: REMOTE + "/../easyxdm.swf",
+                    /**
+                     * Register the url to the remote interface
+                     * @field
+                     */
+                    remote: REMOTE + "/remote.html",
+                    remoteHelper: REMOTE + "/../name.html"
+                }, {
+                    remote: {
+                        open: {},
+                        postMessage: {}
+                    },
+                    local: {
+                        /**
+                         * Register the method that should handle incoming data
+                         * @param {Object} data
+                         * @param {String} origin
+                         */
+                        postMessage: function(data){
+                            var div = document.createElement("div");
+                            div.innerHTML = "data from '" + proxy.origin + "'";
+                            document.body.appendChild(div);
+                            for (var key in data) {
+                                if (data.hasOwnProperty(key)) {
+                                    div = document.createElement("div");
+                                    div.innerHTML = key + "=" + data[key];
+                                    document.body.appendChild(div);
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // lets tell the proxy to open up the window as soon as possible
+                proxy.open("mainapp");
+            }
+        </script>
+    </head>
+    <body>
+        <div style="border:1px solid black;padding:3px;margin:10px;">
+            <a href="index.html">Index of examples</a>
+            | <a href="http://github.com/oyvindkinsey/easyXDM/#readme">Readme at github</a>
+            | 
+            | <a href="http://easyxdm.net/">easyXDM.net</a>
+            | <a href="http://groups.google.com/group/easyxdm">easyXDM at Google Groups</a>
+            <br/>
+            The examples are executing slower than the production build due to the extensive tracing.
+            <br/>
+            If you are alerted about a popup, then this is only the trace log feature. You can ignore this.
+        </div>
+        <!-- easyXDM.Debug.trace(msg) will output its messages to any element with the id "log" -->
+        <div id="log" style="height:100px;border:1px dotted black;overflow:auto">
+        </div>
+        <input id="btnOpen" type="button" onclick="openPopup();" value="Open popup"/><!-- Send som data to the other side --><input id="btn" disabled="disabled" type="button" onclick="proxy.postMessage({a:'b',c:'d',e:'f'});" value="send data to remote"/>
+        <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+        </script>
+        <script type="text/javascript">
+            if (location.host.indexOf("easyxdm.net") !== -1) {
+                try {
+                    var pageTracker = _gat._getTracker("UA-9535591-3");
+                    pageTracker._setDomainName(".easyxdm.net");
+                    pageTracker._trackPageview();
+                } 
+                catch (err) {
+                }
+            }
+        </script>
+    </body>
+</html>

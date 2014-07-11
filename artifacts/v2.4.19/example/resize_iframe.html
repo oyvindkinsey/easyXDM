@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+    <head>
+        <title>easyXDM</title>
+        <script type="text/javascript" src="../easyXDM.debug.js">
+        </script>
+        <script type="text/javascript">
+            var REMOTE = (function(){
+                var remote = location.href;
+                switch (location.host) {
+                    case "provider.easyxdm.net":
+                        location.href = remote.replace("provider", "consumer");
+                        break;
+                    case "easyxdm.net":
+                        remote = remote.replace("easyxdm.net", "consumer.easyxdm.net");
+                        break;
+                    case "consumer.easyxdm.net":
+                        remote = remote.replace("consumer", "provider");
+                        break;
+                    case "xdm1":
+                        remote = remote.replace("xdm1", "xdm2");
+                        break;
+                }
+                return remote.substring(0, remote.lastIndexOf("/"));
+            }());
+            
+            var transport = new easyXDM.Socket(/** The configuration */{
+                remote: REMOTE + "/resize_intermediate.html?url=resized_iframe_1.html",
+                swf: REMOTE + "/../easyxdm.swf",
+                container: "embedded",
+                onMessage: function(message, origin){
+                    this.container.getElementsByTagName("iframe")[0].style.height = message + "px";
+                }
+            });
+        </script>
+    </head>
+    <body>
+        <div style="border:1px solid black;padding:3px;margin:10px;">
+            <a href="index.html">Index of examples</a>
+            | <a href="http://github.com/oyvindkinsey/easyXDM/#readme">Readme at github</a>
+            | 
+            | <a href="http://easyxdm.net/">easyXDM.net</a>
+            | <a href="http://groups.google.com/group/easyxdm">easyXDM at Google Groups</a>
+            <br/>
+            The examples are executing slower than the production build due to the extensive tracing.
+            <br/>
+            If you are alerted about a popup, then this is only the trace log feature. You can ignore this.
+        </div>
+        <!-- easyXDM.Debug.trace(msg) will output its messages to any element with the id "log" -->
+        <div id="log" style="height:100px;border:1px dotted black;overflow:auto">
+        </div>
+        <div id="embedded">
+        </div>
+        <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+        </script>
+        <script type="text/javascript">
+            if (location.host.indexOf("easyxdm.net") !== -1) {
+                try {
+                    var pageTracker = _gat._getTracker("UA-9535591-3");
+                    pageTracker._setDomainName(".easyxdm.net");
+                    pageTracker._trackPageview();
+                } 
+                catch (err) {
+                }
+            }
+        </script>
+    </body>
+</html>

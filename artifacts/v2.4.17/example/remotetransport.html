@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+    <head>
+        <title>easyXDM</title>
+        <script type="text/javascript" src="../easyXDM.debug.js">
+        </script>
+        <script type="text/javascript">
+            var transport = new easyXDM.Socket(/** The configuration */{
+                local: "../name.html",
+                swf: "../easyxdm.swf",
+                /**
+                 * Register the method that should handle incoming messages
+                 * @param {String} data
+                 * @param {String} origin
+                 */
+                onMessage: function(message, origin){
+                    alert("Received '" + message + "' from '" + origin + "'");
+                }
+            });
+        </script>
+    </head>
+    <body>
+    </body>
+</html>
