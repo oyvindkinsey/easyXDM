@@ -77,7 +77,7 @@ easyXDM.stack.PostMessageTransport = function(config){
         // #ifdef debug
         trace("received message '" + event.data + "' from " + origin);
         // #endif
-        if (origin == targetOrigin && event.data.substring(0, config.channel.length + 1) == config.channel + " ") {
+        if (origin == targetOrigin && typeof event.data === 'string' && event.data.substring(0, config.channel.length + 1) == config.channel + " ") {
             pub.up.incoming(event.data.substring(config.channel.length + 1), origin);
         }
     }
