@@ -133,7 +133,7 @@ Call the methods like this
         // here we can do something with the return value from `helloWorld`
     }, function(errorObj){
         // here we can react to a possible error
-    };
+    });
 ```
 
 And this is what's needed for the *provider*
