@@ -2627,6 +2627,8 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
             }
             // Send the method request
             _send(message);
+            // return request id to calling component to allow abort this request later.
+            return message.id;
         };
     }
     
@@ -2701,6 +2703,10 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
             var data = serializer.parse(message);
             if (data.method) {
                 trace("received request to execute method " + data.method + (data.id ? (" using callback id " + data.id) : ""));
+                if(data && data.params && data.params[0] && typeof data.params[0] === "object"){
+                    // forward request id to remote page to allow abort this request later.
+                    data.params[0].id = data.id;
+                }
                 // A method call from the remote end
                 if (config.handle) {
                     config.handle(data, _send);
