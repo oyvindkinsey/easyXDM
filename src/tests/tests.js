@@ -174,6 +174,11 @@ function runTests(){
                 return easyXDM.checkAcl(this.acl, "http://domainb.com");
             }
         }, {
+            name: "Dot only matches dot",
+            run: function(){
+                return !easyXDM.checkAcl(this.acl, "http://wwwXdomain.invalid");
+            }
+        }, {
             name: "Match RegExp",
             run: function(){
                 return easyXDM.checkAcl(this.acl, "http://domcccain.com");

@@ -596,7 +596,7 @@ function checkAcl(acl, domain){
     var re, i = acl.length;
     while (i--) {
         re = acl[i];
-        re = new RegExp(re.substr(0, 1) == "^" ? re : ("^" + re.replace(/(\*)/g, ".$1").replace(/\?/g, ".") + "$"));
+        re = new RegExp(re.substr(0, 1) == "^" ? re : ("^" + re.replace(/\./g, "\\.").replace(/\*/g, ".*").replace(/\?/g, ".") + "$"));
         if (re.test(domain)) {
             return true;
         }
