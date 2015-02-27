@@ -501,11 +501,19 @@ function createFrame(config){
         testForNamePropertyBug();
     }
     var frame;
-    // This is to work around the problems in IE6/7 with setting the name property. 
+    // This is to work around the problems in IE6/7 with setting the name property.
     // Internally this is set as 'submitName' instead when using 'iframe.name = ...'
-    // This is not required by easyXDM itself, but is to facilitate other use cases 
+    // This is not required by easyXDM itself, but is to facilitate other use cases
     if (HAS_NAME_PROPERTY_BUG) {
-        frame = document.createElement("<iframe name=\"" + config.props.name + "\"/>");
+	try {
+	    frame = document.createElement("<iframe name=\"" + config.props.name + "\"/>");
+	}
+	catch(e) {
+	    // Due to people phasing out IE6/7 support form.elements behaviour may be altered
+	    // to falsely trigger the HAS_NAME_PROPERTY_BUG
+	    frame = document.createElement("IFRAME");
+	    frame.name = config.props.name;
+	}
     }
     else {
         frame = document.createElement("IFRAME");
