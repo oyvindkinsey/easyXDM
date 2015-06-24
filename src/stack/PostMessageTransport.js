@@ -112,7 +112,7 @@ easyXDM.stack.PostMessageTransport = function(config){
             if (config.isHost) {
                 // add the event handler for listening
                 var waitForReady = function(event){  
-                    if (event.data == config.channel + "-ready") {
+                    if (frame && event.data == config.channel + "-ready") {
                         // #ifdef debug
                         trace("firing onReady");
                         // #endif
