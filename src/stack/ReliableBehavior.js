@@ -55,7 +55,6 @@ easyXDM.stack.ReliableBehavior = function(config){
                 currentMessage = "";
                 if (callback) {
                     callback(true);
-                    callback = null;
                 }
             }
             if (message.length > 0) {
