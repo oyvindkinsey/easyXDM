@@ -73,6 +73,10 @@ easyXDM.stack.PostMessageTransport = function(config){
      * @param {Object} event The messageevent
      */
     function _window_onMessage(event){
+        if (typeof event.data !== "string") {
+            // postMessage also supports passing objects, but easyXDM's messages are always strings
+            return;
+        }
         var origin = _getOrigin(event);
         // #ifdef debug
         trace("received message '" + event.data + "' from " + origin);

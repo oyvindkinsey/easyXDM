@@ -58,6 +58,9 @@
             // #ifdef debug
             this._trace("retrieving function " + name);
             // #endif
+            if (!_map.hasOwnProperty(name)) {
+                return;
+            }
             var fn = _map[name];
             // #ifdef debug
             if (!fn) {

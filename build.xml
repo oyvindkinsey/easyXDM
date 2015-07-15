@@ -4,7 +4,7 @@
 	<property file="build.secret.properties"/>
 	<property name="project.build.artifactdir" value="./artifacts/"/>
 	<property name="project.build.publishdir" value="./artifacts/"/>
-	<property name="project.build.version" value="2.4.17"/>
+	<property name="project.build.version" value="2.4.19"/>
 	
 	<!-- Setup classpath for js-build-tools ant tasks -->
 	<path id="js-build-tasks.classpath">
@@ -32,7 +32,7 @@
 	</target>
 	
 	<target name="jslint">
-		<jslint encoding="UTF-8">
+		<jslint encoding="UTF-8" options="laxbreak">
 			<formatter type="plain" />
 			<fileset dir="${project.src.dir}" includes="easyXDM*.js"/>
 			<fileset dir="${project.src.dir}/stack/" includes="*.js"/>
