@@ -85,6 +85,28 @@ easyXDM.stack.PostMessageTransport = function(config){
             pub.up.incoming(event.data.substring(config.channel.length + 1), origin);
         }
     }
+
+    
+    /**
+     * This adds the listener for messages when the frame is ready.
+     * @private
+     * @param {Object} event The messageevent
+     */
+    // add the event handler for listening
+    function _window_waitForReady(event){  
+        if (event.data == config.channel + "-ready") {
+            // #ifdef debug
+            trace("firing onReady");
+            // #endif
+            // replace the eventlistener
+            callerWindow = ("postMessage" in frame.contentWindow) ? frame.contentWindow : frame.contentWindow.document;
+            un(window, "message", _window_waitForReady);
+            on(window, "message", _window_onMessage);
+            setTimeout(function(){
+                pub.up.callback(true);
+            }, 0);
+        }
+    };
     
     return (pub = {
         outgoing: function(message, domain, fn){
@@ -97,6 +119,7 @@ easyXDM.stack.PostMessageTransport = function(config){
             // #ifdef debug
             trace("destroy");
             // #endif
+            un(window, "message", _window_waitForReady);
             un(window, "message", _window_onMessage);
             if (frame) {
                 callerWindow = null;
@@ -110,22 +133,7 @@ easyXDM.stack.PostMessageTransport = function(config){
             // #endif
             targetOrigin = getLocation(config.remote);
             if (config.isHost) {
-                // add the event handler for listening
-                var waitForReady = function(event){  
-                    if (event.data == config.channel + "-ready") {
-                        // #ifdef debug
-                        trace("firing onReady");
-                        // #endif
-                        // replace the eventlistener
-                        callerWindow = ("postMessage" in frame.contentWindow) ? frame.contentWindow : frame.contentWindow.document;
-                        un(window, "message", waitForReady);
-                        on(window, "message", _window_onMessage);
-                        setTimeout(function(){
-                            pub.up.callback(true);
-                        }, 0);
-                    }
-                };
-                on(window, "message", waitForReady);
+                on(window, "message", _window_waitForReady);
                 
                 // set up the iframe
                 apply(config.props, {
