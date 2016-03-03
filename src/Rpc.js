@@ -146,7 +146,10 @@ easyXDM.Rpc = function(config, jsonRpcConfig){
             }
         }
     }
-	
+    
+    // read query data
+    buildQuery(config);
+    
     // create the stack
     var stack = chainStack(prepareTransportStack(config).concat([new easyXDM.stack.RpcBehavior(this, jsonRpcConfig), {
         callback: function(success){
