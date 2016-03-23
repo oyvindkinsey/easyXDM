@@ -4,7 +4,7 @@
 	<property file="build.secret.properties"/>
 	<property name="project.build.artifactdir" value="./artifacts/"/>
 	<property name="project.build.publishdir" value="./artifacts/"/>
-	<property name="project.build.version" value="2.4.19"/>
+	<property name="project.build.version" value="2.4.20"/>
 	
 	<!-- Setup classpath for js-build-tools ant tasks -->
 	<path id="js-build-tasks.classpath">
