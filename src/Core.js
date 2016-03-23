@@ -750,8 +750,6 @@ function prepareTransportStack(config){
             }
             else {
                 apply(config, {
-                    channel: query.xdm_c,
-                    remote: query.xdm_e,
                     useParent: !undef(query.xdm_pa),
                     usePolling: !undef(query.xdm_po),
                     useResize: config.useParent ? false : config.useResize

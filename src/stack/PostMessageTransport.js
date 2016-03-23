@@ -106,7 +106,7 @@ easyXDM.stack.PostMessageTransport = function(config){
                 pub.up.callback(true);
             }, 0);
         }
-    };
+    }
     
     return (pub = {
         outgoing: function(message, domain, fn){
