@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+    <head>
+        <title>easyXDM</title>
+        <script type="text/javascript" src="../easyXDM.debug.js">
+        </script>
+        <script type="text/javascript">
+            easyXDM.DomHelper.requiresJSON("../json2.js");
+        </script>
+        <script type="text/javascript">
+            // the `rpc` object will be referenced by the upload handler
+            var rpc = new easyXDM.Rpc({
+                swf: "../easyxdm.swf"
+            }, {
+                remote: {
+                    returnUploadResponse: {}
+                }
+            });
+        </script>
+    </head>
+    <body>
+        <iframe name="upload_target" src="about:blank">
+        </iframe>
+    </body>
+</html>
