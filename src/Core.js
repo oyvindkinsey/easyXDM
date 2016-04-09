@@ -592,6 +592,11 @@ function createFrame(config){
  * @return {Boolean} True if the domain is allowed, false if not.
  */
 function checkAcl(acl, domain){
+	// No need to check cross-domain communication as we are in the same domain.
+	if (getLocation(location.href) == getLocation(domain)) {		
+		return true;
+	}
+
     // normalize into an array
     if (typeof acl == "string") {
         acl = [acl];
@@ -599,7 +604,7 @@ function checkAcl(acl, domain){
     var re, i = acl.length;
     while (i--) {
         re = acl[i];
-        re = new RegExp(re.substr(0, 1) == "^" ? re : ("^" + re.replace(/(\*)/g, ".$1").replace(/\?/g, ".") + "$"));
+        re = new RegExp(re.substr(0, 1) == "^" ? re : ("^" + re.replace(/\./g, "\\.").replace(/(\*)/g, ".$1").replace(/\?/g, ".") + "$"));
         if (re.test(domain)) {
             return true;
         }
