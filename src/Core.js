@@ -543,7 +543,13 @@ function createFrame(config){
     
     frame.border = frame.frameBorder = 0;
     frame.allowTransparency = true;
-    config.container.appendChild(frame);
+    if (config.insertAfter) {
+        config.container.insertBefore(frame, config.insertAfter.nextSibling);
+    } else if (config.insertBefore) {
+        config.container.insertBefore(frame, config.insertBefore);
+    } else {
+        config.container.appendChild(frame);
+    }
     
     if (config.onLoad) {
         on(frame, "load", config.onLoad);
