@@ -112,7 +112,9 @@ function runTests(){
             this.url2 = "http://foo.bar:80/a/b/c?d=e#f";
             this.url3 = "http://foo.bar:88/a/b/c?d=e#f";
             this.url4 = "hTtp://Foo.Bar:88/a/b/c?d=e#f";
-            
+            this.url5 = "/a/b/c?d=e#f";
+            this.url6 = "https://foo.bar/a/b/c?d=e#f";
+            this.url7 = "//foo.bar/a/b/c?d=e#f"
         },
         steps: [{
             name: "getDomainName",
@@ -146,6 +148,24 @@ function runTests(){
                     g: "h"
                 }) ===
                 "http://foo.bar:80/a/b/c?d=e&g=h#f";
+            }
+        }, {
+            name: "resolveUrl",
+            run: function(){
+                return resolveUrl(this.url5) ===
+                location.protocol + "//" + location.host + "/a/b/c?d=e#f";
+            }
+        }, {
+            name: "resolveUrl with different protocol",
+            run: function(){
+                return resolveUrl(this.url6) ===
+                "https://foo.bar/a/b/c?d=e#f";
+            }
+        }, {
+            name: "resolveUrl with relative protocol",
+            run: function(){
+                return resolveUrl(this.url7) ===
+                "//foo.bar/a/b/c?d=e#f";
             }
         }]
     }, {

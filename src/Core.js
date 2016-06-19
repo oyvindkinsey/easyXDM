@@ -329,7 +329,7 @@ function resolveUrl(url){
     url = url.replace(reDoubleSlash, "$1/");
     
     // If the url is a valid url we do nothing
-    if (!url.match(/^(http||https):\/\//)) {
+    if (!url.match(/^(http:||https:)?\/\//)) {
         // If this is a relative path
         var path = (url.substring(0, 1) === "/") ? "" : location.pathname;
         if (path.substring(path.length - 1) !== "/") {
