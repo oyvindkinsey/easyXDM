@@ -375,7 +375,12 @@ function appendQueryParameters(url, parameters){
             q.push(key + "=" + encodeURIComponent(parameters[key]));
         }
     }
-    return url + (useHash ? "#" : (url.indexOf("?") == -1 ? "?" : "&")) + q.join("&") + hash;
+    if(useHash) {
+      // Add parameters after existing hash, treating it like a query string
+      return url + (hash.indexOf("#") == -1 ? "#" : hash + "&") + q.join("&");
+    } else {
+      return url + (url.indexOf("?") == -1 ? "?" : "&") + q.join("&") + hash;
+    }
 }
 
 
