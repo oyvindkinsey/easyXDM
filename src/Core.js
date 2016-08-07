@@ -310,7 +310,7 @@ function getLocation(url){
     if ((proto == "http:" && port == ":80") || (proto == "https:" && port == ":443")) {
         port = "";
     }
-    return proto + "//" + domain + port;
+    return (proto + "//" + domain + port).toLowerCase();
 }
 
 /**
