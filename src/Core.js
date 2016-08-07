@@ -505,7 +505,7 @@ function createFrame(config){
     // Internally this is set as 'submitName' instead when using 'iframe.name = ...'
     // This is not required by easyXDM itself, but is to facilitate other use cases 
     if (HAS_NAME_PROPERTY_BUG) {
-        frame = document.createElement("<iframe name=\"" + config.props.name + "\"/>");
+        frame = document.createElement('<iframe name=\"' + config.props.name + '\"\/>');
     }
     else {
         frame = document.createElement("IFRAME");
