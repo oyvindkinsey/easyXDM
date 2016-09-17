@@ -4,6 +4,7 @@ dist/
 docs/
 build.number
 .tmp_*
+.idea
 src/.*
 *.prefs
 build.secret.properties
