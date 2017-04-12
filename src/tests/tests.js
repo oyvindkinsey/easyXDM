@@ -112,6 +112,7 @@ function runTests(){
             this.url2 = "http://foo.bar:80/a/b/c?d=e#f";
             this.url3 = "http://foo.bar:88/a/b/c?d=e#f";
             this.url4 = "hTtp://Foo.Bar:88/a/b/c?d=e#f";
+            this.url5 = "chrome-extension://noojglkidnpfjbincgijbaiedldjf"
             
         },
         steps: [{
@@ -138,6 +139,11 @@ function runTests(){
             name: "getLocation with capitals",
             run: function(){
                 return easyXDM.getLocation(this.url4) === "http://foo.bar:88";
+            }
+        }, {
+            name: "getLocation with non standard url",
+            run: function(){
+                return easyXDM.getLocation(this.url5) === '';
             }
         }, {
             name: "appendQueryParameters",
