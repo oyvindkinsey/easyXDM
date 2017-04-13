@@ -307,7 +307,7 @@ function getLocation(url){
     // #endif
     var m = url.toLowerCase().match(reURI);
     //if the origin is non standard url, such as chrome extensions
-    if(!m) {
+    if (!m) {
         return '';
     }
     var proto = m[2], domain = m[3], port = m[4] || "";
