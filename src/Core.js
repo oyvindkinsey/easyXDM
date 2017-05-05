@@ -618,7 +618,7 @@ function checkAcl(acl, domain){
  */
 function prepareTransportStack(config){
     var protocol = config.protocol, stackEls;
-    config.isHost = config.isHost || undef(query.xdm_p);
+    config.isHost = undef(config.isHost) ? undef(query.xdm_p) : !!config.isHost;
     useHash = config.hash || false;
     // #ifdef debug
     _trace("preparing transport stack");
