@@ -5,10 +5,13 @@
         <script type="text/javascript" src="../easyXDM.debug.js">
         </script>
         <script type="text/javascript">
+        
+            var example = { easyXDM: easyXDM.noConflict("example") };
+        
             /**
              * Request the use of the JSON object
              */
-            easyXDM.DomHelper.requiresJSON("../json2.js");
+            example.easyXDM.DomHelper.requiresJSON("../json2.js");
         </script>
         <script type="text/javascript">
             /* Here we demo how to have two visible web applications communicate together.
@@ -55,7 +58,7 @@
                 
                 document.getElementById("btn").disabled = "";
                 
-                proxy = new easyXDM.Rpc(/** The configuration */{
+                proxy = new example.easyXDM.Rpc(/** The configuration */{
                     /**
                      * Register the url to name.html, this must be an absolute path
                      * or a path relative to the root.
