@@ -510,6 +510,12 @@ function createFrame(config){
     // This is not required by easyXDM itself, but is to facilitate other use cases 
     if (HAS_NAME_PROPERTY_BUG) {
         frame = document.createElement("<iframe name=\"" + config.props.name + "\"/>");
+
+        //this is to prevent the mixed mode popup in IE6/7 when serving in a https context.
+	if(config.initialFrameSource)
+	{
+		frame.src = config.initialFrameSource;
+	}
     }
     else {
         frame = document.createElement("IFRAME");
