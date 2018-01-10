@@ -185,6 +185,16 @@ function runTests(){
                 return easyXDM.checkAcl(this.acl, "http://domcccain.com");
             }
         }, {
+            name: "No match * with wildcard",
+            run: function(){
+                return !easyXDM.checkAcl(this.acl, "http://nodomaina.com");
+            }
+        }, {
+            name: "No match non RegExp as RegExp",
+            run: function(){
+                return !easyXDM.checkAcl(this.acl, "http://www2domain.invalid");
+            }
+        }, {
             name: "No match",
             run: function(){
                 return !easyXDM.checkAcl(this.acl, "http://foo.com");
