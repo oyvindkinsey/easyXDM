@@ -136,7 +136,7 @@ if ("readyState" in document) {
     // 'interactive' (HTML5 specs, recent WebKit builds) states.
     // https://bugs.webkit.org/show_bug.cgi?id=45119
     readyState = document.readyState;
-    domIsReady = readyState == "complete" || (~ navigator.userAgent.indexOf('AppleWebKit/') && (readyState == "loaded" || readyState == "interactive"));
+    domIsReady = readyState == "complete" || readyState == "interactive" || (~ navigator.userAgent.indexOf('AppleWebKit/') && readyState == "loaded");
 }
 else {
     // If readyState is not supported in the browser, then in order to be able to fire whenReady functions apropriately
