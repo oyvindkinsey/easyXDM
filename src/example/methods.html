@@ -11,56 +11,66 @@
             easyXDM.DomHelper.requiresJSON("../json2.js");
         </script>
         <script type="text/javascript">
-            var remote;
-            var remoteUrl = location.protocol + "//" + location.host.replace("consumer", "provider") + location.pathname.substring(0, location.pathname.lastIndexOf("/"));
-            if (remoteUrl.indexOf("xdm1") !== -1) {
-                remoteUrl = remoteUrl.replace("xdm1", "xdm2");
-            }
-            window.onload = function(){
+            var REMOTE = (function(){
+                var remote = location.href;
+                switch (location.host) {
+                    case "provider.easyxdm.net":
+                        location.href = remote.replace("provider", "consumer");
+                        break;
+                    case "easyxdm.net":
+                        remote = remote.replace("easyxdm.net", "consumer.easyxdm.net");
+                        break;
+                    case "consumer.easyxdm.net":
+                        remote = remote.replace("consumer", "provider");
+                        break;
+                    case "xdm1":
+                        remote = remote.replace("xdm1", "xdm2");
+                        break;
+                }
+                return remote.substring(0, remote.lastIndexOf("/"));
+            }());
+            var remote = new easyXDM.Rpc(/** The channel configuration */{
                 /**
-                 * When the window is finished loading start setting up the interface
+                 * Register the url to hash.html, this must be an absolute path
+                 * or a path relative to the root.
+                 * @field
                  */
-                remote = new easyXDM.Rpc(/** The channel configuration */{
-                    /**
-                     * Register the url to hash.html, this must be an absolute path
-                     * or a path relative to the root.
-                     * @field
-                     */
-                    local: "../name.html",
-                    /**
-                     * Register the url to the remote interface
-                     * @field
-                     */
-                    remote: remoteUrl + "/remotemethods.html",
-                    remoteHelper: remoteUrl + "/../name.html",
-                    /**
-                     * Register the DOMElement that the generated IFrame should be inserted into
-                     */
-                    container: document.getElementById("embedded"),
-                    onReady: function(){
-                        /**
-                         * Call a method on the other side
-                         */
-                        remote.noOp();
+                local: "../name.html",
+                swf: REMOTE + "/../easyxdm.swf",
+                /**
+                 * Register the url to the remote interface
+                 * @field
+                 */
+                remote: REMOTE + "/remotemethods.html",
+                remoteHelper: REMOTE + "/../name.html",
+                /**
+                 * Register the DOMElement that the generated IFrame should be inserted into
+                 */
+                container: "embedded",
+                props: {
+                    style: {
+                        border: "2px dotted red",
+                        height: "200px"
                     }
-                }, /** The interface configuration */ {
-                    remote: {
-                        addNumbers: {},
-                        multiplyNumbers: {},
-                        noOp: {
-                            isVoid: true
-                        }
-                    },
-                    local: {
-                        alertMessage: {
-                            method: function(msg){
-                                alert(msg);
-                            },
-                            isVoid: true
-                        }
+                },
+                onReady: function(){
+                    /**
+                     * Call a method on the other side
+                     */
+                    remote.noOp();
+                }
+            }, /** The interface configuration */ {
+                remote: {
+                    addNumbers: {},
+                    multiplyNumbers: {},
+                    noOp: {}
+                },
+                local: {
+                    alertMessage: function(msg){
+                        alert(msg);
                     }
-                });
-            };
+                }
+            });
             
             function add(a, b){
                 remote.addNumbers(a, b, function(result){
@@ -75,9 +85,6 @@
             }
         </script>
         <style type="text/css">
-            #embedded {
-                height: 200px;
-            }
             
             #embedded iframe {
                 width: 100%;
@@ -86,15 +93,16 @@
         </style>
     </head>
     <body>
-        <div style="border:1px solid black;padding:3px">
-            <div style="float:right">
-                <a href="http://www.addthis.com/bookmark.php?v=250&amp;pub=xa-4a6cb9890fd71978" onmouseover="return addthis_open(this, '', '[URL]', '[TITLE]');" onmouseout="addthis_close();" onclick="return addthis_sendto();"><img src="http://s7.addthis.com/static/btn/lg-share-en.gif" width="125" height="16" alt="Bookmark and Share" style="border:0"/></a>
-                <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js?pub=xa-4a6cb9890fd71978">
-                </script>
-            </div>
-            <a href="http://easyxdm.net/docs/">See easyxdm.net/docs for full documentation and more examples</a>
+        <div style="border:1px solid black;padding:3px;margin:10px;">
+            <a href="index.html">Index of examples</a>
+            | <a href="http://github.com/oyvindkinsey/easyXDM/#readme">Readme at github</a>
+            | 
+            | <a href="http://easyxdm.net/">easyXDM.net</a>
+            | <a href="http://groups.google.com/group/easyxdm">easyXDM at Google Groups</a>
             <br/>
             The examples are executing slower than the production build due to the extensive tracing.
+            <br/>
+            If you are alerted about a popup, then this is only the trace log feature. You can ignore this.
         </div>
         <script type="text/javascript">
             document.write("Domain: " + location.host);

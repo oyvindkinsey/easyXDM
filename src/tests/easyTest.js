@@ -74,6 +74,30 @@ var easyTest = (function(){
         var _timer, _runStep, _startedAt, _stepStartedAt;
         
         /**
+         * Clean up and tear down the test.<br/>
+         * Calls back to notify that the test is complete
+         */
+        function _endTest(){
+            // Tear down the test
+            if (test.tearDown) {
+                try {
+                    test.tearDown.call(_scope);
+                } 
+                catch (ex) {
+                    _log("Teardown '" + ex.message + "(" + ex.fileName + ", " + ex.lineNumber + ")" + "'", MessageType.Error);
+                }
+            }
+            for (var key in _scope) {
+                if (_scope.hasOwnProperty(key)) {
+                    delete _scope[key];
+                }
+            }
+            
+            // Call back
+            fn();
+        }
+        
+        /**
          * Used to notify the framework of the result of the test
          * @param {String} name The name of the test
          * @param {Boolean} result The result of the test
@@ -96,34 +120,17 @@ var easyTest = (function(){
                 }
             }
             // Go to next step
-            _stepIndex++;
-            window.setTimeout(function(){
-                _runStep();
-            }, 0);
+            if (result) {
+                _stepIndex++;
+                window.setTimeout(function(){
+                    _runStep();
+                }, 0);
+            }
+            else {
+                _endTest();
+            }
         }
         
-        /**
-         * Clean up and tear down the test.<br/>
-         * Calls back to notify that the test is complete
-         */
-        function _endTest(){
-            for (var key in _scope) {
-                if (_scope.hasOwnProperty(key)) {
-                    delete _scope[key];
-                }
-            }
-            // Tear down the test
-            if (test.tearDown) {
-                try {
-                    test.tearDown.call(_scope);
-                } 
-                catch (ex) {
-                    _notifyResult("Teardown", false, "'" + ex.message + "(" + ex.fileName + ", " + ex.lineNumber  + ")" + "'");
-                }
-            }
-            // Call back
-            fn();
-        }
         
         /**
          * Runs through the test step
@@ -144,7 +151,7 @@ var easyTest = (function(){
                     catch (ex) {
                         //If it fails we cancel the timeout
                         window.clearTimeout(_timer);
-                        _notifyResult(_step.name, false, "'" + ex.message + "(" + ex.fileName + ", " + ex.lineNumber  + ")" + "'");
+                        _notifyResult(_step.name, false, "'" + ex.message + "(" + ex.fileName + ", " + ex.lineNumber + ")" + "'");
                     }
                 }
                 else {
@@ -154,7 +161,7 @@ var easyTest = (function(){
                         _notifyResult(_step.name, result);
                     } 
                     catch (ex) {
-                        _notifyResult(_step.name, false, "'" + ex.message + "(" + ex.fileName + ", " + ex.lineNumber  + ")" + "'");
+                        _notifyResult(_step.name, false, "'" + ex.message + "(" + ex.fileName + ", " + ex.lineNumber + ")" + "'");
                     }
                 }
             }

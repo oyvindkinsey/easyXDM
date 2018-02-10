@@ -11,47 +11,70 @@
             easyXDM.DomHelper.requiresJSON("../json2.js");
         </script>
         <script type="text/javascript">
-            var xhr;
-            var remoteUrl = location.protocol + "//" + location.host.replace("consumer", "provider") + location.pathname.substring(0, location.pathname.lastIndexOf("/"));
-            if (remoteUrl.indexOf("xdm1") !== -1) {
-                remoteUrl = remoteUrl.replace("xdm1", "xdm2");
-            }
-            window.onload = function(){
+            // this is only bootstrapping code
+            var REMOTE = (function(){
+                var remote = location.href;
+                switch (location.host) {
+                    case "provider.easyxdm.net":
+                        location.href = remote.replace("provider", "consumer");
+                        break;
+                    case "easyxdm.net":
+                        remote = remote.replace("easyxdm.net", "consumer.easyxdm.net");
+                        break;
+                    case "consumer.easyxdm.net":
+                        remote = remote.replace("consumer", "provider");
+                        break;
+                    case "xdm1":
+                        remote = remote.replace("xdm1", "xdm2");
+                        break;
+                }
+                return remote.substring(0, remote.lastIndexOf("/"));
+            }());
             
-                xhr = new easyXDM.Rpc({
-                    local: "../name.html",
-                    remote: remoteUrl + "/../xhr.html",
-                    remoteHelper: remoteUrl + "/../name.html"
-                }, {
-                    remote: {
-                        post: {}
-                    }
-                });
-                
-            };
+            // this is really what you are after
+            var xhr = new easyXDM.Rpc({
+                local: "../name.html",
+                swf: REMOTE + "/../easyxdm.swf",
+                remote: REMOTE + "/../cors/",
+                remoteHelper: REMOTE + "/../name.html"
+            }, {
+                remote: {
+                    request: {}
+                }
+            });
             
             function getGlossary(){
-				
-                xhr.post("example/glossary.php", {
-                    param1: "a",
-                    param2: "b"
-                }, function(json){
-                    alert(json.glossary.title);
+                xhr.request({
+                    url: "../example/glossary.aspx",
+                    method: "POST",
+                    headers: {
+                        "x-auth-token": "abcde"
+                    },
+                    data: {
+                        param1: "a",
+                        param2: "b"
+                    }
+                }, function(rpcdata){
+                    var json = easyXDM.getJSONObject().parse(rpcdata.data);
+                    
+                    document.getElementById("response").innerHTML = json.glossary.title;
+                    document.getElementById("header").innerHTML = rpcdata.headers["x-foo"];
                 });
-				
+                
             }
         </script>
     </head>
     <body>
-        <div style="border:1px solid black;padding:3px">
-            <div style="float:right">
-                <a href="http://www.addthis.com/bookmark.php?v=250&amp;pub=xa-4a6cb9890fd71978" onmouseover="return addthis_open(this, '', '[URL]', '[TITLE]');" onmouseout="addthis_close();" onclick="return addthis_sendto();"><img src="http://s7.addthis.com/static/btn/lg-share-en.gif" width="125" height="16" alt="Bookmark and Share" style="border:0"/></a>
-                <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js?pub=xa-4a6cb9890fd71978">
-                </script>
-            </div>
-            <a href="http://easyxdm.net/docs/">See easyxdm.net/docs for full documentation and more examples</a>
+        <div style="border:1px solid black;padding:3px;margin:10px;">
+            <a href="index.html">Index of examples</a>
+            | <a href="http://github.com/oyvindkinsey/easyXDM/#readme">Readme at github</a>
+            | 
+            | <a href="http://easyxdm.net/">easyXDM.net</a>
+            | <a href="http://groups.google.com/group/easyxdm">easyXDM at Google Groups</a>
             <br/>
             The examples are executing slower than the production build due to the extensive tracing.
+            <br/>
+            If you are alerted about a popup, then this is only the trace log feature. You can ignore this.
         </div>
         <script type="text/javascript">
             document.write("Domain: " + location.host);
@@ -62,11 +85,13 @@
         <div id="embedded">
         </div>
         <div>
-            This example shows how to use easyXDM to call regular ajax services (no JSONP) from remote domains.
-            <br/>
-			This is done by exposing a method post with the familiar signature 'String url, Object data, Function callback'.
+            This example shows how to use easyXDM to call regular ajax/cors services (no JSONP) from remote domains.
             <br/>
             <input type="button" onclick="getGlossary()" value="Call getGlossary using the exposed method"/>
+            <br/>
+            Data from response:<span id="response"></span>
+            <br/>
+            Data from header:<span id="header"></span>
         </div>
         <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");

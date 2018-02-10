@@ -11,57 +11,70 @@
             easyXDM.DomHelper.requiresJSON("../json2.js");
         </script>
         <script type="text/javascript">
-            /* This window can use window.open() to open up a new window in its own domain.
-             * These two will be able to communicate directly, meaning that we now have two
-             * windows visible to the user that are able to communicate
-             * It can also run XHR-queries the local domain that can be returned to the other side of the proxy.
-             */
-            var proxy;
-            var remoteapp;
-            
-            /**
-             * When the window is finished loading start setting up the channel
-             */
-            window.onload = function(){
-                /**
-                 * Try to open up a new window.
-                 */
-                remoteapp = window.open('remoteapp.html', 'mainapp', 'width=300,height=300');
-                /**
-                 * Check that the window wasn't blocked as a popup
-                 */
-                if (remoteapp) {
+            var win, remoteapp; // reference to the popups window
+            var proxy = new easyXDM.Rpc(/** The configuration */{
+                local: "../name.html",
+                swf: "../easyxdm.swf"
+            }, {
+                local: {
                     /**
-                     * We start by creating a channel
+                     * This is used to open up the popup. A popup with the given name should already be opened
+                     * in the user click handler.
                      */
-                    proxy = new easyXDM.Socket(/** The configuration */{
-                        local: "../name.html",
-                        /**
-                         * Register the method that should handle incoming data
-                         * @param {Object} data
-                         * @param {String} origin
-                         */
-                        onMessage: function(data, origin){
-                            data = JSON.parse(data);
-                            remoteapp.focus();
-                            var div = remoteapp.document.createElement("div");
-                            div.innerHTML = "data from '" + origin + "'";
+                    open: function(name){
+                        remoteapp = null;
+                        // we now open the window, passing the name of this window (includes the channel name)
+                        // in case it has to look us up using the framename
+                        win = window.open('remoteapp.html' + '#easyXDM_' + easyXDM.query.xdm_c + '_provider', name, "width=400, height=400");
+                    },
+                    /**
+                     * This is where we receive the data
+                     * @param {Object} data The data
+                     */
+                    postMessage: function(data){
+                        if (win.closed) {
+                            alert("the popup has been closed - please open it again");
+                            return;
+                        }
+                        var div = remoteapp.document.createElement("div");
+                        div.innerHTML = "data from '" + proxy.origin + "'";
+                        if (remoteapp) {
                             remoteapp.document.body.appendChild(div);
                             for (var key in data) {
-                                div = remoteapp.document.createElement("div");
-                                div.innerHTML = key + "=" + data[key];
-                                remoteapp.document.body.appendChild(div);
+                                if (data.hasOwnProperty(key)) {
+                                    div = remoteapp.document.createElement("div");
+                                    div.innerHTML = key + "=" + data[key];
+                                    remoteapp.document.body.appendChild(div);
+                                }
                             }
+                            remoteapp.focus();
                         }
-                    });
+                    }
+                },
+                remote: {
+                    postMessage: {}
                 }
-                else {
-                    alert("you need to allow opening popups for this to work");
-                }
-            };
+            });
             
+            
+            /**
+             * The popup must use this window to register itself
+             * @param {DOMWindow} app The window object of the popup
+             */
+            function setApp(app){
+                remoteapp = app;
+            }
+            
+            /**
+             * The popup must use this method to send data. This clones the object in order to
+             * work around a but in IE
+             * @param {Object} data The data to send
+             */
             function sendData(data){
-                proxy.postMessage(JSON.stringify(data));
+                var copy = {};
+                // copy the object in order to avoid the JSON serialization bug
+                easyXDM.apply(copy, data);
+                proxy.postMessage(copy);
             }
         </script>
     </head>

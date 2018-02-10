@@ -1,5 +1,28 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, JSON */
+/*global easyXDM, window, escape, unescape, isHostObject, isHostMethod, un, on, createFrame, debug */
+//
+// easyXDM
+// http://easyxdm.net/
+// Copyright(c) 2009-2011, Øyvind Sean Kinsey, oyvind@kinsey.no.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
 
 /** 
  * @class easyXDM.DomHelper
@@ -7,185 +30,40 @@
  * @singleton
  */
 easyXDM.DomHelper = {
-
-    /**
-     * Creates a frame and appends it to the DOM.
-     * @param {String} url The url the frame should be set to
-     * @param {DOMElement} container Its parent element (Optional)
-     * @param {Function} onLoad A method that should be called with the frames contentWindow as argument when the frame is fully loaded. (Optional)
-     * @param {String} name The id/name the frame should get (Optional)
-     * @return The frames DOMElement
-     * @type DOMElement
-     */
-    createFrame: function(url, container, onLoad, name){
-        // #ifdef debug
-        this._trace("creating frame: " + url);
-        // #endif
-        var frame;
-        function loadFn(){
-            onLoad(frame.contentWindow);
-        }
-        if (name && window.attachEvent) {
-            // Internet Explorer does not support setting the 
-            // name om DOMElements created in Javascript.
-            // A workaround is to insert HTML and have the browser parse
-            // and instantiate the element.
-            var span = document.createElement("span");
-            document.body.appendChild(span);
-            if (container) {
-                span.innerHTML = '<iframe src="' + url + '" id="' + name + '" name="' + name + '"></iframe>';
-                frame = span.firstChild;
-                container.appendChild(frame);
-                document.body.removeChild(span);
-            }
-            else {
-                span.innerHTML = '<iframe style="position:absolute;left:-2000px;" src="' + url + '" id="' + name + '" name="' + name + '"></iframe>';
-                frame = span.firstChild;
-            }
-            
-            if (onLoad) {
-                frame.loadFn = loadFn;
-                this.on(frame, "load", loadFn);
-            }
-        }
-        else {
-            frame = document.createElement("IFRAME");
-            frame.src = url;
-            if (onLoad) {
-                frame.loadFn = loadFn;
-                this.on(frame, "load", loadFn);
-            }
-            if (container) {
-                container.appendChild(frame);
-            }
-            else {
-                frame.style.position = "absolute";
-                frame.style.left = "-2000px";
-                document.body.appendChild(frame);
-            }
-        }
-        if (name) {
-            frame.id = frame.name = name;
-        }
-        return frame;
-    },
-    
     /**
      * Provides a consistent interface for adding eventhandlers
      * @param {Object} target The target to add the event to
      * @param {String} type The name of the event
      * @param {Function} listener The listener
      */
-    on: function(target, type, listener, useCapture){
-        // Uses memoizing to cache the implementation
-        // #ifdef debug
-        var trace = this._trace;
-        // #endif
-        if (window.addEventListener) {
-            /**
-             * Set on to use the DOM level 2 on
-             * https://developer.mozilla.org/en/DOM/element.on
-             * @ignore
-             * @param {Object} target
-             * @param {String} type
-             * @param {Function} listener
-             */
-            easyXDM.DomHelper.on = function(target, type, listener){
-                // #ifdef debug
-                trace("adding listener " + type);
-                // #endif
-                target.addEventListener(type, listener, false);
-            };
-        }
-        else {
-            /**
-             * Set on to a wrapper around the IE spesific attachEvent
-             * http://msdn.microsoft.com/en-us/library/ms536343%28VS.85%29.aspx
-             * @ignore
-             * @param {Object} object
-             * @param {String} sEvent
-             * @param {Function} fpNotify
-             */
-            easyXDM.DomHelper.on = function(object, sEvent, fpNotify){
-                // #ifdef debug
-                trace("adding listener " + sEvent);
-                // #endif
-                object.attachEvent("on" + sEvent, fpNotify);
-            };
-        }
-        easyXDM.DomHelper.on(target, type, listener);
-    },
-    
+    on: on,
     /**
      * Provides a consistent interface for removing eventhandlers
      * @param {Object} target The target to remove the event from
      * @param {String} type The name of the event
      * @param {Function} listener The listener
      */
-    un: function(target, type, listener, useCapture){
-        // Uses memoizing to cache the implementation
-        var un;
-        // #ifdef debug
-        var trace = this._trace;
-        // #endif
-        if (window.removeEventListener) {
-            /**
-             * Set un to use the DOM level 2 un
-             * https://developer.mozilla.org/en/DOM/element.un
-             * @ignore
-             * @param {Object} target
-             * @param {String} type
-             * @param {Function} listener
-             */
-            un = function(target, type, listener, useCapture){
-                // #ifdef debug
-                trace("removing listener " + type);
-                // #endif
-                target.removeEventListener(type, listener, useCapture);
-            };
-        }
-        else {
-            /**
-             * Set un to a wrapper around the IE spesific detachEvent
-             * http://msdn.microsoft.com/en-us/library/ms536411%28VS.85%29.aspx
-             * @ignore
-             * @param {Object} object
-             * @param {String} sEvent
-             * @param {Function} fpNotify
-             */
-            un = function(object, sEvent, fpNotify){
-                // #ifdef debug
-                trace("removing listener " + type);
-                // #endif
-                object.detachEvent("on" + sEvent, fpNotify);
-            };
-        }
-        un(target, type, listener);
-        easyXDM.DomHelper.un = un;
-    },
-    
+    un: un,
     /**
-     * Checks for the precense of the JSON object.
-     * If it is not precent it will use the supplied path to load the JSON2 library.
+     * Checks for the presence of the JSON object.
+     * If it is not present it will use the supplied path to load the JSON2 library.
      * This should be called in the documents head right after the easyXDM script tag.
      * http://json.org/json2.js
      * @param {String} path A valid path to json2.js
      */
     requiresJSON: function(path){
-        if (typeof JSON == "undefined" || !JSON) {
+        if (!isHostObject(window, "JSON")) {
             // #ifdef debug
-            easyXDM.Debug.log("loading external JSON");
+            debug.log("loading external JSON");
             // #endif
-            document.write('<script type="text/javascript" src="' + path + '"></script>');
+            // we need to encode the < in order to avoid an illegal token error
+            // when the script is inlined in a document.
+            document.write('<' + 'script type="text/javascript" src="' + path + '"><' + '/script>');
         }
         // #ifdef debug
         else {
-            easyXDM.Debug.log("native JSON found");
+            debug.log("native JSON found");
         }
         // #endif
     }
 };
-
-// #ifdef debug
-easyXDM.DomHelper._trace = easyXDM.Debug.getTracer("easyXDM.DomHelper");
-// #endif

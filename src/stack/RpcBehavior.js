@@ -1,141 +1,215 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape, JSON */
+/*global easyXDM, window, escape, unescape, undef, getJSON, debug, emptyFn, isArray */
+//
+// easyXDM
+// http://easyxdm.net/
+// Copyright(c) 2009-2011, Øyvind Sean Kinsey, oyvind@kinsey.no.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
 
 /**
  * @class easyXDM.stack.RpcBehavior
- * This uses a protocol similar to JSON-RPC to expose local methods and to invoke remote methods and have responses returned over the the string based transport stack.<br/>
- * Local methods can be both asynchronous and synchronous.<br/>
- * Remote methods can be set up to return a response or not.
- * @extends easyXDM.stack.StackElement
+ * This uses JSON-RPC 2.0 to expose local methods and to invoke remote methods and have responses returned over the the string based transport stack.<br/>
+ * Exposed methods can return values synchronous, asyncronous, or bet set up to not return anything.
  * @namespace easyXDM.stack
  * @constructor
  * @param {Object} proxy The object to apply the methods to.
- * @param {easyXDM.configuration.RpcConfiguration} config The definition of the local and remote interface to implement.
- * @cfg {easyXDM.configuration.LocalConfiguration} local The local interface to expose.
- * @cfg {easyXDM.configuration.RemoteConfiguration} remote The remote methods to expose through the proxy.
+ * @param {Object} config The definition of the local and remote interface to implement.
+ * @cfg {Object} local The local interface to expose.
+ * @cfg {Object} remote The remote methods to expose through the proxy.
+ * @cfg {Object} serializer The serializer to use for serializing and deserializing the JSON. Should be compatible with the HTML5 JSON object. Optional, will default to JSON.
  */
 easyXDM.stack.RpcBehavior = function(proxy, config){
     // #ifdef debug
-    var trace = easyXDM.Debug.getTracer("easyXDM.stack.RpcBehavior");
+    var trace = debug.getTracer("easyXDM.stack.RpcBehavior");
     // #endif
-    var pub;
+    var pub, serializer = config.serializer || getJSON();
     var _callbackCounter = 0, _callbacks = {};
+    
+    /**
+     * Serializes and sends the message
+     * @private
+     * @param {Object} data The JSON-RPC message to be sent. The jsonrpc property will be added.
+     */
+    function _send(data){
+        data.jsonrpc = "2.0";
+        pub.down.outgoing(serializer.stringify(data));
+    }
     
     /**
      * Creates a method that implements the given definition
      * @private
-     * @param {easyXDM.configuration.Methods.Method} The method configuration
-     * @param {String} name The name of the method
+     * @param {Object} The method configuration
+     * @param {String} method The name of the method
+     * @return {Function} A stub capable of proxying the requested method call
      */
-    function _createMethod(definition, name){
-        // Add the scope so that calling the methods will work as expected
-        if (typeof definition.scope === "undefined") {
-            definition.scope = window;
-        }
-        if (definition.isVoid) {
+    function _createMethod(definition, method){
+        var slice = Array.prototype.slice;
+        
+        // #ifdef debug
+        trace("creating method " + method);
+        // #endif
+        return function(){
             // #ifdef debug
-            trace("creating void method " + name);
+            trace("executing method " + method);
             // #endif
-            // No need to register a callback
-            return function(){
-                // #ifdef debug
-                trace("executing void method " + name);
-                // #endif
-                var params = Array.prototype.slice.call(arguments, 0);
-                // Send the method request
-                window.setTimeout(function(){
-                    pub.down.outgoing(JSON.stringify({
-                        name: name,
-                        params: params
-                    }));
-                }, 0);
+            var l = arguments.length, callback, message = {
+                method: method
             };
-        }
-        else {
-            // #ifdef debug
-            trace("creating method " + name);
-            // #endif
-            // We need to extract and register the callback
-            return function(){
-                // #ifdef debug
-                trace("executing method " + name);
-                // #endif
-                _callbacks["" + (++_callbackCounter)] = arguments[arguments.length - 1];
-                var request = {
-                    name: name,
-                    id: (_callbackCounter),
-                    params: Array.prototype.slice.call(arguments, 0, arguments.length - 1)
-                };
-                // Send the method request
-                pub.down.outgoing(JSON.stringify(request));
-            };
-        }
+            
+            if (l > 0 && typeof arguments[l - 1] === "function") {
+                //with callback, procedure
+                if (l > 1 && typeof arguments[l - 2] === "function") {
+                    // two callbacks, success and error
+                    callback = {
+                        success: arguments[l - 2],
+                        error: arguments[l - 1]
+                    };
+                    message.params = slice.call(arguments, 0, l - 2);
+                }
+                else {
+                    // single callback, success
+                    callback = {
+                        success: arguments[l - 1]
+                    };
+                    message.params = slice.call(arguments, 0, l - 1);
+                }
+                _callbacks["" + (++_callbackCounter)] = callback;
+                message.id = _callbackCounter;
+            }
+            else {
+                // no callbacks, a notification
+                message.params = slice.call(arguments, 0);
+            }
+            if (definition.namedParams && message.params.length === 1) {
+                message.params = message.params[0];
+            }
+            // Send the method request
+            _send(message);
+        };
     }
     
     /**
      * Executes the exposed method
      * @private
-     * @param {String} name The name of the method
+     * @param {String} method The name of the method
      * @param {Number} id The callback id to use
      * @param {Function} method The exposed implementation
      * @param {Array} params The parameters supplied by the remote end
      */
-    function _executeMethod(name, id, method, params){
-        if (!method) {
-            throw new Error("The method " + name + " is not implemented.");
-        }
-        if (method.isAsync) {
+    function _executeMethod(method, id, fn, params){
+        if (!fn) {
             // #ifdef debug
-            trace("requested to execute async method " + name);
+            trace("requested to execute non-existent procedure " + method);
             // #endif
-            // The method is async, we need to add a callback
-            params.push(function(result){
-                // Send back the result
-                pub.down.outgoing(JSON.stringify({
+            if (id) {
+                _send({
                     id: id,
-                    response: result
-                }));
-            });
-            // Call local method
-            method.method.apply(method.scope, params);
+                    error: {
+                        code: -32601,
+                        message: "Procedure not found."
+                    }
+                });
+            }
+            return;
+        }
+        
+        // #ifdef debug
+        trace("requested to execute procedure " + method);
+        // #endif
+        var success, error;
+        if (id) {
+            success = function(result){
+                success = emptyFn;
+                _send({
+                    id: id,
+                    result: result
+                });
+            };
+            error = function(message, data){
+                error = emptyFn;
+                var msg = {
+                    id: id,
+                    error: {
+                        code: -32099,
+                        message: message
+                    }
+                };
+                if (data) {
+                    msg.error.data = data;
+                }
+                _send(msg);
+            };
         }
         else {
-            if (method.isVoid) {
-                // #ifdef debug
-                trace("requested to execute void method " + name);
-                // #endif
-                // Call local method 
-                method.method.apply(method.scope, params);
+            success = error = emptyFn;
+        }
+        // Call local method
+        if (!isArray(params)) {
+            params = [params];
+        }
+        try {
+            var result = fn.method.apply(fn.scope, params.concat([success, error]));
+            if (!undef(result)) {
+                success(result);
             }
-            else {
-                // #ifdef debug
-                trace("requested to execute method " + name);
-                // #endif
-                // Call local method and send back the response
-                pub.down.outgoing(JSON.stringify({
-                    id: id,
-                    response: method.method.apply(method.scope, params)
-                }));
-            }
+        } 
+        catch (ex1) {
+            error(ex1.message);
         }
     }
     
     return (pub = {
         incoming: function(message, origin){
-            var data = JSON.parse(message);
-            if (data.name) {
+            var data = serializer.parse(message);
+            if (data.method) {
                 // #ifdef debug
-                trace("received request to execute method " + data.name + (data.id ? (" using callback id " + data.id) : ""));
+                trace("received request to execute method " + data.method + (data.id ? (" using callback id " + data.id) : ""));
                 // #endif
                 // A method call from the remote end
-                _executeMethod(data.name, data.id, config.local[data.name], data.params);
+                if (config.handle) {
+                    config.handle(data, _send);
+                }
+                else {
+                    _executeMethod(data.method, data.id, config.local[data.method], data.params);
+                }
             }
             else {
                 // #ifdef debug
                 trace("received return value destined to callback with id " + data.id);
                 // #endif
                 // A method response from the other end
-                _callbacks[data.id](data.response);
+                var callback = _callbacks[data.id];
+                if (data.error) {
+                    if (callback.error) {
+                        callback.error(data.error);
+                    }
+                    // #ifdef debug
+                    else {
+                        trace("unhandled error returned.");
+                    }
+                    // #endif
+                }
+                else if (callback.success) {
+                    callback.success(data.result);
+                }
                 delete _callbacks[data.id];
             }
         },
@@ -145,12 +219,12 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
             // #endif
             if (config.remote) {
                 // #ifdef debug
-                trace("creating concrete implementations");
+                trace("creating stubs");
                 // #endif
                 // Implement the remote sides exposed methods
-                for (var name in config.remote) {
-                    if (config.remote.hasOwnProperty(name)) {
-                        proxy[name] = _createMethod(config.remote[name], name);
+                for (var method in config.remote) {
+                    if (config.remote.hasOwnProperty(method)) {
+                        proxy[method] = _createMethod(config.remote[method], method);
                     }
                 }
             }
@@ -160,9 +234,9 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
             // #ifdef debug
             trace("destroy");
             // #endif
-            for (var x in proxy) {
-                if (proxy.hasOwnProperty(x)) {
-                    delete proxy[x];
+            for (var method in config.remote) {
+                if (config.remote.hasOwnProperty(method) && proxy.hasOwnProperty(method)) {
+                    delete proxy[method];
                 }
             }
             pub.down.destroy();

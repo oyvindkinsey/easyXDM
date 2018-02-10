@@ -6,3 +6,5 @@ build.number
 .tmp_*
 src/.*
 *.prefs
+build.secret.properties
+src/tests/easyXDM.debug.js

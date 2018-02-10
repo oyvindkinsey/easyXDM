@@ -1,12 +1,34 @@
 /*jslint evil: true, browser: true, immed: true, passfail: true, undef: true, newcap: true*/
-/*global easyXDM, window, escape, unescape */
+/*global easyXDM, window, escape, unescape, undef, getLocation, appendQueryParameters, resolveUrl, createFrame, debug, un, apply, whenReady, IFRAME_PREFIX*/
+//
+// easyXDM
+// http://easyxdm.net/
+// Copyright(c) 2009-2011, Øyvind Sean Kinsey, oyvind@kinsey.no.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
 
 /**
  * @class easyXDM.stack.NameTransport
  * NameTransport uses the window.name property to relay data.
  * The <code>local</code> parameter needs to be set on both the consumer and provider,<br/>
  * and the <code>remoteHelper</code> parameter needs to be set on the consumer.
- * @extends easyXDM.stack.TransportStackElement
  * @constructor
  * @param {Object} config The transports configuration.
  * @cfg {String} remoteHelper The url to the remote instance of hash.html - this is only needed for the host.
@@ -14,15 +36,19 @@
  */
 easyXDM.stack.NameTransport = function(config){
     // #ifdef debug
-    var trace = easyXDM.Debug.getTracer("easyXDM.stack.NameTransport");
+    var trace = debug.getTracer("easyXDM.stack.NameTransport");
     trace("constructor");
+    if (config.isHost && undef(config.remoteHelper)) {
+        trace("missing remoteHelper");
+        throw new Error("missing remoteHelper");
+    }
     // #endif
     
     var pub; // the public interface
     var isHost, callerWindow, remoteWindow, readyCount, callback, remoteOrigin, remoteUrl;
     
     function _sendMessage(message){
-        var url = config.remoteHelper + (isHost ? ("#_3" + encodeURIComponent(remoteUrl + "#" + config.channel)) : ("#_2" + config.channel));
+        var url = config.remoteHelper + (isHost ? "#_3" : "#_2") + config.channel;
         // #ifdef debug
         trace("sending message " + message);
         trace("navigating to  '" + url + "'");
@@ -54,7 +80,7 @@ easyXDM.stack.NameTransport = function(config){
     
     function _onLoad(){
         if (callback) {
-            window.setTimeout(function(){
+            setTimeout(function(){
                 callback(true);
             }, 0);
         }
@@ -66,6 +92,9 @@ easyXDM.stack.NameTransport = function(config){
             _sendMessage(message);
         },
         destroy: function(){
+            // #ifdef debug
+            trace("destroy");
+            // #endif
             callerWindow.parentNode.removeChild(callerWindow);
             callerWindow = null;
             if (isHost) {
@@ -73,14 +102,14 @@ easyXDM.stack.NameTransport = function(config){
                 remoteWindow = null;
             }
         },
-        init: function(){
+        onDOMReady: function(){
             // #ifdef debug
             trace("init");
             // #endif
             isHost = config.isHost;
             readyCount = 0;
-            remoteOrigin = easyXDM.Url.getLocation(config.remote);
-            config.local = easyXDM.Url.resolveUrl(config.local);
+            remoteOrigin = getLocation(config.remote);
+            config.local = resolveUrl(config.local);
             
             if (isHost) {
                 // Register the callback
@@ -96,25 +125,47 @@ easyXDM.stack.NameTransport = function(config){
                 });
                 
                 // Set up the frame that points to the remote instance
-                remoteUrl = easyXDM.Url.appendQueryParameters(config.remote, {
+                remoteUrl = appendQueryParameters(config.remote, {
                     xdm_e: config.local,
                     xdm_c: config.channel,
                     xdm_p: 2
                 });
-                
-                remoteWindow = easyXDM.DomHelper.createFrame(remoteUrl + '#' + config.channel, config.container, null, config.channel);
+                apply(config.props, {
+                    src: remoteUrl + '#' + config.channel,
+                    name: IFRAME_PREFIX + config.channel + "_provider"
+                });
+                remoteWindow = createFrame(config);
             }
             else {
                 config.remoteHelper = config.remote;
                 easyXDM.Fn.set(config.channel, _onMessage);
             }
+            
             // Set up the iframe that will be used for the transport
-            callerWindow = easyXDM.DomHelper.createFrame(config.local + "#_4" + config.channel, null, function(){
+            var onLoad = function(){
                 // Remove the handler
-                easyXDM.DomHelper.un(callerWindow, "load", callerWindow.loadFn);
+                var w = callerWindow || this;
+                un(w, "load", onLoad);
                 easyXDM.Fn.set(config.channel + "_load", _onLoad);
-                _onReady();
+                (function test(){
+                    if (typeof w.contentWindow.sendMessage == "function") {
+                        _onReady();
+                    }
+                    else {
+                        setTimeout(test, 50);
+                    }
+                }());
+            };
+            
+            callerWindow = createFrame({
+                props: {
+                    src: config.local + "#_4" + config.channel
+                },
+                onLoad: onLoad
             });
+        },
+        init: function(){
+            whenReady(pub.onDOMReady, pub);
         }
     });
 };

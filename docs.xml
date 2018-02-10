@@ -50,7 +50,7 @@
         -->
 
     <sources>
-        <source src="work\easyXDM.debug.js"/>
+        <source src="src/" match="*.js"/>
     </sources>
     <tags>
         <tag name="author" title="Author"/>

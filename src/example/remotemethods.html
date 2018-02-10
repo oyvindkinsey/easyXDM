@@ -11,46 +11,27 @@
             easyXDM.DomHelper.requiresJSON("../json2.js");
         </script>
         <script type="text/javascript">
-            var channel, remote;
-            /**
-             * When the window is finished loading start setting up the channel
-             */
-            window.onload = function(){
-            
-                /**
-                 * When the channel is ready we create the interface
-                 */
-                remote = new easyXDM.Rpc(/** The channel configuration*/{
-                    local: "../name.html"
-                }, /** The configuration */ {
-                    remote: {
-                        alertMessage: {
-                            isVoid: true
-                        }
+            var remote = new easyXDM.Rpc(/** The channel configuration*/{
+                local: "../name.html",
+                swf: "../easyxdm.swf"
+            }, /** The configuration */ {
+                remote: {
+                    alertMessage: {}
+                },
+                local: {
+                    addNumbers: function(a, b){
+                        return a + b;
                     },
-                    local: {
-                        addNumbers: {
-                            method: function(a, b){
-                                return a + b;
-                            }
-                        },
-                        multiplyNumbers: {
-                            isAsync: true,
-                            method: function(a, b, fn){
-                                window.setTimeout(function(){
-                                    fn(a * b);
-                                }, 5000);
-                            }
-                        },
-                        noOp: {
-                            isVoid: true,
-                            method: function(){
-                                alert("Method not returning any data");
-                            }
-                        }
+                    multiplyNumbers: function(a, b, fn){
+                        window.setTimeout(function(){
+                            fn(a * b);
+                        }, 5000);
+                    },
+                    noOp: function(){
+                        alert("Method not returning any data");
                     }
-                });
-            };
+                }
+            });
         </script>
     </head>
     <body>

@@ -1,0 +1,431 @@
+<!doctype HTML>
+<html>
+    <head>
+        <title>Changes</title>
+    </head>
+    <body>
+        <ul>
+             <li>
+                2.4.19 18.01.14
+                <br/>
+                Removed XSS vulnerability:
+                <br/>
+                - XSS due to lack of validation in name.html (CVE-2014-1403) - disclosed by <a href="http://blog.kotowicz.net">Krzystof Kotowicz</a>
+            </li>
+            <li>
+                2.4.18 21.09.13
+                <br/>
+                Removed two sets of XSS vulnerabilities:
+                <br/>
+                - XSS due to lack of validation in easyxdm.as - disclosed responsibly by Jakob Heuser (LinkedIn)
+                <br/>
+                - XSS due to lack of validation in easyxdm.as (CVE-2013-5212) - disclosed by Krzystof Kotowicz (Cure53)
+                <br/>				
+                +++ See commit log
+            </li>
+            <li>
+                2.4.16 09.02.12
+                <br/>
+                Improved many of the samples</br>
+                Fixed issues with logging</br>
+                Added support for posting to the initial src</br>
+                Several minor bugfixes</br>
+                +++ See commit log
+            </li>
+            <li>
+                2.4.15 07.07.11
+                <br/>
+                Fixed an issue with the FlashTransport and domains containing hyphens.
+                <br/>
+                Fixed an issue with the FlashTransport and IE7 due to aggressive caching.
+                <br/>
+                The stack will now only fall back to the FlashTransport if the swf: property has explicitly been set.
+            </li>
+            <li>
+                2.4.14 07.06.11
+                <br/>
+                Fixed several issues with the FlashTransport. These includes proper support for valid domain names, non-standard ports, a race condition relating to
+                creating multiple transports rapidly, allowing multiple transports to different providers, support for CDN.
+                <br/>
+                Refactored the testForNamePropertyBug so that it no longer errs when subjected to refreshing
+                <br/>
+                Fixed an issue with Safari, capitalized urls and the PostMessageTransport.
+                <br/>
+                Fixed an issue with some errors being thrown in IE8 due to named FE's having two 'references' in IE, one inside and one outside the function.
+            </li>
+            <li>
+                2.4.13 02.05.11
+                <br/>
+                Improved the FlashTransport in many ways, worked around a bug in Flash<10, added support for messages above 40k, the swf can now be hosted on both domains.
+                <br/>
+                Fixed several security related issues.
+                <br/>
+                Removed the NixTransport from the build.
+            </li>
+            <li>
+                2.4.12 12.04.11
+                <br/>
+                Added the FlashTransport that takes over for the NixTransport as a response to <a href="http://www.microsoft.com/technet/security/Bulletin/MS11-018.mspx">Microsoft Security Bulletin MS11-018</a>.
+                <br/>
+                Fixed several examples and some minor bugs
+            </li>
+            <li>
+                2.4.11 22.03.11
+                <br/>
+                Move hidden iframes to the top instead of left in order to support both right-to-left and left-to-right pages (Anton Kovalyov)
+                <br/>
+                Refactored the way attributes/properties were applied to created iframes in order to avoid redraw bugs in IE (George Courtsunis)
+                <br/>
+                Added support for passing data from the consumer to the provider using the hash instead of the query.
+                <br/>
+                Switched from using insertBefore to appendChild for adding the iframe to the DOM
+                <br/>
+                Minor improvements regarding url comparisons etc.
+            </li>
+            <li>
+                2.4.10 02.01.11
+                <br/>
+                easyXDM.noConflict added by Anton Kovalyov, this enables you to easily embed easyXDM in a distribution without risking version collisions.
+                <br/>
+                Fixed a bug in the DOM 
+                <code>
+                    whenReady
+                </code>
+                code where easyXDM wouldn't get initialized when loaded dynamically on WebKit.
+                <br/>
+                Improved the documentation and the shipped examples.
+            </li>
+            <li>
+                2.4.9 10.11.10
+                <br/>
+                Improved the 
+                <code>
+                    whenReady
+                </code>
+                feature - easyXDM will now work correctly in IE9 too.
+                <br/>
+                Replaced the xhr.html endpoint with a stricter /cors/ endpoint. This adhers to the CORS standard and enables a similar autorization scheme.
+                <br/>
+                Improved the error message sent by the RpcBehavior. This now includes extra error data passed from the origin of the error. 
+            </li>
+            <li>
+                2.4.8 15.09.10
+                <br/>
+                Fixed a bug in the SameOriginTransport that could cause onReady to fire prior to the constructor of the Socket/Rpc returning.
+                <br/>
+                Removed the browser sniffing related to the element.name bug (IE). This also makes easyXMD work correctly in IE9 (beta)! 
+                <br/>
+                <strong>Removed the ajax feature from the core in order to streamline the library.</strong>
+                If you rely on this, then please use the 
+                <code>
+                    tinylib
+                </code>
+                library present in 
+                <code>
+                    xhr.html
+                </code>
+                (the only place easyXDM itself used the ajax feature).
+                <br/>
+                Added support to the Rpc object for using named parameters. 
+            </li>
+            <li>
+                2.4.7 23.08.10
+                <br/>
+                Fixed <a href="http://github.com/oyvindkinsey/easyXDM/issues/issue/28">http://github.com/oyvindkinsey/easyXDM/issues/issue/28</a>
+                <br/>
+                Implemented consistent naming of the iframes so that they can be accessed using the frames collection.
+                <br/>
+                Improved the ReliableBehavior. The HashTransport is now working much better and is more deterministic.
+            </li>
+            <li>
+                2.4.6 03.08.10
+                <br/>
+                Fixed a small bug in the RpcBehaviors error handling. The message passed back on errors was formatted wrongly with the [data]
+                field a property of the message instead of of the error object.
+            </li>
+            <li>
+                2.4.5 03.08.10
+                <br/>
+                Fixed a bug in the dom_onReady function. This would cause easyXDM to load unreliably when loaded using a script loader.
+            </li>
+            <li>
+                2.4.4 02.08.10
+                <br/>
+                Fixed <a href="http://github.com/oyvindkinsey/easyXDM/issues/issue/23">http://github.com/oyvindkinsey/easyXDM/issues/issue/23</a>
+                <br/>
+                Implemented return of ajax error messages: <a href="http://github.com/oyvindkinsey/easyXDM/issues/issue/24">http://github.com/oyvindkinsey/easyXDM/issues/issue/24</a>
+                <br/>
+                Implemented lazy initialization: <a href="http://github.com/oyvindkinsey/easyXDM/issues/issue/25">http://github.com/oyvindkinsey/easyXDM/issues/issue/25</a>
+                <br/>
+                Implemented DOMContentReady detection: <a href="http://github.com/oyvindkinsey/easyXDM/issues/issue/26">http://github.com/oyvindkinsey/easyXDM/issues/issue/26</a>
+                <br/>
+            </li>
+            <li>
+                2.4.3 26.07.10
+                <br/>
+                Added two more transports, the SameOriginTransport and the FrameElementTransport.
+                Made some improvements in the NixTransport
+            </li>
+            <li>
+                2.4.2 25.07.10
+                <br/>
+                Major improvements on the support for older browsers. 
+                The use of resize in the HashTransport to notify about incoming messages has now been removed as it was not reliant across browsers.  
+                The library has now been tested on IE6/7/8, Opera 10, Firefox 2, 3.6, Safari 3.2, 5 and Chrome 5, and there are now no tests that are failing. 
+            </li>
+            <li>
+                2.4.1 25.07.10
+                <br/>
+                Fixed http://github.com/oyvindkinsey/easyXDM/issues/issue/22
+                Implemented http://github.com/oyvindkinsey/easyXDM/issues/issue/20
+                Fixed some minor issues relating to ajax.
+            </li>
+            <li>
+                2.4.0 20.06.10
+                <br/>
+                Implemented http://github.com/oyvindkinsey/easyXDM/issues/19
+                You can now interact with the Socket/Rpc prior to the onReady event being fired.
+                These actions will be buffered and executed once the transport is ready.
+                Fixed an issue that lead to the minified file *not* being properly minified.
+            </li>
+            <li>
+                2.3.3 18.06.10
+                <br/>
+                Fixed http://github.com/oyvindkinsey/easyXDM/issues/issue/15
+                Fixed http://github.com/oyvindkinsey/easyXDM/issues/issue/17
+            </li>
+            <li>
+                2.3.2 05.06.10
+                <br/>
+                Improved the ajax feature - this is now propely implemented and which should make the xhr.html file more suiting.
+                Minor security fixes to the NixTransport.
+                The transport configuration now takes a 'props' property that can be used to apply arbitrary properties onto the created iframe.
+                This can be used to style the iframe using e.g 'props: {style: {border: "1px solid red"}}'
+            </li>
+            <li>
+                2.3.1 24.05.10
+                <br/>
+                Fixed a bug in the NixTransport that would cause the provider to fire onReady before the constructor has returned.
+            </li>
+            <li>
+                2.3.0 22.05.10
+                <br/>
+                Fixed some minor bugs (debug related)
+                The biggest change is a new first-class transport for IE6 and IE7, a transport that is actually faster than postMessage for IE8!
+                This means that you can now support IE6+ and Opera 9+ Firefox 3+ and Chrome using javascript only (no more name.html!)
+            </li>
+            <li>
+                2.2.0 21.04.10
+                <br/>
+                Rpc
+                No more isVoid/isAsync
+                These are no longer needed as all of this is automatically handled by the RpcBehavior.
+                Optional callbacks when calling methods, success, success+error, or none if the remote method does not return data or you just don't care about it
+                A shorthand notation for defining local methods, nameOfMethod: function(... instead of nameOfMethod: { method: function(...
+                Smaller code base due to a simpler(!) RpcBehavior
+                Overall
+                Reduced the public API
+                This makes it more manageable for most
+                Proper documentation with code examples for Socket and Rpc
+                Restructured internal methods so that they are faster and more easy to minify
+            </li>
+            <li>
+                2.1.0 18.04.10
+                <br/>
+                The Rpc behavior is now using the JSON-PRC 2.0 protocol, and will now also support an error callback. 
+                The Rpc class will also make sure that the serializer being used actually works, and so is not wrecked by the inclusion  
+                of PrototypeJs and other libraries that interferes with HTML5's JSON object. 
+                The xhr.html file is now completely self-contained and now uses separate callbacks for success and error.
+                Lots of small changes to improve scope lookup, and to improve minifying the code.
+            </li>
+            <li>
+                2.0.1 27.03.10
+                <br/>
+                See commit log at github
+                github.com/oyvindkinsey/easyXDM
+            </li>
+            <li>
+                2.0 18.03.10
+                <br/>
+                Refactored all the transport classes into stack elements.
+                The transports are now exposed as a single Socket that selects the appropriate stack to initialize based on the available features and config parameters.
+                Removed the Channel class as this can easily be implemented when needed using the Socket class and JSON.parse/stringify.
+                Refactored the Interface class and renamed it Rpc as this is more descriptive.
+                The optional onReady method is now a member of the config argument instead of being a separate one.
+                Removed the serializing namespace as this was not used internally, and as it can easily be injected when needed.
+                Renamed the methods for adding and removing events to on and un.
+                The HashTransport is now only used when access to name.html (old hash.html) is not available.
+            </li>
+            <li>
+                1.8.0 27.02.10
+                <br/>
+                Both the HashTransport and the Nametransport has received a major overhaul. 
+                Generic Behaviors are now implemented, and deal with reliability (making the HashTransport reliable), queueing and sender verification.  
+                This means that all the transports are now equal when it comes to behavior, the only difference is speed. 
+                They are all reliant,  
+                they are all able to queue and dispatch messages automatically 
+                they are all secure from spoofing  
+                and they are all easy to use! 
+                With the new behavior architecture it will also be easier to add new functionality  
+                - it might even be that the transport internals will be moved into similar behaviors. 
+            </li>
+            <li>
+                1.7.5 25.02.10
+                <br/>
+                Made several improvements to the HashTransport - this now verifies that it actually can communicate with the other end
+                and thereby disables the spoofing the origin (as previously possible).
+            </li>
+            <li>
+                1.7.4 - 22.02.10
+                <br/>
+                Implemented queing for NameTransport, this also made it more reliable. 
+                This means that all transports now support rapid sending of messages, even within the same js thread.  
+                The tests has also been updated, and from tests that are supposed to fail are now skipped by default. 
+                1.7.3 - 21.02.10
+                <br/>
+                Fixed NameTransport - for some unknown reason, the implementation released did not work.
+            </li>
+            <li>
+                1.7.2 - 19.02.10
+                <br/>
+                Applied an important bugfix contributed by Bjorn Blomqvist (http://github.com/bjornblomqvist).
+                The bug breaks easyXDM under the following conditions
+                the host is set up to use the BestAvailableTransport
+                the host is set up with local: window (to support HashTransport without hash.html)
+                the browser supports postMessage
+            </li>
+            <li>
+                1.7.1 - 19.02.10
+                <br/>
+                Refactored the transport classes so that all query arguments are namespaced.
+                This should avoid errors happening due to colliding argument names.
+                Examples of such errors are when using a wordpress page as the host, as wordpress' p argument (used for paging) would
+                cause easyXDM to believe it was the provider instead of the consumer (host).
+                Breaking changes:
+                As longs as both parties are using the new version no errors will occur.
+                But this version is unable to communicate with earlier versions.
+            </li>
+            <li>
+                1.7.0 - 02.02.10
+                <br/>
+                Many adjustments has been made to how the transports select mode and how the BestAvailableTransport selects a transport.
+                For the host the BestAvailableTransport will pick the best transport dependend on the available features and parameters.
+                For the guest the BestAvailableTransport will choose the on specified in use by reading the query line.
+                A new transport, NameTransport has also been introduced, and is now preferred over HashTransport as long as the
+                correct parameters are set. This is due to its ability to transfer huge amounts of data compared to the HashTransport.
+                This does on the other hand mean that the host need to specify the location of the remote hash.html.
+                Breaking changes:
+                The NameTransport will not work with users who has the old hash.html file, it is therefor adviced that you
+                rename the hash.html file so that your uses will download the correct version.
+            </li>
+            <li>
+                1.6.0 - 04.01.10
+                <br/>
+                Added the option to use the already loaded window as the local document for messaging when falling back 
+                to the HashTransport. This can be done by setting 'local:window' in the transports configuration.
+                The documentation has also been changed sligtly making it a bit easier to see the necessary configuration attributes
+                The version is being upped to 1.6 as we now have complete support for scenarios where you are not able to upload
+                the hash.html file to the local domain, something I think is a big step forward.
+            </li>
+            <li>
+                1.5.5 - 02.01.10
+                <br/>
+                For scenarios where you are unable to place hash.html on the local domain, you can now 
+                set the local attribute to point at any file available on the domain, like robots.txt or favicon.ico,  
+                and set the readyAfter attribute to when you want the library to transition to the ready state. 
+                It is important that the local file has had time to load before this.
+            </li>
+            <li>
+                1.5.4 - 11.11.09
+                <br/>
+                easyXDM.Interface can now take an new configuration parameter, 'serializer'. 
+                This will be used instead of the JSON object if present and has to implement the same signature as the JSON object.  
+                This is to enable users to use serializing methods present in their main framework. 
+                Users of prototypejs will have to use this to override the serializer using the following serializer object
+                <pre>
+{
+	stringify(obj){
+		return Object.toJSON(obj);
+	},
+	parse(str){
+		return str.evalJSON();
+	}
+}
+</pre>
+                This is due to prototypejs adding the toJSON method to Array.prototype which causes the native JSON object to fail.
+                The test suite has also been fixed so that it doesnt crash WebKit.
+            </li>
+            <li>
+                1.5.3 - 06.09.09
+                <br/>
+                The transports now support using remote urls containing query parameters.
+                Added the easyXDM.apply method, and also easyXMD.WidgetManager and easyXDM.Widget.
+                The widget classes makes it extremely easy to support widgets.
+            </li>
+            <li>
+                1.5.2 - 29.08.09
+                <br/>
+                Modified the HashTransport to using the resize event to trigger new messages to be read.
+                This is a lot faster and less resource consuming than polling.
+                For iframes placed in a container we still use polling so that we don't disturbe the layout.
+                Added a test suite.
+            </li>
+            <li>
+                1.5.1 - 17.08.09
+                <br/>
+                Namespaces are now in lowercase. This makes it easier to distinguish between classes 
+                and namespaces.  
+                Refactored the createFrame method as we do no longer require the ability to name frames. 
+                Took away passing the version as a parameter to hash.html, versioning should be handled 
+                by renaming the file or by other means.
+                Breaking changes:
+                Namespaces changed to all lowercase letters.
+            </li>
+            <li>
+                1.5.0 - 08.08.09
+                <br/>
+                Restructured the HashTransport so that all dependencies are contained in one class.
+                Also removed the need to use the fragile window.open(.. method to get a reference
+                to the window to read from.
+                hash.html is now called with the version as a parameter. This should help to avoid the cached
+                version being used accross version changes.
+                Breaking changes:
+                hash.html calls a new method with a new signature.
+            </li>
+            <li>
+                1.4.0 - 07.08.09
+                <br/>
+                Renamed the library to easyXDM to avoid being associated with the XSS-vulnerability
+                Alle references to easyXSS can be replaced with easyXDM
+                The communication protocol has not changed, so easyXDM 1.4.0 is 100% compatible with easyXSS 1.4.0
+            </li>
+            <li>
+                1.4.0 - 07.08.09
+                <br/>
+                Restructured the implementation of easyXSS.Interface, this now creates its own easyXSS.Channel,
+                just like easyXSS.Channel creates its own easyXSS.Transport.ITransport.
+                The internals of this class has also been restructured and should be easier to understand.
+                Breaking changes:
+                The easyXSS.Interface constructor now takes the configuration of a channel instead of a ready channel.
+            </li>
+            <li>
+                1.3.0 - 02.08.09
+                <br/>
+                Restructured the code again sot that it will be easier to understand. 
+                Changed to using the 'new classname' construct instead of easyXSS.createClassname  
+                Added documentation to the examples. 
+                Breaking changes:  
+                Removed several create.. methods. 
+            </li>
+            <li>
+                1.2
+                <br/>
+                Restructured the code to allow better documentation
+                Converted most of the code to JsDoc format
+                The debug version will try to easyXSS.trace all relevant actions to console.info if available
+                Breaking changes:
+                The method called by hash.html has moved.
+            </li>
+        </ul>
+    </body>
+</html>

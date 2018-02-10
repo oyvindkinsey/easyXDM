@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+        <title></title>
+    </head>
+    <body>
+        <img src="../tests/s.gif" />
+        <script type="text/javascript">
+            if (location.host.indexOf("easyxdm.net") !== -1) {
+                var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+                document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+            }
+        </script>
+        <script type="text/javascript">
+            if (location.host.indexOf("easyxdm.net") !== -1) {
+                try {
+                    var pageTracker = _gat._getTracker("UA-9535591-3");
+                    pageTracker._setDomainName(".easyxdm.net");
+                    pageTracker._trackPageview();
+                } 
+                catch (err) {
+                }
+            }
+        </script>
+        <a id="bookmark" src="">Bookmark</a>
+        <script type="text/javascript">
+            var baseUrl = location.href.substring(0, location.href.lastIndexOf("/"));
+            
+            // to simplify development, we create the bookmarklet as a regular function
+            function bookmark(){
+                if (typeof myBookmark === "undefined") {
+                    var script = document.createElement("script");
+                    script.type = "text/javascript";
+                    script.src = baseUrl + "/bookmark.js";
+                    document.getElementsByTagName("head")[0].appendChild(script);
+                }
+                else {
+                    myBookmark.run();
+                }
+            }
+            
+            // and then we include it using .toString().
+            document.getElementById("bookmark").href = 'javascript:(' +
+            (bookmark.toString().replace('baseUrl + "', '"' + baseUrl)).replace(/\s+/g, " ") +
+            ')();';
+            // when finished, you just copy the url from the rendered page
+        </script>
+    </body>
+</html>
