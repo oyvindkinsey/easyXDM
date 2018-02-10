@@ -585,6 +585,16 @@ function createFrame(config){
 }
 
 /**
+ * Escape string-type ACLs so they can be used as a regex
+ * Manually handles and replaces * and ? since we have a special definition for what those do
+ * @param {String} str A string domain with * or ? as wildcards
+ * @return {String} An escaped regex, with * and ? replaced as regex wildcards
+ */
+function escapeRegExp(str) {
+  return str.replace(/[-[\]/{}()+.\^$|]/g, "\\$&").replace(/(\*)/g, '.$1').replace(/\?/g, '.');
+}
+
+/**
  * Check whether a domain is allowed using an Access Control List.
  * The ACL can contain * and ? as wildcards, or can be regular expressions.
  * If regular expressions they need to begin with ^ and end with $.
@@ -598,9 +608,13 @@ function checkAcl(acl, domain){
         acl = [acl];
     }
     var re, i = acl.length;
+
     while (i--) {
-        re = acl[i];
-        re = new RegExp(re.substr(0, 1) == "^" ? re : ("^" + re.replace(/(\*)/g, ".$1").replace(/\?/g, ".") + "$"));
+        // According to docs, this should only be treated as regex if it begins with ^ and ends with $.
+        // If it's not regex, we'll process * and ? chars as part of escaping
+        var isRegex = acl[i].substr(0, 1) === '^' && acl[i].substr(acl[i].length - 1, 1) === '$';
+        re = isRegex ? acl[i] : '^' + escapeRegExp(acl[i]) + '$';
+        re = new RegExp(re);
         if (re.test(domain)) {
             return true;
         }
