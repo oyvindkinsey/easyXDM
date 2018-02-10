@@ -29,7 +29,7 @@
  * Creates a proxy object that can be used to call methods implemented on the remote end of the channel, and also to provide the implementation
  * of methods to be called from the remote end.<br/>
  * The instantiated object will have methods matching those specified in <code>config.remote</code>.<br/>
- * This requires the JSON object present in the document, either natively, using json.org's json2 or as a wrapper around library spesific methods.
+ * This requires the JSON object present in the document, either natively, using json.org's json2 or as a wrapper around library specific methods.
  * <h2>How to set up</h2>
  * <pre><code>
  * var rpc = new easyXDM.Rpc({
@@ -102,7 +102,7 @@
  * &nbsp; alert("error: " + message + );
  * });
  * </code></pre>
- * Both the <code>success</code> and <code>errror</code> callbacks are optional.<br/>
+ * Both the <code>success</code> and <code>error</code> callbacks are optional.<br/>
  * When called with no callback a JSON-RPC 2.0 notification will be executed.
  * Be aware that you will not be notified of any errors with this method.
  * <br/>
@@ -158,7 +158,9 @@ easyXDM.Rpc = function(config, jsonRpcConfig){
 	
     // set the origin 
     this.origin = getLocation(config.remote);
-	
+
+    // set context for this object's local rpc functions
+    this.context = config.context || null;
     
     /**
      * Initiates the destruction of the stack.

@@ -42,7 +42,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
     // #endif
     var pub, serializer = config.serializer || getJSON();
     var _callbackCounter = 0, _callbacks = {};
-    
+
     /**
      * Serializes and sends the message
      * @private
@@ -52,17 +52,17 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
         data.jsonrpc = "2.0";
         pub.down.outgoing(serializer.stringify(data));
     }
-    
+
     /**
      * Creates a method that implements the given definition
      * @private
-     * @param {Object} The method configuration
+     * @param {Object} definition The method configuration
      * @param {String} method The name of the method
      * @return {Function} A stub capable of proxying the requested method call
      */
     function _createMethod(definition, method){
         var slice = Array.prototype.slice;
-        
+
         // #ifdef debug
         trace("creating method " + method);
         // #endif
@@ -73,7 +73,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
             var l = arguments.length, callback, message = {
                 method: method
             };
-            
+
             if (l > 0 && typeof arguments[l - 1] === "function") {
                 //with callback, procedure
                 if (l > 1 && typeof arguments[l - 2] === "function") {
@@ -105,13 +105,13 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
             _send(message);
         };
     }
-    
+
     /**
      * Executes the exposed method
      * @private
      * @param {String} method The name of the method
      * @param {Number} id The callback id to use
-     * @param {Function} method The exposed implementation
+     * @param {Function} fn The exposed implementation
      * @param {Array} params The parameters supplied by the remote end
      */
     function _executeMethod(method, id, fn, params){
@@ -130,7 +130,7 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
             }
             return;
         }
-        
+
         // #ifdef debug
         trace("requested to execute procedure " + method);
         // #endif
@@ -166,16 +166,17 @@ easyXDM.stack.RpcBehavior = function(proxy, config){
             params = [params];
         }
         try {
-            var result = fn.method.apply(fn.scope, params.concat([success, error]));
+            var context = proxy.context || fn.scope;
+            var result = fn.method.apply(context, params.concat([success, error]));
             if (!undef(result)) {
                 success(result);
             }
-        } 
+        }
         catch (ex1) {
             error(ex1.message);
         }
     }
-    
+
     return (pub = {
         incoming: function(message, origin){
             var data = serializer.parse(message);
