@@ -83,6 +83,8 @@ These properties can be set only on the consumer
 
 * `lazy` {Boolean} - If you set this to `true` then the iframe will not be created until the first use of the Socket
 * `container` {String || DOMElement} - Set this to an id or element if you want the iframe to be visible for interaction.
+* `insertAfter` {DOMElement} - Set this to an element if you want the iframe to be placed after specific element.
+* `insertBefore` {DOMElement} - Set this to an element if you want the iframe to be placed before specific element.
 * `props` {Object} - The key/value pairs of this object will be deep-copied onto the iframe. As an example, use `props: {style: {border: "1px solid red"} }` to set the border of the iframe to 1px solid red.
 * `remoteHelper` {String} - To enable the NameTransport as a fallback, set this to point to the `name.html` file on the provider.
 * `hash` {Boolean} - Whether to pass the setup data using the hash instead of using the query. This is mainly useful in scenarios where query arguments affects efficient caching or where the providers HTTP server does not support URL's with query parameters. Using the hash is not compatible with hash based history managers etc.
