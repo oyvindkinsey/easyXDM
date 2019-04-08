@@ -59,7 +59,7 @@
         // this file is by default set up to use Access Control - this means that it will use the headers set by the server to decide whether or not to allow the call to return
         var useAccessControl = true;
         // always trusted origins, can be exact strings or regular expressions
-        var alwaysTrustedOrigins = [(/\.?easyxdm\.net/), (/xdm1/)];
+        var alwaysTrustedOrigins = ["https://consumer.easyxdm.net"];
         
         // instantiate a new easyXDM object which will handle the request 
         var remote = new easyXDM.Rpc({
