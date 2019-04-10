@@ -632,7 +632,7 @@ function checkAcl(acl, domain){
  */
 function prepareTransportStack(config){
     var protocol = config.protocol, stackEls;
-    config.isHost = config.isHost || undef(query.xdm_p);
+    config.isHost = config.isHost || (undef(query.xdm_p) && undef(config.isHost));
     useHash = config.hash || false;
     // #ifdef debug
     _trace("preparing transport stack");
@@ -645,11 +645,14 @@ function prepareTransportStack(config){
         // #ifdef debug
         _trace("using parameters from query");
         // #endif
-        config.channel = query.xdm_c.replace(/["'<>\\]/g, "");
-        config.secret = query.xdm_s;
-        config.remote = query.xdm_e.replace(/["'<>\\]/g, "");
+        if(query.xdm_c)
+            config.channel = query.xdm_c.replace(/["'<>\\]/g, "");
+        if (query.xdm_s)
+            config.secret = query.xdm_s;
+        if(query.xdm_e)
+            config.remote = query.xdm_e.replace(/["'<>\\]/g, "");
         ;
-        protocol = query.xdm_p;
+        protocol = query.xdm_p ? query.xdm_p : detectProtocol(config);
         if (config.acl && !checkAcl(config.acl, config.remote)) {
             throw new Error("Access denied for " + config.remote);
         }
@@ -659,49 +662,7 @@ function prepareTransportStack(config){
         config.channel = config.channel || "default" + channelId++;
         config.secret = Math.random().toString(16).substring(2);
         if (undef(protocol)) {
-            if (getLocation(location.href) == getLocation(config.remote)) {
-                /*
-                 * Both documents has the same origin, lets use direct access.
-                 */
-                protocol = "4";
-            }
-            else if (isHostMethod(window, "postMessage") || isHostMethod(document, "postMessage")) {
-                /*
-                 * This is supported in IE8+, Firefox 3+, Opera 9+, Chrome 2+ and Safari 4+
-                 */
-                protocol = "1";
-            }
-            else if (config.swf && isHostMethod(window, "ActiveXObject") && hasFlash()) {
-                /*
-                 * The Flash transport superseedes the NixTransport as the NixTransport has been blocked by MS
-                 */
-                protocol = "6";
-            }
-            else if (navigator.product === "Gecko" && "frameElement" in window && navigator.userAgent.indexOf('WebKit') == -1) {
-                /*
-                 * This is supported in Gecko (Firefox 1+)
-                 */
-                protocol = "5";
-            }
-            else if (config.remoteHelper) {
-                /*
-                 * This is supported in all browsers that retains the value of window.name when
-                 * navigating from one domain to another, and where parent.frames[foo] can be used
-                 * to get access to a frame from the same domain
-                 */
-                protocol = "2";
-            }
-            else {
-                /*
-                 * This is supported in all browsers where [window].location is writable for all
-                 * The resize event will be used if resize is supported and the iframe is not put
-                 * into a container, else polling will be used.
-                 */
-                protocol = "0";
-            }
-            // #ifdef debug
-            _trace("selecting protocol: " + protocol);
-            // #endif
+            protocol = detectProtocol(config);
         }
         // #ifdef debug
         else {
@@ -813,6 +774,59 @@ function prepareTransportStack(config){
         remove: true
     }));
     return stackEls;
+}
+
+/**
+ * This detects the protocol from environment variables
+ * @param {Object} config
+ */
+function detectProtocol(config){
+    var protocol
+
+    if (getLocation(location.href) == getLocation(config.remote)) {
+        /*
+         * Both documents has the same origin, lets use direct access.
+         */
+        protocol = "4";
+    }
+    else if (isHostMethod(window, "postMessage") || isHostMethod(document, "postMessage")) {
+        /*
+         * This is supported in IE8+, Firefox 3+, Opera 9+, Chrome 2+ and Safari 4+
+         */
+        protocol = "1";
+    }
+    else if (config.swf && isHostMethod(window, "ActiveXObject") && hasFlash()) {
+        /*
+         * The Flash transport superseedes the NixTransport as the NixTransport has been blocked by MS
+         */
+        protocol = "6";
+    }
+    else if (navigator.product === "Gecko" && "frameElement" in window && navigator.userAgent.indexOf('WebKit') == -1) {
+        /*
+         * This is supported in Gecko (Firefox 1+)
+         */
+        protocol = "5";
+    }
+    else if (config.remoteHelper) {
+        /*
+         * This is supported in all browsers that retains the value of window.name when
+         * navigating from one domain to another, and where parent.frames[foo] can be used
+         * to get access to a frame from the same domain
+         */
+        protocol = "2";
+    }
+    else {
+        /*
+         * This is supported in all browsers where [window].location is writable for all
+         * The resize event will be used if resize is supported and the iframe is not put
+         * into a container, else polling will be used.
+         */
+        protocol = "0";
+    }
+    // #ifdef debug
+    _trace("selecting protocol: " + protocol);
+    // #endif
+    return protocol 
 }
 
 /**
