@@ -225,7 +225,11 @@ easyXDM.stack.FlashTransport = function(config){
             }
         },
         init: function(){
-            whenReady(pub.onDOMReady, pub);
+            if (config.immediate) {
+              pub.onDOMReady.call(pub);
+            } else {
+              whenReady(pub.onDOMReady, pub);
+            }
         }
     });
 };
