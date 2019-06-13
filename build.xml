@@ -7,23 +7,7 @@
 	<property name="project.build.version" value="2.5.00"/>
 	
 	<!-- Setup classpath for js-build-tools ant tasks -->
-	<path id="js-build-tasks.classpath">
-		<pathelement location="."/>
-		<fileset dir="tools/js-build-tools/lib">
-			<include name="**/*.jar"/>
-		</fileset>
-	</path>
 	
-	<taskdef name="preprocess" classname="com.moxiecode.ant.tasks.PreProcessTask" classpathref="js-build-tasks.classpath" loaderref="js-build-tasks.classpath.loader" />
-	<taskdef name="yuicompress" classname="com.moxiecode.ant.tasks.YuiCompressTask" classpathref="js-build-tasks.classpath" loaderref="js-build-tasks.classpath.loader" />
-	<taskdef name="jslint" classname="com.googlecode.jslint4java.ant.JSLintTask" classpath="tools/jslint4java-1.3.3/jslint4java-1.3.3.jar" />
-	
-	<path id="githubhuploadtask.classpath">
-		<pathelement location="."/>
-		<fileset dir="tools/GitHubUploadTask">
-			<include name="**/*.jar"/>
-		</fileset>
-	</path>
 	<taskdef name="upload" classname="no.kinsey.ant.GitHubUploadTask" classpathref="githubhuploadtask.classpath" loaderref="githubhuploadtask.classpath.loader" />
 
 	<target name="clean" depends="" description="Cleans up the project from temporary files">
