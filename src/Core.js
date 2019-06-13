@@ -457,7 +457,14 @@ function apply(destination, source, noOverwrite){
     var member;
     for (var prop in source) {
         if (source.hasOwnProperty(prop)) {
-            if (prop in destination) {
+            var prop_in_destination = false;
+            try {
+                if (prop in destination) {
+                    prop_in_destination = true;
+                }
+            }
+            catch (e) {}
+            if (prop_in_destination) {
                 member = source[prop];
                 if (typeof member === "object") {
                     apply(destination[prop], member, noOverwrite);
