@@ -248,6 +248,8 @@ This is useful if you embed your code on the page and cannot guarantee that it d
 
 It also takes a single argument, a string representation of the namespace. We need it to get access to the instance in the parent window (when using SameOriginTransport).
 
+Note that the namespace must be changed on both the client and producer side or it will not work.
+
 Example:
 
 ```javascript
