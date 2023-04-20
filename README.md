@@ -2,6 +2,10 @@
 =====================================
 easyXDM is a Javascript library that enables you as a developer to easily work around the limitation set in place by the Same Origin Policy, in turn making it easy to communicate and expose javascript API's across domain boundaries.
 
+
+> **Warning**
+> This repository is not actively maintained as the services it provides is supported natively by all browsers.
+
 **Some of the goals for the project are that it should**
 
 * be easy to use!!!
